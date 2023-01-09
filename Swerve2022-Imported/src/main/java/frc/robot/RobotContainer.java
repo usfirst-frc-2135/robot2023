@@ -248,12 +248,12 @@ public class RobotContainer
     // driverY.whenPressed(new Dummy(XboxController.Button.kY.value), true);
     //
     // Driver - Bumpers, start, back
-    driverLeftBumper.whenPressed(new IntakingAction(m_intake, m_floorConveyor, m_towerConveyor), true);
-    driverLeftBumper.whenReleased(new IntakingStop(m_intake, m_floorConveyor, m_towerConveyor), true);
-    driverRightBumper.whenPressed(new ScoringActionLowerHub(m_intake, m_floorConveyor, m_towerConveyor, m_shooter, 10.0), true);
-    driverRightBumper.whenReleased(new ScoringStop(m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision), true);
+    driverLeftBumper.onTrue(new IntakingAction(m_intake, m_floorConveyor, m_towerConveyor));
+    driverLeftBumper.onFalse(new IntakingStop(m_intake, m_floorConveyor, m_towerConveyor));
+    driverRightBumper.onTrue(new ScoringActionLowerHub(m_intake, m_floorConveyor, m_towerConveyor, m_shooter, 10.0));
+    driverRightBumper.onFalse(new ScoringStop(m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
     // driverBack.whenPressed(new Dummy(XboxController.Button.kBack.value), true);
-    driverStart.whenPressed(new VisionOn(m_vision, VIRequests.VISION_TOGGLE), true);
+    driverStart.onTrue(new VisionOn(m_vision, VIRequests.VISION_TOGGLE));
     //
     // Driver - POV buttons
     // driverUp.whenPressed(new Dummy(0), true);
