@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.XboxController.Axis;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -293,16 +294,16 @@ public class RobotContainer
     // final AxisTrigger operRightTrigger = new AxisTrigger(m_operatorPad, XboxController.Axis.rightY);
 
     // Operator - A, B, X, Y
-    operA.whenPressed(new IntakeDeploy(m_intake, false), true);
-    operB.whenPressed(new ExhaustingAction(m_intake, m_floorConveyor, m_towerConveyor), true);
-    operB.whenReleased(new ExhaustingStop(m_intake, m_floorConveyor, m_towerConveyor), true);
-    operX.whenPressed(new ScoringStop(m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision), true);
+    operA.onTrue(new IntakeDeploy(m_intake, false));
+    operB.onTrue(new ExhaustingAction(m_intake, m_floorConveyor, m_towerConveyor));
+    operB.onFalse(new ExhaustingStop(m_intake, m_floorConveyor, m_towerConveyor));
+    operX.onFalse(new ScoringStop(m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
     // operY.whenPressed(new Dummy(XboxController.Button.kY.value), true);
     //
     // Operator - Bumpers, start, back
-    operLeftBumper.whenPressed(new IntakingAction(m_intake, m_floorConveyor, m_towerConveyor), true);
-    operLeftBumper.whenReleased(new IntakingStop(m_intake, m_floorConveyor, m_towerConveyor), true);
-    operRightBumper.whenPressed(new ScoringPrime(m_shooter, m_vision), true);
+    operLeftBumper.onTrue(new IntakingAction(m_intake, m_floorConveyor, m_towerConveyor));
+    operLeftBumper.onFalse(new IntakingStop(m_intake, m_floorConveyor, m_towerConveyor));
+    operRightBumper.onTrue(new ScoringPrime(m_shooter, m_vision));
     // operBack.whenPressed(new Dummy(XboxController.Button.kBack.value), true);
     // operStart.whenPressed(new Dummy(XboxController.Button.kStart.value), true);
     //
@@ -314,7 +315,7 @@ public class RobotContainer
     //
     // Operator Left/Right Trigger
     // operLeftTrigger.whenActive(new Dummy(256));
-    operRightTrigger.whileActiveContinuous(new ShooterReverse(m_shooter), true);
+    operRightTrigger.whileTrue(new RepeatCommand(new ShooterReverse(m_shooter)));
   }
 
   // Configure the button bindings
