@@ -13,9 +13,10 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.Ports;
 import frc.robot.Constants.TCConsts;
 import frc.robot.Constants.TCConsts.TCMode;
-import frc.robot.frc2135.PhoenixUtil;
+import frc.robot.team2135.PhoenixUtil;
 
 /**
  *
@@ -26,8 +27,8 @@ public class TowerConveyor extends SubsystemBase
   private static final int                CANTIMEOUT            = 30;  // CAN timeout in msec
 
   // Devices and simulation objects
-  private final WPI_TalonFX               m_motorTC9            = new WPI_TalonFX(TCConsts.kTC9CANID);
-  private final DigitalInput              m_cargoLimit          = new DigitalInput(TCConsts.kCargoDIO);
+  private final WPI_TalonFX               m_motorTC             = new WPI_TalonFX(Ports.kCANID_TowerConv);
+  private final DigitalInput              m_cargoLimit          = new DigitalInput(Ports.kDIO_CargoDetect);
 
   private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true, 45.0, 45.0, 0.001);
   private StatorCurrentLimitConfiguration m_statorCurrentLimits = new StatorCurrentLimitConfiguration(true, 80.0, 80.0, 0.001);
@@ -40,8 +41,8 @@ public class TowerConveyor extends SubsystemBase
   private double                          m_expelSpeed          = TCConsts.kTCExpelSpeed;
   private double                          m_expelSpeedFast      = TCConsts.kTCExpelSpeedFast;
 
-  private boolean                         m_validTC9            = false; // Health indicator for floor conveyor talon
-  private int                             m_resetCountTC9       = 0;     // reset counter for motor
+  private boolean                         m_validTC             = false; // Health indicator for floor conveyor talon
+  private int                             m_resetCountTC        = 0;     // reset counter for motor
 
   /**
    *
@@ -53,20 +54,20 @@ public class TowerConveyor extends SubsystemBase
     addChild("CargoDetect", m_cargoLimit);
 
     // Validate Talon FX controllers, initialize and display firmware versions
-    m_validTC9 = PhoenixUtil.getInstance( ).talonFXInitialize(m_motorTC9, "TC9");
-    SmartDashboard.putBoolean("HL_validTC9", m_validTC9);
+    m_validTC = PhoenixUtil.getInstance( ).talonFXInitialize(m_motorTC, "TC");
+    SmartDashboard.putBoolean("HL_validTC", m_validTC);
 
     // Initialize Motor
-    if (m_validTC9)
+    if (m_validTC)
     {
-      m_motorTC9.setInverted(false);
-      m_motorTC9.setNeutralMode(NeutralMode.Coast);
-      m_motorTC9.set(ControlMode.PercentOutput, 0.0);
+      m_motorTC.setInverted(false);
+      m_motorTC.setNeutralMode(NeutralMode.Coast);
+      m_motorTC.set(ControlMode.PercentOutput, 0.0);
 
-      m_motorTC9.configSupplyCurrentLimit(m_supplyCurrentLimits);
-      m_motorTC9.configStatorCurrentLimit(m_statorCurrentLimits);
-      m_motorTC9.setStatusFramePeriod(StatusFrame.Status_1_General, 255, CANTIMEOUT);
-      m_motorTC9.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 255, CANTIMEOUT);
+      m_motorTC.configSupplyCurrentLimit(m_supplyCurrentLimits);
+      m_motorTC.configStatorCurrentLimit(m_statorCurrentLimits);
+      m_motorTC.setStatusFramePeriod(StatusFrame.Status_1_General, 255, CANTIMEOUT);
+      m_motorTC.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 255, CANTIMEOUT);
     }
 
     initialize( );
@@ -76,10 +77,10 @@ public class TowerConveyor extends SubsystemBase
   public void periodic( )
   {
     // This method will be called once per scheduler run
-    if (m_motorTC9.hasResetOccurred( ))
+    if (m_motorTC.hasResetOccurred( ))
     {
-      m_resetCountTC9 += 1;
-      SmartDashboard.putNumber("HL_resetCountTC9", m_resetCountTC9);
+      m_resetCountTC += 1;
+      SmartDashboard.putNumber("HL_resetCountTC", m_resetCountTC);
     }
 
     m_cargoDetected = isCargoDetected( );
@@ -102,7 +103,7 @@ public class TowerConveyor extends SubsystemBase
 
   public void faultDump( )
   {
-    PhoenixUtil.getInstance( ).talonFXFaultDump(m_motorTC9, "TC9");
+    PhoenixUtil.getInstance( ).talonFXFaultDump(m_motorTC, "TC");
   }
 
   // Set mode of conveyor
@@ -137,8 +138,8 @@ public class TowerConveyor extends SubsystemBase
     }
 
     DataLogManager.log(getSubsystem( ) + ": TC Set Speed - " + strName);
-    if (m_validTC9)
-      m_motorTC9.set(ControlMode.PercentOutput, output);
+    if (m_validTC)
+      m_motorTC.set(ControlMode.PercentOutput, output);
   }
 
   public boolean isCargoDetected( )

@@ -15,7 +15,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FCConsts;
 import frc.robot.Constants.FCConsts.FCMode;
-import frc.robot.frc2135.PhoenixUtil;
+import frc.robot.Constants.Ports;
+import frc.robot.team2135.PhoenixUtil;
 
 /**
  *
@@ -26,7 +27,7 @@ public class FloorConveyor extends SubsystemBase
   private static final int                CANTIMEOUT            = 30;  // CAN timeout in msec
 
   // Devices and simulation objects
-  private WPI_TalonFX                     m_motorFC8            = new WPI_TalonFX(FCConsts.kFC8CANID);
+  private WPI_TalonFX                     m_motorFC             = new WPI_TalonFX(Ports.kCANID_FloorConv);
 
   private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true, 45.0, 45.0, 0.001);
   private StatorCurrentLimitConfiguration m_statorCurrentLimits = new StatorCurrentLimitConfiguration(true, 80.0, 80.0, 0.001);
@@ -36,8 +37,8 @@ public class FloorConveyor extends SubsystemBase
   private double                          m_acquireSpeedSlow    = FCConsts.kFCAcquireSpeedSlow;
   private double                          m_expelSpeedFast      = FCConsts.kFCExpelSpeedFast;
 
-  private boolean                         m_validFC8            = false;  // Health indicator for floor conveyor talon
-  private int                             m_resetCountFC8       = 0;      // reset counter for motor
+  private boolean                         m_validFC             = false;  // Health indicator for floor conveyor talon
+  private int                             m_resetCountFC        = 0;      // reset counter for motor
 
   /**
    *
@@ -49,20 +50,20 @@ public class FloorConveyor extends SubsystemBase
     setSubsystem("FloorConveyor");
 
     // Validate Talon FX controllers, initialize and display firmware versions
-    m_validFC8 = PhoenixUtil.getInstance( ).talonFXInitialize(m_motorFC8, "FC8");
-    SmartDashboard.putBoolean("HL_validFC8", m_validFC8);
+    m_validFC = PhoenixUtil.getInstance( ).talonFXInitialize(m_motorFC, "FC");
+    SmartDashboard.putBoolean("HL_validFC", m_validFC);
 
     // Initialize Motor
-    if (m_validFC8)
+    if (m_validFC)
     {
-      m_motorFC8.setInverted(false);
-      m_motorFC8.setNeutralMode(NeutralMode.Coast);
-      m_motorFC8.set(ControlMode.PercentOutput, 0.0);
+      m_motorFC.setInverted(false);
+      m_motorFC.setNeutralMode(NeutralMode.Coast);
+      m_motorFC.set(ControlMode.PercentOutput, 0.0);
 
-      m_motorFC8.configSupplyCurrentLimit(m_supplyCurrentLimits);
-      m_motorFC8.configStatorCurrentLimit(m_statorCurrentLimits);
-      m_motorFC8.setStatusFramePeriod(StatusFrame.Status_1_General, 255, CANTIMEOUT);
-      m_motorFC8.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 255, CANTIMEOUT);
+      m_motorFC.configSupplyCurrentLimit(m_supplyCurrentLimits);
+      m_motorFC.configStatorCurrentLimit(m_statorCurrentLimits);
+      m_motorFC.setStatusFramePeriod(StatusFrame.Status_1_General, 255, CANTIMEOUT);
+      m_motorFC.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 255, CANTIMEOUT);
     }
 
     initialize( );
@@ -72,10 +73,10 @@ public class FloorConveyor extends SubsystemBase
   public void periodic( )
   {
     // This method will be called once per scheduler run
-    if (m_motorFC8.hasResetOccurred( ))
+    if (m_motorFC.hasResetOccurred( ))
     {
-      m_resetCountFC8 += 1;
-      SmartDashboard.putNumber("HL_resetCountFC8", m_resetCountFC8);
+      m_resetCountFC += 1;
+      SmartDashboard.putNumber("HL_resetCountFC", m_resetCountFC);
     }
   }
 
@@ -96,7 +97,7 @@ public class FloorConveyor extends SubsystemBase
   // Dump all Talon faults
   public void faultDump( )
   {
-    PhoenixUtil.getInstance( ).talonFXFaultDump(m_motorFC8, "FC8");
+    PhoenixUtil.getInstance( ).talonFXFaultDump(m_motorFC, "FC");
   }
 
   public void setFloorConveyorSpeed(FCMode mode)
@@ -126,7 +127,7 @@ public class FloorConveyor extends SubsystemBase
     }
 
     DataLogManager.log(getSubsystem( ) + ": FC Set Speed - " + strName);
-    if (m_validFC8)
-      m_motorFC8.set(ControlMode.PercentOutput, output);
+    if (m_validFC)
+      m_motorFC.set(ControlMode.PercentOutput, output);
   }
 }

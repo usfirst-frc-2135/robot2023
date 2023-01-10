@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Swerve;
 
 /**
  *
@@ -26,7 +26,7 @@ public class SimulateLimelight extends CommandBase
   private final double LL2_HORIZ_HALF_FOV_DEG = 29.8;   // 59.6 degrees FOV
   private final double LL2_VERT_HALF_FOV_DEG  = 24.85;  // 49.7 degrees FOV
 
-  Drivetrain           m_drivetrain;
+  Swerve               m_swerve;
   Translation2d        m_goalTranslation;
   double               m_goalHeightMeters;
   Translation2d        m_cameraTranslationOffset;
@@ -39,10 +39,10 @@ public class SimulateLimelight extends CommandBase
   MechanismLigament2d  m_mechLigament         =
       m_mechRoot.append(new MechanismLigament2d("Target", 0.1, 0.0, 16, new Color8Bit(Color.kGreen)));
 
-  public SimulateLimelight(Drivetrain drivetrain, Translation2d goalTranslation, double goalHeightMeters,
+  public SimulateLimelight(Swerve swerve, Translation2d goalTranslation, double goalHeightMeters,
       Translation2d cameraTranslationOffset, Rotation2d cameraYawOffset, double cameraHeightMeters, double cameraPitchRadians)
   {
-    m_drivetrain = drivetrain;
+    m_swerve = swerve;
     m_goalTranslation = goalTranslation;
     m_goalHeightMeters = goalHeightMeters;
     m_cameraTranslationOffset = cameraTranslationOffset;
@@ -63,7 +63,7 @@ public class SimulateLimelight extends CommandBase
   @Override
   public void execute( )
   {
-    Pose2d robotPose = m_drivetrain.getPose( );
+    Pose2d robotPose = m_swerve.getPose( );
     // The camera may not be centered on the robot, so we need to account for offets
     Pose2d cameraPose = new Pose2d(robotPose.getTranslation( ).plus(m_cameraTranslationOffset.rotateBy(robotPose.getRotation( ))),
         robotPose.getRotation( ).plus(m_cameraYawOffset));

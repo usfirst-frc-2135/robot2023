@@ -4,19 +4,19 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Swerve;
 
 /**
  *
  */
 public class DriveSlowMode extends CommandBase
 {
-  private final Drivetrain m_drivetrain;
-  private final boolean    m_driveSlow;
+  private final Swerve  m_swerve;
+  private final boolean m_driveSlow;
 
-  public DriveSlowMode(Drivetrain drivetrain, boolean driveSlow)
+  public DriveSlowMode(Swerve swerve, boolean driveSlow)
   {
-    m_drivetrain = drivetrain;
+    m_swerve = swerve;
     m_driveSlow = driveSlow;
 
     setName("DriveSlowMode");
@@ -25,9 +25,7 @@ public class DriveSlowMode extends CommandBase
   // Called when the command is initially scheduled.
   @Override
   public void initialize( )
-  {
-    m_drivetrain.setDriveSlowMode(m_driveSlow);
-  }
+  {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
