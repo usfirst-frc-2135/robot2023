@@ -21,7 +21,7 @@ public class RobotInitialize extends CommandBase
   public void initialize( )
   {
     RobotContainer robotContainer = RobotContainer.getInstance( );
-    robotContainer.m_drivetrain.initialize( );
+    robotContainer.m_swerve.initialize( );
     robotContainer.m_intake.initialize( );
     robotContainer.m_floorConveyor.initialize( );
     robotContainer.m_towerConveyor.initialize( );

@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.INConsts;
 import frc.robot.Constants.INConsts.INMode;
+import frc.robot.Constants.Ports;
 
 /**
  *
@@ -21,8 +22,8 @@ public class Intake extends SubsystemBase
   // private static final int CANTIMEOUT = 30; // CAN timeout in msec
 
   // Devices and simulation objects (intake was moved from CAN bus to PWM1)
-  // private WPI_TalonFX m_motorIN6 = new WPI_TalonFX(INConsts.kIN6CANID);
-  private final PWMTalonFX m_motorIN6     = new PWMTalonFX(INConsts.kINPWM1);
+  // private WPI_TalonFX m_motorIN = new WPI_TalonFX(Ports.kCANID_Intake);
+  private final PWMTalonFX m_motorIN      = new PWMTalonFX(Ports.kPWM_Intake);
   private final Solenoid   m_arm          = new Solenoid(0, PneumaticsModuleType.CTREPCM, INConsts.kArmSolenoid);
 
   // @formatter:off
@@ -34,7 +35,7 @@ public class Intake extends SubsystemBase
   private double           m_acquireSpeed = INConsts.kINAcquireSpeed;
   private double           m_expelSpeed   = INConsts.kINExpelSpeed;
 
-  private boolean          m_validIN6     = false;
+  private boolean          m_validIN      = false;
 
   /**
    *
@@ -45,15 +46,15 @@ public class Intake extends SubsystemBase
     setSubsystem("Intake");
     addChild("Arm", m_arm);
 
-    SmartDashboard.putBoolean("HL_validIN6", m_validIN6);
+    SmartDashboard.putBoolean("HL_validIN", m_validIN);
 
     // Check if solenoid is functional or blacklisted
     DataLogManager.log(getSubsystem( ) + ": Arm Solenoid is " + ((m_arm.isDisabled( )) ? "BLACKLISTED" : "OK"));
 
     // Initialize Motor
-    m_motorIN6.setInverted(true);
-    m_motorIN6.setSafetyEnabled(false);
-    m_motorIN6.set(0.0);
+    m_motorIN.setInverted(true);
+    m_motorIN.setSafetyEnabled(false);
+    m_motorIN.set(0.0);
 
     initialize( );
   }
@@ -82,7 +83,7 @@ public class Intake extends SubsystemBase
   // Dump all Talon faults
   public void faultDump( )
   {
-    // PhoenixUtil.getInstance( ).talonFXFaultDump(m_motorIN6, "IN6");
+    // PhoenixUtil.getInstance( ).talonFXFaultDump(m_motorIN, "IN");
   }
 
   public void setIntakeSpeed(INMode mode)
@@ -109,7 +110,7 @@ public class Intake extends SubsystemBase
 
     // Set speed of intake and the percent output
     DataLogManager.log(getSubsystem( ) + ": Set Speed - " + strName);
-    m_motorIN6.set(output);
+    m_motorIN.set(output);
   }
 
   public void setArmSolenoid(boolean extend)

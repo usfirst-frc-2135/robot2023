@@ -3,58 +3,54 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Drivetrain;
+import frc.robot.Constants;
+import frc.robot.Constants.SwerveConstants;
+import frc.robot.subsystems.Swerve;
+import frc.robot.team1678.frc2022.controlboard.ControlBoard;
 
 /**
  *
  */
 public class DriveTeleop extends CommandBase
 {
-  private final Drivetrain     m_drivetrain;
-  private final XboxController m_driverPad;
-  private final int            m_speedAxis;
-  private final int            m_rotationAxis;
+  private final Swerve          m_swerve;
+  private final XboxController  m_driverPad;
 
-  public DriveTeleop(Drivetrain drivetrain, XboxController driverPad, int speedAxis, int rotationAxis)
+  private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter m_rotLimiter    = new SlewRateLimiter(3);
+
+  public DriveTeleop(Swerve swerve, XboxController driverPad)
   {
-    m_drivetrain = drivetrain;
+    m_swerve = swerve;
     m_driverPad = driverPad;
-    m_speedAxis = speedAxis;
-    m_rotationAxis = rotationAxis;
 
     setName("DriveTeleop");
-    addRequirements(m_drivetrain);
+    addRequirements(m_swerve);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize( )
-  {
-    //TODO: replace with updated method
-    //m_drivetrain.driveWithJoysticksInit( );
-  }
+  {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute( )
   {
-    double rotation = m_driverPad.getRawAxis(m_rotationAxis);
-    double speed = m_driverPad.getRawAxis(m_speedAxis);
-
-    //TODO: replace with updated method
-    //m_drivetrain.driveWithJoysticksExecute(speed, rotation);
-    m_drivetrain.driveWithJoystick(m_driverPad, true);
+    driveWithGamepad(m_swerve, m_driverPad, true);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted)
-  {
-    //TODO: replace with updated method
-    //m_drivetrain.driveWithJoysticksEnd( );
-  }
+  {}
 
   // Returns true when the command should end.
   @Override
@@ -68,4 +64,100 @@ public class DriveTeleop extends CommandBase
   {
     return false;
   }
+
+  /**
+   * Method to drive the robot using joystick info.
+   *
+   * @param driverPad
+   *          XboxController used by driver.
+   * @param fieldRelative
+   *          Whether the provided x and y speeds are relative to the field.
+   */
+  public void driveWithGamepad(Swerve swerve, XboxController driverPad, boolean fieldRelative)
+  {
+    // Get x speed. Invert this because Xbox controllers return negative values when pushing forward.
+    final var xSpeed = m_xspeedLimiter.calculate(MathUtil.applyDeadband(driverPad.getLeftY( ), Constants.kStickDeadband))
+        * SwerveConstants.maxSpeed;
+
+    // Get y speed or sideways/strafe speed. Invert this because a positive value is needed when
+    // pulling left. Xbox controllers return positive values when pulling right by default.
+    final var ySpeed = m_yspeedLimiter.calculate(MathUtil.applyDeadband(driverPad.getLeftX( ), Constants.kStickDeadband))
+        * SwerveConstants.maxSpeed;
+
+    // Get rate of angular rotation. Invert this because a positive value is needed when pulling to
+    // the left (CCW is positive in mathematics). Xbox controllers return positive values when pulling
+    // to the right by default.
+    final var rot =
+        m_rotLimiter.calculate(MathUtil.applyDeadband(driverPad.getRightX( ), 0.02)) * SwerveConstants.maxAngularVelocity;
+
+    Translation2d swerveTranslation = new Translation2d(xSpeed, ySpeed);
+
+    swerve.drive(swerveTranslation, rot, fieldRelative, true);
+  }
+
+  public void driveWithGamepad2(Swerve swerve, XboxController driverPad, boolean fieldRelative)
+  {
+    Translation2d swerveTranslation = new Translation2d( );
+    double rot = 0.0;
+
+    double forwardAxis = driverPad.getLeftY( );
+    double strafeAxis = driverPad.getLeftX( );
+
+    forwardAxis = Constants.SwerveConstants.invertYAxis ? forwardAxis : -forwardAxis;
+    strafeAxis = Constants.SwerveConstants.invertXAxis ? strafeAxis : -strafeAxis;
+
+    Translation2d tAxes = new Translation2d(forwardAxis, strafeAxis);
+
+    if (Math.abs(tAxes.getNorm( )) < ControlBoard.kSwerveDeadband)
+    {
+      swerveTranslation = new Translation2d( );
+    }
+    else
+    {
+      // TODO: Clean up this shim from 1678 code
+      final double kEpsilon = 1e-12;
+      double sin_angle_;
+      double cos_angle_;
+
+      double x = tAxes.getX( );
+      double y = tAxes.getY( );
+      double magnitude = Math.hypot(x, y);
+
+      if (magnitude > kEpsilon)
+      {
+        sin_angle_ = y / magnitude;
+        cos_angle_ = x / magnitude;
+      }
+      else
+      {
+        sin_angle_ = 0;
+        cos_angle_ = 1;
+      }
+      double theta_radians = Math.atan2(sin_angle_, cos_angle_);
+
+      Rotation2d deadband_direction = new Rotation2d(theta_radians);
+      Translation2d deadband_vector = new Translation2d(deadband_direction.getCos( ) * ControlBoard.kSwerveDeadband,
+          deadband_direction.getSin( ) * ControlBoard.kSwerveDeadband);
+
+      double scaled_x = tAxes.getX( ) - (deadband_vector.getX( )) / (1 - deadband_vector.getX( ));
+      double scaled_y = tAxes.getY( ) - (deadband_vector.getY( )) / (1 - deadband_vector.getY( ));
+      swerveTranslation = new Translation2d(scaled_x, scaled_y).times(Constants.SwerveConstants.maxSpeed);
+    }
+
+    double rotAxis = driverPad.getRightX( );
+    rotAxis = Constants.SwerveConstants.invertRAxis ? rotAxis : -rotAxis;
+
+    if (Math.abs(rotAxis) < ControlBoard.kSwerveDeadband)
+    {
+      rot = 0.0;
+    }
+    else
+    {
+      rot = Constants.SwerveConstants.maxAngularVelocity * (rotAxis - (Math.signum(rotAxis) * ControlBoard.kSwerveDeadband))
+          / (1 - ControlBoard.kSwerveDeadband);
+    }
+
+    swerve.drive(swerveTranslation, rot, fieldRelative, true);
+  }
+
 }
