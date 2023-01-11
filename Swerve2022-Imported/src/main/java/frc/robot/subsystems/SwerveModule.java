@@ -15,14 +15,13 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.robot.RobotContainer;
-import frc.robot.Constants.DTConsts;
 
 public class SwerveModule
 {
   private static final double          kWheelRadius                  = 0.0508;
   private static final int             kEncoderResolution            = 4096;
 
-  private static final double          kModuleMaxAngularVelocity     = Drivetrain.kMaxAngularSpeed;
+  private static final double          kModuleMaxAngularVelocity     = Math.PI;       //based off of Drivetrain.kMaxAngularSpeed
   private static final double          kModuleMaxAngularAcceleration = 2 * Math.PI;   // radians per second squared
 
   public final WPI_TalonFX             m_driveMotor;

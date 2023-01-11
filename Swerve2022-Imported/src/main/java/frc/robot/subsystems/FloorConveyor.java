@@ -15,8 +15,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FCConsts;
 import frc.robot.Constants.FCConsts.FCMode;
-import frc.robot.Constants.Ports;
 import frc.robot.team2135.PhoenixUtil;
+import frc.robot.Constants.Ports;
 
 /**
  *
