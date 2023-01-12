@@ -24,6 +24,8 @@ public class Vision extends SubsystemBase
   private double       m_vertOffset1 = VIConsts.kLLVertOffset1; // y reading in degrees for first reference point
   private double       m_distance2   = VIConsts.kLLDistance2;   // x position in inches for second reference point
   private double       m_vertOffset2 = VIConsts.kLLVertOffset2; // y reading in degrees for second reference point
+  private double       m_slope;   // Linear regressions slope from calibration
+  private double       m_offset;  // Linear regressions slope from calibration
 
   private NetworkTable m_table;            // Network table reference for getting LL values
 
@@ -168,12 +170,7 @@ public class Vision extends SubsystemBase
 
   private double calculateDist(double vertAngle)
   {
-    double slope = (m_distance2 - m_distance1) / (m_vertOffset2 - m_vertOffset1);
-    double offset = m_distance1 - slope * m_vertOffset1;
-
-    SmartDashboard.putNumber("VI_Slope", slope);
-
-    return (slope * vertAngle) + offset;
+    return (m_slope * vertAngle) + m_offset;
   }
 
   public void syncStateFromDashboard( )
@@ -182,5 +179,12 @@ public class Vision extends SubsystemBase
     m_distance2 = SmartDashboard.getNumber("VI_distance2", m_distance2);
     m_vertOffset1 = SmartDashboard.getNumber("VI_vertOffset1", m_vertOffset1);
     m_vertOffset2 = SmartDashboard.getNumber("VI_vertOffset2", m_vertOffset2);
+
+    m_slope = (m_distance2 - m_distance1) / (m_vertOffset2 - m_vertOffset1);
+    m_offset = m_distance1 - m_slope * m_vertOffset1;
+
+    SmartDashboard.putNumber("VI_Slope", m_slope);
+    SmartDashboard.putNumber("VI_Offset", m_offset);
   }
+
 }

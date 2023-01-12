@@ -24,7 +24,7 @@ public class Intake extends SubsystemBase
   // Devices and simulation objects (intake was moved from CAN bus to PWM1)
   // private WPI_TalonFX m_motorIN = new WPI_TalonFX(Ports.kCANID_Intake);
   private final PWMTalonFX m_motorIN      = new PWMTalonFX(Ports.kPWM_Intake);
-  private final Solenoid   m_arm          = new Solenoid(0, PneumaticsModuleType.CTREPCM, INConsts.kArmSolenoid);
+  private final Solenoid   m_arm          = new Solenoid(0, PneumaticsModuleType.CTREPCM, Ports.kPCM_IntakeArm);
 
   // @formatter:off
   // private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true, 45.0, 45.0, 0.001);

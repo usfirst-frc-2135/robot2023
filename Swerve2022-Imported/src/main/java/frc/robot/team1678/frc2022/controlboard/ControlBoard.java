@@ -1,6 +1,5 @@
 package frc.robot.team1678.frc2022.controlboard;
 
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Constants;
 
@@ -10,9 +9,6 @@ public class ControlBoard
 
   private XboxController     m_driver;
   private XboxController     m_operator;
-
-  private int                mLastDpadLeft   = -1;
-  private int                mLastDpadRight  = -1;
 
   private final int          kDpadUp         = 0;
   private final int          kDpadRight      = 90;
@@ -27,11 +23,19 @@ public class ControlBoard
 
   public enum SwerveCardinal
   {
+    // @formatter:off
     NONE(0),
 
-    FORWARDS(0), LEFT(270), RIGHT(90), BACKWARDS(180),
+    FORWARDS(0), 
+    LEFT(270), 
+    RIGHT(90), 
+    BACKWARDS(180),
 
-    FAR_FENDER(143), RIGHT_FENDER(233), LEFT_FENDER(53), CLOSE_FENDER(323);
+    FAR_FENDER(143), 
+    RIGHT_FENDER(233), 
+    LEFT_FENDER(53), 
+    CLOSE_FENDER(323);
+    // @formatter:on
 
     public final double degrees;
 
@@ -39,21 +43,6 @@ public class ControlBoard
     {
       this.degrees = degrees;
     }
-  }
-
-  public void setDriverRumble(boolean on)
-  {
-    m_driver.setRumble(GenericHID.RumbleType.kRightRumble, (on) ? 1 : 0);
-  }
-
-  public void setOperatorRumble(boolean on)
-  {
-    m_operator.setRumble(GenericHID.RumbleType.kRightRumble, (on) ? 1 : 0);
-  }
-
-  public boolean zeroGyro( )
-  {
-    return m_driver.getStartButton( ) && m_driver.getBackButton( );
   }
 
   public SwerveCardinal getSwerveSnap( )
@@ -90,6 +79,5 @@ public class ControlBoard
       default :
         return SwerveCardinal.NONE;
     }
-
   }
 }
