@@ -201,7 +201,7 @@ public class RobotContainer
     }
 
     @Override
-    public boolean get( )
+    public boolean getAsBoolean( )
     {
       // This returns whether the trigger is active
       return (m_gamepad.getRawAxis(m_axis.value) > Constants.kTriggerThreshold);
