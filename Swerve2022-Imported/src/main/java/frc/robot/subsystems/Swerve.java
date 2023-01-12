@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -29,55 +30,55 @@ import frc.robot.team254.lib.util.TimeDelayedBoolean;
 
 public class Swerve extends SubsystemBase
 {
-  public PeriodicIO            mPeriodicIO         = new PeriodicIO( );
+  public PeriodicIO              mPeriodicIO         = new PeriodicIO( );
 
   // wants vision aim during auto
-  public boolean               mWantsAutoVisionAim = false;
+  public boolean                 mWantsAutoVisionAim = false;
 
-  public SwerveDriveOdometry   swerveOdometry;
-  public SwerveModule[ ]       mSwerveMods;
+  public SwerveModulePosition[ ] swervePositions;
+  public SwerveDriveOdometry     swerveOdometry;
+  public SwerveModule[ ]         mSwerveMods;
 
-  public Pigeon                mPigeon             = new Pigeon(Ports.kCANID_Pigeon2);
+  public Pigeon                  mPigeon             = new Pigeon(Ports.kCANID_Pigeon2);
 
   // chassis velocity status
-  ChassisSpeeds                chassisVelocity     = new ChassisSpeeds( );
+  ChassisSpeeds                  chassisVelocity     = new ChassisSpeeds( );
 
-  public boolean               isSnapping;
-  private double               mLimelightVisionAlignGoal;
-  private double               mGoalTrackVisionAlignGoal;
-  private double               mVisionAlignAdjustment;
+  public boolean                 isSnapping;
+  private double                 mLimelightVisionAlignGoal;
+  private double                 mVisionAlignAdjustment;
 
-  public ProfiledPIDController snapPIDController;
-  public PIDController         visionPIDController;
+  public ProfiledPIDController   snapPIDController;
+  public PIDController           visionPIDController;
 
   // Private boolean to lock Swerve wheels
-  private boolean              mLocked             = false;
+  private boolean                mLocked             = false;
 
-  private RobotContainer       m_rc                = RobotContainer.getInstance( );
-  private Vision               m_vision            = m_rc.m_vision;
+  private RobotContainer         m_rc                = RobotContainer.getInstance( );
+  private Vision                 m_vision            = m_rc.m_vision;
 
   // Limelight drive
-  private double               m_turnConstant      = SWConsts.kTurnConstant;
-  private double               m_turnPidKp         = SWConsts.kTurnPidKp;
-  private double               m_turnPidKi         = SWConsts.kTurnPidKi;
-  private double               m_turnPidKd         = SWConsts.kTurnPidKd;
-  private double               m_turnMax           = SWConsts.kTurnMax;
-  private double               m_throttlePidKp     = SWConsts.kThrottlePidKp;
-  private double               m_throttlePidKi     = SWConsts.kThrottlePidKi;
-  private double               m_throttlePidKd     = SWConsts.kThrottlePidKd;
-  private double               m_throttleMax       = SWConsts.kThrottleMax;
-  private double               m_throttleShape     = SWConsts.kThrottleShape;
+  private double                 m_turnConstant      = SWConsts.kTurnConstant;
+  private double                 m_turnPidKp         = SWConsts.kTurnPidKp;
+  private double                 m_turnPidKi         = SWConsts.kTurnPidKi;
+  private double                 m_turnPidKd         = SWConsts.kTurnPidKd;
+  private double                 m_turnMax           = SWConsts.kTurnMax;
+  private double                 m_throttlePidKp     = SWConsts.kThrottlePidKp;
+  private double                 m_throttlePidKi     = SWConsts.kThrottlePidKi;
+  private double                 m_throttlePidKd     = SWConsts.kThrottlePidKd;
+  private double                 m_throttleMax       = SWConsts.kThrottleMax;
+  private double                 m_throttleShape     = SWConsts.kThrottleShape;
 
-  private double               m_targetAngle       = SWConsts.kTargetAngle; // Optimal shooting angle
-  private double               m_setPointDistance  = SWConsts.kSetPointDistance; // Optimal shooting distance
-  private double               m_angleThreshold    = SWConsts.kAngleThreshold; // Tolerance around optimal
-  private double               m_distThreshold     = SWConsts.kDistThreshold; // Tolerance around optimal
+  private double                 m_targetAngle       = SWConsts.kTargetAngle; // Optimal shooting angle
+  private double                 m_setPointDistance  = SWConsts.kSetPointDistance; // Optimal shooting distance
+  private double                 m_angleThreshold    = SWConsts.kAngleThreshold; // Tolerance around optimal
+  private double                 m_distThreshold     = SWConsts.kDistThreshold; // Tolerance around optimal
 
   // DriveWithLimelight pid controller objects
-  private int                  m_limelightDebug    = 0; // Debug flag to disable extra limelight logging calls
-  private PIDController        m_turnPid           = new PIDController(0.0, 0.0, 0.0);
-  private PIDController        m_throttlePid       = new PIDController(0.0, 0.0, 0.0);
-  private double               m_limelightDistance;
+  private int                    m_limelightDebug    = 0; // Debug flag to disable extra limelight logging calls
+  private PIDController          m_turnPid           = new PIDController(0.0, 0.0, 0.0);
+  private PIDController          m_throttlePid       = new PIDController(0.0, 0.0, 0.0);
+  private double                 m_limelightDistance;
 
   // Getter
   public boolean getLocked( )
@@ -96,17 +97,6 @@ public class Swerve extends SubsystemBase
     setName("Swerve");
     setSubsystem("Swerve");
 
-    swerveOdometry = new SwerveDriveOdometry(Constants.SwerveConstants.swerveKinematics, mPigeon.getYaw( ).getWPIRotation2d( ));
-
-    snapPIDController = new ProfiledPIDController(Constants.SnapConstants.kP, Constants.SnapConstants.kI,
-        Constants.SnapConstants.kD, Constants.SnapConstants.kThetaControllerConstraints);
-    snapPIDController.enableContinuousInput(-Math.PI, Math.PI);
-
-    visionPIDController = new PIDController(Constants.VisionAlignConstants.kP, Constants.VisionAlignConstants.kI,
-        Constants.VisionAlignConstants.kD);
-    visionPIDController.enableContinuousInput(-Math.PI, Math.PI);
-    visionPIDController.setTolerance(0.0);
-
     zeroGyro( );
 
     mSwerveMods = new SwerveModule[ ]
@@ -116,6 +106,22 @@ public class Swerve extends SubsystemBase
         new SwerveModule(2, Constants.SwerveConstants.Mod2.SwerveModuleConstants( )),
         new SwerveModule(3, Constants.SwerveConstants.Mod3.SwerveModuleConstants( ))
     };
+
+    swerveOdometry = new SwerveDriveOdometry(Constants.SwerveConstants.swerveKinematics, mPigeon.getYaw( ).getWPIRotation2d( ),
+        new SwerveModulePosition[ ]
+        {
+            mSwerveMods[0].getPosition( ), mSwerveMods[1].getPosition( ), mSwerveMods[2].getPosition( ),
+            mSwerveMods[3].getPosition( )
+        });
+
+    snapPIDController = new ProfiledPIDController(Constants.SnapConstants.kP, Constants.SnapConstants.kI,
+        Constants.SnapConstants.kD, Constants.SnapConstants.kThetaControllerConstraints);
+    snapPIDController.enableContinuousInput(-Math.PI, Math.PI);
+
+    visionPIDController = new PIDController(Constants.VisionAlignConstants.kP, Constants.VisionAlignConstants.kI,
+        Constants.VisionAlignConstants.kD);
+    visionPIDController.enableContinuousInput(-Math.PI, Math.PI);
+    visionPIDController.setTolerance(0.0);
 
     resetOdometry(new Pose2d( ));
     resetAnglesToAbsolute( );
@@ -431,11 +437,6 @@ public class Swerve extends SubsystemBase
     }
   }
 
-  public void acceptLatestGoalTrackVisionAlignGoal(double vision_goal)
-  {
-    mGoalTrackVisionAlignGoal = vision_goal;
-  }
-
   public void chooseVisionAlignGoal( )
   {
     double currentAngle = mPigeon.getYaw( ).getRadians( );
@@ -499,7 +500,7 @@ public class Swerve extends SubsystemBase
 
   public void resetOdometry(Pose2d pose)
   {
-    swerveOdometry.resetPosition(pose, pose.getRotation( ));
+    swerveOdometry.resetPosition(pose.getRotation( ), getPosition( ), pose);
     zeroGyro(pose.getRotation( ).getDegrees( ));
   }
 
@@ -522,6 +523,19 @@ public class Swerve extends SubsystemBase
           MathUtil.inputModulus(states[mod.moduleNumber].angle.getDegrees( ), 0, 180));
     }
     return states;
+  }
+
+  public SwerveModulePosition[ ] getPosition( )
+  {
+    SwerveModulePosition[ ] positions = new SwerveModulePosition[4];
+    for (SwerveModule mod : mSwerveMods)
+    {
+      positions[mod.moduleNumber] = mod.getPosition( );
+      SmartDashboard.putNumber("mod " + mod.moduleNumber + " current distance", positions[mod.moduleNumber].distanceMeters);
+      SmartDashboard.putNumber("mod " + mod.moduleNumber + " current angle",
+          MathUtil.inputModulus(positions[mod.moduleNumber].angle.getDegrees( ), 0, 180));
+    }
+    return positions;
   }
 
   public void setAnglePIDValues(double kP, double kI, double kD)
@@ -563,7 +577,7 @@ public class Swerve extends SubsystemBase
 
   public void updateSwerveOdometry( )
   {
-    swerveOdometry.update(mPigeon.getYaw( ).getWPIRotation2d( ), getStates( ));
+    swerveOdometry.update(mPigeon.getYaw( ).getWPIRotation2d( ), getPosition( ));
 
     chassisVelocity = Constants.SwerveConstants.swerveKinematics.toChassisSpeeds(mSwerveMods[0].getState( ),
         mSwerveMods[1].getState( ), mSwerveMods[2].getState( ), mSwerveMods[3].getState( ));
