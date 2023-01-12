@@ -29,7 +29,8 @@ public class Constants
 
   public static final class Ports
   {
-    public static final String kCANivoreName     = "canivore1";
+    public static final String kCANCarnivore     = "canivore1";
+    public static final String kCANRio           = "rio";
 
     public static final int    kCANID_DriveLF    = 10;
     public static final int    kCANID_TurnLF     = 11;

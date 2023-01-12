@@ -15,6 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.robot.RobotContainer;
+import frc.robot.Constants.Ports;
 
 public class SwerveModule
 {
@@ -45,10 +46,10 @@ public class SwerveModule
    */
   public SwerveModule(int driveMotorCANID, int turningMotorCANID, int addressCANID)
   {
-    m_driveMotor = new WPI_TalonFX(driveMotorCANID, DTConsts.kCANBusString);
-    m_turningMotor = new WPI_TalonFX(turningMotorCANID, DTConsts.kCANBusString);
+    m_driveMotor = new WPI_TalonFX(driveMotorCANID, Ports.kCANCarnivore);
+    m_turningMotor = new WPI_TalonFX(turningMotorCANID, Ports.kCANCarnivore);
 
-    m_turningCANCoder = new CANCoder(addressCANID, DTConsts.kCANBusString);
+    m_turningCANCoder = new CANCoder(addressCANID, Ports.kCANCarnivore);
 
     // Limit the PID Controller's input range between -pi and pi and set the input
     // to be continuous.
@@ -108,12 +109,12 @@ public class SwerveModule
 
   private double nativeUnitsToMeters(double nativeUnits)
   {
-    return nativeUnits * DTConsts.kEncoderMetersPerCount;
+    return nativeUnits * SWConsts.kEncoderMetersPerCount;
   }
 
   private double nativeUnitsToMPS(double nativeUnitsVelocity)
   {
-    return nativeUnitsVelocity * DTConsts.kEncoderMetersPerCount * 10;
+    return nativeUnitsVelocity * SWConsts.kEncoderMetersPerCount * 10;
   }
 
   private double degToRad(CANCoder encoder)
