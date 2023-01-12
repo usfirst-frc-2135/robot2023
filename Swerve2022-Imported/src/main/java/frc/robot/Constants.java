@@ -32,21 +32,21 @@ public class Constants
     public static final String kCANCarnivore     = "canivore1";
     public static final String kCANRio           = "rio";
 
-    public static final int    kCANID_DriveLF    = 10;
-    public static final int    kCANID_TurnLF     = 11;
-    public static final int    kCANID_CANCoderLF = 12;
+    public static final int    kCANID_DriveLF    = 1;
+    public static final int    kCANID_TurnLF     = 2;
+    public static final int    kCANID_CANCoderLF = 3;
 
-    public static final int    kCANID_DriveRF    = 7;
-    public static final int    kCANID_TurnRF     = 8;
-    public static final int    kCANID_CANCoderRF = 9;
+    public static final int    kCANID_DriveRF    = 4;
+    public static final int    kCANID_TurnRF     = 5;
+    public static final int    kCANID_CANCoderRF = 6;
 
-    public static final int    kCANID_DriveLR    = 4;
-    public static final int    kCANID_TurnLR     = 5;
-    public static final int    kCANID_CANCoderLR = 6;
+    public static final int    kCANID_DriveLR    = 7;
+    public static final int    kCANID_TurnLR     = 8;
+    public static final int    kCANID_CANCoderLR = 9;
 
-    public static final int    kCANID_DriveRR    = 1;
-    public static final int    kCANID_TurnRR     = 2;
-    public static final int    kCANID_CANCoderRR = 3;
+    public static final int    kCANID_DriveRR    = 10;
+    public static final int    kCANID_TurnRR     = 11;
+    public static final int    kCANID_CANCoderRR = 12;
 
     public static final int    kCANID_Pigeon2    = 13;
 
@@ -60,6 +60,9 @@ public class Constants
 
     // PWM outputs
     public static final int    kPWM_Intake       = 1;
+
+    // Solenoid assignments
+    public static final int    kPCM_IntakeArm    = 0;
   }
 
   public static final class Falcon500
@@ -125,9 +128,6 @@ public class Constants
 
   public static final class INConsts
   {
-    // public static final int kIN8CANID = 6;
-    public static final int    kArmSolenoid    = 0;
-
     public static final double kINAcquireSpeed = 0.6;
     public static final double kINExpelSpeed   = -0.6;
 
@@ -215,7 +215,9 @@ public class Constants
 
     public enum VIRequests
     {
-      VISION_OFF, VISION_ON, VISION_TOGGLE
+      VISION_OFF,   // Disable limelight LED and enable secondary camera mode
+      VISION_ON,    // Enable limelight LED and disable secondary camera mode
+      VISION_TOGGLE // Toggle modes
     }
 
     public static final double kLLDistance1   = 48;    // distance from bumper in inches for first reference point
@@ -314,9 +316,14 @@ public class Constants
     };
   }
 
-  ///// 1678 Constants /////
-  // toggle constants between comp bot and practice bot ("epsilon")
-  public static final boolean isComp = true;
+  //// 1678 Constants ///////////////////////////////////////////////////////////
+
+  // toggle constants between comp bot and practice bot (named "epsilon")
+  public static final boolean isComp            = true;
+
+  // Timeout constants
+  public static final int     kLongCANTimeoutMs = 100;
+  public static final int     kCANTimeoutMs     = 10;
 
   public static final class SwerveConstants
   {
@@ -400,7 +407,7 @@ public class Constants
     public static final class Mod0
     {
       public static final double epsilonAngleOffset = 239.06;
-      public static final double compAngleOffset    = 187.646;
+      public static final double compAngleOffset    = 15.996;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -413,7 +420,7 @@ public class Constants
     public static final class Mod1
     {
       public static final double epsilonAngleOffset = 339.96;
-      public static final double compAngleOffset    = 2.461;
+      public static final double compAngleOffset    = 239.590;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -426,7 +433,7 @@ public class Constants
     public static final class Mod2
     {
       public static final double epsilonAngleOffset = 317.20;
-      public static final double compAngleOffset    = 60.029;
+      public static final double compAngleOffset    = 181.934;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -439,7 +446,7 @@ public class Constants
     public static final class Mod3
     {
       public static final double epsilonAngleOffset = 311.22;
-      public static final double compAngleOffset    = 195.117;
+      public static final double compAngleOffset    = 7.910;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -484,9 +491,5 @@ public class Constants
 
   /*** SUBSYSTEM CONSTANTS ***/
 
-  // Timeout constants
-  public static final int kLongCANTimeoutMs = 100;
-  public static final int kCANTimeoutMs     = 10;
-
-  ///// 1678 Constants /////
+  //// 1678 Constants ///////////////////////////////////////////////////////////
 }
