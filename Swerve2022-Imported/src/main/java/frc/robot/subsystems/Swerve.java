@@ -49,7 +49,8 @@ public class Swerve extends SubsystemBase
   private double                 mVisionAlignAdjustment;
 
   public ProfiledPIDController   snapPIDController;
-  public PIDController           visionPIDController;
+  public PIDController           visionPIDController =
+      new PIDController(Constants.VisionAlignConstants.kP, Constants.VisionAlignConstants.kI, Constants.VisionAlignConstants.kD);
 
   // Private boolean to lock Swerve wheels
   private boolean                mLocked             = false;
@@ -118,8 +119,6 @@ public class Swerve extends SubsystemBase
         Constants.SnapConstants.kD, Constants.SnapConstants.kThetaControllerConstraints);
     snapPIDController.enableContinuousInput(-Math.PI, Math.PI);
 
-    visionPIDController = new PIDController(Constants.VisionAlignConstants.kP, Constants.VisionAlignConstants.kI,
-        Constants.VisionAlignConstants.kD);
     visionPIDController.enableContinuousInput(-Math.PI, Math.PI);
     visionPIDController.setTolerance(0.0);
 
