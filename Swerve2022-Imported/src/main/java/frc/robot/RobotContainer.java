@@ -76,30 +76,32 @@ import frc.robot.subsystems.Vision;
  */
 public class RobotContainer
 {
-  private static RobotContainer m_robotContainer = new RobotContainer( );
+  private static RobotContainer m_robotContainer;
 
   // Joysticks
-  private final XboxController  m_driverPad      = new XboxController(Constants.kDriverPadPort);
-  private final XboxController  m_operatorPad    = new XboxController(Constants.kOperatorPadPort);
+  private final XboxController  m_driverPad     = new XboxController(Constants.kDriverPadPort);
+  private final XboxController  m_operatorPad   = new XboxController(Constants.kOperatorPadPort);
 
   // The robot's subsystems
-  public final Swerve           m_swerve         = new Swerve( );
-  public final Intake           m_intake         = new Intake( );
-  public final FloorConveyor    m_floorConveyor  = new FloorConveyor( );
-  public final TowerConveyor    m_towerConveyor  = new TowerConveyor( );
-  public final Shooter          m_shooter        = new Shooter( );
-  public final Vision           m_vision         = new Vision( );
-  public final LED              m_led            = new LED( );
-  public final Pneumatics       m_pneumatics     = new Pneumatics( );
-  public final Power            m_power          = new Power( );
+  public final LED              m_led           = new LED( );
+  public final Power            m_power         = new Power( );
+  public final Pneumatics       m_pneumatics    = new Pneumatics( );
+  public final Vision           m_vision        = new Vision( );
+
+  // These subsystems can use LED or vision and must be created afterward
+  public final Swerve           m_swerve        = new Swerve( );
+  public final Intake           m_intake        = new Intake( );
+  public final FloorConveyor    m_floorConveyor = new FloorConveyor( );
+  public final TowerConveyor    m_towerConveyor = new TowerConveyor( );
+  public final Shooter          m_shooter       = new Shooter( );
 
   // A chooser for autonomous commands
-  SendableChooser<Command>      m_chooser        = new SendableChooser<>( );
+  SendableChooser<Command>      m_chooser       = new SendableChooser<>( );
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
-  private RobotContainer( )
+  public RobotContainer( )
   {
     addSmartDashboardWidgets( );
 

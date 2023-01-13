@@ -21,14 +21,16 @@ public class RobotInitialize extends CommandBase
   public void initialize( )
   {
     RobotContainer robotContainer = RobotContainer.getInstance( );
+    robotContainer.m_led.initialize( );
+    robotContainer.m_power.initialize( );
+    robotContainer.m_pneumatics.initialize( );
+    robotContainer.m_vision.initialize( );
+
     robotContainer.m_swerve.initialize( );
     robotContainer.m_intake.initialize( );
     robotContainer.m_floorConveyor.initialize( );
     robotContainer.m_towerConveyor.initialize( );
     robotContainer.m_shooter.initialize( );
-    robotContainer.m_pneumatics.initialize( );
-    robotContainer.m_power.initialize( );
-    robotContainer.m_led.initialize( );
   }
 
   // Called every time the scheduler runs while the command is scheduled.
