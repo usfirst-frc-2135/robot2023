@@ -48,7 +48,8 @@ public class Swerve extends SubsystemBase
   private double                 mLimelightVisionAlignGoal;
   private double                 mVisionAlignAdjustment;
 
-  public ProfiledPIDController   snapPIDController;
+  public ProfiledPIDController   snapPIDController   = new ProfiledPIDController(Constants.SnapConstants.kP,
+      Constants.SnapConstants.kI, Constants.SnapConstants.kD, Constants.SnapConstants.kThetaControllerConstraints);
   public PIDController           visionPIDController =
       new PIDController(Constants.VisionAlignConstants.kP, Constants.VisionAlignConstants.kI, Constants.VisionAlignConstants.kD);
 
@@ -115,8 +116,6 @@ public class Swerve extends SubsystemBase
             mSwerveMods[3].getPosition( )
         });
 
-    snapPIDController = new ProfiledPIDController(Constants.SnapConstants.kP, Constants.SnapConstants.kI,
-        Constants.SnapConstants.kD, Constants.SnapConstants.kThetaControllerConstraints);
     snapPIDController.enableContinuousInput(-Math.PI, Math.PI);
 
     visionPIDController.enableContinuousInput(-Math.PI, Math.PI);
