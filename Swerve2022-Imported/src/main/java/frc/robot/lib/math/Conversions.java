@@ -1,5 +1,7 @@
 package frc.robot.lib.math;
 
+import frc.robot.Constants.Falcon500;
+
 public class Conversions
 {
 
@@ -86,6 +88,34 @@ public class Conversions
     double wheelRPM = ((velocity * 60) / circumference);
     double wheelVelocity = RPMToFalcon(wheelRPM, gearRatio);
     return wheelVelocity;
+  }
+
+  /**
+   * @param distancecounts
+   *          Falcon Distance Counts
+   * @param circumference
+   *          Circumference of Wheel
+   * @param gearRatio
+   *          Gear Ratio between Falcon and Mechanism (set to 1 for Falcon RPM)
+   * @return Falcon Velocity Counts
+   */
+  public static double falconToMeters(double distanceCounts, double circumference, double gearRatio)
+  {
+    return distanceCounts * (circumference / Falcon500.kEncoderCPR / gearRatio);
+  }
+
+  /**
+   * @param distance
+   *          distance in meters
+   * @param circumference
+   *          Circumference of Wheel
+   * @param gearRatio
+   *          Gear Ratio between Falcon and Mechanism (set to 1 for Falcon RPM)
+   * @return Falcon Velocity Counts
+   */
+  public static double metersToFalcon(double distance, double circumference, double gearRatio)
+  {
+    return distance / (circumference / Falcon500.kEncoderCPR / gearRatio);
   }
 
 }
