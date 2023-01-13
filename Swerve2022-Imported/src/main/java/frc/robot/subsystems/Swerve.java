@@ -56,9 +56,6 @@ public class Swerve extends SubsystemBase
   // Private boolean to lock Swerve wheels
   private boolean                mLocked             = false;
 
-  // private RobotContainer         m_rc                = RobotContainer.getInstance( );
-  // private Vision                 m_vision            = m_rc.m_vision;
-
   // Limelight drive
   private double                 m_turnConstant      = SWConsts.kTurnConstant;
   private double                 m_turnPidKp         = SWConsts.kTurnPidKp;
@@ -198,151 +195,153 @@ public class Swerve extends SubsystemBase
   //
   public void driveWithLimelightInit(boolean m_endAtTarget)
   {
-    // // get pid values from dashboard
-    // m_turnConstant = SmartDashboard.getNumber("DTL_turnConstant", m_turnConstant);
-    // m_turnPidKp = SmartDashboard.getNumber("DTL_turnPidKp", m_turnPidKp);
-    // m_turnPidKi = SmartDashboard.getNumber("DTL_turnPidKi", m_turnPidKi);
-    // m_turnPidKd = SmartDashboard.getNumber("DTL_turnPidKd", m_turnPidKd);
-    // m_turnMax = SmartDashboard.getNumber("DTL_turnMax", m_turnMax);
+    // get pid values from dashboard
+    m_turnConstant = SmartDashboard.getNumber("DTL_turnConstant", m_turnConstant);
+    m_turnPidKp = SmartDashboard.getNumber("DTL_turnPidKp", m_turnPidKp);
+    m_turnPidKi = SmartDashboard.getNumber("DTL_turnPidKi", m_turnPidKi);
+    m_turnPidKd = SmartDashboard.getNumber("DTL_turnPidKd", m_turnPidKd);
+    m_turnMax = SmartDashboard.getNumber("DTL_turnMax", m_turnMax);
 
-    // m_throttlePidKp = SmartDashboard.getNumber("DTL_throttlePidKp", m_throttlePidKp);
-    // m_throttlePidKi = SmartDashboard.getNumber("DTL_throttlePidKi", m_throttlePidKi);
-    // m_throttlePidKd = SmartDashboard.getNumber("DTL_throttlePidKd", m_throttlePidKd);
-    // m_throttleMax = SmartDashboard.getNumber("DTL_throttleMax", m_throttleMax);
-    // m_throttleShape = SmartDashboard.getNumber("DTL_throttleShape", m_throttleShape);
+    m_throttlePidKp = SmartDashboard.getNumber("DTL_throttlePidKp", m_throttlePidKp);
+    m_throttlePidKi = SmartDashboard.getNumber("DTL_throttlePidKi", m_throttlePidKi);
+    m_throttlePidKd = SmartDashboard.getNumber("DTL_throttlePidKd", m_throttlePidKd);
+    m_throttleMax = SmartDashboard.getNumber("DTL_throttleMax", m_throttleMax);
+    m_throttleShape = SmartDashboard.getNumber("DTL_throttleShape", m_throttleShape);
 
-    // m_targetAngle = SmartDashboard.getNumber("DTL_targetAngle", m_targetAngle);
-    // m_setPointDistance = SmartDashboard.getNumber("DTL_setPointDistance", m_setPointDistance);
-    // m_angleThreshold = SmartDashboard.getNumber("DTL_angleThreshold", m_angleThreshold);
-    // m_distThreshold = SmartDashboard.getNumber("DTL_distThreshold", m_distThreshold);
+    m_targetAngle = SmartDashboard.getNumber("DTL_targetAngle", m_targetAngle);
+    m_setPointDistance = SmartDashboard.getNumber("DTL_setPointDistance", m_setPointDistance);
+    m_angleThreshold = SmartDashboard.getNumber("DTL_angleThreshold", m_angleThreshold);
+    m_distThreshold = SmartDashboard.getNumber("DTL_distThreshold", m_distThreshold);
 
-    // // load in Pid constants to controller
-    // m_turnPid = new PIDController(m_turnPidKp, m_turnPidKi, m_turnPidKd);
-    // m_throttlePid = new PIDController(m_throttlePidKp, m_throttlePidKi, m_throttlePidKd);
+    // load in Pid constants to controller
+    m_turnPid = new PIDController(m_turnPidKp, m_turnPidKi, m_turnPidKd);
+    m_throttlePid = new PIDController(m_throttlePidKp, m_throttlePidKi, m_throttlePidKd);
 
-    // m_vision.m_tyfilter.reset( );
-    // m_vision.m_tvfilter.reset( );
-    // m_vision.syncStateFromDashboard( );
+    RobotContainer rc = RobotContainer.getInstance( );
+    rc.m_vision.m_tyfilter.reset( );
+    rc.m_vision.m_tvfilter.reset( );
+    rc.m_vision.syncStateFromDashboard( );
   }
 
   public void driveWithLimelightExecute( )
   {
-    // boolean tv = m_vision.getTargetValid( );
-    // double tx = m_vision.getHorizOffsetDeg( );
-    // double ty = m_vision.getVertOffsetDeg( );
+    RobotContainer rc = RobotContainer.getInstance( );
+    boolean tv = rc.m_vision.getTargetValid( );
+    double tx = rc.m_vision.getHorizOffsetDeg( );
+    double ty = rc.m_vision.getVertOffsetDeg( );
 
-    // if (!tv)
-    // {
-    //   drive(new Translation2d(0.0, 0.0), 0.0, false, true);
-    //   if (m_limelightDebug >= 1)
-    //     DataLogManager.log(getSubsystem( ) + ": DTL TV-FALSE - SIT STILL");
+    if (!tv)
+    {
+      drive(new Translation2d(0.0, 0.0), 0.0, false, true);
+      if (m_limelightDebug >= 1)
+        DataLogManager.log(getSubsystem( ) + ": DTL TV-FALSE - SIT STILL");
 
-    //   return;
-    // }
+      return;
+    }
 
-    // // get turn value - just horizontal offset from target
-    // double turnOutput = -m_turnPid.calculate(tx, m_targetAngle);
+    // get turn value - just horizontal offset from target
+    double turnOutput = -m_turnPid.calculate(tx, m_targetAngle);
 
-    // if (turnOutput > 0)
-    //   turnOutput = turnOutput + m_turnConstant;
-    // else if (turnOutput < 0)
-    //   turnOutput = turnOutput - m_turnConstant;
+    if (turnOutput > 0)
+      turnOutput = turnOutput + m_turnConstant;
+    else if (turnOutput < 0)
+      turnOutput = turnOutput - m_turnConstant;
 
-    // // get throttle value
-    // m_limelightDistance = m_vision.getDistLimelight( );
+    // get throttle value
+    m_limelightDistance = RobotContainer.getInstance( ).m_vision.getDistLimelight( );
 
-    // double throttleDistance = m_throttlePid.calculate(m_limelightDistance, m_setPointDistance);
-    // double throttleOutput = throttleDistance * Math.pow(Math.cos(turnOutput * Math.PI / 180), m_throttleShape);
+    double throttleDistance = m_throttlePid.calculate(m_limelightDistance, m_setPointDistance);
+    double throttleOutput = throttleDistance * Math.pow(Math.cos(turnOutput * Math.PI / 180), m_throttleShape);
 
-    // // put turn and throttle outputs on the dashboard
-    // SmartDashboard.putNumber("DTL_turnOutput", turnOutput);
-    // SmartDashboard.putNumber("DTL_throttleOutput", throttleOutput);
-    // SmartDashboard.putNumber("DTL_limeLightDist", m_limelightDistance);
+    // put turn and throttle outputs on the dashboard
+    SmartDashboard.putNumber("DTL_turnOutput", turnOutput);
+    SmartDashboard.putNumber("DTL_throttleOutput", throttleOutput);
+    SmartDashboard.putNumber("DTL_limeLightDist", m_limelightDistance);
 
-    // // cap max turn and throttle output
-    // turnOutput = MathUtil.clamp(turnOutput, -m_turnMax, m_turnMax);
-    // throttleOutput = MathUtil.clamp(throttleOutput, -m_throttleMax, m_throttleMax);
+    // cap max turn and throttle output
+    turnOutput = MathUtil.clamp(turnOutput, -m_turnMax, m_turnMax);
+    throttleOutput = MathUtil.clamp(throttleOutput, -m_throttleMax, m_throttleMax);
 
-    // // put turn and throttle outputs on the dashboard
-    // SmartDashboard.putNumber("DTL_turnClamped", turnOutput);
-    // SmartDashboard.putNumber("DTL_throttleClamped", throttleOutput);
+    // put turn and throttle outputs on the dashboard
+    SmartDashboard.putNumber("DTL_turnClamped", turnOutput);
+    SmartDashboard.putNumber("DTL_throttleClamped", throttleOutput);
 
-    // Translation2d llTranslation = new Translation2d(throttleOutput, 0);
-    // drive(llTranslation, turnOutput, false, true);
+    Translation2d llTranslation = new Translation2d(throttleOutput, 0);
+    drive(llTranslation, turnOutput, false, true);
 
-    // if (m_limelightDebug >= 1)
-    //   DataLogManager.log(getSubsystem( )
-    //   // @formatter:off
-    //     + ": DTL tv: " + tv 
-    //     + " tx: "      + String.format("%.1f", tx)
-    //     + " ty: "      + String.format("%.1f", ty)
-    //     + " lldist: "  + String.format("%.1f", m_limelightDistance)
-    //     + " distErr: " + String.format("%.1f", Math.abs(m_setPointDistance - m_limelightDistance))
-    //     // + " stopped: " + driveIsStopped( )
-    //     + " trnOut: "  + String.format("%.2f", turnOutput)
-    //     + " thrOut: "  + String.format("%.2f", throttleOutput)
-    //     // @formatter:on
-    //   );
+    if (m_limelightDebug >= 1)
+      DataLogManager.log(getSubsystem( )
+      // @formatter:off
+        + ": DTL tv: " + tv 
+        + " tx: "      + String.format("%.1f", tx)
+        + " ty: "      + String.format("%.1f", ty)
+        + " lldist: "  + String.format("%.1f", m_limelightDistance)
+        + " distErr: " + String.format("%.1f", Math.abs(m_setPointDistance - m_limelightDistance))
+        // + " stopped: " + driveIsStopped( )
+        + " trnOut: "  + String.format("%.2f", turnOutput)
+        + " thrOut: "  + String.format("%.2f", throttleOutput)
+        // @formatter:on
+      );
   }
 
   public boolean driveWithLimelightIsFinished( )
   {
-    // boolean tv = m_vision.getTargetValid( );
-    // double tx = m_vision.getHorizOffsetDeg( );
+    RobotContainer rc = RobotContainer.getInstance( );
+    boolean tv = rc.m_vision.getTargetValid( );
+    double tx = rc.m_vision.getHorizOffsetDeg( );
 
-    // if (tv)
-    // {
-    //   if (Math.abs(tx) <= m_angleThreshold)
-    //     m_rc.m_led.setLLColor(LEDColor.LEDCOLOR_GREEN);
-    //   else
-    //   {
-    //     if (tx < -m_angleThreshold)
-    //       m_rc.m_led.setLLColor(LEDColor.LEDCOLOR_RED);
-    //     else if (tx > m_angleThreshold)
-    //       m_rc.m_led.setLLColor(LEDColor.LEDCOLOR_BLUE);
-    //   }
-    // }
-    // else
-    //   m_rc.m_led.setLLColor(LEDColor.LEDCOLOR_YELLOW);
+    if (tv)
+    {
+      if (Math.abs(tx) <= m_angleThreshold)
+        rc.m_led.setLLColor(LEDColor.LEDCOLOR_GREEN);
+      else
+      {
+        if (tx < -m_angleThreshold)
+          rc.m_led.setLLColor(LEDColor.LEDCOLOR_RED);
+        else if (tx > m_angleThreshold)
+          rc.m_led.setLLColor(LEDColor.LEDCOLOR_BLUE);
+      }
+    }
+    else
+      rc.m_led.setLLColor(LEDColor.LEDCOLOR_YELLOW);
 
-    // return (tv && ((Math.abs(tx)) <= m_angleThreshold) && (Math.abs(m_setPointDistance - m_limelightDistance) <= m_distThreshold)
-    // // TODO: add back in
-    // // && driveIsStopped( )
-    // );
-    return true;
+    return (tv && ((Math.abs(tx)) <= m_angleThreshold) && (Math.abs(m_setPointDistance - m_limelightDistance) <= m_distThreshold)
+    // TODO: add back in
+    // && driveIsStopped( )
+    );
   }
 
   public void driveWithLimelightEnd( )
   {
-    // drive(new Translation2d(0.0, 0.0), 0.0, false, true);
+    drive(new Translation2d(0.0, 0.0), 0.0, false, true);
 
-    // RobotContainer.getInstance( ).m_led.setLLColor(LEDColor.LEDCOLOR_OFF);
+    RobotContainer.getInstance( ).m_led.setLLColor(LEDColor.LEDCOLOR_OFF);
   }
 
   public boolean isLimelightValid(double horizAngleRange, double distRange)
   {
-    // // check whether target is valid
-    // // check whether the limelight tx and ty is within a certain tolerance
-    // // check whether distance is within a certain tolerance
-    // boolean tv = m_vision.getTargetValid( );
-    // double tx = m_vision.getHorizOffsetDeg( );
-    // double ty = m_vision.getVertOffsetDeg( );
-    // m_limelightDistance = m_vision.getDistLimelight( );
+    // check whether target is valid
+    // check whether the limelight tx and ty is within a certain tolerance
+    // check whether distance is within a certain tolerance
+    RobotContainer rc = RobotContainer.getInstance( );
+    boolean tv = rc.m_vision.getTargetValid( );
+    double tx = rc.m_vision.getHorizOffsetDeg( );
+    double ty = rc.m_vision.getVertOffsetDeg( );
+    m_limelightDistance = rc.m_vision.getDistLimelight( );
 
-    // boolean sanityCheck =
-    //     tv && (Math.abs(tx) <= horizAngleRange) && (Math.abs(m_setPointDistance - m_limelightDistance) <= distRange);
-    // // && (fabs(ty) <= vertAngleRange)
+    boolean sanityCheck =
+        tv && (Math.abs(tx) <= horizAngleRange) && (Math.abs(m_setPointDistance - m_limelightDistance) <= distRange);
+    // && (fabs(ty) <= vertAngleRange)
 
-    // DataLogManager.log(getSubsystem( ) + ": DTL tv: " + tv //
-    //     + " tx: " + tx //
-    //     + " ty: " + ty //
-    //     + " lldist: " + m_limelightDistance //
-    //     + " distErr: " + Math.abs(m_setPointDistance - m_limelightDistance) //
-    //     + " sanityCheck: " + ((sanityCheck) ? "PASSED" : "FAILED") //
-    // );
+    DataLogManager.log(getSubsystem( ) + ": DTL tv: " + tv //
+        + " tx: " + tx //
+        + " ty: " + ty //
+        + " lldist: " + m_limelightDistance //
+        + " distErr: " + Math.abs(m_setPointDistance - m_limelightDistance) //
+        + " sanityCheck: " + ((sanityCheck) ? "PASSED" : "FAILED") //
+    );
 
-    // return sanityCheck;
-    return true;
+    return sanityCheck;
   }
 
   ///////////////////////////////////////////////////////////////////////////////
