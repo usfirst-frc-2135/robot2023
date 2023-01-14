@@ -46,7 +46,7 @@ public class Robot extends TimedRobot
 
     // Instantiate our RobotContainer. This will perform all our button bindings, and put our autonomous
     // chooser on the dashboard.
-    m_robotContainer = RobotContainer.getInstance( );
+    m_robotContainer = new RobotContainer( );
     ctreConfigs = new CTREConfigs( );
 
     LiveWindow.disableAllTelemetry( );
@@ -94,15 +94,17 @@ public class Robot extends TimedRobot
     DataLogManager.log("DisabledInit: Match " + matchTypeToString(DriverStation.getMatchType( )) + DriverStation.getMatchNumber( )
         + ", " + allianceToString(DriverStation.getAlliance( )) + " Alliance");
 
+    m_robotContainer.m_pneumatics.initialize( );
+    m_robotContainer.m_power.initialize( );
+    m_robotContainer.m_led.initialize( );
+    m_robotContainer.m_vision.initialize( );
+
+    // These subsystems can use LED and vision subsystems
     m_robotContainer.m_swerve.initialize( );
     m_robotContainer.m_intake.initialize( );
     m_robotContainer.m_floorConveyor.initialize( );
     m_robotContainer.m_towerConveyor.initialize( );
     m_robotContainer.m_shooter.initialize( );
-    m_robotContainer.m_pneumatics.initialize( );
-    m_robotContainer.m_power.initialize( );
-    m_robotContainer.m_led.initialize( );
-    m_robotContainer.m_vision.initialize( );
   }
 
   @Override
