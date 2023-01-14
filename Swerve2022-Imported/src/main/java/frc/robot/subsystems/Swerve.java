@@ -48,14 +48,13 @@ public class Swerve extends SubsystemBase
   private double                 mLimelightVisionAlignGoal;
   private double                 mVisionAlignAdjustment;
 
-  public ProfiledPIDController   snapPIDController;
-  public PIDController           visionPIDController;
+  public ProfiledPIDController   snapPIDController   = new ProfiledPIDController(Constants.SnapConstants.kP,
+      Constants.SnapConstants.kI, Constants.SnapConstants.kD, Constants.SnapConstants.kThetaControllerConstraints);
+  public PIDController           visionPIDController =
+      new PIDController(Constants.VisionAlignConstants.kP, Constants.VisionAlignConstants.kI, Constants.VisionAlignConstants.kD);
 
   // Private boolean to lock Swerve wheels
   private boolean                mLocked             = false;
-
-  private RobotContainer         m_rc                = RobotContainer.getInstance( );
-  private Vision                 m_vision            = m_rc.m_vision;
 
   // Limelight drive
   private double                 m_turnConstant      = SWConsts.kTurnConstant;
@@ -114,12 +113,8 @@ public class Swerve extends SubsystemBase
             mSwerveMods[3].getPosition( )
         });
 
-    snapPIDController = new ProfiledPIDController(Constants.SnapConstants.kP, Constants.SnapConstants.kI,
-        Constants.SnapConstants.kD, Constants.SnapConstants.kThetaControllerConstraints);
     snapPIDController.enableContinuousInput(-Math.PI, Math.PI);
 
-    visionPIDController = new PIDController(Constants.VisionAlignConstants.kP, Constants.VisionAlignConstants.kI,
-        Constants.VisionAlignConstants.kD);
     visionPIDController.enableContinuousInput(-Math.PI, Math.PI);
     visionPIDController.setTolerance(0.0);
 
@@ -222,16 +217,18 @@ public class Swerve extends SubsystemBase
     m_turnPid = new PIDController(m_turnPidKp, m_turnPidKi, m_turnPidKd);
     m_throttlePid = new PIDController(m_throttlePidKp, m_throttlePidKi, m_throttlePidKd);
 
-    m_vision.m_tyfilter.reset( );
-    m_vision.m_tvfilter.reset( );
-    m_vision.syncStateFromDashboard( );
+    RobotContainer rc = RobotContainer.getInstance( );
+    rc.m_vision.m_tyfilter.reset( );
+    rc.m_vision.m_tvfilter.reset( );
+    rc.m_vision.syncStateFromDashboard( );
   }
 
   public void driveWithLimelightExecute( )
   {
-    boolean tv = m_vision.getTargetValid( );
-    double tx = m_vision.getHorizOffsetDeg( );
-    double ty = m_vision.getVertOffsetDeg( );
+    RobotContainer rc = RobotContainer.getInstance( );
+    boolean tv = rc.m_vision.getTargetValid( );
+    double tx = rc.m_vision.getHorizOffsetDeg( );
+    double ty = rc.m_vision.getVertOffsetDeg( );
 
     if (!tv)
     {
@@ -251,7 +248,7 @@ public class Swerve extends SubsystemBase
       turnOutput = turnOutput - m_turnConstant;
 
     // get throttle value
-    m_limelightDistance = m_vision.getDistLimelight( );
+    m_limelightDistance = RobotContainer.getInstance( ).m_vision.getDistLimelight( );
 
     double throttleDistance = m_throttlePid.calculate(m_limelightDistance, m_setPointDistance);
     double throttleOutput = throttleDistance * Math.pow(Math.cos(turnOutput * Math.PI / 180), m_throttleShape);
@@ -289,23 +286,24 @@ public class Swerve extends SubsystemBase
 
   public boolean driveWithLimelightIsFinished( )
   {
-    boolean tv = m_vision.getTargetValid( );
-    double tx = m_vision.getHorizOffsetDeg( );
+    RobotContainer rc = RobotContainer.getInstance( );
+    boolean tv = rc.m_vision.getTargetValid( );
+    double tx = rc.m_vision.getHorizOffsetDeg( );
 
     if (tv)
     {
       if (Math.abs(tx) <= m_angleThreshold)
-        m_rc.m_led.setLLColor(LEDColor.LEDCOLOR_GREEN);
+        rc.m_led.setLLColor(LEDColor.LEDCOLOR_GREEN);
       else
       {
         if (tx < -m_angleThreshold)
-          m_rc.m_led.setLLColor(LEDColor.LEDCOLOR_RED);
+          rc.m_led.setLLColor(LEDColor.LEDCOLOR_RED);
         else if (tx > m_angleThreshold)
-          m_rc.m_led.setLLColor(LEDColor.LEDCOLOR_BLUE);
+          rc.m_led.setLLColor(LEDColor.LEDCOLOR_BLUE);
       }
     }
     else
-      m_rc.m_led.setLLColor(LEDColor.LEDCOLOR_YELLOW);
+      rc.m_led.setLLColor(LEDColor.LEDCOLOR_YELLOW);
 
     return (tv && ((Math.abs(tx)) <= m_angleThreshold) && (Math.abs(m_setPointDistance - m_limelightDistance) <= m_distThreshold)
     // TODO: add back in
@@ -317,7 +315,7 @@ public class Swerve extends SubsystemBase
   {
     drive(new Translation2d(0.0, 0.0), 0.0, false, true);
 
-    RobotContainer.getInstance( ).m_led.setLLColor(LEDColor.LEDCOLOR_OFF);
+    // RobotContainer.getInstance( ).m_led.setLLColor(LEDColor.LEDCOLOR_OFF);
   }
 
   public boolean isLimelightValid(double horizAngleRange, double distRange)
@@ -325,10 +323,11 @@ public class Swerve extends SubsystemBase
     // check whether target is valid
     // check whether the limelight tx and ty is within a certain tolerance
     // check whether distance is within a certain tolerance
-    boolean tv = m_vision.getTargetValid( );
-    double tx = m_vision.getHorizOffsetDeg( );
-    double ty = m_vision.getVertOffsetDeg( );
-    m_limelightDistance = m_vision.getDistLimelight( );
+    RobotContainer rc = RobotContainer.getInstance( );
+    boolean tv = rc.m_vision.getTargetValid( );
+    double tx = rc.m_vision.getHorizOffsetDeg( );
+    double ty = rc.m_vision.getVertOffsetDeg( );
+    m_limelightDistance = rc.m_vision.getDistLimelight( );
 
     boolean sanityCheck =
         tv && (Math.abs(tx) <= horizAngleRange) && (Math.abs(m_setPointDistance - m_limelightDistance) <= distRange);
@@ -612,11 +611,6 @@ public class Swerve extends SubsystemBase
     public double vision_align_target_angle;
     public double swerve_heading;
 
-    public double angular_velocity;
-    public double goal_velocity;
-
-    public double profile_position;
-
     // outputs
     public double snap_target;
   }
@@ -625,61 +619,59 @@ public class Swerve extends SubsystemBase
   // // @Override
   // public void registerLogger(LoggingSystem LS)
   // {
-  // SetupLog( );
-  // LS.register(mStorage, "SWERVE_LOGS.csv");
+  //   SetupLog( );
+  //   LS.register(mStorage, "SWERVE_LOGS.csv");
   // }
 
   // public void SetupLog( )
   // {
-  // mStorage = new LogStorage<PeriodicIO>( );
+  //   mStorage = new LogStorage<PeriodicIO>( );
 
-  // ArrayList<String> headers = new ArrayList<String>( );
-  // headers.add("timestamp");
-  // headers.add("is_enabled");
-  // headers.add("odometry_pose_x");
-  // headers.add("odometry_pose_y");
-  // headers.add("odometry_pose_rot");
-  // headers.add("pigeon_heading");
-  // headers.add("robot_pitch");
-  // headers.add("robot_roll");
-  // headers.add("snap_target");
-  // headers.add("vision_align_target_angle");
-  // headers.add("swerve_heading");
-  // for (SwerveModule module : this.mSwerveMods)
-  // {
-  // headers.add(module.moduleNumber + "_angle");
-  // headers.add(module.moduleNumber + "_desired_angle");
-  // headers.add(module.moduleNumber + "_velocity");
-  // headers.add(module.moduleNumber + "_cancoder");
-  // }
+  //   ArrayList<String> headers = new ArrayList<String>( );
+  //   headers.add("timestamp");
+  //   headers.add("is_enabled");
+  //   headers.add("odometry_pose_x");
+  //   headers.add("odometry_pose_y");
+  //   headers.add("odometry_pose_rot");
+  //   headers.add("pigeon_heading");
+  //   headers.add("robot_pitch");
+  //   headers.add("robot_roll");
+  //   headers.add("vision_align_target_angle");
+  //   headers.add("swerve_heading");
+  //   for (SwerveModule module : this.mSwerveMods)
+  //   {
+  //     headers.add(module.moduleNumber + "_angle");
+  //     headers.add(module.moduleNumber + "_desired_angle");
+  //     headers.add(module.moduleNumber + "_velocity");
+  //     headers.add(module.moduleNumber + "_cancoder");
+  //   }
 
-  // mStorage.setHeaders(headers);
+  //   mStorage.setHeaders(headers);
   // }
 
   // public void SendLog( )
   // {
-  // ArrayList<Number> items = new ArrayList<Number>( );
-  // items.add(Timer.getFPGATimestamp( ));
-  // items.add(mPeriodicIO.odometry_pose_x);
-  // items.add(mPeriodicIO.odometry_pose_y);
-  // items.add(mPeriodicIO.odometry_pose_rot);
-  // items.add(mPeriodicIO.pigeon_heading);
-  // items.add(mPeriodicIO.robot_pitch);
-  // items.add(mPeriodicIO.robot_roll);
-  // items.add(mPeriodicIO.snap_target);
-  // items.add(mPeriodicIO.vision_align_target_angle);
-  // items.add(mPeriodicIO.swerve_heading);
-  // for (SwerveModule module : this.mSwerveMods)
-  // {
-  // items.add(module.getState( ).angle.getDegrees( ));
-  // items.add(module.getTargetAngle( ));
-  // items.add(module.getState( ).speedMetersPerSecond);
-  // items.add(MathUtil.inputModulus(module.getCanCoder( ).getDegrees( ) -
-  // module.angleOffset, 0, 360));
-  // }
+  //   ArrayList<Number> items = new ArrayList<Number>( );
+  //   items.add(Timer.getFPGATimestamp( ));
+  //   items.add(mPeriodicIO.odometry_pose_x);
+  //   items.add(mPeriodicIO.odometry_pose_y);
+  //   items.add(mPeriodicIO.odometry_pose_rot);
+  //   items.add(mPeriodicIO.pigeon_heading);
+  //   items.add(mPeriodicIO.robot_pitch);
+  //   items.add(mPeriodicIO.robot_roll);
+  //   items.add(mPeriodicIO.snap_target);
+  //   items.add(mPeriodicIO.vision_align_target_angle);
+  //   items.add(mPeriodicIO.swerve_heading);
+  //   for (SwerveModule module : this.mSwerveMods)
+  //   {
+  //     items.add(module.getState( ).angle.getDegrees( ));
+  //     items.add(module.getTargetAngle( ));
+  //     items.add(module.getState( ).speedMetersPerSecond);
+  //     items.add(MathUtil.inputModulus(module.getCanCoder( ).getDegrees( ) - module.angleOffset, 0, 360));
+  //   }
 
-  // // send data to logging storage
-  // mStorage.addData(items);
+  //   // // send data to logging storage
+  //   mStorage.addData(items);
   // }
 
   //// 1678 Swerve //////////////////////////////////////////////////////////////

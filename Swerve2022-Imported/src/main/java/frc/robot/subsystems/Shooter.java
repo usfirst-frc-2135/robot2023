@@ -190,7 +190,7 @@ public class Shooter extends SubsystemBase
     else
       color = LEDColor.LEDCOLOR_OFF;
 
-    RobotContainer.getInstance( ).m_led.setNormalColor(color);
+    // RobotContainer.getInstance( ).m_led.setNormalColor(color);
   }
 
   @Override

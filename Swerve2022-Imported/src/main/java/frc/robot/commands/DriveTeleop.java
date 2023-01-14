@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.Swerve;
-import frc.robot.team1678.frc2022.controlboard.ControlBoard;
 
 /**
  *
@@ -108,7 +107,7 @@ public class DriveTeleop extends CommandBase
 
     Translation2d tAxes = new Translation2d(forwardAxis, strafeAxis);
 
-    if (Math.abs(tAxes.getNorm( )) < ControlBoard.kSwerveDeadband)
+    if (Math.abs(tAxes.getNorm( )) < Constants.kStickDeadband)
     {
       swerveTranslation = new Translation2d( );
     }
@@ -136,8 +135,8 @@ public class DriveTeleop extends CommandBase
       double theta_radians = Math.atan2(sin_angle_, cos_angle_);
 
       Rotation2d deadband_direction = new Rotation2d(theta_radians);
-      Translation2d deadband_vector = new Translation2d(deadband_direction.getCos( ) * ControlBoard.kSwerveDeadband,
-          deadband_direction.getSin( ) * ControlBoard.kSwerveDeadband);
+      Translation2d deadband_vector = new Translation2d(deadband_direction.getCos( ) * Constants.kStickDeadband,
+          deadband_direction.getSin( ) * Constants.kStickDeadband);
 
       double scaled_x = tAxes.getX( ) - (deadband_vector.getX( )) / (1 - deadband_vector.getX( ));
       double scaled_y = tAxes.getY( ) - (deadband_vector.getY( )) / (1 - deadband_vector.getY( ));
@@ -147,14 +146,14 @@ public class DriveTeleop extends CommandBase
     double rotAxis = driverPad.getRightX( );
     rotAxis = Constants.SwerveConstants.invertRAxis ? rotAxis : -rotAxis;
 
-    if (Math.abs(rotAxis) < ControlBoard.kSwerveDeadband)
+    if (Math.abs(rotAxis) < Constants.kStickDeadband)
     {
       rot = 0.0;
     }
     else
     {
-      rot = Constants.SwerveConstants.maxAngularVelocity * (rotAxis - (Math.signum(rotAxis) * ControlBoard.kSwerveDeadband))
-          / (1 - ControlBoard.kSwerveDeadband);
+      rot = Constants.SwerveConstants.maxAngularVelocity * (rotAxis - (Math.signum(rotAxis) * Constants.kStickDeadband))
+          / (1 - Constants.kStickDeadband);
     }
 
     swerve.drive(swerveTranslation, rot, fieldRelative, true);
