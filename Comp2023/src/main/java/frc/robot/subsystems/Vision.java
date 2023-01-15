@@ -3,6 +3,10 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.filter.MedianFilter;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -28,6 +32,11 @@ public class Vision extends SubsystemBase
   private double       m_offset;  // Linear regressions slope from calibration
 
   private NetworkTable m_table;            // Network table reference for getting LL values
+
+  private DoubleArraySubscriber m_botposeSub; 
+  private Transform3d m_botposeTransform3d; 
+
+  private double m_targetID; 
 
   private double       m_targetHorizAngle; // LL Target horizontal Offset from Crosshair to Target (-27 to 27 deg)
   private double       m_targetVertAngle;  // LL Target vertical Offset from Crosshair to Target (-20.5 to 20.5 deg)
@@ -63,6 +72,9 @@ public class Vision extends SubsystemBase
     SmartDashboard.putNumber("VI_OVERRIDE_TA", 0.0);
     SmartDashboard.putNumber("VI_OVERRIDE_TS", 0.0);
     SmartDashboard.putNumber("VI_OVERRIDE_TV", 0.0);
+    SmartDashboard.putNumberArray("VI_RobotPose", new double[]{});
+
+    m_botposeSub = m_table.getDoubleArrayTopic("botpose").subscribe(new double[] {});
 
     initialize( );
   }
@@ -87,10 +99,21 @@ public class Vision extends SubsystemBase
       m_targetArea = m_table.getEntry("ta").getDouble(0.0);
       m_targetSkew = m_table.getEntry("ts").getDouble(0.0);
       m_targetValid = m_tvfilter.calculate(m_table.getEntry("tv").getDouble(0.0)) > 0.5;
+      m_targetID = m_table.getEntry("tid").getDouble(-1.0);
     }
 
     m_distLL = calculateDist(m_targetVertAngle);
 
+    if (m_targetID > 0){
+      
+      double[] m_botposeArray = m_botposeSub.get();
+    
+      m_botposeTransform3d = new Transform3d(new Translation3d(m_botposeArray[0],m_botposeArray[1],m_botposeArray[2]), new Rotation3d(m_botposeArray[3], m_botposeArray[4], m_botposeArray[5]));
+
+      SmartDashboard.putNumberArray("VI_RobotPose", m_botposeArray);
+    }
+    
+    
     SmartDashboard.putNumber("VI_horizAngle", m_targetHorizAngle);
     SmartDashboard.putNumber("VI_vertAngle", m_targetVertAngle);
     SmartDashboard.putNumber("VI_area", m_targetArea);
@@ -112,8 +135,8 @@ public class Vision extends SubsystemBase
   {
     DataLogManager.log(getSubsystem( ) + ": subsystem initialized!");
 
-    setLEDMode(VIConsts.LED_OFF);
-    setCameraDisplay(VIConsts.PIP_SECONDARY);
+    //setLEDMode(VIConsts.LED_OFF);
+    //setCameraDisplay(VIConsts.PIP_SECONDARY);
 
     syncStateFromDashboard( );
   }
