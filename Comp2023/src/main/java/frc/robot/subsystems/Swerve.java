@@ -164,12 +164,16 @@ public class Swerve extends SubsystemBase
   {
     SmartDashboard.putNumber("SWMod: 0 - Speed", mSwerveMods[0].getState( ).speedMetersPerSecond);
     SmartDashboard.putNumber("SWMod: 0 - Angle", mSwerveMods[0].getState( ).angle.getDegrees( ));
+    SmartDashboard.putNumber("SWMod: 0 - Dist", mSwerveMods[0].getPosition( ).distanceMeters);
     SmartDashboard.putNumber("SWMod: 1 - Speed", mSwerveMods[1].getState( ).speedMetersPerSecond);
     SmartDashboard.putNumber("SWMod: 1 - Angle", mSwerveMods[1].getState( ).angle.getDegrees( ));
+    SmartDashboard.putNumber("SWMod: 1 - Dist", mSwerveMods[1].getPosition( ).distanceMeters);
     SmartDashboard.putNumber("SWMod: 2 - Speed", mSwerveMods[2].getState( ).speedMetersPerSecond);
     SmartDashboard.putNumber("SWMod: 2 - Angle", mSwerveMods[2].getState( ).angle.getDegrees( ));
+    SmartDashboard.putNumber("SWMod: 2 - Dist", mSwerveMods[2].getPosition( ).distanceMeters);
     SmartDashboard.putNumber("SWMod: 3 - Speed", mSwerveMods[3].getState( ).speedMetersPerSecond);
     SmartDashboard.putNumber("SWMod: 3 - Angle", mSwerveMods[3].getState( ).angle.getDegrees( ));
+    SmartDashboard.putNumber("SWMod: 3 - Dist", mSwerveMods[3].getPosition( ).distanceMeters);
 
     SmartDashboard.putNumber("SW: pose_x", mPeriodicIO.odometry_pose_x);
     SmartDashboard.putNumber("SW: pose_y", mPeriodicIO.odometry_pose_y);
