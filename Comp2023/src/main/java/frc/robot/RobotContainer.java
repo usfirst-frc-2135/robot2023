@@ -41,10 +41,6 @@ public class RobotContainer
 
   // These subsystems can use LED or vision and must be created afterward
   public final Swerve           m_swerve      = new Swerve( );
-  // public final Intake           m_intake        = new Intake( );
-  // public final FloorConveyor    m_floorConveyor = new FloorConveyor( );
-  // public final TowerConveyor    m_towerConveyor = new TowerConveyor( );
-  // public final Shooter          m_shooter       = new Shooter( );
 
   // A chooser for autonomous commands
   SendableChooser<Command>      m_chooser     = new SendableChooser<>( );
@@ -73,66 +69,16 @@ public class RobotContainer
     // Smartdashboard Subsystems
 
     // SmartDashboard Buttons
-    // SmartDashboard.putData("AutoDrive", new AutoDrive(m_swerve, m_intake));
-    // // SmartDashboard.putData("AutoDrivePath", new AutoDrivePath(m_swerve, "simCurvePath", true));
-    // SmartDashboard.putData("AutoDriveShoot",
-    //     new AutoDriveShoot(m_swerve, m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
-    // SmartDashboard.putData("AutoPathSequence", new AutoPathSequence(m_swerve));
-    // SmartDashboard.putData("AutoShoot", new AutoShoot(m_swerve, m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
-    // SmartDashboard.putData("AutoShootDriveShoot",
-    //     new AutoShootDriveShoot(m_swerve, m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
-    // SmartDashboard.putData("AutoShootLowHub",
-    //     new AutoShootLowHub(m_swerve, m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
-    // SmartDashboard.putData("AutoStop", new AutoStop(m_swerve));
-
+    
     // SmartDashboard.putData("DriveLimelight", new DriveLimelight(m_swerve, m_vision, false));
     // SmartDashboard.putData("DriveLimelightStop",
     //     new DriveLimelightStop(m_swerve, m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
-    // SmartDashboard.putData("DriveLimelightShoot",
-    //     new DriveLimelightShoot(m_swerve, m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
     // SmartDashboard.putData("DriveMotorTest", new DriveMotorTest(m_swerve, true));
     // SmartDashboard.putData("DriveResetSensors", new DriveResetSensors(m_swerve));
     // SmartDashboard.putData("DriveSlowMode", new DriveSlowMode(m_swerve, false));
 
-    // SmartDashboard.putData("ExhaustingAction", new ExhaustingAction(m_intake, m_floorConveyor, m_towerConveyor));
-    // SmartDashboard.putData("ExhaustingStop", new ExhaustingStop(m_intake, m_floorConveyor, m_towerConveyor));
-
-    // SmartDashboard.putData("Fconveyor-STOP", new FloorConveyorRun(m_floorConveyor, FCMode.FCONVEYOR_STOP));
-    // SmartDashboard.putData("Fconveyor-ACQUIRE", new FloorConveyorRun(m_floorConveyor, FCMode.FCONVEYOR_ACQUIRE));
-    // SmartDashboard.putData("Fconveyor-EXPEL", new FloorConveyorRun(m_floorConveyor, FCMode.FCONVEYOR_EXPEL));
-    // SmartDashboard.putData("Fconveyor-EXPELFAST", new FloorConveyorRun(m_floorConveyor, FCMode.FCONVEYOR_EXPEL_FAST));
-
-    // SmartDashboard.putData("IntakeDeploy", new IntakeDeploy(m_intake, false));
-    // SmartDashboard.putData("IntakeStow", new IntakeDeploy(m_intake, false));
-
-    // SmartDashboard.putData("Intake-STOP", new IntakeRun(m_intake, INMode.INTAKE_STOP));
-    // SmartDashboard.putData("Intake-ACQUIRE", new IntakeRun(m_intake, INMode.INTAKE_ACQUIRE));
-    // SmartDashboard.putData("Intake-EXPEL", new IntakeRun(m_intake, INMode.INTAKE_EXPEL));
-    // SmartDashboard.putData("IntakingAction", new IntakingAction(m_intake, m_floorConveyor, m_towerConveyor));
-    // SmartDashboard.putData("IntakingStop", new IntakingStop(m_intake, m_floorConveyor, m_towerConveyor));
-
     // SmartDashboard.putData("LEDSet", new LEDSet(m_led, LEDColor.LEDCOLOR_OFF));
     // SmartDashboard.putData("RobotInitialize", new RobotInitialize( ));
-
-    // SmartDashboard.putData("ScoringActionUpperHub",
-    // new ScoringActionUpperHub(m_intake, m_floorConveyor, m_towerConveyor, m_shooter, 2.0));
-    // SmartDashboard.putData("ScoringActionLowerHub",
-    // new ScoringActionLowerHub(m_intake, m_floorConveyor, m_towerConveyor, m_shooter, 2.0));
-    // SmartDashboard.putData("ScoringPrime", new ScoringPrime(m_shooter, m_vision));
-    // SmartDashboard.putData("ScoringStop", new ScoringStop(m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
-
-    // SmartDashboard.putData("Shooter-OFF", new ShooterRun(m_shooter, SHMode.SHOOTER_STOP));
-    // SmartDashboard.putData("Shooter-PRIME", new ShooterRun(m_shooter, SHMode.SHOOTER_PRIME));
-    // SmartDashboard.putData("Shooter-LOW", new ShooterRun(m_shooter, SHMode.SHOOTER_LOWERHUB));
-    // SmartDashboard.putData("Shooter-HIGH", new ShooterRun(m_shooter, SHMode.SHOOTER_UPPERHUB));
-    // SmartDashboard.putData("Shooter-REV", new ShooterRun(m_shooter, SHMode.SHOOTER_REVERSE));
-    // SmartDashboard.putData("ShooterReverse", new ShooterReverse(m_shooter));
-
-    // SmartDashboard.putData("Tconveyor-STOP", new TowerConveyorRun(m_towerConveyor, TCMode.TCONVEYOR_STOP));
-    // SmartDashboard.putData("Tconveyor-ACQUIRE", new TowerConveyorRun(m_towerConveyor, TCMode.TCONVEYOR_ACQUIRE));
-    // SmartDashboard.putData("Tconveyor-ACQUIRESLOW", new TowerConveyorRun(m_towerConveyor, TCMode.TCONVEYOR_ACQUIRE_SLOW));
-    // SmartDashboard.putData("Tconveyor-EXPEL", new TowerConveyorRun(m_towerConveyor, TCMode.TCONVEYOR_EXPEL));
-    // SmartDashboard.putData("Tconveyor-EXPELFAST", new TowerConveyorRun(m_towerConveyor, TCMode.TCONVEYOR_EXPEL_FAST));
 
     SmartDashboard.putData("Dummy", new Dummy(2135));
   }
@@ -199,10 +145,6 @@ public class RobotContainer
     // driverY.whenPressed(new Dummy(XboxController.Button.kY.value), true);
     //
     // Driver - Bumpers, start, back
-    // driverLeftBumper.onTrue(new IntakingAction(m_intake, m_floorConveyor, m_towerConveyor));
-    // driverLeftBumper.onFalse(new IntakingStop(m_intake, m_floorConveyor, m_towerConveyor));
-    // driverRightBumper.onTrue(new ScoringActionLowerHub(m_intake, m_floorConveyor, m_towerConveyor, m_shooter, 10.0));
-    // driverRightBumper.onFalse(new ScoringStop(m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
     // // driverBack.whenPressed(new Dummy(XboxController.Button.kBack.value), true);
     // driverStart.onTrue(new VisionOn(m_vision, VIRequests.VISION_TOGGLE));
     //
@@ -214,11 +156,7 @@ public class RobotContainer
     //
     // Driver - Triggers
     driverLeftTrigger.whenActive(new Dummy(256));
-    // driverRightTrigger
-    //     .whenActive(new DriveLimelightShoot(m_swerve, m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
-    // driverRightTrigger
-    //     .whenInactive(new DriveLimelightStop(m_swerve, m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
-
+    
     ///////////////////////////////////////////////////////
     // Operator Controller Assignments
     final JoystickButton operA = new JoystickButton(m_operatorPad, XboxController.Button.kA.value);
@@ -279,21 +217,6 @@ public class RobotContainer
   private void initAutonomousChooser( )
   {
     // Configure autonomous sendable chooser
-    // m_chooser.addOption("Auto1Ball1OppRight",
-    //     new Auto1Ball1OppRight(m_swerve, m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
-    // m_chooser.addOption("Auto1Ball2OppLeft",
-    //     new Auto1Ball2OppLeft(m_swerve, m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
-    // m_chooser.addOption("Auto1BallLimelight",
-    //     new Auto1BallLimelight(m_swerve, m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
-    // m_chooser.addOption("Auto3BallLeft",
-    //     new Auto3BallLeft(m_swerve, m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
-    // m_chooser.addOption("Auto3BallRight",
-    //     new Auto3BallRight(m_swerve, m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
-    // m_chooser.addOption("AutoShootDriveShoot",
-    //     new AutoShootDriveShoot(m_swerve, m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
-    // m_chooser.addOption("AutoDriveShoot",
-    //     new AutoDriveShoot(m_swerve, m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
-    // m_chooser.setDefaultOption("AutoStop", new AutoStop(m_swerve));
 
     // SmartDashboard.putData("Auto Mode", m_chooser);
   }
