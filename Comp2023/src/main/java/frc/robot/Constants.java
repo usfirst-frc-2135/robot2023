@@ -50,19 +50,8 @@ public class Constants
 
     public static final int    kCANID_Pigeon2    = 13;
 
-    public static final int    kCANID_Intake     = 15;
-    public static final int    kCANID_FloorConv  = 16;
-    public static final int    kCANID_TowerConv  = 17;
-    public static final int    kCANID_Shooter    = 18;
-
     // Digital I/Os
     public static final int    kDIO_CargoDetect  = 2;
-
-    // PWM outputs
-    public static final int    kPWM_Intake       = 1;
-
-    // Solenoid assignments
-    public static final int    kPCM_IntakeArm    = 0;
   }
 
   public static final class Falcon500
@@ -124,106 +113,6 @@ public class Constants
     public static final double kSetPointDistance      = 60.0;          // Optimal shooting distance
     public static final double kAngleThreshold        = 3.5;           // Degrees tolerance around optimal
     public static final double kDistThreshold         = 6.0;           // Inches tolerance around optimal
-  }
-
-  public static final class INConsts
-  {
-    public static final double kINAcquireSpeed = 0.6;
-    public static final double kINExpelSpeed   = -0.6;
-
-    public enum INMode
-    {
-      INTAKE_STOP,    // Stop intake motor
-      INTAKE_ACQUIRE, // Acquire game pieces
-      INTAKE_EXPEL,   // Expel game pieces
-    }
-  }
-
-  public static final class FCConsts
-  {
-    public static final double kFCAcquireSpeed     = 1.0;
-    public static final double kFCAcquireSpeedSlow = 0.2;
-    public static final double kFCExpelSpeedFast   = -1.0;
-
-    public enum FCMode
-    {
-      FCONVEYOR_STOP,       // Stop floor conveyor motor
-      FCONVEYOR_ACQUIRE,    // Aquire game pieces
-      FCONVEYOR_EXPEL,      // Expel game pieces
-      FCONVEYOR_EXPEL_FAST, // Expel Fast
-    }
-  }
-
-  public static final class TCConsts
-  {
-    public static final double kTCAcquireSpeed     = 1.0;
-    public static final double kTCAcquireSpeedSlow = 0.2;
-    public static final double kTCExpelSpeed       = -0.2;
-    public static final double kTCExpelSpeedFast   = -1.0;
-
-    public enum TCMode
-    {
-      TCONVEYOR_STOP,         // Conveyor stop
-      TCONVEYOR_ACQUIRE,      // Conveyor moves game pieces to shooter
-      TCONVEYOR_ACQUIRE_SLOW, // Conveyor moves during game piece intake
-      TCONVEYOR_EXPEL,        // Conveyor moves game pieces to hopper
-      TCONVEYOR_EXPEL_FAST,   // Conveyor moves game pieces to hopper
-    }
-  }
-
-  public static final class SHConsts
-  {
-    public static final double                   kFlywheelGearRatio       = (18.0 / 12.0);
-    public static final double                   kFlywheelCPR             = Falcon500.kEncoderCPR * kFlywheelGearRatio;
-
-    public static final int                      kVelocityMeasWindow      = 1;
-    public static final SensorVelocityMeasPeriod kVelocityMeasPeriod      = SensorVelocityMeasPeriod.Period_10Ms;
-    public static final double                   kFlywheelPidKf           = 0.04775;
-    public static final double                   kFlywheelPidKp           = 0.2;
-    public static final double                   kFlywheelPidKi           = 0.0;
-    public static final double                   kFlywheelPidKd           = 0.0;
-    public static final double                   kFlywheelNeutralDeadband = 0.01;
-
-    public static final double                   kFlywheelToleranceRPM    = 150.0;     // Tolerance band around target RPM
-    public static final double                   kFlywheelLowerTargetRPM  = 1000.0;    // RPM for lower hub
-    public static final double                   kFlywheelUpperTargetRPM  = 2150.0;    // RPM for upper hub
-    public static final double                   kFlywheelPrimeRPM        = kFlywheelUpperTargetRPM; // RPM for shooter priming
-
-    public static final double                   kReverseRPMThreshold     = 20.0;      // RPM threshold for allowing reverse
-    public static final double                   kFlywheelReverseRPM      = -1000.0;   // RPM for reversing out game pieces
-
-    public enum SHMode
-    {
-      SHOOTER_REVERSE,    // Shooter runs in reverse direction to handle jams
-      SHOOTER_STOP,       // Shooter is stopped
-      SHOOTER_PRIME,      // Shooter ramped to an initial speed before shooting
-      SHOOTER_LOWERHUB,   // Shooter at speed for low hub
-      SHOOTER_UPPERHUB,   // Shooter at speed for high hub
-    }
-  }
-
-  public static final class VIConsts
-  {
-    // Limelight-defined streaming states
-    public static final int STANDARD      = 0;  // Both cameras side-by-side
-    public static final int PIP_MAIN      = 1;  // Limelight with second camera inset
-    public static final int PIP_SECONDARY = 2;  // Second camera with limelight inset
-
-    // Limelight-defined LED mode states
-    public static final int LED_OFF       = 1;
-    public static final int LED_ON        = 3;
-
-    public enum VIRequests
-    {
-      VISION_OFF,   // Disable limelight LED and enable secondary camera mode
-      VISION_ON,    // Enable limelight LED and disable secondary camera mode
-      VISION_TOGGLE // Toggle modes
-    }
-
-    public static final double kLLDistance1   = 48;    // distance from bumper in inches for first reference point
-    public static final double kLLVertOffset1 = 0.42;  // LL y reading in degrees for first reference point
-    public static final double kLLDistance2   = 60;    // distance from bumper in inches for second reference point
-    public static final double kLLVertOffset2 = -4.85; // LL y reading in degrees for second reference point
   }
 
   public static final class LEDConsts
@@ -406,8 +295,8 @@ public class Constants
     /* Front Left Module - Module 0 */
     public static final class Mod0
     {
-      public static final double epsilonAngleOffset = 239.06;
-      public static final double compAngleOffset    = 15.996;
+      public static final double epsilonAngleOffset = 187.119;
+      public static final double compAngleOffset    = 187.295;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -419,8 +308,8 @@ public class Constants
     /* Front Right Module - Module 1 */
     public static final class Mod1
     {
-      public static final double epsilonAngleOffset = 339.96;
-      public static final double compAngleOffset    = 239.590;
+      public static final double epsilonAngleOffset = 360;
+      public static final double compAngleOffset    = 361.758;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -432,8 +321,8 @@ public class Constants
     /* Back Left Module - Module 2 */
     public static final class Mod2
     {
-      public static final double epsilonAngleOffset = 317.20;
-      public static final double compAngleOffset    = 181.934;
+      public static final double epsilonAngleOffset = 59.678;
+      public static final double compAngleOffset    = 60.117;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -445,8 +334,8 @@ public class Constants
     /* Back Right Module - Module 3 */
     public static final class Mod3
     {
-      public static final double epsilonAngleOffset = 311.22;
-      public static final double compAngleOffset    = 7.910;
+      public static final double epsilonAngleOffset = 194.502;
+      public static final double compAngleOffset    = 194.15;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {

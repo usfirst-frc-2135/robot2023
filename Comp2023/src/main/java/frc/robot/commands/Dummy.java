@@ -3,34 +3,28 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.RobotContainer;
 
 /**
  *
  */
-public class RobotInitialize extends CommandBase
+public class Dummy extends CommandBase
 {
-  public RobotInitialize( )
+  private final int m_statusCode;
+
+  public Dummy(int statusCode)
   {
-    setName("RobotInitialize");
+    m_statusCode = statusCode;
+
+    setName("Dummy");
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize( )
   {
-    RobotContainer rc = RobotContainer.getInstance( );
-    rc.m_led.initialize( );
-    rc.m_power.initialize( );
-    rc.m_pneumatics.initialize( );
-    rc.m_vision.initialize( );
-
-    rc.m_swerve.initialize( );
-    rc.m_intake.initialize( );
-    rc.m_floorConveyor.initialize( );
-    rc.m_towerConveyor.initialize( );
-    rc.m_shooter.initialize( );
+    DataLogManager.log(getName( ) + " status code - " + m_statusCode);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
