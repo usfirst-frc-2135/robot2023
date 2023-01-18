@@ -133,6 +133,30 @@ public class Constants
     }
   }
 
+  public static final class VIConsts
+  {
+    // Limelight-defined streaming states
+    public static final int STANDARD      = 0;  // Both cameras side-by-side
+    public static final int PIP_MAIN      = 1;  // Limelight with second camera inset
+    public static final int PIP_SECONDARY = 2;  // Second camera with limelight inset
+
+    // Limelight-defined LED mode states
+    public static final int LED_OFF       = 1;
+    public static final int LED_ON        = 3;
+
+    public enum VIRequests
+    {
+      VISION_OFF,   // Disable limelight LED and enable secondary camera mode
+      VISION_ON,    // Enable limelight LED and disable secondary camera mode
+      VISION_TOGGLE // Toggle modes
+    }
+
+    public static final double kLLDistance1   = 48;    // distance from bumper in inches for first reference point
+    public static final double kLLVertOffset1 = 0.42;  // LL y reading in degrees for first reference point
+    public static final double kLLDistance2   = 60;    // distance from bumper in inches for second reference point
+    public static final double kLLVertOffset2 = -4.85; // LL y reading in degrees for second reference point
+  }
+
   public static final class SIMLLConsts
   {
     public static final double kFieldLength        = Units.feetToMeters(54.0);      // Field dimensions are 54ft x 27ft

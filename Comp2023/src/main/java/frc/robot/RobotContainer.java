@@ -18,6 +18,7 @@ import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
 import frc.robot.subsystems.Power;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Vision;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -37,13 +38,14 @@ public class RobotContainer
   // public final LED              m_led           = new LED( );
   public final Power            m_power       = new Power( );
   // public final Pneumatics       m_pneumatics    = new Pneumatics( );
-  // public final Vision           m_vision        = new Vision( );
+  public final Vision           m_vision        = new Vision( );
 
   // These subsystems can use LED or vision and must be created afterward
   public final Swerve           m_swerve      = new Swerve( );
 
   // A chooser for autonomous commands
   SendableChooser<Command>      m_chooser     = new SendableChooser<>( );
+  
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
