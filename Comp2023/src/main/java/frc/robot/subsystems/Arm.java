@@ -16,7 +16,11 @@ public class Arm extends SubsystemBase
 
   /** Creates a new ExampleSubsystem. */
   public Arm( )
-  {}
+  {
+    setName("Arm");
+    setSubsystem("Arm");
+
+  }
 
   /**
    * Example command factory method.

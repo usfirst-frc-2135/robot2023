@@ -14,7 +14,11 @@ public class Gripper extends SubsystemBase
 
   /** Creates a new ExampleSubsystem. */
   public Gripper( )
-  {}
+  {
+    setName("Gripper");
+    setSubsystem("Gripper");
+
+  }
 
   /**
    * Example command factory method.
