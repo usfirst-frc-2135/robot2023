@@ -4,11 +4,14 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Gripper extends SubsystemBase
 {
+  private final WPI_TalonFX mGripper17 = new WPI_TalonFX(17);
+
   /** Creates a new ExampleSubsystem. */
   public Gripper( )
   {}
