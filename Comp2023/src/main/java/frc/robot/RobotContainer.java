@@ -14,8 +14,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
+import frc.robot.commands.GripperRun;
+import frc.robot.subsystems.Gripper;
 import frc.robot.subsystems.Power;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
@@ -30,6 +33,8 @@ public class RobotContainer
 {
   private static RobotContainer m_robotContainer;
 
+  public final Gripper          m_Gripper     = new Gripper( );
+
   // Joysticks
   private final XboxController  m_driverPad   = new XboxController(Constants.kDriverPadPort);
   private final XboxController  m_operatorPad = new XboxController(Constants.kOperatorPadPort);
@@ -38,14 +43,13 @@ public class RobotContainer
   // public final LED              m_led           = new LED( );
   public final Power            m_power       = new Power( );
   // public final Pneumatics       m_pneumatics    = new Pneumatics( );
-  public final Vision           m_vision        = new Vision( );
+  public final Vision           m_vision      = new Vision( );
 
   // These subsystems can use LED or vision and must be created afterward
   public final Swerve           m_swerve      = new Swerve( );
 
   // A chooser for autonomous commands
   SendableChooser<Command>      m_chooser     = new SendableChooser<>( );
-  
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -71,7 +75,7 @@ public class RobotContainer
     // Smartdashboard Subsystems
 
     // SmartDashboard Buttons
-    
+
     // SmartDashboard.putData("DriveLimelight", new DriveLimelight(m_swerve, m_vision, false));
     // SmartDashboard.putData("DriveLimelightStop",
     //     new DriveLimelightStop(m_swerve, m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
@@ -158,7 +162,7 @@ public class RobotContainer
     //
     // Driver - Triggers
     driverLeftTrigger.whenActive(new Dummy(256));
-    
+
     ///////////////////////////////////////////////////////
     // Operator Controller Assignments
     final JoystickButton operA = new JoystickButton(m_operatorPad, XboxController.Button.kA.value);
@@ -191,7 +195,7 @@ public class RobotContainer
     // // operY.whenPressed(new Dummy(XboxController.Button.kY.value), true);
     // //
     // // Operator - Bumpers, start, back
-    // operLeftBumper.onTrue(new IntakingAction(m_intake, m_floorConveyor, m_towerConveyor));
+    operLeftBumper.onTrue(new GripperRun(m_Gripper, GRMode.GR_ACQUIRE));
     // operLeftBumper.onFalse(new IntakingStop(m_intake, m_floorConveyor, m_towerConveyor));
     // operRightBumper.onTrue(new ScoringPrime(m_shooter, m_vision));
     // operBack.whenPressed(new Dummy(XboxController.Button.kBack.value), true);
