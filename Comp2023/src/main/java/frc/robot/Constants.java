@@ -72,6 +72,21 @@ public class Constants
     public static final double kStatorTriggerTime    = 0.001; // Default time duration of trigger that will causing limiting
   }
 
+  public static final class GRConsts
+  {
+    public static final int    kGRPWM17        = 17;
+
+    public static final double kGRAcquireSpeed = 1.0;
+    public static final double kGRExpelSpeed   = -1.0;
+
+    public enum GRMode
+    {
+      GR_STOP, //stop motor
+      GR_ACQUIRE, //acquire game pieces
+      GR_EXPEL, //expel game pieces
+    }
+  }
+
   public static final class SWConsts
   {
     // Swerve specs
