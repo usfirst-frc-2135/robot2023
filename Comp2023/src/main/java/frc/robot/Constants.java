@@ -72,6 +72,21 @@ public class Constants
     public static final double kStatorTriggerTime    = 0.001; // Default time duration of trigger that will causing limiting
   }
 
+  public static final class GRConsts
+  {
+    public static final int    kGRPWM17        = 17;
+
+    public static final double kGRAcquireSpeed = 1.0;
+    public static final double kGRExpelSpeed   = -1.0;
+
+    public enum GRMode
+    {
+      GR_STOP, //stop motor
+      GR_ACQUIRE, //acquire game pieces
+      GR_EXPEL, //expel game pieces
+    }
+  }
+
   public static final class SWConsts
   {
     // Swerve specs
@@ -232,7 +247,7 @@ public class Constants
   //// 1678 Constants ///////////////////////////////////////////////////////////
 
   // toggle constants between comp bot and practice bot (named "epsilon")
-  public static final boolean isComp            = true;
+  public static final boolean isComp            = false;
 
   // Timeout constants
   public static final int     kLongCANTimeoutMs = 100;
@@ -319,7 +334,7 @@ public class Constants
     /* Front Left Module - Module 0 */
     public static final class Mod0
     {
-      public static final double epsilonAngleOffset = 187.119;
+      public static final double epsilonAngleOffset = 325.723;
       public static final double compAngleOffset    = 187.295;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
@@ -332,7 +347,7 @@ public class Constants
     /* Front Right Module - Module 1 */
     public static final class Mod1
     {
-      public static final double epsilonAngleOffset = 360;
+      public static final double epsilonAngleOffset = 142.91;
       public static final double compAngleOffset    = 361.758;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
@@ -345,7 +360,7 @@ public class Constants
     /* Back Left Module - Module 2 */
     public static final class Mod2
     {
-      public static final double epsilonAngleOffset = 59.678;
+      public static final double epsilonAngleOffset = 227.549;
       public static final double compAngleOffset    = 60.117;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
@@ -358,7 +373,7 @@ public class Constants
     /* Back Right Module - Module 3 */
     public static final class Mod3
     {
-      public static final double epsilonAngleOffset = 194.502;
+      public static final double epsilonAngleOffset = 44.736;
       public static final double compAngleOffset    = 194.15;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
