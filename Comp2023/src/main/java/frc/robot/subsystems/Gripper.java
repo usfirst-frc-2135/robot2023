@@ -5,12 +5,15 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.GRConsts;
+import frc.robot.Constants.GRConsts.GRMode;
 
 public class Gripper extends SubsystemBase
 {
-  private final WPI_TalonFX mGripper17 = new WPI_TalonFX(17);
+  private final WPI_TalonFX mGripper17 = new WPI_TalonFX(GRConsts.kGRPWM17);
 
   /** Creates a new ExampleSubsystem. */
   public Gripper( )
@@ -18,32 +21,12 @@ public class Gripper extends SubsystemBase
     setName("Gripper");
     setSubsystem("Gripper");
 
-  }
+    mGripper17.setInverted(true);
+    mGripper17.setSafetyEnabled(false);
+    mGripper17.set(0.0);
 
-  /**
-   * Example command factory method.
-   *
-   * @return a command
-   */
-  public CommandBase exampleMethodCommand( )
-  {
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
-    return runOnce(( ) ->
-    {
-      /* one-time action goes here */
-    });
-  }
+    initialize( );
 
-  /**
-   * An example method querying a boolean state of the subsystem (for example, a digital sensor).
-   *
-   * @return value of some boolean subsystem state, such as a digital sensor.
-   */
-  public boolean exampleCondition( )
-  {
-    // Query some boolean state, such as a digital sensor.
-    return false;
   }
 
   @Override
@@ -56,5 +39,37 @@ public class Gripper extends SubsystemBase
   public void simulationPeriodic( )
   {
     // This method will be called once per scheduler run during simulation
+  }
+
+  public void initialize( )
+  {
+    DataLogManager.log(getSubsystem( ) + ": subsystem initialized!");
+    setGripperSpeed(GRMode.GR_STOP);
+  }
+
+  public void setGripperSpeed(GRMode mode)
+  {
+    final String strName;
+    double output = 0.0; //off default
+
+    switch (mode)
+    {
+      default :
+      case GR_STOP :
+        strName = "STOP";
+        output = 0.0;
+        break;
+      case GR_ACQUIRE :
+        strName = "ACQUIRE";
+        output = GRConsts.kGRAcquireSpeed;
+        break;
+      case GR_EXPEL :
+        strName = "EXPEL";
+        output = GRConsts.kGRExpelSpeed;
+        break;
+    }
+
+    DataLogManager.log(getSubsystem( ) + ": Set As - " + strName);
+    mGripper17.set(output);
   }
 }
