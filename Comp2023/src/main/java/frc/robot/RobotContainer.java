@@ -196,7 +196,7 @@ public class RobotContainer
     // //
     // // Operator - Bumpers, start, back
     operLeftBumper.onTrue(new GripperRun(m_Gripper, GRMode.GR_ACQUIRE));
-    // operLeftBumper.onFalse(new IntakingStop(m_intake, m_floorConveyor, m_towerConveyor));
+    operLeftBumper.onFalse(new GripperRun(m_Gripper, GRMode.GR_STOP));
     // operRightBumper.onTrue(new ScoringPrime(m_shooter, m_vision));
     // operBack.whenPressed(new Dummy(XboxController.Button.kBack.value), true);
     // operStart.whenPressed(new Dummy(XboxController.Button.kStart.value), true);
