@@ -441,7 +441,59 @@ public class Swerve extends SubsystemBase
     double targetHeading = trajState.poseMeters.getRotation( ).getDegrees( ); ///Maybe get in radians?
     double currentHeading = currentPose.getRotation( ).getDegrees( ); ///Maybe get in radians?
 
-    //IN PROG
+    //TODO: include setting swerve  + feedWatchDog
+
+    DataLogManager.log(getSubsystem( )
+    // @formatter:off
+          + ": DTR time: "     + String.format("%.3f", m_trajTimer.get( ))
+              + " curXYR: "    + String.format("%.2f", currentTrajX) 
+                + " "          + String.format("%.2f", currentTrajY) 
+                + " "          + String.format("%.1f", currentHeading)
+              + " targXYR: "   + String.format("%.2f", targetTrajX) 
+                + " "          + String.format("%.2f", targetTrajY) 
+                + " "          + String.format("%.1f", targetHeading)
+              + " chasXYO: "   + String.format("%.1f", targetChassisSpeeds.vxMetersPerSecond) 
+                + " "          + String.format("%.1f", targetChassisSpeeds.vyMetersPerSecond)
+                + " "          + String.format("%.1f", targetChassisSpeeds.omegaRadiansPerSecond)
+              + " targVel: " + String.format("%.1f", frontLeft.speedMetersPerSecond) 
+                + " "          + String.format("%.1f", frontRight.speedMetersPerSecond)
+                + " "          + String.format("%.1f", backLeft.speedMetersPerSecond) 
+                + " "          + String.format("%.1f", backRight.speedMetersPerSecond)
+              + " curVel: "  + String.format("%.2f", currentfrontLeft) 
+                + " "          + String.format("%.2f", currentfrontRight)
+                + " "          + String.format("%.2f", currentbackLeft)
+                + " "          + String.format("%.2f", currentbackRight)); 
+        // @formatter:on
+
+    // target velocity and its error
+    SmartDashboard.putNumber(getSubsystem( ) + ": DTR_targetVelFrontLeft", targetfrontLeft);
+    SmartDashboard.putNumber(getSubsystem( ) + ": DTR_targetVelFrontRight", targetfrontRight);
+    SmartDashboard.putNumber(getSubsystem( ) + ": DTR_targetVelBackLeft", targetbackLeft);
+    SmartDashboard.putNumber(getSubsystem( ) + ": DTR_targetVelBackRight", targetbackRight);
+    SmartDashboard.putNumber(getSubsystem( ) + ": DTR_currentVelFrontLeft", currentfrontLeft);
+    SmartDashboard.putNumber(getSubsystem( ) + ": DTR_currentVelFrontRight", currentfrontRight);
+    SmartDashboard.putNumber(getSubsystem( ) + ": DTR_currentVelBackLeft", currentbackLeft);
+    SmartDashboard.putNumber(getSubsystem( ) + ": DTR_currentVelBackRight", currentbackRight);
+
+    SmartDashboard.putNumber(getSubsystem( ) + ": DTR_velErrorFrontLeft", targetfrontLeft - currentfrontLeft);
+    SmartDashboard.putNumber(getSubsystem( ) + ": DTR_velErrorFrontRight", targetfrontRight - currentfrontRight);
+    SmartDashboard.putNumber(getSubsystem( ) + ": DTR_velErrorBackLeft", targetbackLeft - currentbackLeft);
+    SmartDashboard.putNumber(getSubsystem( ) + ": DTR_velErrorBackRight", targetbackRight - currentbackRight);
+
+    // target distance and its error
+    SmartDashboard.putNumber(getSubsystem( ) + ": DTR_currentTrajX", targetTrajX);
+    SmartDashboard.putNumber(getSubsystem( ) + ": DTR_currentTrajY", targetTrajY);
+    SmartDashboard.putNumber(getSubsystem( ) + ": DTR_targetTrajX", currentTrajX);
+    SmartDashboard.putNumber(getSubsystem( ) + ": DTR_targetTrajY", currentTrajY);
+
+    SmartDashboard.putNumber(getSubsystem( ) + ": DTR_trajErrorX", trajState.poseMeters.relativeTo(currentPose).getX( ));
+    SmartDashboard.putNumber(getSubsystem( ) + ": DTR_trajErrorY", trajState.poseMeters.relativeTo(currentPose).getY( ));
+
+    // target heading and its error
+    SmartDashboard.putNumber(getSubsystem( ) + ": DTR_targetHeading", targetHeading);
+    SmartDashboard.putNumber(getSubsystem( ) + ": DTR_currentHeading", currentHeading);
+    SmartDashboard.putNumber(getSubsystem( ) + ": DTR_headingError",
+        trajState.poseMeters.relativeTo(currentPose).getRotation( ).getDegrees( ));
 
   }
 
