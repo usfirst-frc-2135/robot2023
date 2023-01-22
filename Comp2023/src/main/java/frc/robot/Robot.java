@@ -77,10 +77,9 @@ public class Robot extends TimedRobot
   @Override
   public void robotPeriodic( )
   {
-    // Runs the Scheduler. This is responsible for polling buttons, adding
-    // newly-scheduled commands, running already-scheduled commands, removing
-    // finished or interrupted commands, and running subsystem periodic()
-    // methods. This must be called from the robot's periodic block in order
+    // Runs the Scheduler. This is responsible for polling buttons, adding newly-scheduled commands,
+    // running already-scheduled commands, removing finished or interrupted commands, and running 
+    // subsystem periodic() methods. This must be called from the robot's periodic block in order
     // for anything in the Command-based framework to work.
     CommandScheduler.getInstance( ).run( );
   }
@@ -94,12 +93,12 @@ public class Robot extends TimedRobot
     DataLogManager.log("DisabledInit: Match " + matchTypeToString(DriverStation.getMatchType( )) + DriverStation.getMatchNumber( )
         + ", " + allianceToString(DriverStation.getAlliance( )) + " Alliance");
 
-    // m_robotContainer.m_pneumatics.initialize( );
-    m_robotContainer.m_power.initialize( );
     // m_robotContainer.m_led.initialize( );
     // m_robotContainer.m_vision.initialize( );
 
     // These subsystems can use LED and vision subsystems
+    m_robotContainer.m_power.initialize( );
+    // m_robotContainer.m_pneumatics.initialize( );
     m_robotContainer.m_swerve.initialize( );
   }
 
@@ -150,10 +149,7 @@ public class Robot extends TimedRobot
     DataLogManager.log("TeleopInit: Match " + matchTypeToString(DriverStation.getMatchType( )) + DriverStation.getMatchNumber( )
         + ", " + allianceToString(DriverStation.getAlliance( )) + " Alliance");
 
-    // This makes sure that the autonomous stops running when
-    // teleop starts running. If you want the autonomous to
-    // continue until interrupted by another command, remove
-    // this line or comment it out.
+    // This makes sure that the autonomous stops running when teleop starts running. 
     if (m_autonomousCommand != null)
     {
       m_autonomousCommand.cancel( );
@@ -207,6 +203,7 @@ public class Robot extends TimedRobot
       case Elimination :
         return "E";
     }
+
     return "<unknown>";
   }
 
@@ -221,6 +218,7 @@ public class Robot extends TimedRobot
       case Invalid :
         return "Invalid";
     }
+
     return "<unknown>";
   }
 
@@ -230,9 +228,9 @@ public class Robot extends TimedRobot
   {
     // Print out talon faults and clear sticky ones
     DataLogManager.log("----- DUMP FAULTS --------------");
-    m_robotContainer.m_swerve.faultDump( );
-    // m_robotContainer.m_pneumatics.faultDump( );
-    m_robotContainer.m_power.faultDump( );
     // m_robotContainer.m_led.faultDump( );
+    m_robotContainer.m_power.faultDump( );
+    // m_robotContainer.m_pneumatics.faultDump( );
+    m_robotContainer.m_swerve.faultDump( );
   }
 }

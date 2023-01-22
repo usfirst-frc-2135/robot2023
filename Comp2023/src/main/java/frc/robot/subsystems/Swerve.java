@@ -46,18 +46,12 @@ public class Swerve extends SubsystemBase
 {
   public PeriodicIO                 mPeriodicIO         = new PeriodicIO( );
 
-  //module  variables 
-  private double                    mStopTolerance      = SWConsts.kStopTolerance;    // Position tolerance (<5cm)
-
-  // wants vision aim during auto
-  public boolean                    mWantsAutoVisionAim = false;
-
   public SwerveModulePosition[ ]    swervePositions;
   public SwerveDriveOdometry        swerveOdometry;
   public SwerveModule[ ]            mSwerveMods;
 
   //Odometery and telemetry
-  public Pigeon                     mPigeon             = new Pigeon(Ports.kCANID_Pigeon2);
+  public Pigeon                     m_pigeon            = new Pigeon(Ports.kCANID_Pigeon2);
   private Field2d                   m_field             = new Field2d( );
 
   // chassis velocity status
@@ -73,7 +67,7 @@ public class Swerve extends SubsystemBase
       new PIDController(Constants.VisionAlignConstants.kP, Constants.VisionAlignConstants.kI, Constants.VisionAlignConstants.kD);
 
   // Private boolean to lock Swerve wheels
-  private boolean                   mLocked             = false;
+  private boolean                   m_locked            = false;
 
   // Holonomic Drive Controller objects
   private HolonomicDriveController  m_holonomicController;
@@ -117,13 +111,13 @@ public class Swerve extends SubsystemBase
   // Getter
   public boolean getLocked( )
   {
-    return mLocked;
+    return m_locked;
   }
 
   // Setter
   public void setLocked(boolean lock)
   {
-    mLocked = lock;
+    m_locked = lock;
   }
 
   public Swerve( )
@@ -141,7 +135,7 @@ public class Swerve extends SubsystemBase
         new SwerveModule(3, Constants.SwerveConstants.Mod3.SwerveModuleConstants( ))
     };
 
-    swerveOdometry = new SwerveDriveOdometry(Constants.SwerveConstants.swerveKinematics, mPigeon.getYaw( ).getWPIRotation2d( ),
+    swerveOdometry = new SwerveDriveOdometry(Constants.SwerveConstants.swerveKinematics, m_pigeon.getYaw( ).getWPIRotation2d( ),
         new SwerveModulePosition[ ]
         {
             mSwerveMods[0].getPosition( ), mSwerveMods[1].getPosition( ), mSwerveMods[2].getPosition( ),
@@ -477,28 +471,6 @@ public class Swerve extends SubsystemBase
 
   //// 1678 Swerve //////////////////////////////////////////////////////////////
 
-  public void setWantAutoVisionAim(boolean aim)
-  {
-    mWantsAutoVisionAim = aim;
-  }
-
-  public boolean getWantAutoVisionAim( )
-  {
-    return mWantsAutoVisionAim;
-  }
-
-  public void visionAlignDrive(Translation2d translation2d, boolean fieldRelative)
-  {
-    drive(translation2d, mVisionAlignAdjustment, fieldRelative, false);
-  }
-
-  public void angleAlignDrive(Translation2d translation2d, double targetHeading, boolean fieldRelative)
-  {
-    snapPIDController.setGoal(new TrapezoidProfile.State(Math.toRadians(targetHeading), 0.0));
-    double angleAdjustment = snapPIDController.calculate(mPigeon.getYaw( ).getRadians( ));
-    drive(translation2d, angleAdjustment, fieldRelative, false);
-  }
-
   public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop)
   {
     if (isSnapping)
@@ -515,7 +487,7 @@ public class Swerve extends SubsystemBase
     }
 
     SwerveModuleState[ ] swerveModuleStates = null;
-    if (mLocked)
+    if (m_locked)
     {
       swerveModuleStates = new SwerveModuleState[ ]
       {
@@ -525,10 +497,10 @@ public class Swerve extends SubsystemBase
     }
     else
     {
-      swerveModuleStates = Constants.SwerveConstants.swerveKinematics.toSwerveModuleStates(
-          fieldRelative
+      swerveModuleStates =
+          Constants.SwerveConstants.swerveKinematics.toSwerveModuleStates(fieldRelative
               ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX( ), translation.getY( ), rotation,
-                  mPigeon.getYaw( ).getWPIRotation2d( ))
+                  m_pigeon.getYaw( ).getWPIRotation2d( ))
               : new ChassisSpeeds(translation.getX( ), translation.getY( ), rotation));
     }
 
@@ -540,21 +512,14 @@ public class Swerve extends SubsystemBase
     }
   }
 
-  public void chooseVisionAlignGoal( )
-  {
-    double currentAngle = mPigeon.getYaw( ).getRadians( );
-
-    mVisionAlignAdjustment = visionPIDController.calculate(currentAngle);
-  }
-
   public double calculateSnapValue( )
   {
-    return snapPIDController.calculate(mPigeon.getYaw( ).getRadians( ));
+    return snapPIDController.calculate(m_pigeon.getYaw( ).getRadians( ));
   }
 
   public void startSnap(double snapAngle)
   {
-    snapPIDController.reset(mPigeon.getYaw( ).getRadians( ));
+    snapPIDController.reset(m_pigeon.getYaw( ).getRadians( ));
     snapPIDController.setGoal(new TrapezoidProfile.State(Math.toRadians(snapAngle), 0.0));
     isSnapping = true;
   }
@@ -563,7 +528,7 @@ public class Swerve extends SubsystemBase
 
   private boolean snapComplete( )
   {
-    double error = snapPIDController.getGoal( ).position - mPigeon.getYaw( ).getRadians( );
+    double error = snapPIDController.getGoal( ).position - m_pigeon.getYaw( ).getRadians( );
     return delayedBoolean.update(Math.abs(error) < Math.toRadians(Constants.SnapConstants.kEpsilon),
         Constants.SnapConstants.kTimeout);
   }
@@ -577,7 +542,7 @@ public class Swerve extends SubsystemBase
     if (force || snapComplete( ))
     {
       isSnapping = false;
-      snapPIDController.reset(mPigeon.getYaw( ).getRadians( ));
+      snapPIDController.reset(m_pigeon.getYaw( ).getRadians( ));
     }
   }
 
@@ -674,13 +639,13 @@ public class Swerve extends SubsystemBase
 
   public void zeroGyro(double reset)
   {
-    mPigeon.setYaw(reset);
+    m_pigeon.setYaw(reset);
     visionPIDController.reset( );
   }
 
   public void updateSwerveOdometry( )
   {
-    swerveOdometry.update(mPigeon.getYaw( ).getWPIRotation2d( ), getPosition( ));
+    swerveOdometry.update(m_pigeon.getYaw( ).getWPIRotation2d( ), getPosition( ));
 
     chassisVelocity = Constants.SwerveConstants.swerveKinematics.toChassisSpeeds(mSwerveMods[0].getState( ),
         mSwerveMods[1].getState( ), mSwerveMods[2].getState( ), mSwerveMods[3].getState( ));
@@ -692,12 +657,12 @@ public class Swerve extends SubsystemBase
     mPeriodicIO.odometry_pose_x = swerveOdometry.getPoseMeters( ).getX( );
     mPeriodicIO.odometry_pose_y = swerveOdometry.getPoseMeters( ).getY( );
     mPeriodicIO.odometry_pose_rot = swerveOdometry.getPoseMeters( ).getRotation( ).getDegrees( );
-    mPeriodicIO.pigeon_heading = mPigeon.getYaw( ).getDegrees( );
-    mPeriodicIO.robot_pitch = mPigeon.getUnadjustedPitch( ).getDegrees( );
-    mPeriodicIO.robot_roll = mPigeon.getRoll( ).getDegrees( );
+    mPeriodicIO.pigeon_heading = m_pigeon.getYaw( ).getDegrees( );
+    mPeriodicIO.robot_pitch = m_pigeon.getUnadjustedPitch( ).getDegrees( );
+    mPeriodicIO.robot_roll = m_pigeon.getRoll( ).getDegrees( );
     mPeriodicIO.snap_target = Math.toDegrees(snapPIDController.getGoal( ).position);
     mPeriodicIO.vision_align_target_angle = Math.toDegrees(mLimelightVisionAlignGoal);
-    mPeriodicIO.swerve_heading = MathUtil.inputModulus(mPigeon.getYaw( ).getDegrees( ), 0, 360);
+    mPeriodicIO.swerve_heading = MathUtil.inputModulus(m_pigeon.getYaw( ).getDegrees( ), 0, 360);
 
     // SendLog( );
   }
