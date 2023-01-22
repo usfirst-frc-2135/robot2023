@@ -442,16 +442,31 @@ public class Swerve extends SubsystemBase
     double targetHeading = trajState.poseMeters.getRotation( ).getDegrees( ); ///Maybe get in radians?
     double currentHeading = currentPose.getRotation( ).getDegrees( ); ///Maybe get in radians?
 
+    //IN PROG
+
   }
 
   public boolean driveWithPathFollowerIsFinished( )
   {
-    return true;
+    if (m_trajTimer.get( ) == 0)
+      return false;
+
+    if (m_trajTimer.get( ) >= 15.0)
+    {
+      DataLogManager.log(getSubsystem( ) + ": path follower timeout!");
+      return true;
+    }
+    return ((m_trajTimer.get( ) >= m_trajectory.getTotalTimeSeconds( ))
+        && (Math.abs(mSwerveMods[0].getState( ).speedMetersPerSecond) <= 0 + mStopTolerance)
+        && (Math.abs(mSwerveMods[1].getState( ).speedMetersPerSecond) <= 0 + mStopTolerance)
+        && (Math.abs(mSwerveMods[2].getState( ).speedMetersPerSecond) <= 0 + mStopTolerance)
+        && (Math.abs(mSwerveMods[3].getState( ).speedMetersPerSecond) <= 0 + mStopTolerance));
   }
 
   public void driveWithPathFollowerEnd( )
   {
-
+    m_trajTimer.stop( );
+    drive(getPose( ).getTranslation( ), 0.0, false, true);
   }
 
   //// 1678 Swerve //////////////////////////////////////////////////////////////
