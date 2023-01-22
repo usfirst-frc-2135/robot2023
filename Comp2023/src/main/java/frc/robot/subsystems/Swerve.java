@@ -46,9 +46,6 @@ public class Swerve extends SubsystemBase
 {
   public PeriodicIO                 mPeriodicIO         = new PeriodicIO( );
 
-  // wants vision aim during auto
-  public boolean                    mWantsAutoVisionAim = false;
-
   public SwerveModulePosition[ ]    swervePositions;
   public SwerveDriveOdometry        swerveOdometry;
   public SwerveModule[ ]            mSwerveMods;
@@ -459,28 +456,6 @@ public class Swerve extends SubsystemBase
 
   //// 1678 Swerve //////////////////////////////////////////////////////////////
 
-  public void setWantAutoVisionAim(boolean aim)
-  {
-    mWantsAutoVisionAim = aim;
-  }
-
-  public boolean getWantAutoVisionAim( )
-  {
-    return mWantsAutoVisionAim;
-  }
-
-  public void visionAlignDrive(Translation2d translation2d, boolean fieldRelative)
-  {
-    drive(translation2d, mVisionAlignAdjustment, fieldRelative, false);
-  }
-
-  public void angleAlignDrive(Translation2d translation2d, double targetHeading, boolean fieldRelative)
-  {
-    snapPIDController.setGoal(new TrapezoidProfile.State(Math.toRadians(targetHeading), 0.0));
-    double angleAdjustment = snapPIDController.calculate(m_pigeon.getYaw( ).getRadians( ));
-    drive(translation2d, angleAdjustment, fieldRelative, false);
-  }
-
   public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop)
   {
     if (isSnapping)
@@ -520,13 +495,6 @@ public class Swerve extends SubsystemBase
     {
       mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
     }
-  }
-
-  public void chooseVisionAlignGoal( )
-  {
-    double currentAngle = m_pigeon.getYaw( ).getRadians( );
-
-    mVisionAlignAdjustment = visionPIDController.calculate(currentAngle);
   }
 
   public double calculateSnapValue( )
