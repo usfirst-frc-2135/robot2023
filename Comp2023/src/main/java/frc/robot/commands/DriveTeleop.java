@@ -21,8 +21,8 @@ public class DriveTeleop extends CommandBase
   private final Swerve          m_swerve;
   private final XboxController  m_driverPad;
 
-  private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
-  private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter m_xSpeedLimiter = new SlewRateLimiter(3);
+  private final SlewRateLimiter m_ySpeedLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter m_rotLimiter    = new SlewRateLimiter(3);
 
   public DriveTeleop(Swerve swerve, XboxController driverPad)
@@ -75,12 +75,14 @@ public class DriveTeleop extends CommandBase
   public void driveWithGamepad(Swerve swerve, XboxController driverPad, boolean fieldRelative)
   {
     // Get x speed. Invert this because Xbox controllers return negative values when pushing forward.
-    final var xSpeed = m_xspeedLimiter.calculate(MathUtil.applyDeadband(driverPad.getLeftY( ), Constants.kStickDeadband))
+    final var xSpeed = m_xSpeedLimiter.calculate(MathUtil.applyDeadband(driverPad.getLeftY( ), Constants.kStickDeadband))
+
         * SwerveConstants.maxSpeed;
 
     // Get y speed or sideways/strafe speed. Invert this because a positive value is needed when
     // pulling left. Xbox controllers return positive values when pulling right by default.
-    final var ySpeed = m_yspeedLimiter.calculate(MathUtil.applyDeadband(driverPad.getLeftX( ), Constants.kStickDeadband))
+    final var ySpeed = m_ySpeedLimiter.calculate(MathUtil.applyDeadband(driverPad.getLeftX( ), Constants.kStickDeadband))
+
         * SwerveConstants.maxSpeed;
 
     // Get rate of angular rotation. Invert this because a positive value is needed when pulling to
@@ -158,5 +160,4 @@ public class DriveTeleop extends CommandBase
 
     swerve.drive(swerveTranslation, rot, fieldRelative, true);
   }
-
 }

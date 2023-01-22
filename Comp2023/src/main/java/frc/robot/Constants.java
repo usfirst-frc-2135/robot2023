@@ -20,13 +20,14 @@ import frc.robot.lib.util.SwerveModuleConstants;
  */
 public class Constants
 {
-  /* Control Board */
+  // Game controller definitions
   public static final int    kDriverPadPort    = 0;
   public static final int    kOperatorPadPort  = 1;
 
   public static final double kStickDeadband    = 0.15;
   public static final double kTriggerThreshold = 0.25;
 
+  // CAN IDs and PWM IDs
   public static final class Ports
   {
     public static final String kCANCarnivore     = "canivore1";
@@ -51,7 +52,7 @@ public class Constants
     public static final int    kCANID_Pigeon2    = 13;
 
     // Digital I/Os
-    public static final int    kDIO_CargoDetect  = 2;
+    // public static final int    kDIO_CargoDetect  = 2;
   }
 
   public static final class Falcon500
@@ -81,53 +82,40 @@ public class Constants
 
     public enum GRMode
     {
-      GR_STOP, //stop motor
-      GR_ACQUIRE, //acquire game pieces
-      GR_EXPEL, //expel game pieces
+      GR_STOP,    // stop motor
+      GR_ACQUIRE, // acquire game pieces
+      GR_EXPEL,   // expel game pieces
     }
   }
 
   public static final class SWConsts
   {
-    // Swerve specs
-    public static final double kWheelDiaMeters        = Units.inchesToMeters(4.0); // 4in (39.37 in/meter)
-    public static final double kGearRatio             = 6.75;
-    public static final double kEncoderMetersPerCount = (kWheelDiaMeters * Math.PI) / (Falcon500.kEncoderCPR) / kGearRatio;
-
     // Joystick tuning
-    public static final double kDriveXScaling         = 1.0;           // 1.0 is no scaling
-    public static final double kDriveYScaling         = 1.0;           // 1.0 is no scaling
-    public static final double kQuickTurnScaling      = 0.5;           // Scale by 50% of full speed
-    public static final double kSlowClimbScaling      = 0.3;           // Scale by 30% of full speed
-
-    // Measured characterization
-    public static final double ks                     = 0.65;          // Volts
-    public static final double kv                     = 2.84;          // Volts / mps
-    public static final double ka                     = 0.309;         // Volts / (mps^2)
-    public static final double KvAngular              = 1.5;           // Volts / (rad/sec)
-    public static final double KaAngular              = 0.3;           // Volts / (rad/sec^2)
+    public static final double kDriveXScaling    = 1.0;           // 1.0 is no scaling
+    public static final double kDriveYScaling    = 1.0;           // 1.0 is no scaling
+    public static final double kDriveSlowScaling = 0.3;           // Scale by 30% of full speed
 
     // Teleop driving controls
-    public static final double kOpenLoopRamp          = 0.5;           // CTRE: full speed in 0.5 sec
-    public static final double kClosedLoopRamp        = 0.0;           // CTRE: 0 is disabled
-    public static final double kStopTolerance         = 0.05;          // Target position tolerance (< 5cm)
+    public static final double kOpenLoopRamp     = 0.5;           // CTRE: full speed in 0.5 sec
+    public static final double kClosedLoopRamp   = 0.0;           // CTRE: 0 is disabled
+    public static final double kStopTolerance    = 0.05;          // Target position tolerance (< 5cm)
 
     // Limelight driving controls
-    public static final double kTurnConstant          = 0.0;
-    public static final double kTurnPidKp             = 0.005;
-    public static final double kTurnPidKi             = 0.0;
-    public static final double kTurnPidKd             = 0.0;
-    public static final double kTurnMax               = 0.4;
-    public static final double kThrottlePidKp         = 0.011;
-    public static final double kThrottlePidKi         = 0.0;
-    public static final double kThrottlePidKd         = 0.0;
-    public static final double kThrottleMax           = 0.2;
-    public static final double kThrottleShape         = 10.0;
+    public static final double kTurnConstant     = 0.0;
+    public static final double kTurnPidKp        = 0.005;
+    public static final double kTurnPidKi        = 0.0;
+    public static final double kTurnPidKd        = 0.0;
+    public static final double kTurnMax          = 0.4;
+    public static final double kThrottlePidKp    = 0.011;
+    public static final double kThrottlePidKi    = 0.0;
+    public static final double kThrottlePidKd    = 0.0;
+    public static final double kThrottleMax      = 0.2;
+    public static final double kThrottleShape    = 10.0;
 
-    public static final double kTargetAngle           = 0.0;           // Optimal shooting angle
-    public static final double kSetPointDistance      = 60.0;          // Optimal shooting distance
-    public static final double kAngleThreshold        = 3.5;           // Degrees tolerance around optimal
-    public static final double kDistThreshold         = 6.0;           // Inches tolerance around optimal
+    public static final double kTargetAngle      = 0.0;           // Optimal shooting angle
+    public static final double kSetPointDistance = 60.0;          // Optimal shooting distance
+    public static final double kAngleThreshold   = 3.5;           // Degrees tolerance around optimal
+    public static final double kDistThreshold    = 6.0;           // Inches tolerance around optimal
   }
 
   public static final class LEDConsts
@@ -174,68 +162,28 @@ public class Constants
 
   public static final class SIMLLConsts
   {
-    public static final double kFieldLength        = Units.feetToMeters(54.0);      // Field dimensions are 54ft x 27ft
-    public static final double kFieldWidth         = Units.feetToMeters(27.0);
-    public static final double kGoalPostionX       = kFieldLength / 2 - Units.feetToMeters(2.0); // Goal target on field
-    public static final double kGoalPostionY       = kFieldWidth / 2;
-    public static final double kGoalHeight         = Units.inchesToMeters(102.81);  // Upper hub height from floor
-    public static final double kCameraPositionX    = Units.inchesToMeters(0.0);     // Camera position on robot (X, Y)
-    public static final double kCameraPositionY    = Units.inchesToMeters(0.0);
-    public static final double kCameraRotation     = Units.degreesToRadians(180.0); // Camera rotation on robot
-    public static final double kCameraLensHeight   = Units.inchesToMeters(41.0);    // Camera lens height from floor
-    public static final double kCameraLensBackTilt = Units.degreesToRadians(40.0);  // Camera backward tilt from normal
+    // public static final double kFieldLength        = Units.feetToMeters(54.0);      // Field dimensions are 54ft x 27ft
+    // public static final double kFieldWidth         = Units.feetToMeters(27.0);
+    // public static final double kGoalPostionX       = kFieldLength / 2 - Units.feetToMeters(2.0); // Goal target on field
+    // public static final double kGoalPostionY       = kFieldWidth / 2;
+    // public static final double kGoalHeight         = Units.inchesToMeters(102.81);  // Upper hub height from floor
+    // public static final double kCameraPositionX    = Units.inchesToMeters(0.0);     // Camera position on robot (X, Y)
+    // public static final double kCameraPositionY    = Units.inchesToMeters(0.0);
+    // public static final double kCameraRotation     = Units.degreesToRadians(180.0); // Camera rotation on robot
+    // public static final double kCameraLensHeight   = Units.inchesToMeters(41.0);    // Camera lens height from floor
+    // public static final double kCameraLensBackTilt = Units.degreesToRadians(40.0);  // Camera backward tilt from normal
   }
 
   public static final class AUTOConstants
   {
-    public static final String  kOneBallLimelight_path1    = "fenderToOffTarmac";
-    public static final String  kOneBallLimelight_path2    = "shootingPosToOffTarmac";
+    public static final double k_WaitTime1 = 0.0; // First wait timer - time to wait
+    public static final double k_WaitTime2 = 0.0; // Second wait timer - time to wait
 
-    public static final String  kDrive_path                = "startToOffTarmac";
+    public static final String path1       = "forward39";
+    public static final String path2       = "backward39";
+    public static final String path3       = "rightAngleTurn";
 
-    public static final String  kDriveShoot_path1          = "startToShootingPos";
-    public static final String  kDriveShoot_path2          = "shootingPosToOffTarmac";
-
-    public static final String  kShootDriveShoot_path1     = "startToShootingPos";
-    public static final String  kShootDriveShoot_path2     = "shootingPosToBall";
-    public static final String  kShootDriveShoot_path3     = "ballToShootingPos";
-    public static final String  kShootDriveShoot_path4     = "shootingPosToOffTarmac";
-
-    public static final String  k3BallLeft_path1           = "startToShootingPos";
-    public static final String  k3BallLeft_path2           = "shootingPosToBall";
-    public static final String  k3BallLeft_path3           = "ballToShootingPos";
-    public static final String  k3BallLeft_path4           = "shootingPosToLeftBall";
-    public static final String  k3BallLeft_path5           = "leftBallToLeftShootingPos";
-
-    public static final String  k3BallRight_path1          = "startToShootingPos";
-    public static final String  k3BallRight_path2          = "shootingPosToBall";
-    public static final String  k3BallRight_path3          = "ballToShootingPos";
-    public static final String  k3BallRight_path4          = "shootingPosToRightBall";
-    public static final String  k3BallRight_path5          = "rightBallToRightShootingPos";
-    public static final String  k3BallRight_path6          = "shootingPosToOffTarmac";
-
-    public static final String  k1BallLimelight_path1      = "fenderToOffTarmac";
-    public static final String  k1BallLimelight_path2      = "shootingPosToOffTarmac";
-
-    public static final String  k1Ball2OppLeft_path1       = "startToShootingPos";
-    public static final String  k1Ball2OppLeft_path2       = "shootingPosToLeftOppBall1";
-    public static final String  k1Ball2OppLeft_path3       = "leftOppBall1ToBall2";
-    public static final String  k1Ball2OppLeft_path4       = "leftOppBall2ToShootingPos";
-
-    public static final String  k1Ball1OppRight_path1      = "rightstarttoSP";
-    public static final String  k1Ball1OppRight_path2      = "rightSPtoball";
-
-    public static final boolean k_ShootOppBall             = true;
-
-    public static final double  k_WaitTime1                = 0.0; // First wait timer - time to wait
-    public static final double  k_WaitTime2                = 0.0; // Second wait timer - time to wait
-
-    public static final String  path1                      = "forward39";
-    public static final String  path2                      = "backward39";
-    public static final String  path3                      = "rightAngleTurn";
-    public static final String  kDriveLimelightShoot_path1 = "forward39";
-    public static final String  kDriveLimelightShoot_path2 = "backward39";
-    public static final String  kShoot_path                = "startToShootingPos";
+    public static final String kDrive_path = "startToOffTarmac";
 
     public enum AutoTimer
     {
@@ -246,7 +194,7 @@ public class Constants
 
   //// 1678 Constants ///////////////////////////////////////////////////////////
 
-  // toggle constants between comp bot and practice bot (named "epsilon")
+  // toggle constants between comp bot and practice bot (named "beta")
   public static final boolean isComp            = false;
 
   // Timeout constants
