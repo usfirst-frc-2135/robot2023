@@ -472,7 +472,7 @@ public class Swerve extends SubsystemBase
   public void driveWithPathFollowerEnd( )
   {
     m_trajTimer.stop( );
-    drive(new Translation2d(0.0, 0.0), 0.0, false, true);
+    drive(getPose( ).getTranslation( ), 0.0, false, true);
   }
 
   //// 1678 Swerve //////////////////////////////////////////////////////////////
