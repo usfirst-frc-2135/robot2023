@@ -194,7 +194,7 @@ public class Constants
 
   //// 1678 Constants ///////////////////////////////////////////////////////////
 
-  // toggle constants between comp bot and practice bot (named "epsilon")
+  // toggle constants between comp bot and practice bot (named "beta")
   public static final boolean isComp            = false;
 
   // Timeout constants
