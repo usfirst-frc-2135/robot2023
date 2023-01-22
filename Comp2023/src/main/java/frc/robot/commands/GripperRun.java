@@ -11,23 +11,23 @@ import frc.robot.subsystems.Gripper;
 /** An example command that uses an example subsystem. */
 public class GripperRun extends CommandBase
 {
-  private final Gripper m_Gripper;
-  private final GRMode  m_Mode;
+  private final Gripper m_gripper;
+  private final GRMode  m_mode;
 
   public GripperRun(Gripper gripper, GRMode mode)
   {
-    m_Gripper = gripper;
-    m_Mode = mode;
+    m_gripper = gripper;
+    m_mode = mode;
 
     setName("GripperRun");
-    addRequirements(m_Gripper);
+    addRequirements(m_gripper);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize( )
   {
-    m_Gripper.setGripperSpeed(m_Mode);
+    m_gripper.setGripperSpeed(m_mode);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
