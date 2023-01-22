@@ -4,7 +4,6 @@
 package frc.robot.subsystems;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -12,7 +11,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -33,10 +31,8 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SWConsts;
-import frc.robot.Constants.SwerveConstants;
 import frc.robot.RobotContainer;
 import frc.robot.team1678.frc2022.drivers.Pigeon;
 import frc.robot.team1678.frc2022.drivers.SwerveModule;
@@ -44,7 +40,10 @@ import frc.robot.team254.lib.util.TimeDelayedBoolean;
 
 public class Swerve extends SubsystemBase
 {
-  public PeriodicIO                 mPeriodicIO         = new PeriodicIO( );
+  public PeriodicIO                 m_PeriodicIO        = new PeriodicIO( );
+
+  //module variables
+  private double                    m_StopTolerance     = SWConsts.kStopTolerance;
 
   public SwerveModulePosition[ ]    swervePositions;
   public SwerveDriveOdometry        swerveOdometry;
@@ -204,17 +203,17 @@ public class Swerve extends SubsystemBase
     SmartDashboard.putNumber("SWMod: 3 - Angle", mSwerveMods[3].getState( ).angle.getDegrees( ));
     SmartDashboard.putNumber("SWMod: 3 - Dist", mSwerveMods[3].getPosition( ).distanceMeters);
 
-    SmartDashboard.putNumber("SW: pose_x", mPeriodicIO.odometry_pose_x);
-    SmartDashboard.putNumber("SW: pose_y", mPeriodicIO.odometry_pose_y);
-    SmartDashboard.putNumber("SW: pose_rot", mPeriodicIO.odometry_pose_rot);
+    SmartDashboard.putNumber("SW: pose_x", m_PeriodicIO.odometry_pose_x);
+    SmartDashboard.putNumber("SW: pose_y", m_PeriodicIO.odometry_pose_y);
+    SmartDashboard.putNumber("SW: pose_rot", m_PeriodicIO.odometry_pose_rot);
 
-    SmartDashboard.putNumber("SW: pigeon-hdg", mPeriodicIO.pigeon_heading);
-    SmartDashboard.putNumber("SW: pitch", mPeriodicIO.robot_pitch);
-    SmartDashboard.putNumber("SW: roll", mPeriodicIO.robot_roll);
+    SmartDashboard.putNumber("SW: pigeon-hdg", m_PeriodicIO.pigeon_heading);
+    SmartDashboard.putNumber("SW: pitch", m_PeriodicIO.robot_pitch);
+    SmartDashboard.putNumber("SW: roll", m_PeriodicIO.robot_roll);
 
-    SmartDashboard.putNumber("SW: snap", mPeriodicIO.snap_target);
-    SmartDashboard.putNumber("SW: vision", mPeriodicIO.vision_align_target_angle);
-    SmartDashboard.putNumber("SW: swerve-hdg", mPeriodicIO.swerve_heading);
+    SmartDashboard.putNumber("SW: snap", m_PeriodicIO.snap_target);
+    SmartDashboard.putNumber("SW: vision", m_PeriodicIO.vision_align_target_angle);
+    SmartDashboard.putNumber("SW: swerve-hdg", m_PeriodicIO.swerve_heading);
   }
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -457,10 +456,10 @@ public class Swerve extends SubsystemBase
       return true;
     }
     return ((m_trajTimer.get( ) >= m_trajectory.getTotalTimeSeconds( ))
-        && (Math.abs(mSwerveMods[0].getState( ).speedMetersPerSecond) <= 0 + mStopTolerance)
-        && (Math.abs(mSwerveMods[1].getState( ).speedMetersPerSecond) <= 0 + mStopTolerance)
-        && (Math.abs(mSwerveMods[2].getState( ).speedMetersPerSecond) <= 0 + mStopTolerance)
-        && (Math.abs(mSwerveMods[3].getState( ).speedMetersPerSecond) <= 0 + mStopTolerance));
+        && (Math.abs(mSwerveMods[0].getState( ).speedMetersPerSecond) <= 0 + m_StopTolerance)
+        && (Math.abs(mSwerveMods[1].getState( ).speedMetersPerSecond) <= 0 + m_StopTolerance)
+        && (Math.abs(mSwerveMods[2].getState( ).speedMetersPerSecond) <= 0 + m_StopTolerance)
+        && (Math.abs(mSwerveMods[3].getState( ).speedMetersPerSecond) <= 0 + m_StopTolerance));
   }
 
   public void driveWithPathFollowerEnd( )
@@ -654,20 +653,20 @@ public class Swerve extends SubsystemBase
   // @Override
   public void readPeriodicInputs( )
   {
-    mPeriodicIO.odometry_pose_x = swerveOdometry.getPoseMeters( ).getX( );
-    mPeriodicIO.odometry_pose_y = swerveOdometry.getPoseMeters( ).getY( );
-    mPeriodicIO.odometry_pose_rot = swerveOdometry.getPoseMeters( ).getRotation( ).getDegrees( );
-    mPeriodicIO.pigeon_heading = m_pigeon.getYaw( ).getDegrees( );
-    mPeriodicIO.robot_pitch = m_pigeon.getUnadjustedPitch( ).getDegrees( );
-    mPeriodicIO.robot_roll = m_pigeon.getRoll( ).getDegrees( );
-    mPeriodicIO.snap_target = Math.toDegrees(snapPIDController.getGoal( ).position);
-    mPeriodicIO.vision_align_target_angle = Math.toDegrees(mLimelightVisionAlignGoal);
-    mPeriodicIO.swerve_heading = MathUtil.inputModulus(m_pigeon.getYaw( ).getDegrees( ), 0, 360);
+    m_PeriodicIO.odometry_pose_x = swerveOdometry.getPoseMeters( ).getX( );
+    m_PeriodicIO.odometry_pose_y = swerveOdometry.getPoseMeters( ).getY( );
+    m_PeriodicIO.odometry_pose_rot = swerveOdometry.getPoseMeters( ).getRotation( ).getDegrees( );
+    m_PeriodicIO.pigeon_heading = m_pigeon.getYaw( ).getDegrees( );
+    m_PeriodicIO.robot_pitch = m_pigeon.getUnadjustedPitch( ).getDegrees( );
+    m_PeriodicIO.robot_roll = m_pigeon.getRoll( ).getDegrees( );
+    m_PeriodicIO.snap_target = Math.toDegrees(snapPIDController.getGoal( ).position);
+    m_PeriodicIO.vision_align_target_angle = Math.toDegrees(mLimelightVisionAlignGoal);
+    m_PeriodicIO.swerve_heading = MathUtil.inputModulus(m_pigeon.getYaw( ).getDegrees( ), 0, 360);
 
     // SendLog( );
   }
 
-  public static class PeriodicIO
+  public class PeriodicIO
   {
     // inputs
     public double odometry_pose_x;
@@ -722,15 +721,15 @@ public class Swerve extends SubsystemBase
   // {
   //   ArrayList<Number> items = new ArrayList<Number>( );
   //   items.add(Timer.getFPGATimestamp( ));
-  //   items.add(mPeriodicIO.odometry_pose_x);
-  //   items.add(mPeriodicIO.odometry_pose_y);
-  //   items.add(mPeriodicIO.odometry_pose_rot);
-  //   items.add(mPeriodicIO.pigeon_heading);
-  //   items.add(mPeriodicIO.robot_pitch);
-  //   items.add(mPeriodicIO.robot_roll);
-  //   items.add(mPeriodicIO.snap_target);
-  //   items.add(mPeriodicIO.vision_align_target_angle);
-  //   items.add(mPeriodicIO.swerve_heading);
+  //   items.add(m_PeriodicIO.odometry_pose_x);
+  //   items.add(m_PeriodicIO.odometry_pose_y);
+  //   items.add(m_PeriodicIO.odometry_pose_rot);
+  //   items.add(m_PeriodicIO.pigeon_heading);
+  //   items.add(m_PeriodicIO.robot_pitch);
+  //   items.add(m_PeriodicIO.robot_roll);
+  //   items.add(m_PeriodicIO.snap_target);
+  //   items.add(m_PeriodicIO.vision_align_target_angle);
+  //   items.add(m_PeriodicIO.swerve_heading);
   //   for (SwerveModule module : this.mSwerveMods)
   //   {
   //     items.add(module.getState( ).angle.getDegrees( ));
