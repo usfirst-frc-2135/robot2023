@@ -6,6 +6,10 @@ package frc.robot.commands;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
+
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -19,11 +23,11 @@ import frc.robot.subsystems.Swerve;
  */
 public class AutoDrivePath extends CommandBase
 {
-  private final Swerve  m_swerve;
-  private final boolean m_useInitialPose;
+  private final Swerve          m_swerve;
+  private final boolean         m_useInitialPose;
 
-  private String        m_trajectoryJSON;
-  private Trajectory    m_trajectory;
+  private String                m_trajectoryJSON;
+  private PathPlannerTrajectory m_trajectory;
 
   public AutoDrivePath(Swerve drivetrain, String pathName, boolean useInitialPose)
   {
@@ -34,21 +38,12 @@ public class AutoDrivePath extends CommandBase
     addRequirements(m_swerve);
 
     // Get our trajectory
-    m_trajectoryJSON = Filesystem.getDeployDirectory( ).getAbsolutePath( ).toString( ) + "/output/" + pathName + ".wpilib.json";
+    m_trajectoryJSON = Filesystem.getDeployDirectory( ).getAbsolutePath( ).toString( ) + "/pathplanner/" + pathName + ".path";
 
-    try
-    {
-      DataLogManager.log(String.format("%s: TrajPath %s", getName( ), m_trajectoryJSON));
-      Path trajectoryPath = Filesystem.getDeployDirectory( ).toPath( ).resolve(m_trajectoryJSON);
-      m_trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-      DataLogManager.log(String.format("%s: Num states %2d Total time %.3f secs", getName( ), m_trajectory.getStates( ).size( ),
-          m_trajectory.getTotalTimeSeconds( )));
-    }
-    catch (IOException ex)
-    {
-      DataLogManager.log(String.format("%s: Unable to open %s", getName( ), m_trajectoryJSON));
-      DriverStation.reportError("Unable to open trajectory: " + m_trajectoryJSON, ex.getStackTrace( ));
-    }
+    //DataLogManager.log(String.format("%s: TrajPath %s", getName( ), m_trajectoryJSON));
+    m_trajectory = PathPlanner.loadPath(pathName, new PathConstraints(4, 3));
+    DataLogManager.log(String.format("%s: Num states %2d Total time %.3f secs", getName( ), m_trajectory.getStates( ).size( ),
+        m_trajectory.getTotalTimeSeconds( )));
 
   }
 
