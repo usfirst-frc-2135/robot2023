@@ -40,72 +40,61 @@ import frc.robot.team254.lib.util.TimeDelayedBoolean;
 
 public class Swerve extends SubsystemBase
 {
-  public PeriodicIO                 m_PeriodicIO        = new PeriodicIO( );
+  public PeriodicIO                m_PeriodicIO        = new PeriodicIO( );
 
   //module variables
-  private double                    m_StopTolerance     = SWConsts.kStopTolerance;
+  private double                   m_StopTolerance     = SWConsts.kStopTolerance;
 
-  public SwerveModulePosition[ ]    swervePositions;
-  public SwerveDriveOdometry        swerveOdometry;
-  public SwerveModule[ ]            mSwerveMods;
+  public SwerveModulePosition[ ]   swervePositions;
+  public SwerveDriveOdometry       swerveOdometry;
+  public SwerveModule[ ]           mSwerveMods;
 
   //Odometery and telemetry
-  public Pigeon                     m_pigeon            = new Pigeon(Ports.kCANID_Pigeon2);
-  private Field2d                   m_field             = new Field2d( );
+  public Pigeon                    m_pigeon            = new Pigeon(Ports.kCANID_Pigeon2);
+  private Field2d                  m_field             = new Field2d( );
 
   // chassis velocity status
-  public ChassisSpeeds              chassisVelocity     = new ChassisSpeeds( );
+  public ChassisSpeeds             chassisVelocity     = new ChassisSpeeds( );
 
-  public boolean                    isSnapping;
-  private double                    mLimelightVisionAlignGoal;
-  private double                    mVisionAlignAdjustment;
+  public boolean                   isSnapping;
+  private double                   mLimelightVisionAlignGoal;
+  private double                   mVisionAlignAdjustment;
 
-  public ProfiledPIDController      snapPIDController   = new ProfiledPIDController(Constants.SnapConstants.kP,
+  public ProfiledPIDController     snapPIDController   = new ProfiledPIDController(Constants.SnapConstants.kP,
       Constants.SnapConstants.kI, Constants.SnapConstants.kD, Constants.SnapConstants.kThetaControllerConstraints);
-  public PIDController              visionPIDController =
+  public PIDController             visionPIDController =
       new PIDController(Constants.VisionAlignConstants.kP, Constants.VisionAlignConstants.kI, Constants.VisionAlignConstants.kD);
 
   // Private boolean to lock Swerve wheels
-  private boolean                   m_locked            = false;
+  private boolean                  m_locked            = false;
 
   // Holonomic Drive Controller objects
-  private HolonomicDriveController  m_holonomicController;
-  private Trajectory                m_trajectory;
-  private Timer                     m_trajTimer         = new Timer( );
+  private HolonomicDriveController m_holonomicController;
+  private Trajectory               m_trajectory;
+  private Timer                    m_trajTimer         = new Timer( );
 
   // Limelight drive
-  private double                    m_turnConstant      = SWConsts.kTurnConstant;
-  private double                    m_turnPidKp         = SWConsts.kTurnPidKp;
-  private double                    m_turnPidKi         = SWConsts.kTurnPidKi;
-  private double                    m_turnPidKd         = SWConsts.kTurnPidKd;
-  private double                    m_turnMax           = SWConsts.kTurnMax;
-  private double                    m_throttlePidKp     = SWConsts.kThrottlePidKp;
-  private double                    m_throttlePidKi     = SWConsts.kThrottlePidKi;
-  private double                    m_throttlePidKd     = SWConsts.kThrottlePidKd;
-  private double                    m_throttleMax       = SWConsts.kThrottleMax;
-  private double                    m_throttleShape     = SWConsts.kThrottleShape;
+  private double                   m_turnConstant      = SWConsts.kTurnConstant;
+  private double                   m_turnPidKp         = SWConsts.kTurnPidKp;
+  private double                   m_turnPidKi         = SWConsts.kTurnPidKi;
+  private double                   m_turnPidKd         = SWConsts.kTurnPidKd;
+  private double                   m_turnMax           = SWConsts.kTurnMax;
+  private double                   m_throttlePidKp     = SWConsts.kThrottlePidKp;
+  private double                   m_throttlePidKi     = SWConsts.kThrottlePidKi;
+  private double                   m_throttlePidKd     = SWConsts.kThrottlePidKd;
+  private double                   m_throttleMax       = SWConsts.kThrottleMax;
+  private double                   m_throttleShape     = SWConsts.kThrottleShape;
 
-  private double                    m_targetAngle       = SWConsts.kTargetAngle; // Optimal shooting angle
-  private double                    m_setPointDistance  = SWConsts.kSetPointDistance; // Optimal shooting distance
-  private double                    m_angleThreshold    = SWConsts.kAngleThreshold; // Tolerance around optimal
-  private double                    m_distThreshold     = SWConsts.kDistThreshold;// Tolerance around optimal
-
-  private static final List<Pose3d> m_targetPoses       =
-      Collections.unmodifiableList(List.of(new Pose3d(new Translation3d(7.24310, -2.93659, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 1 
-          new Pose3d(new Translation3d(7.24310, -1.26019, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 2 
-          new Pose3d(new Translation3d(7.24310, 0.41621, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 3 
-          new Pose3d(new Translation3d(7.24310, 2.74161, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 4 
-          new Pose3d(new Translation3d(-7.24310, 2.74161, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 5 
-          new Pose3d(new Translation3d(-7.24310, 0.46272, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 6 
-          new Pose3d(new Translation3d(-7.24310, -1.26019, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 7
-          new Pose3d(new Translation3d(-7.24310, -2.74161, 0), new Rotation3d(0, 0, 0)) // AprilTag ID: 8
-      ));
+  private double                   m_targetAngle       = SWConsts.kTargetAngle; // Optimal shooting angle
+  private double                   m_setPointDistance  = SWConsts.kSetPointDistance; // Optimal shooting distance
+  private double                   m_angleThreshold    = SWConsts.kAngleThreshold; // Tolerance around optimal
+  private double                   m_distThreshold     = SWConsts.kDistThreshold;// Tolerance around optimal
 
   // DriveWithLimelight pid controller objects
-  private int                       m_limelightDebug    = 0; // Debug flag to disable extra limelight logging calls
-  private PIDController             m_turnPid           = new PIDController(0.0, 0.0, 0.0);
-  private PIDController             m_throttlePid       = new PIDController(0.0, 0.0, 0.0);
-  private double                    m_limelightDistance;
+  private int                      m_limelightDebug    = 0; // Debug flag to disable extra limelight logging calls
+  private PIDController            m_turnPid           = new PIDController(0.0, 0.0, 0.0);
+  private PIDController            m_throttlePid       = new PIDController(0.0, 0.0, 0.0);
+  private double                   m_limelightDistance;
 
   // Getter
   public boolean getLocked( )
