@@ -59,6 +59,7 @@ public class Swerve extends SubsystemBase
   public boolean                    isSnapping;
   private double                    mLimelightVisionAlignGoal;
   private double                    mVisionAlignAdjustment;
+  private int                       m_ramseteDebug      = 0;    // Debug flag to disable extra ramsete logging calls
 
   public ProfiledPIDController      snapPIDController   = new ProfiledPIDController(Constants.SnapConstants.kP,
       Constants.SnapConstants.kI, Constants.SnapConstants.kD, Constants.SnapConstants.kThetaControllerConstraints);
@@ -404,29 +405,15 @@ public class Swerve extends SubsystemBase
 
     //TODO: how to find the goal position
 
-    // Get the adjusted speeds. Here, we want the robot to be facing
-    // 70 degrees (in the field-relative coordinate system).
     //TODO: update the degrees to desired coordinate system
-    ChassisSpeeds targetChassisSpeeds = m_holonomicController.calculate(currentPose, trajState, Rotation2d.fromDegrees(70.0));
+    ChassisSpeeds targetChassisSpeeds = m_holonomicController.calculate(currentPose, trajState, Rotation2d.fromDegrees(0));
     // Convert to module states
     SwerveModuleState[ ] moduleStates = Constants.SwerveConstants.swerveKinematics.toSwerveModuleStates(targetChassisSpeeds);
 
-    // Front left module state
-    SwerveModuleState frontLeft = moduleStates[0];
-
-    // Front right module state
-    SwerveModuleState frontRight = moduleStates[1];
-
-    // Back left module state
-    SwerveModuleState backLeft = moduleStates[2];
-
-    // Back right module state
-    SwerveModuleState backRight = moduleStates[3];
-
-    double targetfrontLeft = (frontLeft.speedMetersPerSecond); //TODO: Add MPS ??
-    double targetfrontRight = (frontRight.speedMetersPerSecond); //TODO: Add MPS ??
-    double targetbackLeft = (backLeft.speedMetersPerSecond);
-    double targetbackRight = (backRight.speedMetersPerSecond);
+    double targetfrontLeft = (moduleStates[0].speedMetersPerSecond); //TODO: Add MPS ??
+    double targetfrontRight = (moduleStates[1].speedMetersPerSecond); //TODO: Add MPS ??
+    double targetbackLeft = (moduleStates[2].speedMetersPerSecond);
+    double targetbackRight = (moduleStates[3].speedMetersPerSecond);
 
     double currentfrontLeft = mSwerveMods[0].getState( ).speedMetersPerSecond;
     double currentfrontRight = mSwerveMods[1].getState( ).speedMetersPerSecond;
@@ -441,8 +428,67 @@ public class Swerve extends SubsystemBase
     double targetHeading = trajState.poseMeters.getRotation( ).getDegrees( ); ///Maybe get in radians?
     double currentHeading = currentPose.getRotation( ).getDegrees( ); ///Maybe get in radians?
 
-    //IN PROG
+    //TODO: feedWatchDog
 
+    setModuleStates(moduleStates);
+
+    if (m_ramseteDebug >= 1)
+    {
+      DataLogManager.log(getSubsystem( )
+     // @formatter:off
+            + ": DTR time: "     + String.format("%.3f", m_trajTimer.get( ))
+                + " curXYR: "    + String.format("%.2f", currentTrajX) 
+                  + " "          + String.format("%.2f", currentTrajY) 
+                  + " "          + String.format("%.1f", currentHeading)
+               + " targXYR: "   + String.format("%.2f", targetTrajX) 
+                  + " "          + String.format("%.2f", targetTrajY) 
+                  + " "          + String.format("%.1f", targetHeading)
+                + " chasXYO: "   + String.format("%.1f", targetChassisSpeeds.vxMetersPerSecond) 
+                  + " "          + String.format("%.1f", targetChassisSpeeds.vyMetersPerSecond)
+                  + " "          + String.format("%.1f", targetChassisSpeeds.omegaRadiansPerSecond)
+                + " targVel: " + String.format("%.1f", moduleStates[0].speedMetersPerSecond) 
+                  + " "          + String.format("%.1f", moduleStates[1].speedMetersPerSecond)
+                  + " "          + String.format("%.1f", moduleStates[2].speedMetersPerSecond) 
+                  + " "          + String.format("%.1f", moduleStates[3].speedMetersPerSecond)
+                + " curVel: "  + String.format("%.2f", currentfrontLeft) 
+                  + " "          + String.format("%.2f", currentfrontRight)
+                  + " "          + String.format("%.2f", currentbackLeft)
+                  + " "          + String.format("%.2f", currentbackRight)); 
+        // @formatter:on
+    }
+
+    if (m_ramseteDebug >= 2)
+    {
+      // target velocity and its error
+      SmartDashboard.putNumber(getSubsystem( ) + ": DTR_targetVelFrontLeft", targetfrontLeft);
+      SmartDashboard.putNumber(getSubsystem( ) + ": DTR_targetVelFrontRight", targetfrontRight);
+      SmartDashboard.putNumber(getSubsystem( ) + ": DTR_targetVelBackLeft", targetbackLeft);
+      SmartDashboard.putNumber(getSubsystem( ) + ": DTR_targetVelBackRight", targetbackRight);
+      SmartDashboard.putNumber(getSubsystem( ) + ": DTR_currentVelFrontLeft", currentfrontLeft);
+      SmartDashboard.putNumber(getSubsystem( ) + ": DTR_currentVelFrontRight", currentfrontRight);
+      SmartDashboard.putNumber(getSubsystem( ) + ": DTR_currentVelBackLeft", currentbackLeft);
+      SmartDashboard.putNumber(getSubsystem( ) + ": DTR_currentVelBackRight", currentbackRight);
+
+      SmartDashboard.putNumber(getSubsystem( ) + ": DTR_velErrorFrontLeft", targetfrontLeft - currentfrontLeft);
+      SmartDashboard.putNumber(getSubsystem( ) + ": DTR_velErrorFrontRight", targetfrontRight - currentfrontRight);
+      SmartDashboard.putNumber(getSubsystem( ) + ": DTR_velErrorBackLeft", targetbackLeft - currentbackLeft);
+      SmartDashboard.putNumber(getSubsystem( ) + ": DTR_velErrorBackRight", targetbackRight - currentbackRight);
+
+      // target distance and its error
+      SmartDashboard.putNumber(getSubsystem( ) + ": DTR_currentTrajX", targetTrajX);
+      SmartDashboard.putNumber(getSubsystem( ) + ": DTR_currentTrajY", targetTrajY);
+      SmartDashboard.putNumber(getSubsystem( ) + ": DTR_targetTrajX", currentTrajX);
+      SmartDashboard.putNumber(getSubsystem( ) + ": DTR_targetTrajY", currentTrajY);
+
+      SmartDashboard.putNumber(getSubsystem( ) + ": DTR_trajErrorX", trajState.poseMeters.relativeTo(currentPose).getX( ));
+      SmartDashboard.putNumber(getSubsystem( ) + ": DTR_trajErrorY", trajState.poseMeters.relativeTo(currentPose).getY( ));
+
+      // target heading and its error
+      SmartDashboard.putNumber(getSubsystem( ) + ": DTR_targetHeading", targetHeading);
+      SmartDashboard.putNumber(getSubsystem( ) + ": DTR_currentHeading", currentHeading);
+      SmartDashboard.putNumber(getSubsystem( ) + ": DTR_headingError",
+          trajState.poseMeters.relativeTo(currentPose).getRotation( ).getDegrees( ));
+    }
   }
 
   public boolean driveWithPathFollowerIsFinished( )
@@ -456,10 +502,10 @@ public class Swerve extends SubsystemBase
       return true;
     }
     return ((m_trajTimer.get( ) >= m_trajectory.getTotalTimeSeconds( ))
-        && (Math.abs(mSwerveMods[0].getState( ).speedMetersPerSecond) <= 0 + m_StopTolerance)
-        && (Math.abs(mSwerveMods[1].getState( ).speedMetersPerSecond) <= 0 + m_StopTolerance)
-        && (Math.abs(mSwerveMods[2].getState( ).speedMetersPerSecond) <= 0 + m_StopTolerance)
-        && (Math.abs(mSwerveMods[3].getState( ).speedMetersPerSecond) <= 0 + m_StopTolerance));
+        && (Math.abs(mSwerveMods[0].getState( ).speedMetersPerSecond) <= m_StopTolerance)
+        && (Math.abs(mSwerveMods[1].getState( ).speedMetersPerSecond) <= m_StopTolerance)
+        && (Math.abs(mSwerveMods[2].getState( ).speedMetersPerSecond) <= m_StopTolerance)
+        && (Math.abs(mSwerveMods[3].getState( ).speedMetersPerSecond) <= m_StopTolerance));
   }
 
   public void driveWithPathFollowerEnd( )
