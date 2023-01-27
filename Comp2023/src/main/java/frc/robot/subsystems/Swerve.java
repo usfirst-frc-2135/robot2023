@@ -171,7 +171,7 @@ public class Swerve extends SubsystemBase
 
   private void initSmartDashboard( )
   {
-
+    SmartDashboard.putData("Field", m_field);
   }
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -204,6 +204,8 @@ public class Swerve extends SubsystemBase
     SmartDashboard.putNumber("SW: snap", m_PeriodicIO.snap_target);
     SmartDashboard.putNumber("SW: vision", m_PeriodicIO.vision_align_target_angle);
     SmartDashboard.putNumber("SW: swerve-hdg", m_PeriodicIO.swerve_heading);
+
+    m_field.setRobotPose(getPose( ));
   }
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -383,8 +385,6 @@ public class Swerve extends SubsystemBase
 
     m_trajTimer.reset( );
     m_trajTimer.start( );
-
-    m_field.setRobotPose(getPose( ));
   }
 
   public void driveWithPathFollowerExecute( )
