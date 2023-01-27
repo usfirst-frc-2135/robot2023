@@ -59,7 +59,7 @@ public class Swerve extends SubsystemBase
   public boolean                    isSnapping;
   private double                    mLimelightVisionAlignGoal;
   private double                    mVisionAlignAdjustment;
-  private int                       m_ramseteDebug      = 0;    // Debug flag to disable extra ramsete logging calls
+  private int                       m_pathDebug         = 0;    // Debug flag to disable extra ramsete logging calls
 
   public ProfiledPIDController     snapPIDController   = new ProfiledPIDController(Constants.SnapConstants.kP,
       Constants.SnapConstants.kI, Constants.SnapConstants.kD, Constants.SnapConstants.kThetaControllerConstraints);
@@ -421,7 +421,7 @@ public class Swerve extends SubsystemBase
 
     setModuleStates(moduleStates);
 
-    if (m_ramseteDebug >= 1)
+    if (m_pathDebug >= 1)
     {
       DataLogManager.log(getSubsystem( )
      // @formatter:off
@@ -446,7 +446,7 @@ public class Swerve extends SubsystemBase
         // @formatter:on
     }
 
-    if (m_ramseteDebug >= 2)
+    if (m_pathDebug >= 2)
     {
       // target velocity and its error
       SmartDashboard.putNumber(getSubsystem( ) + ": DTR_targetVelFrontLeft", targetfrontLeft);
