@@ -4,7 +4,7 @@
 
 // ROBOTBUILDER TYPE: RobotContainer.
 
-package frc.robot;
+package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -15,15 +15,13 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants;
 import frc.robot.Constants.GRConsts.GRMode;
+import frc.robot.Robot;
 import frc.robot.commands.AutoDrivePath;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.GripperRun;
-import frc.robot.subsystems.Gripper;
-import frc.robot.subsystems.Power;
-import frc.robot.subsystems.Swerve;
-import frc.robot.subsystems.Vision;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
