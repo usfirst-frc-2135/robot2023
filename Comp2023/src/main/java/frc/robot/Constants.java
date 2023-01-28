@@ -165,7 +165,7 @@ public class Constants
     public static final double        kLLDistance2   = 60;    // distance from bumper in inches for second reference point
     public static final double        kLLVertOffset2 = -4.85; // LL y reading in degrees for second reference point
 
-    private static final List<Pose3d> m_targetPoses  =
+    private static final List<Pose3d> kAprilTagPoses =
         Collections.unmodifiableList(List.of(new Pose3d(new Translation3d(7.24310, -2.93659, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 1 
             new Pose3d(new Translation3d(7.24310, -1.26019, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 2 
             new Pose3d(new Translation3d(7.24310, 0.41621, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 3 
