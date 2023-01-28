@@ -4,14 +4,23 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class ExampleSubsystem extends SubsystemBase
+public class Arm extends SubsystemBase
 {
+  private final WPI_TalonFX mArm14 = new WPI_TalonFX(14);;
+  private final WPI_TalonFX mArm15 = new WPI_TalonFX(15);;
+
   /** Creates a new ExampleSubsystem. */
-  public ExampleSubsystem( )
-  {}
+  public Arm( )
+  {
+    setName("Arm");
+    setSubsystem("Arm");
+
+  }
 
   /**
    * Example command factory method.

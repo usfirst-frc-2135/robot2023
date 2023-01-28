@@ -318,7 +318,7 @@ public class Constants
 
   //// 1678 Constants ///////////////////////////////////////////////////////////
 
-  // toggle constants between comp bot and practice bot (named "epsilon")
+  // toggle constants between comp bot and practice bot (named "beta")
   public static final boolean isComp            = true;
 
   // Timeout constants
@@ -406,52 +406,52 @@ public class Constants
     /* Front Left Module - Module 0 */
     public static final class Mod0
     {
-      public static final double epsilonAngleOffset = 239.06;
-      public static final double compAngleOffset    = 15.996;
+      public static final double betaAngleOffset = 239.06;
+      public static final double compAngleOffset = 15.996;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
         return new SwerveModuleConstants(Ports.kCANID_DriveLF, Ports.kCANID_TurnLF, Ports.kCANID_CANCoderLF,
-            isComp ? compAngleOffset : epsilonAngleOffset);
+            isComp ? compAngleOffset : betaAngleOffset);
       }
     }
 
     /* Front Right Module - Module 1 */
     public static final class Mod1
     {
-      public static final double epsilonAngleOffset = 339.96;
-      public static final double compAngleOffset    = 239.590;
+      public static final double betaAngleOffset = 339.96;
+      public static final double compAngleOffset = 239.590;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
         return new SwerveModuleConstants(Ports.kCANID_DriveRF, Ports.kCANID_TurnRF, Ports.kCANID_CANCoderRF,
-            isComp ? compAngleOffset : epsilonAngleOffset);
+            isComp ? compAngleOffset : betaAngleOffset);
       }
     }
 
     /* Back Left Module - Module 2 */
     public static final class Mod2
     {
-      public static final double epsilonAngleOffset = 317.20;
-      public static final double compAngleOffset    = 181.934;
+      public static final double betaAngleOffset = 317.20;
+      public static final double compAngleOffset = 181.934;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
         return new SwerveModuleConstants(Ports.kCANID_DriveLR, Ports.kCANID_TurnLR, Ports.kCANID_CANCoderLR,
-            isComp ? compAngleOffset : epsilonAngleOffset);
+            isComp ? compAngleOffset : betaAngleOffset);
       }
     }
 
     /* Back Right Module - Module 3 */
     public static final class Mod3
     {
-      public static final double epsilonAngleOffset = 311.22;
-      public static final double compAngleOffset    = 7.910;
+      public static final double betaAngleOffset = 311.22;
+      public static final double compAngleOffset = 7.910;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
         return new SwerveModuleConstants(Ports.kCANID_DriveRR, Ports.kCANID_TurnRR, Ports.kCANID_CANCoderRR,
-            isComp ? compAngleOffset : epsilonAngleOffset);
+            isComp ? compAngleOffset : betaAngleOffset);
       }
     }
   }
