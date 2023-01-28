@@ -16,11 +16,14 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.GRConsts.GRMode;
+import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.commands.AutoDrivePath;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.GripperRun;
+import frc.robot.commands.LEDSet;
 import frc.robot.subsystems.Gripper;
+import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Power;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
@@ -42,7 +45,7 @@ public class RobotContainer
   private final XboxController  m_operatorPad = new XboxController(Constants.kOperatorPadPort);
 
   // The robot's subsystems
-  // public final LED              m_led           = new LED( );
+  public final LED              m_led         = new LED( );
   public final Vision           m_vision      = new Vision( );
 
   // These subsystems can use LED or vision and must be created afterward
@@ -83,7 +86,7 @@ public class RobotContainer
     // SmartDashboard.putData("DriveMotorTest", new DriveMotorTest(m_swerve, true));
     // SmartDashboard.putData("DriveResetSensors", new DriveResetSensors(m_swerve));
     // SmartDashboard.putData("DriveSlowMode", new DriveSlowMode(m_swerve, false));
-    // SmartDashboard.putData("LEDSet", new LEDSet(m_led, LEDColor.LEDCOLOR_OFF));
+    //SmartDashboard.putData("LEDSet", new LEDSet(m_led, LEDColor.LEDCOLOR_OFF));
 
     SmartDashboard.putData("Dummy", new Dummy(2135));
   }
