@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -39,6 +38,7 @@ public class Constants
     public static final String kCANCarnivore     = "canivore1";
     public static final String kCANRio           = "rio";
 
+    // Swerve IDs
     public static final int    kCANID_DriveLF    = 1;
     public static final int    kCANID_TurnLF     = 2;
     public static final int    kCANID_CANCoderLF = 3;
@@ -57,6 +57,13 @@ public class Constants
 
     public static final int    kCANID_Pigeon2    = 13;
 
+    // Other subsystem CAN IDs
+    public static final int    kCANID_Elbow      = 15;
+    public static final int    kCANID_Wrist      = 16;
+    public static final int    kCANID_Gripper    = 18;
+
+    public static final int    kCANID_CANdle     = 0;
+
     // Digital I/Os
     // public static final int    kDIO_CargoDetect  = 2;
   }
@@ -65,8 +72,8 @@ public class Constants
   {
     public static int          kMaxRPM               = 6380;             // free speed for Falcon 500 motor
     public static final double kEncoderCPR           = 2048;             // CPR is 2048 from Falcon 500 Manual
-    public static final int    kTalonReqVersion      = ((22 * 256) + 0); // Talon version is 22.0
-    public static final int    kPigeonReqVersion     = ((22 * 256) + 0); // Pigeon IMU version is 22.0
+    public static final int    kTalonReqVersion      = ((23 * 256) + 0); // Talon version is 23.0
+    public static final int    kPigeonReqVersion     = ((23 * 256) + 0); // Pigeon IMU version is 23.0
 
     // Input current limit settings
     public static final double kSupplyCurrentLimit   = 45.0;  // Default supply current limit (after trigger)
@@ -81,8 +88,6 @@ public class Constants
 
   public static final class GRConsts
   {
-    public static final int    kGRPWM17        = 17;
-
     public static final double kGRAcquireSpeed = 1.0;
     public static final double kGRExpelSpeed   = -1.0;
 
@@ -126,8 +131,6 @@ public class Constants
 
   public static final class LEDConsts
   {
-    public static final int kCANDdleID = 0;
-
     public enum LEDColor
     {
       LEDCOLOR_OFF,     // CANdle off
@@ -194,20 +197,9 @@ public class Constants
 
   public static final class AUTOConstants
   {
-    public static final double k_WaitTime1 = 0.0; // First wait timer - time to wait
-    public static final double k_WaitTime2 = 0.0; // Second wait timer - time to wait
-
-    public static final String path1       = "forward39";
-    public static final String path2       = "backward39";
-    public static final String path3       = "rightAngleTurn";
-
-    public static final String kDrive_path = "startToOffTarmac";
-
-    public enum AutoTimer
-    {
-      TIMER1,     // Select first auto wait timer for use
-      TIMER2      // Select second auto wait timer for use
-    };
+    public static final String path1 = "forward39";
+    public static final String path2 = "backward39";
+    public static final String path3 = "rightAngleTurn";
   }
 
   //// 1678 Constants ///////////////////////////////////////////////////////////
@@ -291,9 +283,9 @@ public class Constants
     public static final boolean                                      canCoderInvert              = false;
 
     /* Controller Invert */
+    public static final boolean                                      invertXAxis                 = false;
     public static final boolean                                      invertYAxis                 = false;
     public static final boolean                                      invertRAxis                 = false;
-    public static final boolean                                      invertXAxis                 = false;
 
     /*** MODULE SPECIFIC CONSTANTS ***/
 
@@ -382,8 +374,6 @@ public class Constants
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints             =
         new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
   }
-
-  /*** SUBSYSTEM CONSTANTS ***/
 
   //// 1678 Constants ///////////////////////////////////////////////////////////
 }
