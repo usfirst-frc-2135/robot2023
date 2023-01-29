@@ -28,8 +28,6 @@ public class Robot extends TimedRobot
   private RobotContainer    m_robotContainer;
 
   private boolean           m_faultsCleared = false;
-  private double            m_waitTime1     = 0.0;
-  private double            m_waitTime2     = 0.0;
 
   public static CTREConfigs ctreConfigs;
 
@@ -54,9 +52,6 @@ public class Robot extends TimedRobot
     CommandScheduler.getInstance( ).onCommandInitialize(cmd -> DataLogManager.log(cmd.getName( ) + ": Init"));
     CommandScheduler.getInstance( ).onCommandInterrupt(cmd -> DataLogManager.log(cmd.getName( ) + ": Interrupted"));
     CommandScheduler.getInstance( ).onCommandFinish(cmd -> DataLogManager.log(cmd.getName( ) + ": End"));
-
-    SmartDashboard.putNumber("AUTO_WaitTime1", m_waitTime1);
-    SmartDashboard.putNumber("AUTO_WaitTime2", m_waitTime2);
 
     PortForwarder.add(5800, "limelight.local", 5800);
     PortForwarder.add(5801, "limelight.local", 5801);
