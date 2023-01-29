@@ -8,6 +8,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -33,25 +34,28 @@ import frc.robot.subsystems.Vision;
  */
 public class RobotContainer
 {
-  private static RobotContainer m_robotContainer;
+  private static RobotContainer m_robotContainer = new RobotContainer( );
 
-  public final Gripper          m_Gripper     = new Gripper( );
+  public final Gripper          m_Gripper        = new Gripper( );
 
   // Joysticks
-  private final XboxController  m_driverPad   = new XboxController(Constants.kDriverPadPort);
-  private final XboxController  m_operatorPad = new XboxController(Constants.kOperatorPadPort);
+  private final XboxController  m_driverPad      = new XboxController(Constants.kDriverPadPort);
+  private final XboxController  m_operatorPad    = new XboxController(Constants.kOperatorPadPort);
 
   // The robot's subsystems
   // public final LED              m_led           = new LED( );
-  public final Vision           m_vision      = new Vision( );
+  public final Vision           m_vision         = new Vision( );
 
   // These subsystems can use LED or vision and must be created afterward
   // public final Pneumatics       m_pneumatics    = new Pneumatics( );
-  public final Power            m_power       = new Power( );
-  public final Swerve           m_swerve      = new Swerve( );
+  public final Power            m_power          = new Power( );
+  // public final Swerve           m_swerve      = new Swerve( );
 
   // A chooser for autonomous commands
-  SendableChooser<Command>      m_chooser     = new SendableChooser<>( );
+  SendableChooser<Command>      m_chooser        = new SendableChooser<>( );
+
+  //Field 2d widget declaration
+  public final Field2d          m_field2d        = new Field2d( );
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -75,7 +79,7 @@ public class RobotContainer
   private void addSmartDashboardWidgets( )
   {
     // SmartDashboard Buttons
-    SmartDashboard.putData("AutoDrivePathForward", new AutoDrivePath(m_swerve, "forward1m", true));
+    //SmartDashboard.putData("AutoDrivePathForward", new AutoDrivePath(m_swerve, "forward1m", true));
 
     // SmartDashboard.putData("DriveLimelight", new DriveLimelight(m_swerve, m_vision, false));
     // SmartDashboard.putData("DriveLimelightStop",
@@ -85,6 +89,7 @@ public class RobotContainer
     // SmartDashboard.putData("DriveSlowMode", new DriveSlowMode(m_swerve, false));
     // SmartDashboard.putData("LEDSet", new LEDSet(m_led, LEDColor.LEDCOLOR_OFF));
 
+    SmartDashboard.putData("Field2d", m_field2d);
     SmartDashboard.putData("Dummy", new Dummy(2135));
   }
 
@@ -198,7 +203,7 @@ public class RobotContainer
   private void initDefaultCommands( )
   {
     // Configure default commands for these subsystems
-    m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_driverPad));
+    // m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_driverPad));
   }
 
   private void initAutonomousChooser( )

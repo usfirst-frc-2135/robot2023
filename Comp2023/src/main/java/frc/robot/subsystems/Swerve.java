@@ -51,15 +51,14 @@ public class Swerve extends SubsystemBase
 
   //Odometery and telemetry
   public Pigeon                    m_pigeon            = new Pigeon(Ports.kCANID_Pigeon2);
-  private Field2d                  m_field             = new Field2d( );
 
   // chassis velocity status
   public ChassisSpeeds             chassisVelocity     = new ChassisSpeeds( );
 
-  public boolean                    isSnapping;
-  private double                    mLimelightVisionAlignGoal;
-  private double                    mVisionAlignAdjustment;
-  private int                       m_pathDebug         = 0;    // Debug flag to disable extra ramsete logging calls
+  public boolean                   isSnapping;
+  private double                   mLimelightVisionAlignGoal;
+  private double                   mVisionAlignAdjustment;
+  private int                      m_pathDebug         = 0;    // Debug flag to disable extra ramsete logging calls
 
   public ProfiledPIDController     snapPIDController   = new ProfiledPIDController(Constants.SnapConstants.kP,
       Constants.SnapConstants.kI, Constants.SnapConstants.kD, Constants.SnapConstants.kThetaControllerConstraints);
@@ -90,6 +89,9 @@ public class Swerve extends SubsystemBase
   private double                   m_setPointDistance  = SWConsts.kSetPointDistance; // Optimal shooting distance
   private double                   m_angleThreshold    = SWConsts.kAngleThreshold; // Tolerance around optimal
   private double                   m_distThreshold     = SWConsts.kDistThreshold;// Tolerance around optimal
+
+  private double                   m_targetID;
+  private boolean                  m_targetValid;
 
   // DriveWithLimelight pid controller objects
   private int                      m_limelightDebug    = 0; // Debug flag to disable extra limelight logging calls
@@ -170,9 +172,7 @@ public class Swerve extends SubsystemBase
   }
 
   private void initSmartDashboard( )
-  {
-    SmartDashboard.putData("Field", m_field);
-  }
+  {}
 
   ///////////////////////////////////////////////////////////////////////////////
   //
@@ -205,7 +205,6 @@ public class Swerve extends SubsystemBase
     SmartDashboard.putNumber("SW: vision", m_PeriodicIO.vision_align_target_angle);
     SmartDashboard.putNumber("SW: swerve-hdg", m_PeriodicIO.swerve_heading);
 
-    m_field.setRobotPose(getPose( ));
   }
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -360,7 +359,7 @@ public class Swerve extends SubsystemBase
 
   private void plotTrajectory(Trajectory trajectory)
   {
-    m_field.getObject("trajectory").setTrajectory(trajectory);
+    // m_field.getObject("trajectory").setTrajectory(trajectory);
   }
 
   public void driveWithPathFollowerInit(Trajectory trajectory, boolean useInitialPose)

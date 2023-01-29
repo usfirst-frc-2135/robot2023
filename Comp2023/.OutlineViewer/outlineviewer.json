@@ -1,0 +1,14 @@
+{
+  "NetworkTables Settings": {
+    "mode": "Client (NT4)",
+    "serverTeam": "2135"
+  },
+  "Persistent Values": {
+    "open": false
+  },
+  "retained": {
+    "limelight": {
+      "open": true
+    }
+  }
+}
