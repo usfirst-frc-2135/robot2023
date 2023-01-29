@@ -36,20 +36,20 @@ public class RobotContainer
 {
   private static RobotContainer m_robotContainer = new RobotContainer( );
 
-  public final Gripper          m_Gripper        = new Gripper( );
-
   // Joysticks
   private final XboxController  m_driverPad      = new XboxController(Constants.kDriverPadPort);
   private final XboxController  m_operatorPad    = new XboxController(Constants.kOperatorPadPort);
 
-  // The robot's subsystems
-  // public final LED              m_led           = new LED( );
-  public final Vision           m_vision         = new Vision( );
+  // The robot's shared subsystems
+  // public final LED              m_led         = new LED( );
+  public final Vision           m_vision      = new Vision( );
 
   // These subsystems can use LED or vision and must be created afterward
-  // public final Pneumatics       m_pneumatics    = new Pneumatics( );
-  public final Power            m_power          = new Power( );
-  // public final Swerve           m_swerve      = new Swerve( );
+  // public final Arm              m_arm         = new Arm();
+  public final Gripper          m_Gripper     = new Gripper( );
+  // public final Pneumatics       m_pneumatics  = new Pneumatics( );
+  public final Power            m_power       = new Power( );
+  public final Swerve           m_swerve      = new Swerve( );
 
   // A chooser for autonomous commands
   SendableChooser<Command>      m_chooser        = new SendableChooser<>( );

@@ -4,7 +4,6 @@
 package frc.robot.subsystems;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import edu.wpi.first.math.MathUtil;
@@ -12,11 +11,8 @@ import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -40,63 +36,63 @@ import frc.robot.team254.lib.util.TimeDelayedBoolean;
 
 public class Swerve extends SubsystemBase
 {
-  public PeriodicIO                m_PeriodicIO        = new PeriodicIO( );
+  private SwerveModule[ ]          m_swerveMods;
+  private SwerveDriveOdometry      m_swerveOdometry;
 
-  //module variables
-  private double                   m_StopTolerance     = SWConsts.kStopTolerance;
+  // Odometery and telemetry
+  private Pigeon                   m_pigeon              = new Pigeon(Ports.kCANID_Pigeon2);
+  private Field2d                  m_field               = new Field2d( );
 
-  public SwerveModulePosition[ ]   swervePositions;
-  public SwerveDriveOdometry       swerveOdometry;
-  public SwerveModule[ ]           mSwerveMods;
-
-  //Odometery and telemetry
-  public Pigeon                    m_pigeon            = new Pigeon(Ports.kCANID_Pigeon2);
-
-  // chassis velocity status
-  public ChassisSpeeds             chassisVelocity     = new ChassisSpeeds( );
-
-  public boolean                   isSnapping;
-  private double                   mLimelightVisionAlignGoal;
-  private double                   mVisionAlignAdjustment;
-  private int                      m_pathDebug         = 0;    // Debug flag to disable extra ramsete logging calls
-
-  public ProfiledPIDController     snapPIDController   = new ProfiledPIDController(Constants.SnapConstants.kP,
-      Constants.SnapConstants.kI, Constants.SnapConstants.kD, Constants.SnapConstants.kThetaControllerConstraints);
-  public PIDController             visionPIDController =
+  // PID objects
+  private ProfiledPIDController    m_snapPIDController   = new ProfiledPIDController( // 
+      Constants.SnapConstants.kP, //
+      Constants.SnapConstants.kI, //
+      Constants.SnapConstants.kD, //
+      Constants.SnapConstants.kThetaControllerConstraints);
+  private PIDController            m_visionPIDController =
       new PIDController(Constants.VisionAlignConstants.kP, Constants.VisionAlignConstants.kI, Constants.VisionAlignConstants.kD);
-
-  // Private boolean to lock Swerve wheels
-  private boolean                  m_locked            = false;
 
   // Holonomic Drive Controller objects
   private HolonomicDriveController m_holonomicController;
   private Trajectory               m_trajectory;
-  private Timer                    m_trajTimer         = new Timer( );
+  private Timer                    m_trajTimer           = new Timer( );
+
+  // Module variables
+  private PeriodicIO               m_periodicIO          = new PeriodicIO( );
+  private boolean                  m_isSnapping;
+  private double                   m_limelightVisionAlignGoal;
+  private double                   m_visionAlignAdjustment;
+
+  // Lock Swerve wheels
+  private boolean                  m_locked              = false;
+
+  // Path following
+  private int                      m_pathDebug           = 0;    // Debug flag to disable extra ramsete logging calls
 
   // Limelight drive
-  private double                   m_turnConstant      = SWConsts.kTurnConstant;
-  private double                   m_turnPidKp         = SWConsts.kTurnPidKp;
-  private double                   m_turnPidKi         = SWConsts.kTurnPidKi;
-  private double                   m_turnPidKd         = SWConsts.kTurnPidKd;
-  private double                   m_turnMax           = SWConsts.kTurnMax;
-  private double                   m_throttlePidKp     = SWConsts.kThrottlePidKp;
-  private double                   m_throttlePidKi     = SWConsts.kThrottlePidKi;
-  private double                   m_throttlePidKd     = SWConsts.kThrottlePidKd;
-  private double                   m_throttleMax       = SWConsts.kThrottleMax;
-  private double                   m_throttleShape     = SWConsts.kThrottleShape;
+  private double                   m_turnConstant        = SWConsts.kTurnConstant;
+  private double                   m_turnPidKp           = SWConsts.kTurnPidKp;
+  private double                   m_turnPidKi           = SWConsts.kTurnPidKi;
+  private double                   m_turnPidKd           = SWConsts.kTurnPidKd;
+  private double                   m_turnMax             = SWConsts.kTurnMax;
+  private double                   m_throttlePidKp       = SWConsts.kThrottlePidKp;
+  private double                   m_throttlePidKi       = SWConsts.kThrottlePidKi;
+  private double                   m_throttlePidKd       = SWConsts.kThrottlePidKd;
+  private double                   m_throttleMax         = SWConsts.kThrottleMax;
+  private double                   m_throttleShape       = SWConsts.kThrottleShape;
 
-  private double                   m_targetAngle       = SWConsts.kTargetAngle; // Optimal shooting angle
-  private double                   m_setPointDistance  = SWConsts.kSetPointDistance; // Optimal shooting distance
-  private double                   m_angleThreshold    = SWConsts.kAngleThreshold; // Tolerance around optimal
-  private double                   m_distThreshold     = SWConsts.kDistThreshold;// Tolerance around optimal
+  private double                   m_targetAngle         = SWConsts.kTargetAngle; // Optimal shooting angle
+  private double                   m_setPointDistance    = SWConsts.kSetPointDistance; // Optimal shooting distance
+  private double                   m_angleThreshold      = SWConsts.kAngleThreshold; // Tolerance around optimal
+  private double                   m_distThreshold       = SWConsts.kDistThreshold;// Tolerance around optimal
 
   private double                   m_targetID;
   private boolean                  m_targetValid;
 
   // DriveWithLimelight pid controller objects
-  private int                      m_limelightDebug    = 0; // Debug flag to disable extra limelight logging calls
-  private PIDController            m_turnPid           = new PIDController(0.0, 0.0, 0.0);
-  private PIDController            m_throttlePid       = new PIDController(0.0, 0.0, 0.0);
+  private int                      m_limelightDebug      = 0; // Debug flag to disable extra limelight logging calls
+  private PIDController            m_turnPid             = new PIDController(0.0, 0.0, 0.0);
+  private PIDController            m_throttlePid         = new PIDController(0.0, 0.0, 0.0);
   private double                   m_limelightDistance;
 
   // Getter
@@ -118,7 +114,7 @@ public class Swerve extends SubsystemBase
 
     zeroGyro( );
 
-    mSwerveMods = new SwerveModule[ ]
+    m_swerveMods = new SwerveModule[ ]
     {
         new SwerveModule(0, Constants.SwerveConstants.Mod0.SwerveModuleConstants( )),
         new SwerveModule(1, Constants.SwerveConstants.Mod1.SwerveModuleConstants( )),
@@ -126,17 +122,19 @@ public class Swerve extends SubsystemBase
         new SwerveModule(3, Constants.SwerveConstants.Mod3.SwerveModuleConstants( ))
     };
 
-    swerveOdometry = new SwerveDriveOdometry(Constants.SwerveConstants.swerveKinematics, m_pigeon.getYaw( ).getWPIRotation2d( ),
+    m_swerveOdometry = new SwerveDriveOdometry(Constants.SwerveConstants.swerveKinematics, m_pigeon.getYaw( ).getWPIRotation2d( ),
         new SwerveModulePosition[ ]
         {
-            mSwerveMods[0].getPosition( ), mSwerveMods[1].getPosition( ), mSwerveMods[2].getPosition( ),
-            mSwerveMods[3].getPosition( )
+            m_swerveMods[0].getPosition( ), //
+            m_swerveMods[1].getPosition( ), //
+            m_swerveMods[2].getPosition( ), //
+            m_swerveMods[3].getPosition( )
         });
 
-    snapPIDController.enableContinuousInput(-Math.PI, Math.PI);
+    m_snapPIDController.enableContinuousInput(-Math.PI, Math.PI);
 
-    visionPIDController.enableContinuousInput(-Math.PI, Math.PI);
-    visionPIDController.setTolerance(0.0);
+    m_visionPIDController.enableContinuousInput(-Math.PI, Math.PI);
+    m_visionPIDController.setTolerance(0.0);
 
     resetOdometry(new Pose2d( ));
     resetAnglesToAbsolute( );
@@ -180,30 +178,30 @@ public class Swerve extends SubsystemBase
   //
   private void updateSmartDashboard( )
   {
-    SmartDashboard.putNumber("SWMod: 0 - Speed", mSwerveMods[0].getState( ).speedMetersPerSecond);
-    SmartDashboard.putNumber("SWMod: 0 - Angle", mSwerveMods[0].getState( ).angle.getDegrees( ));
-    SmartDashboard.putNumber("SWMod: 0 - Dist", mSwerveMods[0].getPosition( ).distanceMeters);
-    SmartDashboard.putNumber("SWMod: 1 - Speed", mSwerveMods[1].getState( ).speedMetersPerSecond);
-    SmartDashboard.putNumber("SWMod: 1 - Angle", mSwerveMods[1].getState( ).angle.getDegrees( ));
-    SmartDashboard.putNumber("SWMod: 1 - Dist", mSwerveMods[1].getPosition( ).distanceMeters);
-    SmartDashboard.putNumber("SWMod: 2 - Speed", mSwerveMods[2].getState( ).speedMetersPerSecond);
-    SmartDashboard.putNumber("SWMod: 2 - Angle", mSwerveMods[2].getState( ).angle.getDegrees( ));
-    SmartDashboard.putNumber("SWMod: 2 - Dist", mSwerveMods[2].getPosition( ).distanceMeters);
-    SmartDashboard.putNumber("SWMod: 3 - Speed", mSwerveMods[3].getState( ).speedMetersPerSecond);
-    SmartDashboard.putNumber("SWMod: 3 - Angle", mSwerveMods[3].getState( ).angle.getDegrees( ));
-    SmartDashboard.putNumber("SWMod: 3 - Dist", mSwerveMods[3].getPosition( ).distanceMeters);
+    SmartDashboard.putNumber("SWMod: 0 - Speed", m_swerveMods[0].getState( ).speedMetersPerSecond);
+    SmartDashboard.putNumber("SWMod: 0 - Angle", m_swerveMods[0].getState( ).angle.getDegrees( ));
+    SmartDashboard.putNumber("SWMod: 0 - Dist", m_swerveMods[0].getPosition( ).distanceMeters);
+    SmartDashboard.putNumber("SWMod: 1 - Speed", m_swerveMods[1].getState( ).speedMetersPerSecond);
+    SmartDashboard.putNumber("SWMod: 1 - Angle", m_swerveMods[1].getState( ).angle.getDegrees( ));
+    SmartDashboard.putNumber("SWMod: 1 - Dist", m_swerveMods[1].getPosition( ).distanceMeters);
+    SmartDashboard.putNumber("SWMod: 2 - Speed", m_swerveMods[2].getState( ).speedMetersPerSecond);
+    SmartDashboard.putNumber("SWMod: 2 - Angle", m_swerveMods[2].getState( ).angle.getDegrees( ));
+    SmartDashboard.putNumber("SWMod: 2 - Dist", m_swerveMods[2].getPosition( ).distanceMeters);
+    SmartDashboard.putNumber("SWMod: 3 - Speed", m_swerveMods[3].getState( ).speedMetersPerSecond);
+    SmartDashboard.putNumber("SWMod: 3 - Angle", m_swerveMods[3].getState( ).angle.getDegrees( ));
+    SmartDashboard.putNumber("SWMod: 3 - Dist", m_swerveMods[3].getPosition( ).distanceMeters);
 
-    SmartDashboard.putNumber("SW: pose_x", m_PeriodicIO.odometry_pose_x);
-    SmartDashboard.putNumber("SW: pose_y", m_PeriodicIO.odometry_pose_y);
-    SmartDashboard.putNumber("SW: pose_rot", m_PeriodicIO.odometry_pose_rot);
+    SmartDashboard.putNumber("SW: pose_x", m_periodicIO.odometry_pose_x);
+    SmartDashboard.putNumber("SW: pose_y", m_periodicIO.odometry_pose_y);
+    SmartDashboard.putNumber("SW: pose_rot", m_periodicIO.odometry_pose_rot);
 
-    SmartDashboard.putNumber("SW: pigeon-hdg", m_PeriodicIO.pigeon_heading);
-    SmartDashboard.putNumber("SW: pitch", m_PeriodicIO.robot_pitch);
-    SmartDashboard.putNumber("SW: roll", m_PeriodicIO.robot_roll);
+    SmartDashboard.putNumber("SW: pigeon-hdg", m_periodicIO.pigeon_heading);
+    SmartDashboard.putNumber("SW: pitch", m_periodicIO.robot_pitch);
+    SmartDashboard.putNumber("SW: roll", m_periodicIO.robot_roll);
 
-    SmartDashboard.putNumber("SW: snap", m_PeriodicIO.snap_target);
-    SmartDashboard.putNumber("SW: vision", m_PeriodicIO.vision_align_target_angle);
-    SmartDashboard.putNumber("SW: swerve-hdg", m_PeriodicIO.swerve_heading);
+    SmartDashboard.putNumber("SW: snap", m_periodicIO.snap_target);
+    SmartDashboard.putNumber("SW: vision", m_periodicIO.vision_align_target_angle);
+    SmartDashboard.putNumber("SW: swerve-hdg", m_periodicIO.swerve_heading);
 
   }
 
@@ -356,12 +354,6 @@ public class Swerve extends SubsystemBase
   //
   // Autonomous mode - Holonomic path follower
   //
-
-  private void plotTrajectory(Trajectory trajectory)
-  {
-    // m_field.getObject("trajectory").setTrajectory(trajectory);
-  }
-
   public void driveWithPathFollowerInit(Trajectory trajectory, boolean useInitialPose)
   {
     m_holonomicController = new HolonomicDriveController(new PIDController(1, 0, 0), new PIDController(1, 0, 0),
@@ -371,7 +363,7 @@ public class Swerve extends SubsystemBase
 
     if (!RobotBase.isReal( ))
     {
-      plotTrajectory(m_trajectory);
+      m_field.getObject("trajectory").setTrajectory(m_trajectory);
     }
 
     List<Trajectory.State> trajStates = new ArrayList<Trajectory.State>( );
@@ -403,10 +395,10 @@ public class Swerve extends SubsystemBase
     double targetbackLeft = (moduleStates[2].speedMetersPerSecond);
     double targetbackRight = (moduleStates[3].speedMetersPerSecond);
 
-    double currentfrontLeft = mSwerveMods[0].getState( ).speedMetersPerSecond;
-    double currentfrontRight = mSwerveMods[1].getState( ).speedMetersPerSecond;
-    double currentbackLeft = mSwerveMods[2].getState( ).speedMetersPerSecond;
-    double currentbackRight = mSwerveMods[3].getState( ).speedMetersPerSecond;
+    double currentfrontLeft = m_swerveMods[0].getState( ).speedMetersPerSecond;
+    double currentfrontRight = m_swerveMods[1].getState( ).speedMetersPerSecond;
+    double currentbackLeft = m_swerveMods[2].getState( ).speedMetersPerSecond;
+    double currentbackRight = m_swerveMods[3].getState( ).speedMetersPerSecond;
 
     double targetTrajX = trajState.poseMeters.getX( );
     double targetTrajY = trajState.poseMeters.getY( );
@@ -428,17 +420,17 @@ public class Swerve extends SubsystemBase
                 + " curXYR: "    + String.format("%.2f", currentTrajX) 
                   + " "          + String.format("%.2f", currentTrajY) 
                   + " "          + String.format("%.1f", currentHeading)
-               + " targXYR: "   + String.format("%.2f", targetTrajX) 
+                + " targXYR: "   + String.format("%.2f", targetTrajX) 
                   + " "          + String.format("%.2f", targetTrajY) 
                   + " "          + String.format("%.1f", targetHeading)
                 + " chasXYO: "   + String.format("%.1f", targetChassisSpeeds.vxMetersPerSecond) 
                   + " "          + String.format("%.1f", targetChassisSpeeds.vyMetersPerSecond)
                   + " "          + String.format("%.1f", targetChassisSpeeds.omegaRadiansPerSecond)
-                + " targVel: " + String.format("%.1f", moduleStates[0].speedMetersPerSecond) 
+                + " targVel: "   + String.format("%.1f", moduleStates[0].speedMetersPerSecond) 
                   + " "          + String.format("%.1f", moduleStates[1].speedMetersPerSecond)
                   + " "          + String.format("%.1f", moduleStates[2].speedMetersPerSecond) 
                   + " "          + String.format("%.1f", moduleStates[3].speedMetersPerSecond)
-                + " curVel: "  + String.format("%.2f", currentfrontLeft) 
+                + " curVel: "    + String.format("%.2f", currentfrontLeft) 
                   + " "          + String.format("%.2f", currentfrontRight)
                   + " "          + String.format("%.2f", currentbackLeft)
                   + " "          + String.format("%.2f", currentbackRight)); 
@@ -490,10 +482,10 @@ public class Swerve extends SubsystemBase
       return true;
     }
     return ((m_trajTimer.get( ) >= m_trajectory.getTotalTimeSeconds( ))
-        && (Math.abs(mSwerveMods[0].getState( ).speedMetersPerSecond) <= m_StopTolerance)
-        && (Math.abs(mSwerveMods[1].getState( ).speedMetersPerSecond) <= m_StopTolerance)
-        && (Math.abs(mSwerveMods[2].getState( ).speedMetersPerSecond) <= m_StopTolerance)
-        && (Math.abs(mSwerveMods[3].getState( ).speedMetersPerSecond) <= m_StopTolerance));
+        && (Math.abs(m_swerveMods[0].getState( ).speedMetersPerSecond) <= SWConsts.kStopTolerance)
+        && (Math.abs(m_swerveMods[1].getState( ).speedMetersPerSecond) <= SWConsts.kStopTolerance)
+        && (Math.abs(m_swerveMods[2].getState( ).speedMetersPerSecond) <= SWConsts.kStopTolerance)
+        && (Math.abs(m_swerveMods[3].getState( ).speedMetersPerSecond) <= SWConsts.kStopTolerance));
   }
 
   public void driveWithPathFollowerEnd( )
@@ -506,7 +498,7 @@ public class Swerve extends SubsystemBase
 
   public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop)
   {
-    if (isSnapping)
+    if (m_isSnapping)
     {
       if (Math.abs(rotation) == 0.0)
       {
@@ -524,8 +516,10 @@ public class Swerve extends SubsystemBase
     {
       swerveModuleStates = new SwerveModuleState[ ]
       {
-          new SwerveModuleState(0.1, Rotation2d.fromDegrees(45)), new SwerveModuleState(0.1, Rotation2d.fromDegrees(315)),
-          new SwerveModuleState(0.1, Rotation2d.fromDegrees(135)), new SwerveModuleState(0.1, Rotation2d.fromDegrees(225))
+          new SwerveModuleState(0.1, Rotation2d.fromDegrees(45)), //
+          new SwerveModuleState(0.1, Rotation2d.fromDegrees(315)), //
+          new SwerveModuleState(0.1, Rotation2d.fromDegrees(135)), //
+          new SwerveModuleState(0.1, Rotation2d.fromDegrees(225))
       };
     }
     else
@@ -539,7 +533,7 @@ public class Swerve extends SubsystemBase
 
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.SwerveConstants.maxSpeed);
 
-    for (SwerveModule mod : mSwerveMods)
+    for (SwerveModule mod : m_swerveMods)
     {
       mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
     }
@@ -547,35 +541,35 @@ public class Swerve extends SubsystemBase
 
   public double calculateSnapValue( )
   {
-    return snapPIDController.calculate(m_pigeon.getYaw( ).getRadians( ));
+    return m_snapPIDController.calculate(m_pigeon.getYaw( ).getRadians( ));
   }
 
   public void startSnap(double snapAngle)
   {
-    snapPIDController.reset(m_pigeon.getYaw( ).getRadians( ));
-    snapPIDController.setGoal(new TrapezoidProfile.State(Math.toRadians(snapAngle), 0.0));
-    isSnapping = true;
+    m_snapPIDController.reset(m_pigeon.getYaw( ).getRadians( ));
+    m_snapPIDController.setGoal(new TrapezoidProfile.State(Math.toRadians(snapAngle), 0.0));
+    m_isSnapping = true;
   }
 
   TimeDelayedBoolean delayedBoolean = new TimeDelayedBoolean( );
 
   private boolean snapComplete( )
   {
-    double error = snapPIDController.getGoal( ).position - m_pigeon.getYaw( ).getRadians( );
+    double error = m_snapPIDController.getGoal( ).position - m_pigeon.getYaw( ).getRadians( );
     return delayedBoolean.update(Math.abs(error) < Math.toRadians(Constants.SnapConstants.kEpsilon),
         Constants.SnapConstants.kTimeout);
   }
 
   public void maybeStopSnap(boolean force)
   {
-    if (!isSnapping)
+    if (!m_isSnapping)
     {
       return;
     }
     if (force || snapComplete( ))
     {
-      isSnapping = false;
-      snapPIDController.reset(m_pigeon.getYaw( ).getRadians( ));
+      m_isSnapping = false;
+      m_snapPIDController.reset(m_pigeon.getYaw( ).getRadians( ));
     }
   }
 
@@ -584,7 +578,7 @@ public class Swerve extends SubsystemBase
   {
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.SwerveConstants.maxSpeed);
 
-    for (SwerveModule mod : mSwerveMods)
+    for (SwerveModule mod : m_swerveMods)
     {
       mod.setDesiredState(desiredStates[mod.moduleNumber], false);
       SmartDashboard.putNumber("mod " + mod.moduleNumber + " desired speed",
@@ -596,18 +590,18 @@ public class Swerve extends SubsystemBase
 
   public Pose2d getPose( )
   {
-    return swerveOdometry.getPoseMeters( );
+    return m_swerveOdometry.getPoseMeters( );
   }
 
   public void resetOdometry(Pose2d pose)
   {
-    swerveOdometry.resetPosition(pose.getRotation( ), getPosition( ), pose);
+    m_swerveOdometry.resetPosition(pose.getRotation( ), getPosition( ), pose);
     zeroGyro(pose.getRotation( ).getDegrees( ));
   }
 
   public void resetAnglesToAbsolute( )
   {
-    for (SwerveModule mod : mSwerveMods)
+    for (SwerveModule mod : m_swerveMods)
     {
       mod.resetToAbsolute( );
     }
@@ -616,7 +610,7 @@ public class Swerve extends SubsystemBase
   public SwerveModuleState[ ] getStates( )
   {
     SwerveModuleState[ ] states = new SwerveModuleState[4];
-    for (SwerveModule mod : mSwerveMods)
+    for (SwerveModule mod : m_swerveMods)
     {
       states[mod.moduleNumber] = mod.getState( );
       SmartDashboard.putNumber("mod " + mod.moduleNumber + " current speed", states[mod.moduleNumber].speedMetersPerSecond);
@@ -629,7 +623,7 @@ public class Swerve extends SubsystemBase
   public SwerveModulePosition[ ] getPosition( )
   {
     SwerveModulePosition[ ] positions = new SwerveModulePosition[4];
-    for (SwerveModule mod : mSwerveMods)
+    for (SwerveModule mod : m_swerveMods)
     {
       positions[mod.moduleNumber] = mod.getPosition( );
       SmartDashboard.putNumber("mod " + mod.moduleNumber + " current distance", positions[mod.moduleNumber].distanceMeters);
@@ -641,7 +635,7 @@ public class Swerve extends SubsystemBase
 
   public void setAnglePIDValues(double kP, double kI, double kD)
   {
-    for (SwerveModule swerveModule : mSwerveMods)
+    for (SwerveModule swerveModule : m_swerveMods)
     {
       swerveModule.updateAnglePID(kP, kI, kD);
     }
@@ -649,19 +643,19 @@ public class Swerve extends SubsystemBase
 
   public double[ ] getAnglePIDValues(int index)
   {
-    return mSwerveMods[index].getAnglePIDValues( );
+    return m_swerveMods[index].getAnglePIDValues( );
   }
 
   public void setVisionAlignPIDValues(double kP, double kI, double kD)
   {
-    visionPIDController.setPID(kP, kI, kD);
+    m_visionPIDController.setPID(kP, kI, kD);
   }
 
   public double[ ] getVisionAlignPIDValues( )
   {
     return new double[ ]
     {
-        visionPIDController.getP( ), visionPIDController.getI( ), visionPIDController.getD( )
+        m_visionPIDController.getP( ), m_visionPIDController.getI( ), m_visionPIDController.getD( )
     };
   }
 
@@ -673,31 +667,25 @@ public class Swerve extends SubsystemBase
   public void zeroGyro(double reset)
   {
     m_pigeon.setYaw(reset);
-    visionPIDController.reset( );
+    m_visionPIDController.reset( );
   }
 
   public void updateSwerveOdometry( )
   {
-    swerveOdometry.update(m_pigeon.getYaw( ).getWPIRotation2d( ), getPosition( ));
-
-    chassisVelocity = Constants.SwerveConstants.swerveKinematics.toChassisSpeeds(mSwerveMods[0].getState( ),
-        mSwerveMods[1].getState( ), mSwerveMods[2].getState( ), mSwerveMods[3].getState( ));
+    m_swerveOdometry.update(m_pigeon.getYaw( ).getWPIRotation2d( ), getPosition( ));
   }
 
-  // @Override
   public void readPeriodicInputs( )
   {
-    m_PeriodicIO.odometry_pose_x = swerveOdometry.getPoseMeters( ).getX( );
-    m_PeriodicIO.odometry_pose_y = swerveOdometry.getPoseMeters( ).getY( );
-    m_PeriodicIO.odometry_pose_rot = swerveOdometry.getPoseMeters( ).getRotation( ).getDegrees( );
-    m_PeriodicIO.pigeon_heading = m_pigeon.getYaw( ).getDegrees( );
-    m_PeriodicIO.robot_pitch = m_pigeon.getUnadjustedPitch( ).getDegrees( );
-    m_PeriodicIO.robot_roll = m_pigeon.getRoll( ).getDegrees( );
-    m_PeriodicIO.snap_target = Math.toDegrees(snapPIDController.getGoal( ).position);
-    m_PeriodicIO.vision_align_target_angle = Math.toDegrees(mLimelightVisionAlignGoal);
-    m_PeriodicIO.swerve_heading = MathUtil.inputModulus(m_pigeon.getYaw( ).getDegrees( ), 0, 360);
-
-    // SendLog( );
+    m_periodicIO.odometry_pose_x = m_swerveOdometry.getPoseMeters( ).getX( );
+    m_periodicIO.odometry_pose_y = m_swerveOdometry.getPoseMeters( ).getY( );
+    m_periodicIO.odometry_pose_rot = m_swerveOdometry.getPoseMeters( ).getRotation( ).getDegrees( );
+    m_periodicIO.pigeon_heading = m_pigeon.getYaw( ).getDegrees( );
+    m_periodicIO.robot_pitch = m_pigeon.getUnadjustedPitch( ).getDegrees( );
+    m_periodicIO.robot_roll = m_pigeon.getRoll( ).getDegrees( );
+    m_periodicIO.snap_target = Math.toDegrees(m_snapPIDController.getGoal( ).position);
+    m_periodicIO.vision_align_target_angle = Math.toDegrees(m_limelightVisionAlignGoal);
+    m_periodicIO.swerve_heading = MathUtil.inputModulus(m_pigeon.getYaw( ).getDegrees( ), 0, 360);
   }
 
   public class PeriodicIO
@@ -716,65 +704,6 @@ public class Swerve extends SubsystemBase
     // outputs
     public double snap_target;
   }
-
-  // //logger
-  // // @Override
-  // public void registerLogger(LoggingSystem LS)
-  // {
-  //   SetupLog( );
-  //   LS.register(mStorage, "SWERVE_LOGS.csv");
-  // }
-
-  // public void SetupLog( )
-  // {
-  //   mStorage = new LogStorage<PeriodicIO>( );
-
-  //   ArrayList<String> headers = new ArrayList<String>( );
-  //   headers.add("timestamp");
-  //   headers.add("is_enabled");
-  //   headers.add("odometry_pose_x");
-  //   headers.add("odometry_pose_y");
-  //   headers.add("odometry_pose_rot");
-  //   headers.add("pigeon_heading");
-  //   headers.add("robot_pitch");
-  //   headers.add("robot_roll");
-  //   headers.add("vision_align_target_angle");
-  //   headers.add("swerve_heading");
-  //   for (SwerveModule module : this.mSwerveMods)
-  //   {
-  //     headers.add(module.moduleNumber + "_angle");
-  //     headers.add(module.moduleNumber + "_desired_angle");
-  //     headers.add(module.moduleNumber + "_velocity");
-  //     headers.add(module.moduleNumber + "_cancoder");
-  //   }
-
-  //   mStorage.setHeaders(headers);
-  // }
-
-  // public void SendLog( )
-  // {
-  //   ArrayList<Number> items = new ArrayList<Number>( );
-  //   items.add(Timer.getFPGATimestamp( ));
-  //   items.add(m_PeriodicIO.odometry_pose_x);
-  //   items.add(m_PeriodicIO.odometry_pose_y);
-  //   items.add(m_PeriodicIO.odometry_pose_rot);
-  //   items.add(m_PeriodicIO.pigeon_heading);
-  //   items.add(m_PeriodicIO.robot_pitch);
-  //   items.add(m_PeriodicIO.robot_roll);
-  //   items.add(m_PeriodicIO.snap_target);
-  //   items.add(m_PeriodicIO.vision_align_target_angle);
-  //   items.add(m_PeriodicIO.swerve_heading);
-  //   for (SwerveModule module : this.mSwerveMods)
-  //   {
-  //     items.add(module.getState( ).angle.getDegrees( ));
-  //     items.add(module.getTargetAngle( ));
-  //     items.add(module.getState( ).speedMetersPerSecond);
-  //     items.add(MathUtil.inputModulus(module.getCanCoder( ).getDegrees( ) - module.angleOffset, 0, 360));
-  //   }
-
-  //   // // send data to logging storage
-  //   mStorage.addData(items);
-  // }
 
   //// 1678 Swerve //////////////////////////////////////////////////////////////
 
