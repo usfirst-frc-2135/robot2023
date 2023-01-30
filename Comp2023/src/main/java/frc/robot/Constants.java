@@ -205,7 +205,7 @@ public class Constants
   //// 1678 Constants ///////////////////////////////////////////////////////////
 
   // toggle constants between comp bot and practice bot (named "beta")
-  public static final boolean isComp            = false;
+  public static final boolean isComp            = true;
 
   // Timeout constants
   public static final int     kLongCANTimeoutMs = 100;
@@ -216,7 +216,7 @@ public class Constants
     public static final boolean                                      invertGyro                  = false; // Always ensure Gyro is CCW+ CW-
 
     /* Swerve Constants - 0.427 m (x, y) */
-    public static final double                                       trackWidth                  = Units.inchesToMeters(23.77);
+    public static final double                                       trackWidth                  = Units.inchesToMeters(22.77);
     public static final double                                       wheelBase                   = Units.inchesToMeters(23.77);
 
     public static final double                                       wheelDiameter               = Units.inchesToMeters(4.0);
