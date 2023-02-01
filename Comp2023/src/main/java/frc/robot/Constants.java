@@ -195,13 +195,6 @@ public class Constants
     // public static final double kCameraLensBackTilt = Units.degreesToRadians(40.0);  // Camera backward tilt from normal
   }
 
-  public static final class AUTOConstants
-  {
-    public static final String path1 = "forward39";
-    public static final String path2 = "backward39";
-    public static final String path3 = "rightAngleTurn";
-  }
-
   //// 1678 Constants ///////////////////////////////////////////////////////////
 
   // toggle constants between comp bot and practice bot (named "beta")
@@ -373,6 +366,59 @@ public class Constants
 
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints             =
         new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+  }
+
+  public static final class AutoConstants
+  {
+    public static final double                       kSlowSpeedMetersPerSecond                   = 1.7;
+    public static final double                       kSlowAccelerationMetersPerSecondSquared     = 2.0;
+
+    public static final double                       kMaxSpeedMetersPerSecond                    = 2.2;
+    public static final double                       kMaxAccelerationMetersPerSecondSquared      = 2.3;
+
+    public static final double                       kSlowMaxAngularSpeedRadiansPerSecond        = 0.8 * Math.PI;
+    public static final double                       kSlowMaxAngularSpeedRadiansPerSecondSquared =
+        Math.pow(kSlowMaxAngularSpeedRadiansPerSecond, 2);
+
+    public static final double                       kMaxAngularSpeedRadiansPerSecond            = 1.2 * Math.PI;
+    public static final double                       kMaxAngularSpeedRadiansPerSecondSquared     =
+        Math.pow(kMaxAngularSpeedRadiansPerSecond, 2);
+
+    public static final double                       kPXController                               = 1;
+    public static final double                       kPYController                               = 1;
+    public static final double                       kPThetaController                           = 5;
+
+    // Constraint for the motion profilied robot angle controller
+    public static final TrapezoidProfile.Constraints kThetaControllerConstraints                 =
+        new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+
+    // Constraint for the motion profilied robot angle controller
+    public static final TrapezoidProfile.Constraints kSlowThetaControllerConstraints             =
+        new TrapezoidProfile.Constraints(kSlowMaxAngularSpeedRadiansPerSecond, kSlowMaxAngularSpeedRadiansPerSecondSquared);
+
+    public static TrajectoryConfig createConfig(double maxSpeed, double maxAccel, double startSpeed, double endSpeed)
+    {
+      TrajectoryConfig config = new TrajectoryConfig(maxSpeed, maxAccel);
+      config.setKinematics(Constants.SwerveConstants.swerveKinematics);
+      config.setStartVelocity(startSpeed);
+      config.setEndVelocity(endSpeed);
+      config.addConstraint(new CentripetalAccelerationConstraint(3.0));
+      return config;
+    }
+
+    // Trajectory Speed Configs
+    public static final TrajectoryConfig defaultSpeedConfig =
+        new TrajectoryConfig(kMaxSpeedMetersPerSecond, kMaxAccelerationMetersPerSecondSquared)
+            .setKinematics(Constants.SwerveConstants.swerveKinematics);
+
+    public static final TrajectoryConfig slowSpeedConfig    =
+        new TrajectoryConfig(kSlowSpeedMetersPerSecond, kSlowAccelerationMetersPerSecondSquared)
+            .setKinematics(Constants.SwerveConstants.swerveKinematics).setStartVelocity(0).setEndVelocity(0);
+
+    // PathPlanner file names
+    public static final String           path1              = "forward39";
+    public static final String           path2              = "backward39";
+    public static final String           path3              = "rightAngleTurn";
   }
 
   //// 1678 Constants ///////////////////////////////////////////////////////////
