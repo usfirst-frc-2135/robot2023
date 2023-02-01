@@ -92,17 +92,6 @@ public class Swerve extends SubsystemBase
   private PIDController            m_throttlePid         = new PIDController(0.0, 0.0, 0.0);
   private double                   m_limelightDistance;
 
-  // Getter
-  public boolean getLocked( )
-  {
-    return m_locked;
-  }
-
-  // Setter
-  public void setLocked(boolean lock)
-  {
-    m_locked = lock;
-  }
 
   public Swerve( )
   {
@@ -194,13 +183,12 @@ public class Swerve extends SubsystemBase
     SmartDashboard.putNumber("SW: pose_y", m_periodicIO.odometry_pose_y);
     SmartDashboard.putNumber("SW: pose_rot", m_periodicIO.odometry_pose_rot);
 
-    SmartDashboard.putNumber("SW: pigeon-hdg", m_periodicIO.pigeon_heading);
+    SmartDashboard.putNumber("SW: swerve-hdg", m_periodicIO.swerve_heading);
     SmartDashboard.putNumber("SW: pitch", m_periodicIO.robot_pitch);
     SmartDashboard.putNumber("SW: roll", m_periodicIO.robot_roll);
 
-    SmartDashboard.putNumber("SW: snap", m_periodicIO.snap_target);
     SmartDashboard.putNumber("SW: vision", m_periodicIO.vision_align_target_angle);
-    SmartDashboard.putNumber("SW: swerve-hdg", m_periodicIO.swerve_heading);
+    SmartDashboard.putNumber("SW: snap", m_periodicIO.snap_target);
 
     m_field.setRobotPose(getPose( ));
   }
@@ -588,6 +576,18 @@ public class Swerve extends SubsystemBase
     }
   }
 
+  // Getter
+  public boolean getLocked( )
+  {
+    return m_locked;
+  }
+
+  // Setter
+  public void setLocked(boolean lock)
+  {
+    m_locked = lock;
+  }
+
   public Pose2d getPose( )
   {
     return m_swerveOdometry.getPoseMeters( );
@@ -680,12 +680,13 @@ public class Swerve extends SubsystemBase
     m_periodicIO.odometry_pose_x = m_swerveOdometry.getPoseMeters( ).getX( );
     m_periodicIO.odometry_pose_y = m_swerveOdometry.getPoseMeters( ).getY( );
     m_periodicIO.odometry_pose_rot = m_swerveOdometry.getPoseMeters( ).getRotation( ).getDegrees( );
-    m_periodicIO.pigeon_heading = m_pigeon.getYaw( ).getDegrees( );
+
+    m_periodicIO.swerve_heading = MathUtil.inputModulus(m_pigeon.getYaw( ).getDegrees( ), 0, 360);
     m_periodicIO.robot_pitch = m_pigeon.getUnadjustedPitch( ).getDegrees( );
     m_periodicIO.robot_roll = m_pigeon.getRoll( ).getDegrees( );
-    m_periodicIO.snap_target = Math.toDegrees(m_snapPIDController.getGoal( ).position);
+
     m_periodicIO.vision_align_target_angle = Math.toDegrees(m_limelightVisionAlignGoal);
-    m_periodicIO.swerve_heading = MathUtil.inputModulus(m_pigeon.getYaw( ).getDegrees( ), 0, 360);
+    m_periodicIO.snap_target = Math.toDegrees(m_snapPIDController.getGoal( ).position);
   }
 
   public class PeriodicIO
@@ -695,11 +696,10 @@ public class Swerve extends SubsystemBase
     public double odometry_pose_y;
     public double odometry_pose_rot;
 
-    public double pigeon_heading;
+    public double swerve_heading;
     public double robot_pitch;
     public double robot_roll;
     public double vision_align_target_angle;
-    public double swerve_heading;
 
     // outputs
     public double snap_target;
