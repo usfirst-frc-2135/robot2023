@@ -205,7 +205,7 @@ public class Constants
   //// 1678 Constants ///////////////////////////////////////////////////////////
 
   // toggle constants between comp bot and practice bot (named "beta")
-  public static final boolean isComp            = false;
+  public static final boolean isComp            = true;
 
   // Timeout constants
   public static final int     kLongCANTimeoutMs = 100;
@@ -216,8 +216,8 @@ public class Constants
     public static final boolean                                      invertGyro                  = false; // Always ensure Gyro is CCW+ CW-
 
     /* Swerve Constants - 0.427 m (x, y) */
-    public static final double                                       trackWidth                  = Units.inchesToMeters(23.77);
-    public static final double                                       wheelBase                   = Units.inchesToMeters(23.77);
+    public static final double                                       trackWidth                  = Units.inchesToMeters(22.77);
+    public static final double                                       wheelBase                   = Units.inchesToMeters(22.77);
 
     public static final double                                       wheelDiameter               = Units.inchesToMeters(4.0);
     public static final double                                       wheelCircumference          = wheelDiameter * Math.PI;
@@ -293,7 +293,7 @@ public class Constants
     public static final class Mod0
     {
       public static final double epsilonAngleOffset = 325.723;
-      public static final double compAngleOffset    = 187.295;
+      public static final double compAngleOffset    = 16.172;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -306,7 +306,7 @@ public class Constants
     public static final class Mod1
     {
       public static final double epsilonAngleOffset = 142.91;
-      public static final double compAngleOffset    = 361.758;
+      public static final double compAngleOffset    = 239.502;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -319,7 +319,7 @@ public class Constants
     public static final class Mod2
     {
       public static final double epsilonAngleOffset = 227.549;
-      public static final double compAngleOffset    = 60.117;
+      public static final double compAngleOffset    = 97.471;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -332,7 +332,7 @@ public class Constants
     public static final class Mod3
     {
       public static final double epsilonAngleOffset = 44.736;
-      public static final double compAngleOffset    = 194.15;
+      public static final double compAngleOffset    = 92.549;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
