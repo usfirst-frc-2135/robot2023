@@ -217,7 +217,7 @@ public class Constants
 
     /* Swerve Constants - 0.427 m (x, y) */
     public static final double                                       trackWidth                  = Units.inchesToMeters(22.77);
-    public static final double                                       wheelBase                   = Units.inchesToMeters(23.77);
+    public static final double                                       wheelBase                   = Units.inchesToMeters(22.77);
 
     public static final double                                       wheelDiameter               = Units.inchesToMeters(4.0);
     public static final double                                       wheelCircumference          = wheelDiameter * Math.PI;
