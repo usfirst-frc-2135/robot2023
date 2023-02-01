@@ -34,7 +34,7 @@ import frc.robot.subsystems.Vision;
  */
 public class RobotContainer
 {
-  private static RobotContainer m_robotContainer;
+  private static RobotContainer m_instance;
 
   // Joysticks
   private final XboxController  m_driverPad   = new XboxController(Constants.kDriverPadPort);
@@ -70,7 +70,9 @@ public class RobotContainer
 
   public static RobotContainer getInstance( )
   {
-    return m_robotContainer;
+    if (m_instance == null)
+      m_instance = new RobotContainer( );
+    return m_instance;
   }
 
   private void addSmartDashboardWidgets( )
