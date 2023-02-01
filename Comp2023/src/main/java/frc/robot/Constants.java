@@ -10,7 +10,9 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.constraint.CentripetalAccelerationConstraint;
 import edu.wpi.first.math.util.Units;
 import frc.robot.lib.util.SwerveModuleConstants;
 
@@ -163,12 +165,12 @@ public class Constants
       VISION_TOGGLE // Toggle modes
     }
 
-    public static final double        kLLDistance1   = 48;    // distance from bumper in inches for first reference point
-    public static final double        kLLVertOffset1 = 0.42;  // LL y reading in degrees for first reference point
-    public static final double        kLLDistance2   = 60;    // distance from bumper in inches for second reference point
-    public static final double        kLLVertOffset2 = -4.85; // LL y reading in degrees for second reference point
+    public static final double       kLLDistance1   = 48;    // distance from bumper in inches for first reference point
+    public static final double       kLLVertOffset1 = 0.42;  // LL y reading in degrees for first reference point
+    public static final double       kLLDistance2   = 60;    // distance from bumper in inches for second reference point
+    public static final double       kLLVertOffset2 = -4.85; // LL y reading in degrees for second reference point
 
-    private static final List<Pose3d> kAprilTagPoses =
+    public static final List<Pose3d> kAprilTagPoses =
         Collections.unmodifiableList(List.of(new Pose3d(new Translation3d(7.24310, -2.93659, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 1 
             new Pose3d(new Translation3d(7.24310, -1.26019, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 2 
             new Pose3d(new Translation3d(7.24310, 0.41621, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 3 
@@ -206,11 +208,11 @@ public class Constants
 
   public static final class SwerveConstants
   {
-    public static final boolean                                      invertGyro                  = false; // Always ensure Gyro is CCW+ CW-
+    public static final boolean                                      invertGyro                  = true; // Always ensure Gyro is CCW+ CW-
 
     /* Swerve Constants - 0.427 m (x, y) */
-    public static final double                                       trackWidth                  = Units.inchesToMeters(22.77);
-    public static final double                                       wheelBase                   = Units.inchesToMeters(22.77);
+    public static final double                                       trackWidth                  = Units.inchesToMeters(22.7);
+    public static final double                                       wheelBase                   = Units.inchesToMeters(22.7);
 
     public static final double                                       wheelDiameter               = Units.inchesToMeters(4.0);
     public static final double                                       wheelCircumference          = wheelDiameter * Math.PI;

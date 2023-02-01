@@ -36,7 +36,14 @@ import frc.robot.team254.lib.util.TimeDelayedBoolean;
 
 public class Swerve extends SubsystemBase
 {
-  private SwerveModule[ ]          m_swerveMods;
+  private SwerveModule[ ]          m_swerveMods          = new SwerveModule[ ]
+  {
+      new SwerveModule(0, Constants.SwerveConstants.Mod0.SwerveModuleConstants( )),
+      new SwerveModule(1, Constants.SwerveConstants.Mod1.SwerveModuleConstants( )),
+      new SwerveModule(2, Constants.SwerveConstants.Mod2.SwerveModuleConstants( )),
+      new SwerveModule(3, Constants.SwerveConstants.Mod3.SwerveModuleConstants( ))
+  };
+
   private SwerveDriveOdometry      m_swerveOdometry;
 
   // Odometery and telemetry
@@ -92,6 +99,11 @@ public class Swerve extends SubsystemBase
   private PIDController            m_throttlePid         = new PIDController(0.0, 0.0, 0.0);
   private double                   m_limelightDistance;
 
+  // define theta controller for robot heading
+  PIDController                    xController           = new PIDController(1, 0, 0);
+  PIDController                    yController           = new PIDController(1, 0, 0);
+  ProfiledPIDController            thetaController       = new ProfiledPIDController(Constants.AutoConstants.kPThetaController, 0,
+      0, Constants.AutoConstants.kThetaControllerConstraints);
 
   public Swerve( )
   {
@@ -99,14 +111,6 @@ public class Swerve extends SubsystemBase
     setSubsystem("Swerve");
 
     zeroGyro( );
-
-    m_swerveMods = new SwerveModule[ ]
-    {
-        new SwerveModule(0, Constants.SwerveConstants.Mod0.SwerveModuleConstants( )),
-        new SwerveModule(1, Constants.SwerveConstants.Mod1.SwerveModuleConstants( )),
-        new SwerveModule(2, Constants.SwerveConstants.Mod2.SwerveModuleConstants( )),
-        new SwerveModule(3, Constants.SwerveConstants.Mod3.SwerveModuleConstants( ))
-    };
 
     m_swerveOdometry = new SwerveDriveOdometry(Constants.SwerveConstants.swerveKinematics, m_pigeon.getYaw( ).getWPIRotation2d( ),
         new SwerveModulePosition[ ]
@@ -121,6 +125,8 @@ public class Swerve extends SubsystemBase
 
     m_visionPIDController.enableContinuousInput(-Math.PI, Math.PI);
     m_visionPIDController.setTolerance(0.0);
+
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
     resetOdometry(new Pose2d( ));
     resetAnglesToAbsolute( );
@@ -344,8 +350,7 @@ public class Swerve extends SubsystemBase
   //
   public void driveWithPathFollowerInit(Trajectory trajectory, boolean useInitialPose)
   {
-    m_holonomicController = new HolonomicDriveController(new PIDController(1, 0, 0), new PIDController(1, 0, 0),
-        new ProfiledPIDController(1, 0, 0, new TrapezoidProfile.Constraints(6.28, 3.14)));
+    m_holonomicController = new HolonomicDriveController(xController, yController, thetaController);
 
     m_trajectory = trajectory;
 
