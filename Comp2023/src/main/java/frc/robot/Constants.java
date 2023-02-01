@@ -293,7 +293,7 @@ public class Constants
     public static final class Mod0
     {
       public static final double epsilonAngleOffset = 325.723;
-      public static final double compAngleOffset    = 187.295;
+      public static final double compAngleOffset    = 16.172;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -306,7 +306,7 @@ public class Constants
     public static final class Mod1
     {
       public static final double epsilonAngleOffset = 142.91;
-      public static final double compAngleOffset    = 361.758;
+      public static final double compAngleOffset    = 239.502;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -319,7 +319,7 @@ public class Constants
     public static final class Mod2
     {
       public static final double epsilonAngleOffset = 227.549;
-      public static final double compAngleOffset    = 60.117;
+      public static final double compAngleOffset    = 97.471;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -332,7 +332,7 @@ public class Constants
     public static final class Mod3
     {
       public static final double epsilonAngleOffset = 44.736;
-      public static final double compAngleOffset    = 194.15;
+      public static final double compAngleOffset    = 92.549;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
