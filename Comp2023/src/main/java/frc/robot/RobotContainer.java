@@ -20,6 +20,7 @@ import frc.robot.commands.AutoDrivePath;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.GripperRun;
+import frc.robot.commands.ResetGyro;
 import frc.robot.subsystems.Gripper;
 import frc.robot.subsystems.Power;
 import frc.robot.subsystems.Swerve;
@@ -131,8 +132,8 @@ public class RobotContainer
     // Driver - Bumpers, start, back
     driverLeftBumper.onTrue(new Dummy(XboxController.Button.kLeftBumper.value));
     driverRightBumper.onTrue(new Dummy(XboxController.Button.kRightBumper.value));
-    driverBack.onTrue(new Dummy(XboxController.Button.kBack.value));
-    driverStart.onTrue(new Dummy(XboxController.Button.kStart.value));
+    driverBack.onTrue(new ResetGyro(m_swerve, driverStart, driverBack));
+    driverStart.onTrue(new ResetGyro(m_swerve, driverStart, driverBack));
     //
     // Driver - POV buttons
     driverUp.onTrue(new Dummy(0));
