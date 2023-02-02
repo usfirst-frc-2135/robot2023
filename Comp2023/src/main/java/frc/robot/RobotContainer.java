@@ -203,7 +203,7 @@ public class RobotContainer
   private void initDefaultCommands( )
   {
     // Configure default commands for these subsystems
-    // m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_driverPad));
+    m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_driverPad));
   }
 
   private void initAutonomousChooser( )
