@@ -19,6 +19,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -383,10 +384,9 @@ public class Swerve extends SubsystemBase
     Trajectory.State trajState = m_trajectory.sample(m_trajTimer.get( ));
     Pose2d currentPose = getPose( );
 
-    //TODO: how to find the goal position
+    ChassisSpeeds targetChassisSpeeds =
+        m_holonomicController.calculate(currentPose, trajState, trajState.poseMeters.getRotation( ));
 
-    //TODO: update the degrees to desired coordinate system
-    ChassisSpeeds targetChassisSpeeds = m_holonomicController.calculate(currentPose, trajState, Rotation2d.fromDegrees(0));
     // Convert to module states
     SwerveModuleState[ ] moduleStates = Constants.SwerveConstants.swerveKinematics.toSwerveModuleStates(targetChassisSpeeds);
 
@@ -425,7 +425,7 @@ public class Swerve extends SubsystemBase
                   + " "          + String.format("%.1f", targetHeading)
                 + " chasXYO: "   + String.format("%.1f", targetChassisSpeeds.vxMetersPerSecond) 
                   + " "          + String.format("%.1f", targetChassisSpeeds.vyMetersPerSecond)
-                  + " "          + String.format("%.1f", targetChassisSpeeds.omegaRadiansPerSecond)
+                  + " "          + String.format("%.1f", Units.radiansToDegrees(targetChassisSpeeds.omegaRadiansPerSecond))
                 + " targVel: "   + String.format("%.1f", moduleStates[0].speedMetersPerSecond) 
                   + " "          + String.format("%.1f", moduleStates[1].speedMetersPerSecond)
                   + " "          + String.format("%.1f", moduleStates[2].speedMetersPerSecond) 
@@ -433,7 +433,10 @@ public class Swerve extends SubsystemBase
                 + " curVel: "    + String.format("%.2f", currentfrontLeft) 
                   + " "          + String.format("%.2f", currentfrontRight)
                   + " "          + String.format("%.2f", currentbackLeft)
-                  + " "          + String.format("%.2f", currentbackRight)); 
+                  + " "          + String.format("%.2f", currentbackRight)
+                + " errorXYR: "    + String.format("%.2f", targetTrajX-currentTrajX) 
+                  + " "          + String.format("%.2f", targetTrajY-currentTrajY)
+                  + " "          + String.format("%.2f", targetHeading-currentHeading)); 
         // @formatter:on
     }
 
@@ -481,17 +484,13 @@ public class Swerve extends SubsystemBase
       DataLogManager.log(getSubsystem( ) + ": path follower timeout!");
       return true;
     }
-    return ((m_trajTimer.get( ) >= m_trajectory.getTotalTimeSeconds( ))
-        && (Math.abs(m_swerveMods[0].getState( ).speedMetersPerSecond) <= SWConsts.kStopTolerance)
-        && (Math.abs(m_swerveMods[1].getState( ).speedMetersPerSecond) <= SWConsts.kStopTolerance)
-        && (Math.abs(m_swerveMods[2].getState( ).speedMetersPerSecond) <= SWConsts.kStopTolerance)
-        && (Math.abs(m_swerveMods[3].getState( ).speedMetersPerSecond) <= SWConsts.kStopTolerance));
+
+    return (m_trajTimer.hasElapsed(m_trajectory.getTotalTimeSeconds( ) + 0.5));
   }
 
   public void driveWithPathFollowerEnd( )
   {
     m_trajTimer.stop( );
-    drive(getPose( ).getTranslation( ), 0.0, false, true);
   }
 
   //// 1678 Swerve //////////////////////////////////////////////////////////////
