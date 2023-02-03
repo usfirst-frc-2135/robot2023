@@ -203,6 +203,10 @@ public class Swerve extends SubsystemBase
     SmartDashboard.putNumber("SW: vision", m_periodicIO.vision_align_target_angle);
     SmartDashboard.putNumber("SW: swerve-hdg", m_periodicIO.swerve_heading);
 
+    if (RobotContainer.getInstance( ).m_vision.getTargetID( ) < 0)
+    {
+      RobotContainer.getInstance( ).m_field2d.setRobotPose(getPose( ));
+    }
   }
 
   ///////////////////////////////////////////////////////////////////////////////
