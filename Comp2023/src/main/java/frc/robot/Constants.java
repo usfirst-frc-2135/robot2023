@@ -208,7 +208,7 @@ public class Constants
 
   public static final class SwerveConstants
   {
-    public static final boolean                                      invertGyro                  = true; // Always ensure Gyro is CCW+ CW-
+    public static final boolean                                      invertGyro                  = false; // Always ensure Gyro is CCW+ CW-
 
     /* Swerve Constants - 0.427 m (x, y) */
     public static final double                                       trackWidth                  = Units.inchesToMeters(22.7);
