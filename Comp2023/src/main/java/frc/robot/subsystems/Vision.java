@@ -92,7 +92,7 @@ public class Vision extends SubsystemBase
     SmartDashboard.putNumber("VI_skew", m_targetSkew);
     SmartDashboard.putBoolean("VI_valid", m_targetValid);
 
-    m_botposeSub = m_table.getDoubleArrayTopic("botpose").subscribe(new double[ ] { });
+    m_botposeSub = m_table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[ ] { });
 
     initialize( );
   }
