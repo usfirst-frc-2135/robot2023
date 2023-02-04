@@ -37,7 +37,14 @@ import frc.robot.team254.lib.util.TimeDelayedBoolean;
 
 public class Swerve extends SubsystemBase
 {
-  private SwerveModule[ ]          m_swerveMods;
+  private SwerveModule[ ]          m_swerveMods          = new SwerveModule[ ]
+  {
+      new SwerveModule(0, Constants.SwerveConstants.Mod0.SwerveModuleConstants( )),
+      new SwerveModule(1, Constants.SwerveConstants.Mod1.SwerveModuleConstants( )),
+      new SwerveModule(2, Constants.SwerveConstants.Mod2.SwerveModuleConstants( )),
+      new SwerveModule(3, Constants.SwerveConstants.Mod3.SwerveModuleConstants( ))
+  };
+
   private SwerveDriveOdometry      m_swerveOdometry;
 
   // Odometery and telemetry
@@ -93,17 +100,11 @@ public class Swerve extends SubsystemBase
   private PIDController            m_throttlePid         = new PIDController(0.0, 0.0, 0.0);
   private double                   m_limelightDistance;
 
-  // Getter
-  public boolean getLocked( )
-  {
-    return m_locked;
-  }
-
-  // Setter
-  public void setLocked(boolean lock)
-  {
-    m_locked = lock;
-  }
+  // define theta controller for robot heading
+  PIDController                    xController           = new PIDController(1, 0, 0);
+  PIDController                    yController           = new PIDController(1, 0, 0);
+  ProfiledPIDController            thetaController       = new ProfiledPIDController(Constants.AutoConstants.kPThetaController, 0,
+      0, Constants.AutoConstants.kThetaControllerConstraints);
 
   public Swerve( )
   {
@@ -111,14 +112,6 @@ public class Swerve extends SubsystemBase
     setSubsystem("Swerve");
 
     zeroGyro( );
-
-    m_swerveMods = new SwerveModule[ ]
-    {
-        new SwerveModule(0, Constants.SwerveConstants.Mod0.SwerveModuleConstants( )),
-        new SwerveModule(1, Constants.SwerveConstants.Mod1.SwerveModuleConstants( )),
-        new SwerveModule(2, Constants.SwerveConstants.Mod2.SwerveModuleConstants( )),
-        new SwerveModule(3, Constants.SwerveConstants.Mod3.SwerveModuleConstants( ))
-    };
 
     m_swerveOdometry = new SwerveDriveOdometry(Constants.SwerveConstants.swerveKinematics, m_pigeon.getYaw( ).getWPIRotation2d( ),
         new SwerveModulePosition[ ]
@@ -133,6 +126,8 @@ public class Swerve extends SubsystemBase
 
     m_visionPIDController.enableContinuousInput(-Math.PI, Math.PI);
     m_visionPIDController.setTolerance(0.0);
+
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
     resetOdometry(new Pose2d( ));
     resetAnglesToAbsolute( );
@@ -195,13 +190,12 @@ public class Swerve extends SubsystemBase
     SmartDashboard.putNumber("SW: pose_y", m_periodicIO.odometry_pose_y);
     SmartDashboard.putNumber("SW: pose_rot", m_periodicIO.odometry_pose_rot);
 
-    SmartDashboard.putNumber("SW: pigeon-hdg", m_periodicIO.pigeon_heading);
+    SmartDashboard.putNumber("SW: swerve-hdg", m_periodicIO.swerve_heading);
     SmartDashboard.putNumber("SW: pitch", m_periodicIO.robot_pitch);
     SmartDashboard.putNumber("SW: roll", m_periodicIO.robot_roll);
 
-    SmartDashboard.putNumber("SW: snap", m_periodicIO.snap_target);
     SmartDashboard.putNumber("SW: vision", m_periodicIO.vision_align_target_angle);
-    SmartDashboard.putNumber("SW: swerve-hdg", m_periodicIO.swerve_heading);
+    SmartDashboard.putNumber("SW: snap", m_periodicIO.snap_target);
 
     m_field.setRobotPose(getPose( ));
   }
@@ -357,8 +351,7 @@ public class Swerve extends SubsystemBase
   //
   public void driveWithPathFollowerInit(Trajectory trajectory, boolean useInitialPose)
   {
-    m_holonomicController = new HolonomicDriveController(new PIDController(1, 0, 0), new PIDController(1, 0, 0),
-        new ProfiledPIDController(1, 0, 0, new TrapezoidProfile.Constraints(6.28, 3.14)));
+    m_holonomicController = new HolonomicDriveController(xController, yController, thetaController);
 
     m_trajectory = trajectory;
 
@@ -587,6 +580,18 @@ public class Swerve extends SubsystemBase
     }
   }
 
+  // Getter
+  public boolean getLocked( )
+  {
+    return m_locked;
+  }
+
+  // Setter
+  public void setLocked(boolean lock)
+  {
+    m_locked = lock;
+  }
+
   public Pose2d getPose( )
   {
     return m_swerveOdometry.getPoseMeters( );
@@ -679,12 +684,13 @@ public class Swerve extends SubsystemBase
     m_periodicIO.odometry_pose_x = m_swerveOdometry.getPoseMeters( ).getX( );
     m_periodicIO.odometry_pose_y = m_swerveOdometry.getPoseMeters( ).getY( );
     m_periodicIO.odometry_pose_rot = m_swerveOdometry.getPoseMeters( ).getRotation( ).getDegrees( );
-    m_periodicIO.pigeon_heading = m_pigeon.getYaw( ).getDegrees( );
+
+    m_periodicIO.swerve_heading = MathUtil.inputModulus(m_pigeon.getYaw( ).getDegrees( ), 0, 360);
     m_periodicIO.robot_pitch = m_pigeon.getUnadjustedPitch( ).getDegrees( );
     m_periodicIO.robot_roll = m_pigeon.getRoll( ).getDegrees( );
-    m_periodicIO.snap_target = Math.toDegrees(m_snapPIDController.getGoal( ).position);
+
     m_periodicIO.vision_align_target_angle = Math.toDegrees(m_limelightVisionAlignGoal);
-    m_periodicIO.swerve_heading = MathUtil.inputModulus(m_pigeon.getYaw( ).getDegrees( ), 0, 360);
+    m_periodicIO.snap_target = Math.toDegrees(m_snapPIDController.getGoal( ).position);
   }
 
   public class PeriodicIO
@@ -694,11 +700,10 @@ public class Swerve extends SubsystemBase
     public double odometry_pose_y;
     public double odometry_pose_rot;
 
-    public double pigeon_heading;
+    public double swerve_heading;
     public double robot_pitch;
     public double robot_roll;
     public double vision_align_target_angle;
-    public double swerve_heading;
 
     // outputs
     public double snap_target;
