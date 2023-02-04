@@ -36,7 +36,7 @@ import frc.robot.subsystems.Vision;
  */
 public class RobotContainer
 {
-  private static RobotContainer m_robotContainer;
+  private static RobotContainer m_instance;
 
   public final Gripper          m_Gripper     = new Gripper( );
 
@@ -49,7 +49,10 @@ public class RobotContainer
   public final Vision           m_vision      = new Vision( );
 
   // These subsystems can use LED or vision and must be created afterward
-  // public final Pneumatics       m_pneumatics    = new Pneumatics( );
+  // public final Arm              m_arm         = new Arm();
+  public final Gripper          m_gripper     = new Gripper( );
+  // public final Pneumatics       m_pneumatics  = new Pneumatics( );
+
   public final Power            m_power       = new Power( );
   public final Swerve           m_swerve      = new Swerve( );
 
@@ -72,7 +75,9 @@ public class RobotContainer
 
   public static RobotContainer getInstance( )
   {
-    return m_robotContainer;
+    if (m_instance == null)
+      m_instance = new RobotContainer( );
+    return m_instance;
   }
 
   private void addSmartDashboardWidgets( )
@@ -81,8 +86,7 @@ public class RobotContainer
     SmartDashboard.putData("AutoDrivePathForward", new AutoDrivePath(m_swerve, "forward1m", true));
 
     // SmartDashboard.putData("DriveLimelight", new DriveLimelight(m_swerve, m_vision, false));
-    // SmartDashboard.putData("DriveLimelightStop",
-    //     new DriveLimelightStop(m_swerve, m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
+    // SmartDashboard.putData("DriveLimelightStop", new DriveLimelightStop(m_swerve, m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
     // SmartDashboard.putData("DriveMotorTest", new DriveMotorTest(m_swerve, true));
     // SmartDashboard.putData("DriveResetSensors", new DriveResetSensors(m_swerve));
     // SmartDashboard.putData("DriveSlowMode", new DriveSlowMode(m_swerve, false));
@@ -178,10 +182,10 @@ public class RobotContainer
     operY.onTrue(new Dummy(XboxController.Button.kY.value));
     //
     // Operator - Bumpers, start, back
-    operLeftBumper.onTrue(new GripperRun(m_Gripper, GRMode.GR_ACQUIRE));
-    operLeftBumper.onFalse(new GripperRun(m_Gripper, GRMode.GR_STOP));
-    operRightBumper.onTrue(new GripperRun(m_Gripper, GRMode.GR_EXPEL));
-    operRightBumper.onFalse(new GripperRun(m_Gripper, GRMode.GR_STOP));
+    operLeftBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
+    operLeftBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
+    operRightBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_EXPEL));
+    operRightBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
     operBack.onTrue(new Dummy(XboxController.Button.kBack.value));
     operStart.onTrue(new Dummy(XboxController.Button.kStart.value));
     //

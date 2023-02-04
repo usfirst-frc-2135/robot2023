@@ -5,7 +5,9 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.constraint.CentripetalAccelerationConstraint;
 import edu.wpi.first.math.util.Units;
 import frc.robot.lib.util.SwerveModuleConstants;
 
@@ -213,6 +215,17 @@ public class Constants
     public static final double kLLVertOffset1 = 0.42;  // LL y reading in degrees for first reference point
     public static final double kLLDistance2   = 60;    // distance from bumper in inches for second reference point
     public static final double kLLVertOffset2 = -4.85; // LL y reading in degrees for second reference point
+
+    public static final List<Pose3d> kAprilTagPoses =
+        Collections.unmodifiableList(List.of(new Pose3d(new Translation3d(7.24310, -2.93659, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 1 
+            new Pose3d(new Translation3d(7.24310, -1.26019, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 2 
+            new Pose3d(new Translation3d(7.24310, 0.41621, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 3 
+            new Pose3d(new Translation3d(7.24310, 2.74161, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 4 
+            new Pose3d(new Translation3d(-7.24310, 2.74161, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 5 
+            new Pose3d(new Translation3d(-7.24310, 0.46272, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 6 
+            new Pose3d(new Translation3d(-7.24310, -1.26019, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 7
+            new Pose3d(new Translation3d(-7.24310, -2.74161, 0), new Rotation3d(0, 0, 0)) // AprilTag ID: 8
+        ));
   }
 
   public static final class SIMLLConsts
@@ -229,24 +242,6 @@ public class Constants
     // public static final double kCameraLensBackTilt = Units.degreesToRadians(40.0);  // Camera backward tilt from normal
   }
 
-  public static final class AUTOConstants
-  {
-    public static final double k_WaitTime1 = 0.0; // First wait timer - time to wait
-    public static final double k_WaitTime2 = 0.0; // Second wait timer - time to wait
-
-    public static final String path1       = "forward39";
-    public static final String path2       = "backward39";
-    public static final String path3       = "rightAngleTurn";
-
-    public static final String kDrive_path = "startToOffTarmac";
-
-    public enum AutoTimer
-    {
-      TIMER1,     // Select first auto wait timer for use
-      TIMER2      // Select second auto wait timer for use
-    };
-  }
-
   //// 1678 Constants ///////////////////////////////////////////////////////////
 
   // toggle constants between comp bot and practice bot (named "beta")
@@ -261,8 +256,9 @@ public class Constants
     public static final boolean                                      invertGyro                  = false; // Always ensure Gyro is CCW+ CW-
 
     /* Swerve Constants - 0.427 m (x, y) */
-    public static final double                                       trackWidth                  = Units.inchesToMeters(23.77);
-    public static final double                                       wheelBase                   = Units.inchesToMeters(23.77);
+
+    public static final double                                       trackWidth                  = Units.inchesToMeters(22.7);
+    public static final double                                       wheelBase                   = Units.inchesToMeters(22.7);
 
     public static final double                                       wheelDiameter               = Units.inchesToMeters(4.0);
     public static final double                                       wheelCircumference          = wheelDiameter * Math.PI;
@@ -421,5 +417,60 @@ public class Constants
   }
 
   /*** SUBSYSTEM CONSTANTS ***/
+
+  public static final class AutoConstants
+  {
+    public static final double                       kSlowSpeedMetersPerSecond                   = 1.7;
+    public static final double                       kSlowAccelerationMetersPerSecondSquared     = 2.0;
+
+    public static final double                       kMaxSpeedMetersPerSecond                    = 2.2;
+    public static final double                       kMaxAccelerationMetersPerSecondSquared      = 2.3;
+
+    public static final double                       kSlowMaxAngularSpeedRadiansPerSecond        = 0.8 * Math.PI;
+    public static final double                       kSlowMaxAngularSpeedRadiansPerSecondSquared =
+        Math.pow(kSlowMaxAngularSpeedRadiansPerSecond, 2);
+
+    public static final double                       kMaxAngularSpeedRadiansPerSecond            = 1.2 * Math.PI;
+    public static final double                       kMaxAngularSpeedRadiansPerSecondSquared     =
+        Math.pow(kMaxAngularSpeedRadiansPerSecond, 2);
+
+    public static final double                       kPXController                               = 1;
+    public static final double                       kPYController                               = 1;
+    public static final double                       kPThetaController                           = 5;
+
+    // Constraint for the motion profilied robot angle controller
+    public static final TrapezoidProfile.Constraints kThetaControllerConstraints                 =
+        new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+
+    // Constraint for the motion profilied robot angle controller
+    public static final TrapezoidProfile.Constraints kSlowThetaControllerConstraints             =
+        new TrapezoidProfile.Constraints(kSlowMaxAngularSpeedRadiansPerSecond, kSlowMaxAngularSpeedRadiansPerSecondSquared);
+
+    public static TrajectoryConfig createConfig(double maxSpeed, double maxAccel, double startSpeed, double endSpeed)
+    {
+      TrajectoryConfig config = new TrajectoryConfig(maxSpeed, maxAccel);
+      config.setKinematics(Constants.SwerveConstants.swerveKinematics);
+      config.setStartVelocity(startSpeed);
+      config.setEndVelocity(endSpeed);
+      config.addConstraint(new CentripetalAccelerationConstraint(3.0));
+      return config;
+    }
+
+    // Trajectory Speed Configs
+    public static final TrajectoryConfig defaultSpeedConfig =
+        new TrajectoryConfig(kMaxSpeedMetersPerSecond, kMaxAccelerationMetersPerSecondSquared)
+            .setKinematics(Constants.SwerveConstants.swerveKinematics);
+
+    public static final TrajectoryConfig slowSpeedConfig    =
+        new TrajectoryConfig(kSlowSpeedMetersPerSecond, kSlowAccelerationMetersPerSecondSquared)
+            .setKinematics(Constants.SwerveConstants.swerveKinematics).setStartVelocity(0).setEndVelocity(0);
+
+    // PathPlanner file names
+    public static final String           path1              = "forward39";
+    public static final String           path2              = "backward39";
+    public static final String           path3              = "rightAngleTurn";
+  }
+
+  //// 1678 Constants ///////////////////////////////////////////////////////////
 
 }

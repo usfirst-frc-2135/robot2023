@@ -24,8 +24,8 @@ import frc.robot.lib.util.CTREConfigs;
  */
 public class Robot extends TimedRobot
 {
-  private Command           m_autonomousCommand;
   private RobotContainer    m_robotContainer;
+  private Command           m_autonomousCommand;
 
   private boolean           m_faultsCleared = false;
   private double            m_waitTime1     = 0.0;
@@ -44,10 +44,10 @@ public class Robot extends TimedRobot
     DataLogManager.start( );
     DataLogManager.log("RobotInit: RoboRIO SN:" + System.getenv("serialnum"));
 
-    // Instantiate our RobotContainer. This will perform all our button bindings, and put our autonomous
-    // chooser on the dashboard.
-    m_robotContainer = new RobotContainer( );
     ctreConfigs = new CTREConfigs( );
+
+    // Instantiate RobotContainer. Performs button bindings, builds autonomous chooser on the dashboard.
+    m_robotContainer = RobotContainer.getInstance( );
 
     LiveWindow.disableAllTelemetry( );
 
