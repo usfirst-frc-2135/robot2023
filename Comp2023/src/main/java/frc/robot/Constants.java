@@ -73,6 +73,61 @@ public class Constants
     public static final double kStatorTriggerTime    = 0.001; // Default time duration of trigger that will causing limiting
   }
 
+  public static final class ARMConsts
+  {
+    public static final int    kARM14LeftCANID      = 14;
+    public static final int    kARM15RightCANID     = 15;
+    public static final int    kARMLeftLimitDIO     = 0;
+    public static final int    kARMRightLimitDIO    = 1;
+    public static final int    kGateHookSolenod     = 1;
+    public static final int    kARMCancoderID       = 0;
+
+    public static final double kGearRatio           = 10.0;   // Gear reduction
+    public static final double kDrumDiameterInches  = 1.375;  // Drum diameter in inches
+    public static final double kDrumDiameterMeters  = Units.inchesToMeters(kDrumDiameterInches); // Drum diameter-meters
+    public static final double kDrumCircumInches    = kDrumDiameterInches * Math.PI;             // Drum diameter in inches
+    public static final double kRolloutRatio        = kDrumCircumInches / kGearRatio; // inches per shaft rotation
+    public static final double kInchesPerCount      = kRolloutRatio / Falcon500.kEncoderCPR;
+    public static final double kMetersPerCount      = Units.inchesToMeters(kInchesPerCount);
+
+    // Config file parameters
+    public static final int    kMMVelocity          = 21776;  // Climber motion magic velocity
+    public static final int    kMMAcceleration      = 43552;  // Climber motion magic acceleration
+    public static final int    kMMSCurveStrength    = 0;      // Climber motion magic S curve smoothing strength
+    public static final double kARMPidKf            = 0.0496; // Climber PID force constant
+    public static final double kARMPidKp            = 0.500;  // Climber PID proportional constant
+    public static final double kARMPidKi            = 0.0;    // Climber PID integral constant
+    public static final double kARMPidKd            = 0.0;    // Climber PID derivative constant
+    public static final int    kARMAllowedError     = 0;      // Climber PID allowable closed loop error in counts
+    public static final double kARMToleranceInches  = 0.25;   // Climber PID tolerance in inches
+
+    public static final double kStowHeight          = 0.10;   // 0.25 inches
+    public static final double kExtendL2            = 29.0;   // 29 inches
+    public static final double kRotateL3            = 31.25;  // 21 inches
+    public static final double kRaiseL4             = 15.0;   // 25.25 inches
+    public static final double kGatehookRestHeight  = 4.0;    // 0.35 inches
+    public static final double kClimberMinHeight    = 0.0;    // Climber minimum allowable height
+    public static final double kClimberMaxHeight    = 36.0;   // Climber maximum allowable height
+
+    public static final double kSpeedCalibrate      = -0.1;   // Motor percent output during calibration
+    public static final double kSpeedMaxManual      = 0.3;    // Motor percent output during manual operation
+    public static final double kStickDeadband       = 0.2;    // Joystick deadband for manual operaton
+
+    public static final double kClimbL2Time         = 0.5;
+    public static final double kRotateExtendL3Time  = 1.5;
+    public static final double kRotateRetractL3Time = 2.0;
+    public static final double kClimbL3Time         = 0.5;
+    public static final double kRotateRetractL4Time = 2.5;
+
+    public enum ARMMode
+    {
+      ARM_INIT,         // Initialize climber
+      ARM_DOWN,         // Move climber down
+      ARM_STOPPED,      // Stop and hold position
+      ARM_UP            // Move climber up
+    }
+  }
+
   public static final class GRConsts
   {
     public static final int    kGRPWM17        = 17;
@@ -367,5 +422,4 @@ public class Constants
 
   /*** SUBSYSTEM CONSTANTS ***/
 
-  //// 1678 Constants ///////////////////////////////////////////////////////////
 }
