@@ -16,14 +16,12 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.GRConsts.GRMode;
-import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.commands.AutoDrivePath;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.GripperRun;
-import frc.robot.commands.LEDSet;
+import frc.robot.commands.ResetGyro;
 import frc.robot.subsystems.Gripper;
-import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Power;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
@@ -38,21 +36,18 @@ public class RobotContainer
 {
   private static RobotContainer m_instance;
 
-  public final Gripper          m_Gripper     = new Gripper( );
-
   // Joysticks
   private final XboxController  m_driverPad   = new XboxController(Constants.kDriverPadPort);
   private final XboxController  m_operatorPad = new XboxController(Constants.kOperatorPadPort);
 
-  // The robot's subsystems
-  public final LED              m_led         = new LED( );
+  // The robot's shared subsystems
+  // public final LED              m_led         = new LED( );
   public final Vision           m_vision      = new Vision( );
 
   // These subsystems can use LED or vision and must be created afterward
   // public final Arm              m_arm         = new Arm();
   public final Gripper          m_gripper     = new Gripper( );
   // public final Pneumatics       m_pneumatics  = new Pneumatics( );
-
   public final Power            m_power       = new Power( );
   public final Swerve           m_swerve      = new Swerve( );
 
@@ -90,7 +85,7 @@ public class RobotContainer
     // SmartDashboard.putData("DriveMotorTest", new DriveMotorTest(m_swerve, true));
     // SmartDashboard.putData("DriveResetSensors", new DriveResetSensors(m_swerve));
     // SmartDashboard.putData("DriveSlowMode", new DriveSlowMode(m_swerve, false));
-    //SmartDashboard.putData("LEDSet", new LEDSet(m_led, LEDColor.LEDCOLOR_OFF));
+    // SmartDashboard.putData("LEDSet", new LEDSet(m_led, LEDColor.LEDCOLOR_OFF));
 
     SmartDashboard.putData("Dummy", new Dummy(2135));
   }
@@ -138,8 +133,8 @@ public class RobotContainer
     // Driver - Bumpers, start, back
     driverLeftBumper.onTrue(new Dummy(XboxController.Button.kLeftBumper.value));
     driverRightBumper.onTrue(new Dummy(XboxController.Button.kRightBumper.value));
-    driverBack.onTrue(new Dummy(XboxController.Button.kBack.value));
-    driverStart.onTrue(new Dummy(XboxController.Button.kStart.value));
+    driverBack.onTrue(new ResetGyro(m_swerve, driverStart, driverBack));
+    driverStart.onTrue(new ResetGyro(m_swerve, driverStart, driverBack));
     //
     // Driver - POV buttons
     driverUp.onTrue(new Dummy(0));
