@@ -48,7 +48,6 @@ public class Swerve extends SubsystemBase
 
   // Odometery and telemetry
   private Pigeon                   m_pigeon              = new Pigeon(Ports.kCANID_Pigeon2);
-  private Field2d                  m_field               = new Field2d( );
 
   // PID objects
   private ProfiledPIDController    m_snapPIDController   = new ProfiledPIDController( // 
@@ -360,7 +359,7 @@ public class Swerve extends SubsystemBase
 
     if (!RobotBase.isReal( ))
     {
-      m_field.getObject("trajectory").setTrajectory(m_trajectory);
+      RobotContainer.getInstance( ).m_field2d.getObject("trajectory").setTrajectory(m_trajectory);
     }
 
     List<Trajectory.State> trajStates = new ArrayList<Trajectory.State>( );
