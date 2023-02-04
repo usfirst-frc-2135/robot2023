@@ -76,11 +76,13 @@ public class DriveTeleop extends CommandBase
   {
     // Get x speed. Invert this because Xbox controllers return negative values when pushing forward.
     final var xSpeed = m_xSpeedLimiter.calculate(MathUtil.applyDeadband(driverPad.getLeftY( ), Constants.kStickDeadband))
+
         * SwerveConstants.maxSpeed;
 
     // Get y speed or sideways/strafe speed. Invert this because a positive value is needed when
     // pulling left. Xbox controllers return positive values when pulling right by default.
     final var ySpeed = m_ySpeedLimiter.calculate(MathUtil.applyDeadband(driverPad.getLeftX( ), Constants.kStickDeadband))
+
         * SwerveConstants.maxSpeed;
 
     // Get rate of angular rotation. Invert this because a positive value is needed when pulling to
