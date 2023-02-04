@@ -135,11 +135,10 @@ public class Vision extends SubsystemBase
         m_sendablePoseArray[2] = m_botposeArray[5]; // Rotation from yaw from the Rotation3d of the "botPose"
 
         m_yawBotPose = m_botposeArray[5];
-        DataLogManager.log(getSubsystem( ) + " : BotPose Array " + Arrays.toString(m_botposeArray) + " : angle " + m_yawBotPose);
+        //DataLogManager.log(getSubsystem( ) + " : BotPose Array " + Arrays.toString(m_botposeArray) + " : angle " + m_yawBotPose);
 
         RobotContainer.getInstance( ).m_field2d.setRobotPose(getBotPose2d( ));
 
-        //SmartDashboard.putData("ROTATION IN DEGREES", (Sendable) getBotPose2d( ).getRotation( ));
       }
     }
 
@@ -227,8 +226,6 @@ public class Vision extends SubsystemBase
       {
         degree = 360 + m_yawBotPose;
 
-        //SmartDashboard.putNumber("VI_ROTTT", rot);
-        //SmartDashboard.putNumber("VI_Compare", m_botposeTransform3d.getRotation( ).getZ( ));
       }
       else
       {
