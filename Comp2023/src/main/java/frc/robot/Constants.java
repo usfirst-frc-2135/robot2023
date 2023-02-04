@@ -1,9 +1,14 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
+import java.util.Collections;
+import java.util.List;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -35,6 +40,7 @@ public class Constants
     public static final String kCANCarnivore     = "canivore1";
     public static final String kCANRio           = "rio";
 
+    // Swerve IDs
     public static final int    kCANID_DriveLF    = 1;
     public static final int    kCANID_TurnLF     = 2;
     public static final int    kCANID_CANCoderLF = 3;
@@ -53,6 +59,13 @@ public class Constants
 
     public static final int    kCANID_Pigeon2    = 13;
 
+    // Other subsystem CAN IDs
+    public static final int    kCANID_Elbow      = 15;
+    public static final int    kCANID_Wrist      = 16;
+    public static final int    kCANID_Gripper    = 18;
+
+    public static final int    kCANID_CANdle     = 0;
+
     // Digital I/Os
     // public static final int    kDIO_CargoDetect  = 2;
   }
@@ -61,8 +74,8 @@ public class Constants
   {
     public static int          kMaxRPM               = 6380;             // free speed for Falcon 500 motor
     public static final double kEncoderCPR           = 2048;             // CPR is 2048 from Falcon 500 Manual
-    public static final int    kTalonReqVersion      = ((22 * 256) + 0); // Talon version is 22.0
-    public static final int    kPigeonReqVersion     = ((22 * 256) + 0); // Pigeon IMU version is 22.0
+    public static final int    kTalonReqVersion      = ((23 * 256) + 0); // Talon version is 23.0
+    public static final int    kPigeonReqVersion     = ((23 * 256) + 0); // Pigeon IMU version is 23.0
 
     // Input current limit settings
     public static final double kSupplyCurrentLimit   = 45.0;  // Default supply current limit (after trigger)
@@ -75,65 +88,8 @@ public class Constants
     public static final double kStatorTriggerTime    = 0.001; // Default time duration of trigger that will causing limiting
   }
 
-  public static final class ARMConsts
-  {
-    public static final int    kARM14LeftCANID      = 14;
-    public static final int    kARM15RightCANID     = 15;
-    public static final int    kARMLeftLimitDIO     = 0;
-    public static final int    kARMRightLimitDIO    = 1;
-    public static final int    kGateHookSolenod     = 1;
-    public static final int    kARMCancoderID       = 0;
-
-    public static final double kGearRatio           = 10.0;   // Gear reduction
-    public static final double kDrumDiameterInches  = 1.375;  // Drum diameter in inches
-    public static final double kDrumDiameterMeters  = Units.inchesToMeters(kDrumDiameterInches); // Drum diameter-meters
-    public static final double kDrumCircumInches    = kDrumDiameterInches * Math.PI;             // Drum diameter in inches
-    public static final double kRolloutRatio        = kDrumCircumInches / kGearRatio; // inches per shaft rotation
-    public static final double kInchesPerCount      = kRolloutRatio / Falcon500.kEncoderCPR;
-    public static final double kMetersPerCount      = Units.inchesToMeters(kInchesPerCount);
-
-    // Config file parameters
-    public static final int    kMMVelocity          = 21776;  // Climber motion magic velocity
-    public static final int    kMMAcceleration      = 43552;  // Climber motion magic acceleration
-    public static final int    kMMSCurveStrength    = 0;      // Climber motion magic S curve smoothing strength
-    public static final double kARMPidKf            = 0.0496; // Climber PID force constant
-    public static final double kARMPidKp            = 0.500;  // Climber PID proportional constant
-    public static final double kARMPidKi            = 0.0;    // Climber PID integral constant
-    public static final double kARMPidKd            = 0.0;    // Climber PID derivative constant
-    public static final int    kARMAllowedError     = 0;      // Climber PID allowable closed loop error in counts
-    public static final double kARMToleranceInches  = 0.25;   // Climber PID tolerance in inches
-
-    public static final double kStowHeight          = 0.10;   // 0.25 inches
-    public static final double kExtendL2            = 29.0;   // 29 inches
-    public static final double kRotateL3            = 31.25;  // 21 inches
-    public static final double kRaiseL4             = 15.0;   // 25.25 inches
-    public static final double kGatehookRestHeight  = 4.0;    // 0.35 inches
-    public static final double kClimberMinHeight    = 0.0;    // Climber minimum allowable height
-    public static final double kClimberMaxHeight    = 36.0;   // Climber maximum allowable height
-
-    public static final double kSpeedCalibrate      = -0.1;   // Motor percent output during calibration
-    public static final double kSpeedMaxManual      = 0.3;    // Motor percent output during manual operation
-    public static final double kStickDeadband       = 0.2;    // Joystick deadband for manual operaton
-
-    public static final double kClimbL2Time         = 0.5;
-    public static final double kRotateExtendL3Time  = 1.5;
-    public static final double kRotateRetractL3Time = 2.0;
-    public static final double kClimbL3Time         = 0.5;
-    public static final double kRotateRetractL4Time = 2.5;
-
-    public enum ARMMode
-    {
-      ARM_INIT,         // Initialize climber
-      ARM_DOWN,         // Move climber down
-      ARM_STOPPED,      // Stop and hold position
-      ARM_UP            // Move climber up
-    }
-  }
-
   public static final class GRConsts
   {
-    public static final int    kGRPWM17        = 17;
-
     public static final double kGRAcquireSpeed = 1.0;
     public static final double kGRExpelSpeed   = -1.0;
 
@@ -177,8 +133,6 @@ public class Constants
 
   public static final class LEDConsts
   {
-    public static final int kCANDdleID = 0;
-
     public enum LEDColor
     {
       LEDCOLOR_OFF,     // CANdle off
@@ -211,10 +165,10 @@ public class Constants
       VISION_TOGGLE // Toggle modes
     }
 
-    public static final double kLLDistance1   = 48;    // distance from bumper in inches for first reference point
-    public static final double kLLVertOffset1 = 0.42;  // LL y reading in degrees for first reference point
-    public static final double kLLDistance2   = 60;    // distance from bumper in inches for second reference point
-    public static final double kLLVertOffset2 = -4.85; // LL y reading in degrees for second reference point
+    public static final double       kLLDistance1   = 48;    // distance from bumper in inches for first reference point
+    public static final double       kLLVertOffset1 = 0.42;  // LL y reading in degrees for first reference point
+    public static final double       kLLDistance2   = 60;    // distance from bumper in inches for second reference point
+    public static final double       kLLVertOffset2 = -4.85; // LL y reading in degrees for second reference point
 
     public static final List<Pose3d> kAprilTagPoses =
         Collections.unmodifiableList(List.of(new Pose3d(new Translation3d(7.24310, -2.93659, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 1 
@@ -226,6 +180,7 @@ public class Constants
             new Pose3d(new Translation3d(-7.24310, -1.26019, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 7
             new Pose3d(new Translation3d(-7.24310, -2.74161, 0), new Rotation3d(0, 0, 0)) // AprilTag ID: 8
         ));
+
   }
 
   public static final class SIMLLConsts
@@ -245,7 +200,7 @@ public class Constants
   //// 1678 Constants ///////////////////////////////////////////////////////////
 
   // toggle constants between comp bot and practice bot (named "beta")
-  public static final boolean isComp            = false;
+  public static final boolean isComp            = true;
 
   // Timeout constants
   public static final int     kLongCANTimeoutMs = 100;
@@ -256,7 +211,6 @@ public class Constants
     public static final boolean                                      invertGyro                  = false; // Always ensure Gyro is CCW+ CW-
 
     /* Swerve Constants - 0.427 m (x, y) */
-
     public static final double                                       trackWidth                  = Units.inchesToMeters(22.7);
     public static final double                                       wheelBase                   = Units.inchesToMeters(22.7);
 
@@ -324,9 +278,9 @@ public class Constants
     public static final boolean                                      canCoderInvert              = false;
 
     /* Controller Invert */
+    public static final boolean                                      invertXAxis                 = false;
     public static final boolean                                      invertYAxis                 = false;
     public static final boolean                                      invertRAxis                 = false;
-    public static final boolean                                      invertXAxis                 = false;
 
     /*** MODULE SPECIFIC CONSTANTS ***/
 
@@ -334,7 +288,7 @@ public class Constants
     public static final class Mod0
     {
       public static final double epsilonAngleOffset = 325.723;
-      public static final double compAngleOffset    = 187.295;
+      public static final double compAngleOffset    = 16.172;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -347,7 +301,7 @@ public class Constants
     public static final class Mod1
     {
       public static final double epsilonAngleOffset = 142.91;
-      public static final double compAngleOffset    = 361.758;
+      public static final double compAngleOffset    = 239.502;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -360,7 +314,7 @@ public class Constants
     public static final class Mod2
     {
       public static final double epsilonAngleOffset = 227.549;
-      public static final double compAngleOffset    = 60.117;
+      public static final double compAngleOffset    = 97.471;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -373,7 +327,7 @@ public class Constants
     public static final class Mod3
     {
       public static final double epsilonAngleOffset = 44.736;
-      public static final double compAngleOffset    = 194.15;
+      public static final double compAngleOffset    = 92.549;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -415,8 +369,6 @@ public class Constants
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints             =
         new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
   }
-
-  /*** SUBSYSTEM CONSTANTS ***/
 
   public static final class AutoConstants
   {
@@ -472,5 +424,4 @@ public class Constants
   }
 
   //// 1678 Constants ///////////////////////////////////////////////////////////
-
 }
