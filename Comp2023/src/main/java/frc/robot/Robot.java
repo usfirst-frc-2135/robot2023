@@ -224,7 +224,7 @@ public class Robot extends TimedRobot
     // Print out talon faults and clear sticky ones
     DataLogManager.log("----- DUMP FAULTS --------------");
     // m_robotContainer.m_led.faultDump( );
-    //m_robotContainer.m_power.faultDump( );
+    m_robotContainer.m_power.faultDump( );
     // m_robotContainer.m_pneumatics.faultDump( );
     m_robotContainer.m_swerve.faultDump( );
   }

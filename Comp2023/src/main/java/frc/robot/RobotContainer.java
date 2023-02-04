@@ -38,8 +38,8 @@ public class RobotContainer
   private static RobotContainer m_instance;
 
   // Joysticks
-  private final XboxController  m_driverPad      = new XboxController(Constants.kDriverPadPort);
-  private final XboxController  m_operatorPad    = new XboxController(Constants.kOperatorPadPort);
+  private final XboxController  m_driverPad   = new XboxController(Constants.kDriverPadPort);
+  private final XboxController  m_operatorPad = new XboxController(Constants.kOperatorPadPort);
 
   // The robot's shared subsystems
   // public final LED              m_led         = new LED( );
@@ -53,10 +53,10 @@ public class RobotContainer
   public final Swerve           m_swerve      = new Swerve( );
 
   // A chooser for autonomous commands
-  SendableChooser<Command>      m_chooser        = new SendableChooser<>( );
+  SendableChooser<Command>      m_chooser     = new SendableChooser<>( );
 
   //Field 2d widget declaration
-  public final Field2d          m_field2d        = new Field2d( );
+  public final Field2d          m_field2d     = new Field2d( );
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -82,7 +82,7 @@ public class RobotContainer
   private void addSmartDashboardWidgets( )
   {
     // SmartDashboard Buttons
-    //SmartDashboard.putData("AutoDrivePathForward", new AutoDrivePath(m_swerve, "forward1m", true));
+    SmartDashboard.putData("AutoDrivePathForward", new AutoDrivePath(m_swerve, "forward1m", true));
 
     // SmartDashboard.putData("DriveLimelight", new DriveLimelight(m_swerve, m_vision, false));
     // SmartDashboard.putData("DriveLimelightStop", new DriveLimelightStop(m_swerve, m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
