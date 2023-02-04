@@ -9,12 +9,11 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.GRConsts;
-import frc.robot.Constants.Ports;
 import frc.robot.Constants.GRConsts.GRMode;
 
 public class Gripper extends SubsystemBase
 {
-  private final WPI_TalonFX mGripper17 = new WPI_TalonFX(Ports.kCANID_Gripper);
+  private final WPI_TalonFX mGripper17 = new WPI_TalonFX(GRConsts.kGRPWM17);
 
   /** Creates a new ExampleSubsystem. */
   public Gripper( )
