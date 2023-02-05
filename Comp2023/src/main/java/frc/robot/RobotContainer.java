@@ -16,11 +16,13 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.GRConsts.GRMode;
+import frc.robot.commands.ArmRun;
 import frc.robot.commands.AutoDrivePath;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.GripperRun;
 import frc.robot.commands.ResetGyro;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Gripper;
 import frc.robot.subsystems.Power;
 import frc.robot.subsystems.Swerve;
@@ -45,7 +47,7 @@ public class RobotContainer
   public final Vision           m_vision      = new Vision( );
 
   // These subsystems can use LED or vision and must be created afterward
-  // public final Arm              m_arm         = new Arm();
+  public final Arm              m_arm         = new Arm( );
   public final Gripper          m_gripper     = new Gripper( );
   // public final Pneumatics       m_pneumatics  = new Pneumatics( );
   public final Power            m_power       = new Power( );
@@ -201,6 +203,7 @@ public class RobotContainer
   {
     // Configure default commands for these subsystems
     m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_driverPad));
+    m_arm.setDefaultCommand(new ArmRun(m_arm, m_operatorPad));
   }
 
   private void initAutonomousChooser( )
