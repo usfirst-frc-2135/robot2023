@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.pathplanner.lib.PathPlannerTrajectory;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
@@ -62,7 +64,7 @@ public class Swerve extends SubsystemBase
 
   // Holonomic Drive Controller objects
   private HolonomicDriveController m_holonomicController;
-  private Trajectory               m_trajectory;
+  private PathPlannerTrajectory    m_trajectory;
   private Timer                    m_trajTimer           = new Timer( );
 
   // Module variables
@@ -75,7 +77,7 @@ public class Swerve extends SubsystemBase
   private boolean                  m_locked              = false;
 
   // Path following
-  private int                      m_pathDebug           = 0;    // Debug flag to disable extra ramsete logging calls
+  private int                      m_pathDebug           = 1;    // Debug flag to disable extra ramsete logging calls
 
   // Limelight drive
   private double                   m_turnConstant        = SWConsts.kTurnConstant;
@@ -349,7 +351,7 @@ public class Swerve extends SubsystemBase
   //
   // Autonomous mode - Holonomic path follower
   //
-  public void driveWithPathFollowerInit(Trajectory trajectory, boolean useInitialPose)
+  public void driveWithPathFollowerInit(PathPlannerTrajectory trajectory, boolean useInitialPose)
   {
     m_holonomicController = new HolonomicDriveController(xController, yController, thetaController);
 
@@ -366,7 +368,7 @@ public class Swerve extends SubsystemBase
 
     // This initializes the odometry (where we are)
     if (useInitialPose)
-      resetOdometry(m_trajectory.getInitialPose( ));
+      resetOdometry(m_trajectory.getInitialHolonomicPose( ));
 
     m_trajTimer.reset( );
     m_trajTimer.start( );
@@ -478,7 +480,7 @@ public class Swerve extends SubsystemBase
       return true;
     }
 
-    return (m_trajTimer.hasElapsed(m_trajectory.getTotalTimeSeconds( ) + 0.5));
+    return (m_trajTimer.hasElapsed(m_trajectory.getTotalTimeSeconds( )));
   }
 
   public void driveWithPathFollowerEnd( )
