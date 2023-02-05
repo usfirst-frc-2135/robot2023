@@ -114,9 +114,9 @@ public class Arm extends SubsystemBase
     SmartDashboard.putBoolean("WR_calibrated", m_calibrated);
 
     if (m_validEL14)
-      climberTalonInitialize(m_Arm14, true);
+      elbowTalonInitialize(m_Arm14, true);
     if (m_validWR15)
-      climberTalonInitialize(m_Arm15, false);
+      wristTalonInitialize(m_Arm15, false);
 
     initialize( );
   }
