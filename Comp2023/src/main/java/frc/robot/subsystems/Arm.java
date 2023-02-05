@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -24,8 +25,8 @@ public class Arm extends SubsystemBase
   private static final int  PIDINDEX          = 0;   // PID in use (0-primary, 1-aux)
   private static final int  SLOTINDEX         = 0;   // Use first PID slot
 
-  private final WPI_TalonFX m_Arm14           = new WPI_TalonFX(14);  //wrist
-  private final WPI_TalonFX m_Arm15           = new WPI_TalonFX(15);  //gripper
+  private final WPI_TalonFX m_Arm14           = new WPI_TalonFX(14);  //elbow
+  private final WPI_TalonFX m_Arm15           = new WPI_TalonFX(15);  //wrist
 
   private boolean           m_validEL14;               // Health indicator for climber Talon 14
   private boolean           m_validWR15;               // Health indicator for climber Talon 15
@@ -49,8 +50,10 @@ public class Arm extends SubsystemBase
   private int               m_climberDebug    = 1; // DEBUG flag to disable/enable extra logging calls
 
   private boolean           m_calibrated      = false;  // Indicates whether the climber has been calibrated
-  private double            m_targetDegrees   = 0.0;    // Target height in inches requested
-  private double            m_curDegrees      = 0.0;    // Current climber height in inches
+  private double            m_targetELDegrees = 0.0;    // Target height in inches requested
+  private double            m_curELDegrees    = 0.0;    // Current climber height in inches
+  private double            m_targetWRDegrees = 0.0;    // Target height in inches requested
+  private double            m_curWRDegrees    = 0.0;    // Current climber height in inches
   private int               m_withinTolerance = 0;      // Counter for consecutive readings within tolerance
 
   private Timer             m_safetyTimer     = new Timer( ); // Safety timer for use in climber
@@ -66,6 +69,46 @@ public class Arm extends SubsystemBase
     setName("Arm");
     setSubsystem("Arm");
 
+    m_validEL14 = PhoenixUtil.getInstance( ).talonFXInitialize(m_Arm14, "elbow14");
+    m_validWR15 = PhoenixUtil.getInstance( ).talonFXInitialize(m_Arm15, "wrist15");
+
+    // SmartDashboard.putBoolean("HL_validCL14", m_validCL14);
+    // SmartDashboard.putBoolean("HL_validCL15", m_validCL15);
+
+    // // Check if solenoids are functional or blacklisted
+    // DataLogManager.log(getSubsystem( ) + ": CL Climber Solenoid is " + ((m_gateHook.isDisabled( )) ? "BLACKLISTED" : "OK"));
+
+    // // Initialize Variables
+    // SmartDashboard.putNumber("CL_velocity", m_velocity);
+    // SmartDashboard.putNumber("CL_acceleration", m_acceleration);
+    // SmartDashboard.putNumber("CL_sCurveStrength", m_sCurveStrength);
+    // SmartDashboard.putNumber("CL_pidKf", m_pidKf);
+    // SmartDashboard.putNumber("CL_pidKp", m_pidKp);
+    // SmartDashboard.putNumber("CL_pidKi", m_pidKi);
+    // SmartDashboard.putNumber("CL_pidKd", m_pidKd);
+
+    // SmartDashboard.putNumber("CL_stowHeight", m_stowHeight);
+    // SmartDashboard.putNumber("CL_extendL2", m_extendL2);
+    // SmartDashboard.putNumber("CL_rotateL3", m_rotateL3);
+    // SmartDashboard.putNumber("CL_raiseL4", m_raiseL4);
+    // SmartDashboard.putNumber("CL_gatehookRestHeight", m_gatehookRestHeight);
+
+    // Field for manually progamming climber height
+    //MAKE THESE READ DEGREES OF THE MOTORS (BOTH SEPERATE)
+    SmartDashboard.putNumber("EL_curDegrees", m_curELDegrees);
+    SmartDashboard.putNumber("EL_targetDegrees", m_targetELDegrees);
+    SmartDashboard.putBoolean("EL_calibrated", m_calibrated);
+
+    SmartDashboard.putNumber("WR_curDegrees", m_curWRDegrees);
+    SmartDashboard.putNumber("WR_targetDegrees", m_targetWRDegrees);
+    SmartDashboard.putBoolean("WR_calibrated", m_calibrated);
+
+    if (m_validEL14)
+      climberTalonInitialize(m_Arm14, true);
+    if (m_validWR15)
+      climberTalonInitialize(m_Arm15, false);
+
+    initialize( );
   }
 
   /**
