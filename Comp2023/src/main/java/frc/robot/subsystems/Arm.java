@@ -50,10 +50,10 @@ public class Arm extends SubsystemBase
   private int               m_climberDebug    = 1; // DEBUG flag to disable/enable extra logging calls
 
   private boolean           m_calibrated      = false;  // Indicates whether the climber has been calibrated
-  private double            m_targetELDegrees = 0.0;    // Target height in inches requested
-  private double            m_curELDegrees    = 0.0;    // Current climber height in inches
-  private double            m_targetWRDegrees = 0.0;    // Target height in inches requested
-  private double            m_curWRDegrees    = 0.0;    // Current climber height in inches
+  private double            m_targetELDegrees = 0.0;    // Target angle in degrees
+  private double            m_curELDegrees    = 0.0;    // Current angle in degrees
+  private double            m_targetWRDegrees = 0.0;    // Target angle in degrees
+  private double            m_curWRDegrees    = 0.0;    // Current angle in degrees
   private int               m_withinTolerance = 0;      // Counter for consecutive readings within tolerance
 
   private Timer             m_safetyTimer     = new Timer( ); // Safety timer for use in climber
@@ -145,17 +145,17 @@ public class Arm extends SubsystemBase
 
     // if disabled, set LED when down
 
-    if (m_validARM14)
+    if (m_validEL14)
     {
       int curCounts = (int) m_Arm14.getSelectedSensorPosition(0);
-      m_curDegrees = countsToDegrees(curCounts);
-      SmartDashboard.putNumber("ARM_curDegrees", m_curDegrees);
+      m_curELDegrees = countsToDegrees(curCounts);
+      SmartDashboard.putNumber("ARM_curDegrees", m_curELDegrees);
     }
-    if (m_validARM15)
+    if (m_validWR15)
     {
       int curCounts = (int) m_Arm15.getSelectedSensorPosition(0);
-      m_curDegrees = countsToDegrees(curCounts);
-      SmartDashboard.putNumber("ARM_curDegrees", m_curDegrees);
+      m_curWRDegrees = countsToDegrees(curCounts);
+      SmartDashboard.putNumber("ARM_curDegrees", m_curWRDegrees);
     }
   }
 
