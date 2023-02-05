@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ARMConsts;
 import frc.robot.Constants.ARMConsts.ARMMode;
+import frc.robot.team2135.PhoenixUtil;
 
 public class Arm extends SubsystemBase
 {
@@ -23,11 +24,11 @@ public class Arm extends SubsystemBase
   private static final int  PIDINDEX          = 0;   // PID in use (0-primary, 1-aux)
   private static final int  SLOTINDEX         = 0;   // Use first PID slot
 
-  private final WPI_TalonFX m_Arm14           = new WPI_TalonFX(14);;
-  private final WPI_TalonFX m_Arm15           = new WPI_TalonFX(15);;
+  private final WPI_TalonFX m_Arm14           = new WPI_TalonFX(14);  //wrist
+  private final WPI_TalonFX m_Arm15           = new WPI_TalonFX(15);  //gripper
 
-  private boolean           m_validARM14;               // Health indicator for climber Talon 14
-  private boolean           m_validARM15;               // Health indicator for climber Talon 15
+  private boolean           m_validEL14;               // Health indicator for climber Talon 14
+  private boolean           m_validWR15;               // Health indicator for climber Talon 15
 
   // Declare module variables
   private int               m_velocity        = ARMConsts.kMMVelocity;        // motion magic velocity
