@@ -141,8 +141,6 @@ public class Arm extends SubsystemBase
   public void periodic( )
   {
     // This method will be called once per scheduler run
-    // This method will be called once per scheduler run
-
     // if disabled, set LED when down
 
     if (m_validEL14)
@@ -167,20 +165,25 @@ public class Arm extends SubsystemBase
 
   public void initialize( )
   {
-    double curCounts = 0.0;
+    double curELCounts = 0.0;
+    double curWRCounts = 0.0;
 
     DataLogManager.log(getSubsystem( ) + ": subsystem initialized!");
 
     setARMStopped( );
 
-    if (m_validARM14)
-      curCounts = m_Arm14.getSelectedSensorPosition(0);
-    if (m_validARM14)
-      curCounts = m_Arm15.getSelectedSensorPosition(0);
+    if (m_validEL14)
+      curELCounts = m_Arm14.getSelectedSensorPosition(0);
+    m_curELDegrees = countsToDegrees((int) curELCounts);
+    m_targetELDegrees = m_curELDegrees;
+    DataLogManager.log(getSubsystem( ) + ": Init Target Inches: " + m_targetELDegrees);
 
-    m_curDegrees = countsToDegrees((int) curCounts);
-    m_targetDegrees = m_curDegrees;
-    DataLogManager.log(getSubsystem( ) + ": Init Target Inches: " + m_targetDegrees);
+    if (m_validWR15)
+      curWRCounts = m_Arm15.getSelectedSensorPosition(0);
+    m_curWRDegrees = countsToDegrees((int) curWRCounts);
+    m_targetWRDegrees = m_curWRDegrees;
+    DataLogManager.log(getSubsystem( ) + ": Init Target Inches: " + m_targetWRDegrees);
+
   }
 
   private int degreesToCounts(double degrees)
