@@ -29,8 +29,8 @@ public class ArmRun extends CommandBase
   @Override
   public void execute( )
   {
-    m_arm.moveELBOWWithJoysticks(m_gamePad);
-    m_arm.moveWRISTWithJoysticks(m_gamePad);
+    m_arm.moveElbowWithJoystick(m_gamePad);
+    m_arm.moveWristWithJoystick(m_gamePad);
   }
 
   // Called once the command ends or is interrupted.

@@ -351,9 +351,15 @@ public class Arm extends SubsystemBase
         motorOutput = manualSpeedMax * (yELBOWValue * Math.abs(yELBOWValue));
       }
     }
+
+    if (m_validEL14)
+      m_Arm14.set(ControlMode.PercentOutput, motorOutput);
+
+    if (m_validWR15)
+      m_Arm15.set(ControlMode.PercentOutput, motorOutput);
   }
 
-  public void moveWRISTWithJoysticks(XboxController joystick)
+  public void moveWristWithJoystick(XboxController joystick)
   {
     double yWRISTValue = 0.0;
     double motorOutput = 0.0;
@@ -391,16 +397,22 @@ public class Arm extends SubsystemBase
         motorOutput = manualSpeedMax * (yWRISTValue * Math.abs(yWRISTValue));
       }
     }
+
+    if (m_validEL14)
+      m_Arm14.set(ControlMode.PercentOutput, motorOutput);
+
+    if (m_validWR15)
+      m_Arm15.set(ControlMode.PercentOutput, motorOutput);
   }
 
   public void setARMStopped( )
   {
     DataLogManager.log(getSubsystem( ) + ": ARM Set Arm Stopped");
 
-    if (m_validARM14)
+    if (m_validEL14)
       m_Arm14.set(ControlMode.PercentOutput, 0.0);
 
-    if (m_validARM15)
+    if (m_validWR15)
       m_Arm15.set(ControlMode.PercentOutput, 0.0);
   }
 }
