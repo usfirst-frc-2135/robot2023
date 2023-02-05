@@ -219,14 +219,101 @@ public class Arm extends SubsystemBase
   private void ARMTalonInitialize(WPI_TalonFX motor, boolean inverted)
   {}
 
-  public void FollowerInitialize( )
+  private void elbowTalonInitialize(WPI_TalonFX motor, boolean inverted)
   {
-    if (m_validARM15)
-    {
-    }
+    motor.setInverted(inverted);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "setInverted");
+    motor.setNeutralMode(NeutralMode.Brake);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
+    motor.setSafetyEnabled(false);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "setSafetyEnabled");
+
+    motor.configVoltageCompSaturation(12.0);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "configVoltageCompSaturation");
+    motor.enableVoltageCompensation(true);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "enableVoltageCompensation");
+
+    motor.configSupplyCurrentLimit(m_supplyCurrentLimits);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "configSupplyCurrentLimits");
+    motor.configStatorCurrentLimit(m_statorCurrentLimits);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "configStatorCurrentLimits");
+
+    // Configure sensor settings
+    motor.setSelectedSensorPosition(0.0);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "setSelectedSensorPosition");
+    motor.configAllowableClosedloopError(SLOTINDEX, m_ELAllowedError, CANTIMEOUT);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllowableClosedloopError");
+
+    motor.configMotionCruiseVelocity(m_velocity, CANTIMEOUT);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionCruiseVelocity");
+    motor.configMotionAcceleration(m_acceleration, CANTIMEOUT);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionAcceleration");
+    motor.configMotionSCurveStrength(m_sCurveStrength, CANTIMEOUT);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionSCurveStrength");
+
+    // Configure Magic Motion settings
+    motor.config_kF(0, m_pidKf, CANTIMEOUT);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kF");
+    motor.config_kP(0, m_pidKp, CANTIMEOUT);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kP");
+    motor.config_kI(0, m_pidKi, CANTIMEOUT);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kI");
+    motor.config_kD(0, m_pidKd, CANTIMEOUT);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kD");
+    motor.selectProfileSlot(SLOTINDEX, PIDINDEX);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "selectProfileSlot");
+
+    motor.set(ControlMode.PercentOutput, 0.0);
   }
 
-  public void moveELBOWWithJoysticks(XboxController joystick)
+  private void wristTalonInitialize(WPI_TalonFX motor, boolean inverted)
+  {
+    motor.setInverted(inverted);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "setInverted");
+    motor.setNeutralMode(NeutralMode.Brake);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
+    motor.setSafetyEnabled(false);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "setSafetyEnabled");
+
+    motor.configVoltageCompSaturation(12.0);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "configVoltageCompSaturation");
+    motor.enableVoltageCompensation(true);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "enableVoltageCompensation");
+
+    motor.configSupplyCurrentLimit(m_supplyCurrentLimits);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "configSupplyCurrentLimits");
+    motor.configStatorCurrentLimit(m_statorCurrentLimits);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "configStatorCurrentLimits");
+
+    // Configure sensor settings
+    motor.setSelectedSensorPosition(0.0);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "setSelectedSensorPosition");
+    motor.configAllowableClosedloopError(SLOTINDEX, m_WRAllowedError, CANTIMEOUT);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllowableClosedloopError");
+
+    motor.configMotionCruiseVelocity(m_velocity, CANTIMEOUT);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionCruiseVelocity");
+    motor.configMotionAcceleration(m_acceleration, CANTIMEOUT);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionAcceleration");
+    motor.configMotionSCurveStrength(m_sCurveStrength, CANTIMEOUT);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionSCurveStrength");
+
+    // Configure Magic Motion settings
+    motor.config_kF(0, m_pidKf, CANTIMEOUT);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kF");
+    motor.config_kP(0, m_pidKp, CANTIMEOUT);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kP");
+    motor.config_kI(0, m_pidKi, CANTIMEOUT);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kI");
+    motor.config_kD(0, m_pidKd, CANTIMEOUT);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kD");
+    motor.selectProfileSlot(SLOTINDEX, PIDINDEX);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "selectProfileSlot");
+
+    motor.set(ControlMode.PercentOutput, 0.0);
+  }
+
+  public void moveElbowWithJoystick(XboxController joystick)
   {
     double yELBOWValue = 0.0;
     double motorOutput = 0.0;
