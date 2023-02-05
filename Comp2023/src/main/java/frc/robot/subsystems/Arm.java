@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -16,49 +18,57 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ARMConsts;
 import frc.robot.Constants.ARMConsts.ARMMode;
+import frc.robot.Constants.Falcon500;
 import frc.robot.team2135.PhoenixUtil;
 
 public class Arm extends SubsystemBase
 {
   // Constants
-  private static final int  CANTIMEOUT        = 30;  // CAN timeout in msec
-  private static final int  PIDINDEX          = 0;   // PID in use (0-primary, 1-aux)
-  private static final int  SLOTINDEX         = 0;   // Use first PID slot
+  private static final int                CANTIMEOUT            = 30;  // CAN timeout in msec
+  private static final int                PIDINDEX              = 0;   // PID in use (0-primary, 1-aux)
+  private static final int                SLOTINDEX             = 0;   // Use first PID slot
 
-  private final WPI_TalonFX m_Arm14           = new WPI_TalonFX(14);  //elbow
-  private final WPI_TalonFX m_Arm15           = new WPI_TalonFX(15);  //wrist
+  private final WPI_TalonFX               m_Arm14               = new WPI_TalonFX(14);  //elbow
+  private final WPI_TalonFX               m_Arm15               = new WPI_TalonFX(15);  //wrist
 
-  private boolean           m_validEL14;               // Health indicator for climber Talon 14
-  private boolean           m_validWR15;               // Health indicator for climber Talon 15
+  private boolean                         m_validEL14;               // Health indicator for climber Talon 14
+  private boolean                         m_validWR15;               // Health indicator for climber Talon 15
+
+  //Devices and simulation objs
+  private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true,
+      Falcon500.kSupplyCurrentLimit, Falcon500.kSupplyTriggerCurrent, Falcon500.kSupplyTriggerTime);
+  private StatorCurrentLimitConfiguration m_statorCurrentLimits = new StatorCurrentLimitConfiguration(true,
+      Falcon500.kStatorCurrentLimit, Falcon500.kStatorTriggerCurrent, Falcon500.kStatorTriggerTime);
 
   // Declare module variables
-  private int               m_velocity        = ARMConsts.kMMVelocity;        // motion magic velocity
-  private int               m_acceleration    = ARMConsts.kMMAcceleration;    // motion magic acceleration
-  private int               m_sCurveStrength  = ARMConsts.kMMSCurveStrength;  // motion magic S curve smoothing
-  private double            m_pidKf           = ARMConsts.kARMPidKf;           // PID force constant
-  private double            m_pidKp           = ARMConsts.kARMPidKp;           // PID proportional
-  private double            m_pidKi           = ARMConsts.kARMPidKi;           // PID integral
-  private double            m_pidKd           = ARMConsts.kARMPidKd;           // PID derivative
-  private int               m_ARMAllowedError = ARMConsts.kARMAllowedError;    // PID allowable closed loop error
-  private double            m_toleranceInches = ARMConsts.kARMToleranceInches; // PID tolerance in inches
+  private int                             m_velocity            = ARMConsts.kMMVelocity;        // motion magic velocity
+  private int                             m_acceleration        = ARMConsts.kMMAcceleration;    // motion magic acceleration
+  private int                             m_sCurveStrength      = ARMConsts.kMMSCurveStrength;  // motion magic S curve smoothing
+  private double                          m_pidKf               = ARMConsts.kARMPidKf;           // PID force constant
+  private double                          m_pidKp               = ARMConsts.kARMPidKp;           // PID proportional
+  private double                          m_pidKi               = ARMConsts.kARMPidKi;           // PID integral
+  private double                          m_pidKd               = ARMConsts.kARMPidKd;           // PID derivative
+  private int                             m_ELAllowedError      = ARMConsts.kELAllowedError;    // PID allowable closed loop error
+  private int                             m_WRAllowedError      = ARMConsts.kWRAllowedError;    // PID allowable closed loop error
+  private double                          m_toleranceInches     = ARMConsts.kARMToleranceInches; // PID tolerance in inches
 
-  private double            m_stowHeight      = ARMConsts.kStowHeight;         // Stow height
+  private double                          m_stowHeight          = ARMConsts.kStowHeight;         // Stow height
 
-  private double            m_stickDeadband   = ARMConsts.kStickDeadband;      // joystick deadband
-  private ARMMode           m_mode            = ARMMode.ARM_INIT;          // Mode active with joysticks
+  private double                          m_stickDeadband       = ARMConsts.kStickDeadband;      // joystick deadband
+  private ARMMode                         m_mode                = ARMMode.ARM_INIT;          // Mode active with joysticks
 
-  private int               m_climberDebug    = 1; // DEBUG flag to disable/enable extra logging calls
+  private int                             m_climberDebug        = 1; // DEBUG flag to disable/enable extra logging calls
 
-  private boolean           m_calibrated      = false;  // Indicates whether the climber has been calibrated
-  private double            m_targetELDegrees = 0.0;    // Target angle in degrees
-  private double            m_curELDegrees    = 0.0;    // Current angle in degrees
-  private double            m_targetWRDegrees = 0.0;    // Target angle in degrees
-  private double            m_curWRDegrees    = 0.0;    // Current angle in degrees
-  private int               m_withinTolerance = 0;      // Counter for consecutive readings within tolerance
+  private boolean                         m_calibrated          = false;  // Indicates whether the climber has been calibrated
+  private double                          m_targetELDegrees     = 0.0;    // Target angle in degrees
+  private double                          m_curELDegrees        = 0.0;    // Current angle in degrees
+  private double                          m_targetWRDegrees     = 0.0;    // Target angle in degrees
+  private double                          m_curWRDegrees        = 0.0;    // Current angle in degrees
+  private int                             m_withinTolerance     = 0;      // Counter for consecutive readings within tolerance
 
-  private Timer             m_safetyTimer     = new Timer( ); // Safety timer for use in climber
-  private double            m_safetyTimeout;                // Seconds that the timer ran before stopping
-  private Timer             timer             = new Timer( );
+  private Timer                           m_safetyTimer         = new Timer( ); // Safety timer for use in climber
+  private double                          m_safetyTimeout;                // Seconds that the timer ran before stopping
+  private Timer                           timer                 = new Timer( );
 
   /**
    *

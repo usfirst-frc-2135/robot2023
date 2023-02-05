@@ -106,23 +106,24 @@ public class Constants
     public static final double kMetersPerCount      = Units.inchesToMeters(kInchesPerCount);
 
     // Config file parameters
-    public static final int    kMMVelocity          = 21776;  // Climber motion magic velocity
-    public static final int    kMMAcceleration      = 43552;  // Climber motion magic acceleration
-    public static final int    kMMSCurveStrength    = 0;      // Climber motion magic S curve smoothing strength
-    public static final double kARMPidKf            = 0.0496; // Climber PID force constant
-    public static final double kARMPidKp            = 0.500;  // Climber PID proportional constant
-    public static final double kARMPidKi            = 0.0;    // Climber PID integral constant
-    public static final double kARMPidKd            = 0.0;    // Climber PID derivative constant
-    public static final int    kARMAllowedError     = 0;      // Climber PID allowable closed loop error in counts
-    public static final double kARMToleranceInches  = 0.25;   // Climber PID tolerance in inches
+    public static final int    kMMVelocity          = 21776;  // Arm motion magic velocity
+    public static final int    kMMAcceleration      = 43552;  // Arm motion magic acceleration
+    public static final int    kMMSCurveStrength    = 0;      // Arm motion magic S curve smoothing strength
+    public static final double kARMPidKf            = 0.0496; // Arm PID force constant
+    public static final double kARMPidKp            = 0.500;  // Arm PID proportional constant
+    public static final double kARMPidKi            = 0.0;    // Arm PID integral constant
+    public static final double kARMPidKd            = 0.0;    // Arm PID derivative constant
+    public static final int    kELAllowedError      = 0;      // Arm PID allowable closed loop error in counts
+    public static final int    kWRAllowedError      = 0;      // Arm PID allowable closed loop error in counts
+    public static final double kARMToleranceInches  = 0.25;   // Arm PID tolerance in inches
 
     public static final double kStowHeight          = 0.10;   // 0.25 inches
     public static final double kExtendL2            = 29.0;   // 29 inches
     public static final double kRotateL3            = 31.25;  // 21 inches
     public static final double kRaiseL4             = 15.0;   // 25.25 inches
     public static final double kGatehookRestHeight  = 4.0;    // 0.35 inches
-    public static final double kClimberMinHeight    = 0.0;    // Climber minimum allowable height
-    public static final double kClimberMaxHeight    = 36.0;   // Climber maximum allowable height
+    public static final double kArmMinHeight        = 0.0;    // Arm minimum allowable height
+    public static final double kArmMaxHeight        = 36.0;   // Arm maximum allowable height
 
     public static final double kSpeedCalibrate      = -0.1;   // Motor percent output during calibration
     public static final double kSpeedMaxManual      = 0.3;    // Motor percent output during manual operation
