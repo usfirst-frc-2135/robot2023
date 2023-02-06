@@ -8,16 +8,29 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.simulation.BatterySim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ARMConsts;
-import frc.robot.Constants.ARMConsts.ARMMode;
+import frc.robot.Constants.ARMConsts.ElbowMode;
+import frc.robot.Constants.ARMConsts.WristMode;
 import frc.robot.Constants.Falcon500;
 import frc.robot.team2135.PhoenixUtil;
 
@@ -30,6 +43,15 @@ public class Arm extends SubsystemBase
 
   private final WPI_TalonFX               m_Arm14               = new WPI_TalonFX(14);  //elbow
   private final WPI_TalonFX               m_Arm15               = new WPI_TalonFX(15);  //wrist
+  private final TalonFXSimCollection      m_elbow15MotorSim     = new TalonFXSimCollection(m_Arm14);
+  private final TalonFXSimCollection      m_wrist16MotorSim     = new TalonFXSimCollection(m_Arm15);
+  private final SingleJointedArmSim       m_elbow15Sim          = new SingleJointedArmSim(DCMotor.getFalcon500(1),
+      ARMConsts.kElbowGearRatio, 2.0, ARMConsts.kForearmLengthMeters, 0.0, Math.PI, ARMConsts.kForearmMassKg, true);
+  private final SingleJointedArmSim       m_wrist16Sim          = new SingleJointedArmSim(DCMotor.getFalcon500(1),
+      ARMConsts.kWristGearRatio, 2.0, ARMConsts.kGripperLengthMeters, 0.0, Math.PI, ARMConsts.kGripperMassKg, true);
+
+  private final MechanismLigament2d       m_elbowLigament;
+  private final MechanismLigament2d       m_wristLigament;
 
   private boolean                         m_validEL14;               // Health indicator for climber Talon 14
   private boolean                         m_validWR15;               // Health indicator for climber Talon 15
@@ -55,15 +77,16 @@ public class Arm extends SubsystemBase
   private double                          m_stowHeight          = ARMConsts.kStowHeight;         // Stow height
 
   private double                          m_stickDeadband       = ARMConsts.kStickDeadband;      // joystick deadband
-  private ARMMode                         m_mode                = ARMMode.ARM_INIT;          // Mode active with joysticks
+  private ElbowMode                       m_elbowMode           = ElbowMode.ELBOW_INIT;          // Mode active with joysticks
+  private WristMode                       m_wristMode           = WristMode.WRIST_INIT;          // Mode active with joysticks
 
   private int                             m_climberDebug        = 1; // DEBUG flag to disable/enable extra logging calls
 
   private boolean                         m_calibrated          = false;  // Indicates whether the climber has been calibrated
   private double                          m_targetELDegrees     = 0.0;    // Target angle in degrees
-  private double                          m_curELDegrees        = 0.0;    // Current angle in degrees
+  private double                          m_elbowCurDegrees     = 0.0;    // Current angle in degrees
   private double                          m_targetWRDegrees     = 0.0;    // Target angle in degrees
-  private double                          m_curWRDegrees        = 0.0;    // Current angle in degrees
+  private double                          m_wristCurDegrees     = 0.0;    // Current angle in degrees
   private int                             m_withinTolerance     = 0;      // Counter for consecutive readings within tolerance
 
   private Timer                           m_safetyTimer         = new Timer( ); // Safety timer for use in climber
@@ -105,11 +128,11 @@ public class Arm extends SubsystemBase
 
     // Field for manually progamming climber height
     //MAKE THESE READ DEGREES OF THE MOTORS (BOTH SEPERATE)
-    SmartDashboard.putNumber("EL_curDegrees", m_curELDegrees);
+    SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
     SmartDashboard.putNumber("EL_targetDegrees", m_targetELDegrees);
     SmartDashboard.putBoolean("EL_calibrated", m_calibrated);
 
-    SmartDashboard.putNumber("WR_curDegrees", m_curWRDegrees);
+    SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
     SmartDashboard.putNumber("WR_targetDegrees", m_targetWRDegrees);
     SmartDashboard.putBoolean("WR_calibrated", m_calibrated);
 
@@ -117,6 +140,19 @@ public class Arm extends SubsystemBase
       elbowTalonInitialize(m_Arm14, true);
     if (m_validWR15)
       wristTalonInitialize(m_Arm15, false);
+
+    // the main mechanism object
+    Mechanism2d armMech = new Mechanism2d(3, 3);
+    // the mechanism root node
+    MechanismRoot2d armRoot = armMech.getRoot("arm", 1.5, 2);
+
+    // MechanismLigament2d objects represent each "section"/"stage" of the mechanism, and are based
+    // off the root node or another ligament object
+    m_elbowLigament = armRoot.append(new MechanismLigament2d("elbow", 1, 0));
+    m_wristLigament = m_elbowLigament.append(new MechanismLigament2d("wrist", 0.5, 90, 6, new Color8Bit(Color.kPurple)));
+
+    // post the mechanism to the dashboard
+    SmartDashboard.putData("ArmMech2d", armMech);
 
     initialize( );
   }
@@ -156,14 +192,16 @@ public class Arm extends SubsystemBase
     if (m_validEL14)
     {
       int curCounts = (int) m_Arm14.getSelectedSensorPosition(0);
-      m_curELDegrees = countsToDegrees(curCounts);
-      SmartDashboard.putNumber("ARM_curDegrees", m_curELDegrees);
+      m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
+      SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
+      m_elbowLigament.setAngle(elbowCountsToDegrees(curCounts));
     }
     if (m_validWR15)
     {
       int curCounts = (int) m_Arm15.getSelectedSensorPosition(0);
-      m_curWRDegrees = countsToDegrees(curCounts);
-      SmartDashboard.putNumber("ARM_curDegrees", m_curWRDegrees);
+      m_wristCurDegrees = wristCountsToDegrees(curCounts);
+      SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
+      m_wristLigament.setAngle(wristCountsToDegrees(curCounts));
     }
   }
 
@@ -171,6 +209,25 @@ public class Arm extends SubsystemBase
   public void simulationPeriodic( )
   {
     // This method will be called once per scheduler run during simulation
+
+    // Set input flywheel voltage from the motor setting
+    m_elbow15MotorSim.setBusVoltage(RobotController.getInputVoltage( ));
+    m_elbow15Sim.setInput(-m_elbow15MotorSim.getMotorOutputLeadVoltage( ));
+
+    m_wrist16MotorSim.setBusVoltage(RobotController.getInputVoltage( ));
+    m_wrist16Sim.setInput(-m_wrist16MotorSim.getMotorOutputLeadVoltage( ));
+
+    // update for 20 msec loop
+    m_elbow15Sim.update(0.020);
+    m_wrist16Sim.update(0.020);
+
+    // Finally, we set our simulated encoder's readings and simulated battery voltage
+    m_Arm14.setSelectedSensorPosition(elbowDegreesToCounts(Units.radiansToDegrees(-m_elbow15Sim.getAngleRads( ))));
+    m_Arm15.setSelectedSensorPosition(wristDegreesToCounts(Units.radiansToDegrees(m_wrist16Sim.getAngleRads( ))));
+
+    // SimBattery estimates loaded battery voltages
+    RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_elbow15Sim.getCurrentDrawAmps( )));
+    RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_wrist16Sim.getCurrentDrawAmps( )));
   }
 
   public void initialize( )
@@ -184,36 +241,36 @@ public class Arm extends SubsystemBase
 
     if (m_validEL14)
       curELCounts = m_Arm14.getSelectedSensorPosition(0);
-    m_curELDegrees = countsToDegrees((int) curELCounts);
-    m_targetELDegrees = m_curELDegrees;
+    m_elbowCurDegrees = elbowCountsToDegrees((int) curELCounts);
+    m_targetELDegrees = m_elbowCurDegrees;
     DataLogManager.log(getSubsystem( ) + ": Init Target Inches: " + m_targetELDegrees);
 
     if (m_validWR15)
       curWRCounts = m_Arm15.getSelectedSensorPosition(0);
-    m_curWRDegrees = countsToDegrees((int) curWRCounts);
-    m_targetWRDegrees = m_curWRDegrees;
+    m_wristCurDegrees = wristCountsToDegrees((int) curWRCounts);
+    m_targetWRDegrees = m_wristCurDegrees;
     DataLogManager.log(getSubsystem( ) + ": Init Target Inches: " + m_targetWRDegrees);
 
   }
 
-  private int degreesToCounts(double degrees)
+  private int elbowDegreesToCounts(double degrees)
   {
-    return (int) (degrees / ARMConsts.kInchesPerCount);
+    return (int) (degrees / ARMConsts.kElbowDegreesPerCount);
   }
 
-  private double countsToDegrees(int counts)
+  private double elbowCountsToDegrees(int counts)
   {
-    return counts * ARMConsts.kInchesPerCount;
+    return counts * ARMConsts.kElbowDegreesPerCount;
   }
 
-  private int metersToNativeUnits(double meters)
+  private int wristDegreesToCounts(double degrees)
   {
-    return (int) (meters / ARMConsts.kMetersPerCount);
+    return (int) (degrees / ARMConsts.kElbowDegreesPerCount);
   }
 
-  private double nativeUnitsToMeters(int counts)
+  private double wristCountsToDegrees(int counts)
   {
-    return counts * ARMConsts.kMetersPerCount;
+    return counts * ARMConsts.kElbowDegreesPerCount;
   }
 
   private void ARMTalonInitialize(WPI_TalonFX motor, boolean inverted)
@@ -322,18 +379,18 @@ public class Arm extends SubsystemBase
     yELBOWValue = -joystick.getLeftY( );
     if (yELBOWValue > -m_stickDeadband && yELBOWValue < m_stickDeadband)
     {
-      if (m_mode != ARMMode.ARM_STOPPED)
-        DataLogManager.log(getSubsystem( ) + "ARM Stopped");
-      m_mode = ARMMode.ARM_STOPPED;
+      if (m_elbowMode != ElbowMode.ELBOW_STOPPED)
+        DataLogManager.log(getSubsystem( ) + " ELBOW Stopped");
+      m_elbowMode = ElbowMode.ELBOW_STOPPED;
     }
     else
     {
       // If joystick is above a value, ARM will move up
       if (yELBOWValue > m_stickDeadband)
       {
-        if (m_mode != ARMMode.ARM_UP)
-          DataLogManager.log(getSubsystem( ) + "ARM Up");
-        m_mode = ARMMode.ARM_UP;
+        if (m_elbowMode != ElbowMode.ELBOW_UP)
+          DataLogManager.log(getSubsystem( ) + " ELBOW Up");
+        m_elbowMode = ElbowMode.ELBOW_UP;
 
         yELBOWValue -= m_stickDeadband;
         yELBOWValue *= (1.0 / (1.0 - m_stickDeadband));
@@ -342,9 +399,9 @@ public class Arm extends SubsystemBase
       // If joystick is below a value, ARM will move down
       else if (yELBOWValue < -m_stickDeadband)
       {
-        if (m_mode != ARMMode.ARM_DOWN)
-          DataLogManager.log(getSubsystem( ) + "ARM Down");
-        m_mode = ARMMode.ARM_DOWN;
+        if (m_elbowMode != ElbowMode.ELBOW_DOWN)
+          DataLogManager.log(getSubsystem( ) + " ELBOW Down");
+        m_elbowMode = ElbowMode.ELBOW_DOWN;
 
         yELBOWValue += m_stickDeadband;
         yELBOWValue *= (1.0 / (1.0 - m_stickDeadband));
@@ -354,9 +411,6 @@ public class Arm extends SubsystemBase
 
     if (m_validEL14)
       m_Arm14.set(ControlMode.PercentOutput, motorOutput);
-
-    if (m_validWR15)
-      m_Arm15.set(ControlMode.PercentOutput, motorOutput);
   }
 
   public void moveWristWithJoystick(XboxController joystick)
@@ -368,18 +422,18 @@ public class Arm extends SubsystemBase
     yWRISTValue = -joystick.getRightY( );
     if (yWRISTValue > -m_stickDeadband && yWRISTValue < m_stickDeadband)
     {
-      if (m_mode != ARMMode.ARM_STOPPED)
-        DataLogManager.log(getSubsystem( ) + "WRIST Stopped");
-      m_mode = ARMMode.ARM_STOPPED;
+      if (m_wristMode != WristMode.WRIST_STOPPED)
+        DataLogManager.log(getSubsystem( ) + " WRIST Stopped");
+      m_wristMode = WristMode.WRIST_STOPPED;
     }
     else
     {
       // If joystick is above a value, WRIST will move up
       if (yWRISTValue > m_stickDeadband)
       {
-        if (m_mode != ARMMode.ARM_UP)
-          DataLogManager.log(getSubsystem( ) + "WRIST Up");
-        m_mode = ARMMode.ARM_UP;
+        if (m_wristMode != WristMode.WRIST_UP)
+          DataLogManager.log(getSubsystem( ) + " WRIST Up");
+        m_wristMode = WristMode.WRIST_UP;
 
         yWRISTValue -= m_stickDeadband;
         yWRISTValue *= (1.0 / (1.0 - m_stickDeadband));
@@ -388,18 +442,15 @@ public class Arm extends SubsystemBase
       // If joystick is below a value, WRIST will move down
       else if (yWRISTValue < -m_stickDeadband)
       {
-        if (m_mode != ARMMode.ARM_DOWN)
-          DataLogManager.log(getSubsystem( ) + "WRIST Down");
-        m_mode = ARMMode.ARM_DOWN;
+        if (m_wristMode != WristMode.WRIST_DOWN)
+          DataLogManager.log(getSubsystem( ) + " WRIST Down");
+        m_wristMode = WristMode.WRIST_DOWN;
 
         yWRISTValue += m_stickDeadband;
         yWRISTValue *= (1.0 / (1.0 - m_stickDeadband));
         motorOutput = manualSpeedMax * (yWRISTValue * Math.abs(yWRISTValue));
       }
     }
-
-    if (m_validEL14)
-      m_Arm14.set(ControlMode.PercentOutput, motorOutput);
 
     if (m_validWR15)
       m_Arm15.set(ControlMode.PercentOutput, motorOutput);
