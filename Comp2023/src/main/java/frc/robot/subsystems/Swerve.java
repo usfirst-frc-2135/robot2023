@@ -379,8 +379,8 @@ public class Swerve extends SubsystemBase
     Trajectory.State trajState = m_trajectory.sample(m_trajTimer.get( ));
     Pose2d currentPose = getPose( );
 
-    ChassisSpeeds targetChassisSpeeds =
-        m_holonomicController.calculate(currentPose, trajState, trajState.poseMeters.getRotation( ));
+    ChassisSpeeds targetChassisSpeeds = m_holonomicController.calculate(currentPose, trajState,
+        Rotation2d.fromDegrees(0)/* trajState.poseMeters.getRotation( ) */); //TODO: find out what's wrong with getting desired rotation
 
     // Convert to module states
     SwerveModuleState[ ] moduleStates = Constants.SwerveConstants.swerveKinematics.toSwerveModuleStates(targetChassisSpeeds);
@@ -601,7 +601,7 @@ public class Swerve extends SubsystemBase
 
   public void resetOdometry(Pose2d pose)
   {
-    m_swerveOdometry.resetPosition(pose.getRotation( ), getPosition( ), pose);
+    m_swerveOdometry.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPosition( ), pose);
     zeroGyro(pose.getRotation( ).getDegrees( ));
   }
 
