@@ -42,6 +42,8 @@ public class Gripper extends SubsystemBase
     // This method will be called once per scheduler run during simulation
   }
 
+  // Put methods for controlling this subsystem here. Call these from Commands.
+
   public void initialize( )
   {
     DataLogManager.log(getSubsystem( ) + ": subsystem initialized!");
