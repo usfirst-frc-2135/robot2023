@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.ARMConsts;
 import frc.robot.Constants.ARMConsts.ElbowMode;
 import frc.robot.Constants.ARMConsts.WristMode;
@@ -41,11 +42,11 @@ public class Arm extends SubsystemBase
   private static final int                PIDINDEX              = 0;   // PID in use (0-primary, 1-aux)
   private static final int                SLOTINDEX             = 0;   // Use first PID slot
 
-  private final WPI_TalonFX               m_elbow14             = new WPI_TalonFX(14);  //elbow
-  private final WPI_TalonFX               m_wrist15             = new WPI_TalonFX(15);  //wrist
-  private final TalonFXSimCollection      m_elbow15MotorSim     = new TalonFXSimCollection(m_elbow14);
-  private final TalonFXSimCollection      m_wrist16MotorSim     = new TalonFXSimCollection(m_wrist15);
-  private final SingleJointedArmSim       m_elbow15Sim          = new SingleJointedArmSim(DCMotor.getFalcon500(1),
+  private final WPI_TalonFX               m_elbow               = new WPI_TalonFX(Constants.Ports.kCANID_Elbow);  //elbow
+  private final WPI_TalonFX               m_wrist               = new WPI_TalonFX(Constants.Ports.kCANID_Wrist);  //wrist
+  private final TalonFXSimCollection      m_elbowMotorSim       = new TalonFXSimCollection(m_elbow);
+  private final TalonFXSimCollection      m_wrist16MotorSim     = new TalonFXSimCollection(m_wrist);
+  private final SingleJointedArmSim       m_elbowSim            = new SingleJointedArmSim(DCMotor.getFalcon500(1),
       ARMConsts.kElbowGearRatio, 2.0, ARMConsts.kForearmLengthMeters, 0.0, Math.PI, ARMConsts.kForearmMassKg, true);
   private final SingleJointedArmSim       m_wrist16Sim          = new SingleJointedArmSim(DCMotor.getFalcon500(1),
       ARMConsts.kWristGearRatio, 2.0, ARMConsts.kGripperLengthMeters, 0.0, Math.PI, ARMConsts.kGripperMassKg, true);
@@ -53,8 +54,8 @@ public class Arm extends SubsystemBase
   private final MechanismLigament2d       m_elbowLigament;
   private final MechanismLigament2d       m_wristLigament;
 
-  private boolean                         m_elbowValid14;               // Health indicator for climber Talon 14
-  private boolean                         m_wristValid15;               // Health indicator for climber Talon 15
+  private boolean                         m_elbowValid;               // Health indicator for climber Talon 
+  private boolean                         m_wristValid;               // Health indicator for climber Talon 
 
   //Devices and simulation objs
   private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true,
@@ -102,11 +103,11 @@ public class Arm extends SubsystemBase
     setName("Arm");
     setSubsystem("Arm");
 
-    m_elbowValid14 = PhoenixUtil.getInstance( ).talonFXInitialize(m_elbow14, "elbow14");
-    m_wristValid15 = PhoenixUtil.getInstance( ).talonFXInitialize(m_wrist15, "wrist15");
+    m_elbowValid = PhoenixUtil.getInstance( ).talonFXInitialize(m_elbow, "elbow");
+    m_wristValid = PhoenixUtil.getInstance( ).talonFXInitialize(m_wrist, "wrist");
 
-    // SmartDashboard.putBoolean("HL_validCL14", m_validCL14);
-    // SmartDashboard.putBoolean("HL_validCL15", m_validCL15);
+    // SmartDashboard.putBoolean("HL_validCL", m_validCL);
+    // SmartDashboard.putBoolean("HL_validCL", m_validCL);
 
     // // Check if solenoids are functional or blacklisted
     // DataLogManager.log(getSubsystem( ) + ": CL Climber Solenoid is " + ((m_gateHook.isDisabled( )) ? "BLACKLISTED" : "OK"));
@@ -136,10 +137,10 @@ public class Arm extends SubsystemBase
     SmartDashboard.putNumber("WR_targetDegrees", m_wristTargetDegrees);
     SmartDashboard.putBoolean("WR_calibrated", m_calibrated);
 
-    if (m_elbowValid14)
-      elbowTalonInitialize(m_elbow14, false);
-    if (m_wristValid15)
-      wristTalonInitialize(m_wrist15, false);
+    if (m_elbowValid)
+      elbowTalonInitialize(m_elbow, false);
+    if (m_wristValid)
+      wristTalonInitialize(m_wrist, false);
 
     // the main mechanism object
     Mechanism2d armMech = new Mechanism2d(3, 3);
@@ -163,16 +164,16 @@ public class Arm extends SubsystemBase
     // This method will be called once per scheduler run
     // if disabled, set LED when down
 
-    if (m_elbowValid14)
+    if (m_elbowValid)
     {
-      int curCounts = (int) m_elbow14.getSelectedSensorPosition(0);
+      int curCounts = (int) m_elbow.getSelectedSensorPosition(0);
       m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
       SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
       m_elbowLigament.setAngle(elbowCountsToDegrees(curCounts));
     }
-    if (m_wristValid15)
+    if (m_wristValid)
     {
-      int curCounts = (int) m_wrist15.getSelectedSensorPosition(0);
+      int curCounts = (int) m_wrist.getSelectedSensorPosition(0);
       m_wristCurDegrees = wristCountsToDegrees(curCounts);
       SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
       m_wristLigament.setAngle(wristCountsToDegrees(curCounts));
@@ -185,22 +186,22 @@ public class Arm extends SubsystemBase
     // This method will be called once per scheduler run during simulation
 
     // Set input flywheel voltage from the motor setting
-    m_elbow15MotorSim.setBusVoltage(RobotController.getInputVoltage( ));
-    m_elbow15Sim.setInput(-m_elbow15MotorSim.getMotorOutputLeadVoltage( ));
+    m_elbowMotorSim.setBusVoltage(RobotController.getInputVoltage( ));
+    m_elbowSim.setInput(-m_elbowMotorSim.getMotorOutputLeadVoltage( ));
 
     m_wrist16MotorSim.setBusVoltage(RobotController.getInputVoltage( ));
     m_wrist16Sim.setInput(-m_wrist16MotorSim.getMotorOutputLeadVoltage( ));
 
     // update for 20 msec loop
-    m_elbow15Sim.update(0.020);
+    m_elbowSim.update(0.020);
     m_wrist16Sim.update(0.020);
 
     // Finally, we set our simulated encoder's readings and simulated battery voltage
-    m_elbow14.setSelectedSensorPosition(elbowDegreesToCounts(Units.radiansToDegrees(-m_elbow15Sim.getAngleRads( ))));
-    m_wrist15.setSelectedSensorPosition(wristDegreesToCounts(Units.radiansToDegrees(m_wrist16Sim.getAngleRads( ))));
+    m_elbow.setSelectedSensorPosition(elbowDegreesToCounts(Units.radiansToDegrees(-m_elbowSim.getAngleRads( ))));
+    m_wrist.setSelectedSensorPosition(wristDegreesToCounts(Units.radiansToDegrees(m_wrist16Sim.getAngleRads( ))));
 
     // SimBattery estimates loaded battery voltages
-    RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_elbow15Sim.getCurrentDrawAmps( )));
+    RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_elbowSim.getCurrentDrawAmps( )));
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_wrist16Sim.getCurrentDrawAmps( )));
   }
 
@@ -213,14 +214,14 @@ public class Arm extends SubsystemBase
 
     setARMStopped( );
 
-    if (m_elbowValid14)
-      curELCounts = m_elbow14.getSelectedSensorPosition(0);
+    if (m_elbowValid)
+      curELCounts = m_elbow.getSelectedSensorPosition(0);
     m_elbowCurDegrees = elbowCountsToDegrees((int) curELCounts);
     m_elbowTargetDegrees = m_elbowCurDegrees;
     DataLogManager.log(getSubsystem( ) + ": Init Target Inches: " + m_elbowTargetDegrees);
 
-    if (m_wristValid15)
-      curWRCounts = m_wrist15.getSelectedSensorPosition(0);
+    if (m_wristValid)
+      curWRCounts = m_wrist.getSelectedSensorPosition(0);
     m_wristCurDegrees = wristCountsToDegrees((int) curWRCounts);
     m_wristTargetDegrees = m_wristCurDegrees;
     DataLogManager.log(getSubsystem( ) + ": Init Target Inches: " + m_wristTargetDegrees);
@@ -380,8 +381,8 @@ public class Arm extends SubsystemBase
       }
     }
 
-    if (m_elbowValid14)
-      m_elbow14.set(ControlMode.PercentOutput, motorOutput);
+    if (m_elbowValid)
+      m_elbow.set(ControlMode.PercentOutput, motorOutput);
   }
 
   public void moveWristWithJoystick(XboxController joystick)
@@ -423,18 +424,18 @@ public class Arm extends SubsystemBase
       }
     }
 
-    if (m_wristValid15)
-      m_wrist15.set(ControlMode.PercentOutput, motorOutput);
+    if (m_wristValid)
+      m_wrist.set(ControlMode.PercentOutput, motorOutput);
   }
 
   public void setARMStopped( )
   {
     DataLogManager.log(getSubsystem( ) + ": ARM Set Arm Stopped");
 
-    if (m_elbowValid14)
-      m_elbow14.set(ControlMode.PercentOutput, 0.0);
+    if (m_elbowValid)
+      m_elbow.set(ControlMode.PercentOutput, 0.0);
 
-    if (m_wristValid15)
-      m_wrist15.set(ControlMode.PercentOutput, 0.0);
+    if (m_wristValid)
+      m_wrist.set(ControlMode.PercentOutput, 0.0);
   }
 }

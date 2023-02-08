@@ -90,8 +90,6 @@ public class Constants
 
   public static final class ARMConsts
   {
-    public static final int    kARM14LeftCANID       = 14;
-    public static final int    kARM15RightCANID      = 15;
     public static final int    kARMLeftLimitDIO      = 0;
     public static final int    kARMRightLimitDIO     = 1;
     public static final int    kGateHookSolenod      = 1;
