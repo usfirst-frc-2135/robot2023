@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.HolonomicDriveController;
@@ -380,7 +381,7 @@ public class Swerve extends SubsystemBase
     Pose2d currentPose = getPose( );
 
     ChassisSpeeds targetChassisSpeeds = m_holonomicController.calculate(currentPose, trajState,
-        Rotation2d.fromDegrees(0)/* trajState.poseMeters.getRotation( ) */); //TODO: find out what's wrong with getting desired rotation
+        m_trajectory.getEndState( ).holonomicRotation/* trajState.poseMeters.getRotation( ) */); //TODO: find out what's wrong with getting desired rotation
 
     // Convert to module states
     SwerveModuleState[ ] moduleStates = Constants.SwerveConstants.swerveKinematics.toSwerveModuleStates(targetChassisSpeeds);
@@ -400,7 +401,8 @@ public class Swerve extends SubsystemBase
     double currentTrajX = currentPose.getX( );
     double currentTrajY = currentPose.getY( );
 
-    double targetHeading = trajState.poseMeters.getRotation( ).getDegrees( ); ///Maybe get in radians?
+    double targetHeading =
+        m_trajectory.getEndState( ).holonomicRotation.getDegrees( )/* trajState.poseMeters.getRotation( ).getDegrees( ) */; ///Maybe get in radians?
     double currentHeading = currentPose.getRotation( ).getDegrees( ); ///Maybe get in radians?
 
     //TODO: feedWatchDog
