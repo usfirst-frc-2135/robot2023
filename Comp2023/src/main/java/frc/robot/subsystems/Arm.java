@@ -41,10 +41,10 @@ public class Arm extends SubsystemBase
   private static final int                PIDINDEX              = 0;   // PID in use (0-primary, 1-aux)
   private static final int                SLOTINDEX             = 0;   // Use first PID slot
 
-  private final WPI_TalonFX               m_Arm14               = new WPI_TalonFX(14);  //elbow
-  private final WPI_TalonFX               m_Arm15               = new WPI_TalonFX(15);  //wrist
-  private final TalonFXSimCollection      m_elbow15MotorSim     = new TalonFXSimCollection(m_Arm14);
-  private final TalonFXSimCollection      m_wrist16MotorSim     = new TalonFXSimCollection(m_Arm15);
+  private final WPI_TalonFX               m_elbow14             = new WPI_TalonFX(14);  //elbow
+  private final WPI_TalonFX               m_wrist15             = new WPI_TalonFX(15);  //wrist
+  private final TalonFXSimCollection      m_elbow15MotorSim     = new TalonFXSimCollection(m_elbow14);
+  private final TalonFXSimCollection      m_wrist16MotorSim     = new TalonFXSimCollection(m_wrist15);
   private final SingleJointedArmSim       m_elbow15Sim          = new SingleJointedArmSim(DCMotor.getFalcon500(1),
       ARMConsts.kElbowGearRatio, 2.0, ARMConsts.kForearmLengthMeters, 0.0, Math.PI, ARMConsts.kForearmMassKg, true);
   private final SingleJointedArmSim       m_wrist16Sim          = new SingleJointedArmSim(DCMotor.getFalcon500(1),
@@ -53,8 +53,8 @@ public class Arm extends SubsystemBase
   private final MechanismLigament2d       m_elbowLigament;
   private final MechanismLigament2d       m_wristLigament;
 
-  private boolean                         m_validEL14;               // Health indicator for climber Talon 14
-  private boolean                         m_validWR15;               // Health indicator for climber Talon 15
+  private boolean                         m_elbowValid14;               // Health indicator for climber Talon 14
+  private boolean                         m_wristValid15;               // Health indicator for climber Talon 15
 
   //Devices and simulation objs
   private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true,
@@ -70,8 +70,8 @@ public class Arm extends SubsystemBase
   private double                          m_pidKp               = ARMConsts.kARMPidKp;           // PID proportional
   private double                          m_pidKi               = ARMConsts.kARMPidKi;           // PID integral
   private double                          m_pidKd               = ARMConsts.kARMPidKd;           // PID derivative
-  private int                             m_ELAllowedError      = ARMConsts.kELAllowedError;    // PID allowable closed loop error
-  private int                             m_WRAllowedError      = ARMConsts.kWRAllowedError;    // PID allowable closed loop error
+  private int                             m_elbowAllowedError   = ARMConsts.kELAllowedError;    // PID allowable closed loop error
+  private int                             m_wristAllowedError   = ARMConsts.kWRAllowedError;    // PID allowable closed loop error
   private double                          m_toleranceInches     = ARMConsts.kARMToleranceInches; // PID tolerance in inches
 
   private double                          m_stowHeight          = ARMConsts.kStowHeight;         // Stow height
@@ -83,9 +83,9 @@ public class Arm extends SubsystemBase
   private int                             m_climberDebug        = 1; // DEBUG flag to disable/enable extra logging calls
 
   private boolean                         m_calibrated          = false;  // Indicates whether the climber has been calibrated
-  private double                          m_targetELDegrees     = 0.0;    // Target angle in degrees
+  private double                          m_elbowTargetDegrees  = 0.0;    // Target angle in degrees
   private double                          m_elbowCurDegrees     = 0.0;    // Current angle in degrees
-  private double                          m_targetWRDegrees     = 0.0;    // Target angle in degrees
+  private double                          m_wristTargetDegrees  = 0.0;    // Target angle in degrees
   private double                          m_wristCurDegrees     = 0.0;    // Current angle in degrees
   private int                             m_withinTolerance     = 0;      // Counter for consecutive readings within tolerance
 
@@ -102,8 +102,8 @@ public class Arm extends SubsystemBase
     setName("Arm");
     setSubsystem("Arm");
 
-    m_validEL14 = PhoenixUtil.getInstance( ).talonFXInitialize(m_Arm14, "elbow14");
-    m_validWR15 = PhoenixUtil.getInstance( ).talonFXInitialize(m_Arm15, "wrist15");
+    m_elbowValid14 = PhoenixUtil.getInstance( ).talonFXInitialize(m_elbow14, "elbow14");
+    m_wristValid15 = PhoenixUtil.getInstance( ).talonFXInitialize(m_wrist15, "wrist15");
 
     // SmartDashboard.putBoolean("HL_validCL14", m_validCL14);
     // SmartDashboard.putBoolean("HL_validCL15", m_validCL15);
@@ -129,17 +129,17 @@ public class Arm extends SubsystemBase
     // Field for manually progamming climber height
     //MAKE THESE READ DEGREES OF THE MOTORS (BOTH SEPERATE)
     SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
-    SmartDashboard.putNumber("EL_targetDegrees", m_targetELDegrees);
+    SmartDashboard.putNumber("EL_targetDegrees", m_elbowTargetDegrees);
     SmartDashboard.putBoolean("EL_calibrated", m_calibrated);
 
     SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
-    SmartDashboard.putNumber("WR_targetDegrees", m_targetWRDegrees);
+    SmartDashboard.putNumber("WR_targetDegrees", m_wristTargetDegrees);
     SmartDashboard.putBoolean("WR_calibrated", m_calibrated);
 
-    if (m_validEL14)
-      elbowTalonInitialize(m_Arm14, true);
-    if (m_validWR15)
-      wristTalonInitialize(m_Arm15, false);
+    if (m_elbowValid14)
+      elbowTalonInitialize(m_elbow14, false);
+    if (m_wristValid15)
+      wristTalonInitialize(m_wrist15, false);
 
     // the main mechanism object
     Mechanism2d armMech = new Mechanism2d(3, 3);
@@ -157,48 +157,22 @@ public class Arm extends SubsystemBase
     initialize( );
   }
 
-  /**
-   * Example command factory method.
-   *
-   * @return a command
-   */
-  public CommandBase exampleMethodCommand( )
-  {
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
-    return runOnce(( ) ->
-    {
-      /* one-time action goes here */
-    });
-  }
-
-  /**
-   * An example method querying a boolean state of the subsystem (for example, a digital sensor).
-   *
-   * @return value of some boolean subsystem state, such as a digital sensor.
-   */
-  public boolean exampleCondition( )
-  {
-    // Query some boolean state, such as a digital sensor.
-    return false;
-  }
-
   @Override
   public void periodic( )
   {
     // This method will be called once per scheduler run
     // if disabled, set LED when down
 
-    if (m_validEL14)
+    if (m_elbowValid14)
     {
-      int curCounts = (int) m_Arm14.getSelectedSensorPosition(0);
+      int curCounts = (int) m_elbow14.getSelectedSensorPosition(0);
       m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
       SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
       m_elbowLigament.setAngle(elbowCountsToDegrees(curCounts));
     }
-    if (m_validWR15)
+    if (m_wristValid15)
     {
-      int curCounts = (int) m_Arm15.getSelectedSensorPosition(0);
+      int curCounts = (int) m_wrist15.getSelectedSensorPosition(0);
       m_wristCurDegrees = wristCountsToDegrees(curCounts);
       SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
       m_wristLigament.setAngle(wristCountsToDegrees(curCounts));
@@ -222,8 +196,8 @@ public class Arm extends SubsystemBase
     m_wrist16Sim.update(0.020);
 
     // Finally, we set our simulated encoder's readings and simulated battery voltage
-    m_Arm14.setSelectedSensorPosition(elbowDegreesToCounts(Units.radiansToDegrees(-m_elbow15Sim.getAngleRads( ))));
-    m_Arm15.setSelectedSensorPosition(wristDegreesToCounts(Units.radiansToDegrees(m_wrist16Sim.getAngleRads( ))));
+    m_elbow14.setSelectedSensorPosition(elbowDegreesToCounts(Units.radiansToDegrees(-m_elbow15Sim.getAngleRads( ))));
+    m_wrist15.setSelectedSensorPosition(wristDegreesToCounts(Units.radiansToDegrees(m_wrist16Sim.getAngleRads( ))));
 
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_elbow15Sim.getCurrentDrawAmps( )));
@@ -239,17 +213,17 @@ public class Arm extends SubsystemBase
 
     setARMStopped( );
 
-    if (m_validEL14)
-      curELCounts = m_Arm14.getSelectedSensorPosition(0);
+    if (m_elbowValid14)
+      curELCounts = m_elbow14.getSelectedSensorPosition(0);
     m_elbowCurDegrees = elbowCountsToDegrees((int) curELCounts);
-    m_targetELDegrees = m_elbowCurDegrees;
-    DataLogManager.log(getSubsystem( ) + ": Init Target Inches: " + m_targetELDegrees);
+    m_elbowTargetDegrees = m_elbowCurDegrees;
+    DataLogManager.log(getSubsystem( ) + ": Init Target Inches: " + m_elbowTargetDegrees);
 
-    if (m_validWR15)
-      curWRCounts = m_Arm15.getSelectedSensorPosition(0);
+    if (m_wristValid15)
+      curWRCounts = m_wrist15.getSelectedSensorPosition(0);
     m_wristCurDegrees = wristCountsToDegrees((int) curWRCounts);
-    m_targetWRDegrees = m_wristCurDegrees;
-    DataLogManager.log(getSubsystem( ) + ": Init Target Inches: " + m_targetWRDegrees);
+    m_wristTargetDegrees = m_wristCurDegrees;
+    DataLogManager.log(getSubsystem( ) + ": Init Target Inches: " + m_wristTargetDegrees);
 
   }
 
@@ -273,9 +247,6 @@ public class Arm extends SubsystemBase
     return counts * ARMConsts.kElbowDegreesPerCount;
   }
 
-  private void ARMTalonInitialize(WPI_TalonFX motor, boolean inverted)
-  {}
-
   private void elbowTalonInitialize(WPI_TalonFX motor, boolean inverted)
   {
     motor.setInverted(inverted);
@@ -298,7 +269,7 @@ public class Arm extends SubsystemBase
     // Configure sensor settings
     motor.setSelectedSensorPosition(0.0);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSelectedSensorPosition");
-    motor.configAllowableClosedloopError(SLOTINDEX, m_ELAllowedError, CANTIMEOUT);
+    motor.configAllowableClosedloopError(SLOTINDEX, m_elbowAllowedError, CANTIMEOUT);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllowableClosedloopError");
 
     motor.configMotionCruiseVelocity(m_velocity, CANTIMEOUT);
@@ -345,7 +316,7 @@ public class Arm extends SubsystemBase
     // Configure sensor settings
     motor.setSelectedSensorPosition(0.0);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSelectedSensorPosition");
-    motor.configAllowableClosedloopError(SLOTINDEX, m_WRAllowedError, CANTIMEOUT);
+    motor.configAllowableClosedloopError(SLOTINDEX, m_wristAllowedError, CANTIMEOUT);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllowableClosedloopError");
 
     motor.configMotionCruiseVelocity(m_velocity, CANTIMEOUT);
@@ -385,7 +356,7 @@ public class Arm extends SubsystemBase
     }
     else
     {
-      // If joystick is above a value, ARM will move up
+      // If joystick is above a value, elbow will move up
       if (yELBOWValue > m_stickDeadband)
       {
         if (m_elbowMode != ElbowMode.ELBOW_UP)
@@ -396,7 +367,7 @@ public class Arm extends SubsystemBase
         yELBOWValue *= (1.0 / (1.0 - m_stickDeadband));
         motorOutput = manualSpeedMax * (yELBOWValue * Math.abs(yELBOWValue));
       }
-      // If joystick is below a value, ARM will move down
+      // If joystick is below a value, elbow will move down
       else if (yELBOWValue < -m_stickDeadband)
       {
         if (m_elbowMode != ElbowMode.ELBOW_DOWN)
@@ -409,8 +380,8 @@ public class Arm extends SubsystemBase
       }
     }
 
-    if (m_validEL14)
-      m_Arm14.set(ControlMode.PercentOutput, motorOutput);
+    if (m_elbowValid14)
+      m_elbow14.set(ControlMode.PercentOutput, motorOutput);
   }
 
   public void moveWristWithJoystick(XboxController joystick)
@@ -428,7 +399,7 @@ public class Arm extends SubsystemBase
     }
     else
     {
-      // If joystick is above a value, WRIST will move up
+      // If joystick is above a value, wrist will move up
       if (yWRISTValue > m_stickDeadband)
       {
         if (m_wristMode != WristMode.WRIST_UP)
@@ -439,7 +410,7 @@ public class Arm extends SubsystemBase
         yWRISTValue *= (1.0 / (1.0 - m_stickDeadband));
         motorOutput = manualSpeedMax * (yWRISTValue * Math.abs(yWRISTValue));
       }
-      // If joystick is below a value, WRIST will move down
+      // If joystick is below a value, wrist will move down
       else if (yWRISTValue < -m_stickDeadband)
       {
         if (m_wristMode != WristMode.WRIST_DOWN)
@@ -452,18 +423,18 @@ public class Arm extends SubsystemBase
       }
     }
 
-    if (m_validWR15)
-      m_Arm15.set(ControlMode.PercentOutput, motorOutput);
+    if (m_wristValid15)
+      m_wrist15.set(ControlMode.PercentOutput, motorOutput);
   }
 
   public void setARMStopped( )
   {
     DataLogManager.log(getSubsystem( ) + ": ARM Set Arm Stopped");
 
-    if (m_validEL14)
-      m_Arm14.set(ControlMode.PercentOutput, 0.0);
+    if (m_elbowValid14)
+      m_elbow14.set(ControlMode.PercentOutput, 0.0);
 
-    if (m_validWR15)
-      m_Arm15.set(ControlMode.PercentOutput, 0.0);
+    if (m_wristValid15)
+      m_wrist15.set(ControlMode.PercentOutput, 0.0);
   }
 }
