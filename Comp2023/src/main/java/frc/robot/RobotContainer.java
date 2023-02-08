@@ -80,9 +80,11 @@ public class RobotContainer
     // SmartDashboard Buttons
     SmartDashboard.putData("AutoDrivePathForward", new AutoDrivePath(m_swerve, "forward1m", true));
     SmartDashboard.putData("AutoDrivePathBackward", new AutoDrivePath(m_swerve, "backward1m", true));
-    SmartDashboard.putData("AutoDrivePathBackward2", new AutoDrivePath(m_swerve, "backward1m Copy", true));
     SmartDashboard.putData("AutoDrivePathForwardLeft", new AutoDrivePath(m_swerve, "forward_left", true));
     SmartDashboard.putData("AutoDrivePathBackwardRight", new AutoDrivePath(m_swerve, "backward_right", true));
+    SmartDashboard.putData("AutoDrivePathTurn180", new AutoDrivePath(m_swerve, "turn180", true));
+    SmartDashboard.putData("AutoDrivePathLeft", new AutoDrivePath(m_swerve, "left1m", true));
+    SmartDashboard.putData("AutoDrivePathRight", new AutoDrivePath(m_swerve, "right1m", true));
 
     // SmartDashboard.putData("DriveLimelight", new DriveLimelight(m_swerve, m_vision, false));
     // SmartDashboard.putData("DriveLimelightStop", new DriveLimelightStop(m_swerve, m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
