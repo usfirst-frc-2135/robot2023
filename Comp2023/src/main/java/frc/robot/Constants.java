@@ -74,8 +74,8 @@ public class Constants
   {
     public static int          kMaxRPM               = 6380;             // free speed for Falcon 500 motor
     public static final double kEncoderCPR           = 2048;             // CPR is 2048 from Falcon 500 Manual
-    public static final int    kTalonReqVersion      = ((23 * 256) + 0); // Talon version is 23.0
-    public static final int    kPigeonReqVersion     = ((23 * 256) + 0); // Pigeon IMU version is 23.0
+    public static final int    kTalonReqVersion      = ((22 * 256) + 0); // Talon version is 23.0
+    public static final int    kPigeonReqVersion     = ((22 * 256) + 0); // Pigeon IMU version is 23.0
 
     // Input current limit settings
     public static final double kSupplyCurrentLimit   = 45.0;  // Default supply current limit (after trigger)
@@ -86,6 +86,69 @@ public class Constants
     public static final double kStatorCurrentLimit   = 80.0;  // Default supply current limit (after trigger)
     public static final double kStatorTriggerCurrent = 80.0;  // Default trigger current that will cause limiting
     public static final double kStatorTriggerTime    = 0.001; // Default time duration of trigger that will causing limiting
+  }
+
+  public static final class ARMConsts
+  {
+    public static final int    kARMLeftLimitDIO      = 0;
+    public static final int    kARMRightLimitDIO     = 1;
+    public static final int    kGateHookSolenod      = 1;
+    public static final int    kARMCancoderID        = 0;
+
+    public static final double kElbowGearRatio       = 300;   // Gear reduction for elbow
+    public static final double kElbowDegreesPerCount = 360 / Falcon500.kEncoderCPR / kElbowGearRatio;
+    public static final double kForearmLengthMeters  = 1.0;
+    public static final double kForearmMassKg        = 6.5;
+    public static final double kWristGearRatio       = 300;   // Gear reduction for wrist
+    public static final double kGripperLengthMeters  = 0.3;
+    public static final double kGripperMassKg        = 4.0;
+    public static final double kWristDegreesPerCount = 360 / Falcon500.kEncoderCPR / kWristGearRatio;
+
+    // Config file parameters
+    public static final int    kMMVelocity           = 21776;  // Arm motion magic velocity
+    public static final int    kMMAcceleration       = 43552;  // Arm motion magic acceleration
+    public static final int    kMMSCurveStrength     = 0;      // Arm motion magic S curve smoothing strength
+    public static final double kARMPidKf             = 0.0496; // Arm PID force constant
+    public static final double kARMPidKp             = 0.500;  // Arm PID proportional constant
+    public static final double kARMPidKi             = 0.0;    // Arm PID integral constant
+    public static final double kARMPidKd             = 0.0;    // Arm PID derivative constant
+    public static final int    kELAllowedError       = 0;      // Arm PID allowable closed loop error in counts
+    public static final int    kWRAllowedError       = 0;      // Arm PID allowable closed loop error in counts
+    public static final double kARMToleranceInches   = 0.25;   // Arm PID tolerance in inches
+
+    public static final double kStowHeight           = 0.10;   // 0.25 inches
+    public static final double kExtendL2             = 29.0;   // 29 inches
+    public static final double kRotateL3             = 31.25;  // 21 inches
+    public static final double kRaiseL4              = 15.0;   // 25.25 inches
+    public static final double kGatehookRestHeight   = 4.0;    // 0.35 inches
+    public static final double kArmMinHeight         = 0.0;    // Arm minimum allowable height
+    public static final double kArmMaxHeight         = 36.0;   // Arm maximum allowable height
+
+    public static final double kSpeedCalibrate       = -0.1;   // Motor percent output during calibration
+    public static final double kSpeedMaxManual       = 0.3;    // Motor percent output during manual operation
+    public static final double kStickDeadband        = 0.2;    // Joystick deadband for manual operaton
+
+    public static final double kClimbL2Time          = 0.5;
+    public static final double kRotateExtendL3Time   = 1.5;
+    public static final double kRotateRetractL3Time  = 2.0;
+    public static final double kClimbL3Time          = 0.5;
+    public static final double kRotateRetractL4Time  = 2.5;
+
+    public enum ElbowMode
+    {
+      ELBOW_INIT,         // Initialize elbow
+      ELBOW_DOWN,         // Move elbow down
+      ELBOW_STOPPED,      // Stop and hold position
+      ELBOW_UP            // Move elbow up
+    }
+
+    public enum WristMode
+    {
+      WRIST_INIT,         // Initialize wrist
+      WRIST_DOWN,         // Move wrist down
+      WRIST_STOPPED,      // Stop and hold position
+      WRIST_UP            // Move wrist up
+    }
   }
 
   public static final class GRConsts
@@ -271,7 +334,7 @@ public class Constants
     public static final NeutralMode                                  driveNeutralMode            = NeutralMode.Brake;
 
     /* Motor Inverts */
-    public static final boolean                                      driveMotorInvert            = false;
+    public static final boolean                                      driveMotorInvert            = true;
     public static final boolean                                      angleMotorInvert            = true;
 
     /* Angle Encoder Invert */

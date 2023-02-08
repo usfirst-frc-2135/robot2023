@@ -16,11 +16,13 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.GRConsts.GRMode;
+import frc.robot.commands.ArmRun;
 import frc.robot.commands.AutoDrivePath;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.GripperRun;
 import frc.robot.commands.ResetGyro;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Gripper;
 import frc.robot.subsystems.Power;
 import frc.robot.subsystems.Swerve;
@@ -45,7 +47,7 @@ public class RobotContainer
   public final Vision           m_vision      = new Vision( );
 
   // These subsystems can use LED or vision and must be created afterward
-  // public final Arm              m_arm         = new Arm();
+  public final Arm              m_arm         = new Arm( );
   public final Gripper          m_gripper     = new Gripper( );
   // public final Pneumatics       m_pneumatics  = new Pneumatics( );
   public final Power            m_power       = new Power( );
@@ -79,6 +81,13 @@ public class RobotContainer
   {
     // SmartDashboard Buttons
     SmartDashboard.putData("AutoDrivePathForward", new AutoDrivePath(m_swerve, "forward1m", true));
+    SmartDashboard.putData("AutoDrivePathBackward", new AutoDrivePath(m_swerve, "backward1m", true));
+    SmartDashboard.putData("AutoDrivePathForwardLeft", new AutoDrivePath(m_swerve, "forward_left", true));
+    SmartDashboard.putData("AutoDrivePathBackwardRight", new AutoDrivePath(m_swerve, "backward_right", true));
+    SmartDashboard.putData("AutoDrivePathLeft", new AutoDrivePath(m_swerve, "left1m", true));
+    SmartDashboard.putData("AutoDrivePathRight", new AutoDrivePath(m_swerve, "right1m", true));
+    SmartDashboard.putData("AutoDrivePathForward2", new AutoDrivePath(m_swerve, "forward2m", true));
+    SmartDashboard.putData("AutoDrivePathBackward2", new AutoDrivePath(m_swerve, "backward2m", true));
 
     // SmartDashboard.putData("DriveLimelight", new DriveLimelight(m_swerve, m_vision, false));
     // SmartDashboard.putData("DriveLimelightStop", new DriveLimelightStop(m_swerve, m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
@@ -201,6 +210,7 @@ public class RobotContainer
   {
     // Configure default commands for these subsystems
     m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_driverPad));
+    m_arm.setDefaultCommand(new ArmRun(m_arm, m_operatorPad));
   }
 
   private void initAutonomousChooser( )
