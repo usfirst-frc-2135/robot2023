@@ -6,6 +6,9 @@ package frc.robot.subsystems;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
@@ -19,6 +22,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -61,7 +65,7 @@ public class Swerve extends SubsystemBase
 
   // Holonomic Drive Controller objects
   private HolonomicDriveController m_holonomicController;
-  private Trajectory               m_trajectory;
+  private PathPlannerTrajectory    m_trajectory;
   private Timer                    m_trajTimer           = new Timer( );
 
   // Module variables
@@ -74,7 +78,7 @@ public class Swerve extends SubsystemBase
   private boolean                  m_locked              = false;
 
   // Path following
-  private int                      m_pathDebug           = 0;    // Debug flag to disable extra ramsete logging calls
+  private int                      m_pathDebug           = 1;    // Debug flag to disable extra ramsete logging calls
 
   // Limelight drive
   private double                   m_turnConstant        = SWConsts.kTurnConstant;
@@ -348,7 +352,7 @@ public class Swerve extends SubsystemBase
   //
   // Autonomous mode - Holonomic path follower
   //
-  public void driveWithPathFollowerInit(Trajectory trajectory, boolean useInitialPose)
+  public void driveWithPathFollowerInit(PathPlannerTrajectory trajectory, boolean useInitialPose)
   {
     m_holonomicController = new HolonomicDriveController(xController, yController, thetaController);
 
@@ -365,7 +369,7 @@ public class Swerve extends SubsystemBase
 
     // This initializes the odometry (where we are)
     if (useInitialPose)
-      resetOdometry(m_trajectory.getInitialPose( ));
+      resetOdometry(m_trajectory.getInitialHolonomicPose( ));
 
     m_trajTimer.reset( );
     m_trajTimer.start( );
@@ -376,10 +380,9 @@ public class Swerve extends SubsystemBase
     Trajectory.State trajState = m_trajectory.sample(m_trajTimer.get( ));
     Pose2d currentPose = getPose( );
 
-    //TODO: how to find the goal position
+    ChassisSpeeds targetChassisSpeeds = m_holonomicController.calculate(currentPose, trajState,
+        m_trajectory.getEndState( ).holonomicRotation/* trajState.poseMeters.getRotation( ) */); //TODO: find out what's wrong with getting desired rotation
 
-    //TODO: update the degrees to desired coordinate system
-    ChassisSpeeds targetChassisSpeeds = m_holonomicController.calculate(currentPose, trajState, Rotation2d.fromDegrees(0));
     // Convert to module states
     SwerveModuleState[ ] moduleStates = Constants.SwerveConstants.swerveKinematics.toSwerveModuleStates(targetChassisSpeeds);
 
@@ -398,7 +401,8 @@ public class Swerve extends SubsystemBase
     double currentTrajX = currentPose.getX( );
     double currentTrajY = currentPose.getY( );
 
-    double targetHeading = trajState.poseMeters.getRotation( ).getDegrees( ); ///Maybe get in radians?
+    double targetHeading =
+        m_trajectory.getEndState( ).holonomicRotation.getDegrees( )/* trajState.poseMeters.getRotation( ).getDegrees( ) */; ///Maybe get in radians?
     double currentHeading = currentPose.getRotation( ).getDegrees( ); ///Maybe get in radians?
 
     //TODO: feedWatchDog
@@ -418,7 +422,7 @@ public class Swerve extends SubsystemBase
                   + " "          + String.format("%.1f", targetHeading)
                 + " chasXYO: "   + String.format("%.1f", targetChassisSpeeds.vxMetersPerSecond) 
                   + " "          + String.format("%.1f", targetChassisSpeeds.vyMetersPerSecond)
-                  + " "          + String.format("%.1f", targetChassisSpeeds.omegaRadiansPerSecond)
+                  + " "          + String.format("%.1f", Units.radiansToDegrees(targetChassisSpeeds.omegaRadiansPerSecond))
                 + " targVel: "   + String.format("%.1f", moduleStates[0].speedMetersPerSecond) 
                   + " "          + String.format("%.1f", moduleStates[1].speedMetersPerSecond)
                   + " "          + String.format("%.1f", moduleStates[2].speedMetersPerSecond) 
@@ -426,7 +430,10 @@ public class Swerve extends SubsystemBase
                 + " curVel: "    + String.format("%.2f", currentfrontLeft) 
                   + " "          + String.format("%.2f", currentfrontRight)
                   + " "          + String.format("%.2f", currentbackLeft)
-                  + " "          + String.format("%.2f", currentbackRight)); 
+                  + " "          + String.format("%.2f", currentbackRight)
+                + " errorXYR: "    + String.format("%.2f", targetTrajX-currentTrajX) 
+                  + " "          + String.format("%.2f", targetTrajY-currentTrajY)
+                  + " "          + String.format("%.2f", targetHeading-currentHeading)); 
         // @formatter:on
     }
 
@@ -474,17 +481,13 @@ public class Swerve extends SubsystemBase
       DataLogManager.log(getSubsystem( ) + ": path follower timeout!");
       return true;
     }
-    return ((m_trajTimer.get( ) >= m_trajectory.getTotalTimeSeconds( ))
-        && (Math.abs(m_swerveMods[0].getState( ).speedMetersPerSecond) <= SWConsts.kStopTolerance)
-        && (Math.abs(m_swerveMods[1].getState( ).speedMetersPerSecond) <= SWConsts.kStopTolerance)
-        && (Math.abs(m_swerveMods[2].getState( ).speedMetersPerSecond) <= SWConsts.kStopTolerance)
-        && (Math.abs(m_swerveMods[3].getState( ).speedMetersPerSecond) <= SWConsts.kStopTolerance));
+
+    return (m_trajTimer.hasElapsed(m_trajectory.getTotalTimeSeconds( ) + 0.25));
   }
 
   public void driveWithPathFollowerEnd( )
   {
     m_trajTimer.stop( );
-    drive(getPose( ).getTranslation( ), 0.0, false, true);
   }
 
   //// 1678 Swerve //////////////////////////////////////////////////////////////
@@ -600,7 +603,7 @@ public class Swerve extends SubsystemBase
 
   public void resetOdometry(Pose2d pose)
   {
-    m_swerveOdometry.resetPosition(pose.getRotation( ), getPosition( ), pose);
+    m_swerveOdometry.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPosition( ), pose);
     zeroGyro(pose.getRotation( ).getDegrees( ));
   }
 
