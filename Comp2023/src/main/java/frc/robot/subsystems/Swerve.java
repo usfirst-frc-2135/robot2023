@@ -13,6 +13,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -33,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SWConsts;
+import frc.robot.Constants.SwerveConstants;
 import frc.robot.RobotContainer;
 import frc.robot.team1678.frc2022.drivers.Pigeon;
 import frc.robot.team1678.frc2022.drivers.SwerveModule;
@@ -53,9 +55,11 @@ public class Swerve extends SubsystemBase
   };
 
   // Odometery and telemetry
-  private Pigeon                   m_pigeon              = new Pigeon(Ports.kCANID_Pigeon2);
+  public Pigeon                    m_pigeon              = new Pigeon(Ports.kCANID_Pigeon2);
   private SwerveDriveOdometry      m_swerveOdometry;
-  private Field2d                  m_field               = new Field2d( );
+
+  public SwerveDrivePoseEstimator  m_poseEstimator       = new SwerveDrivePoseEstimator(SwerveConstants.swerveKinematics,
+      m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), new Pose2d( ));
 
   // PID objects
   private ProfiledPIDController    m_snapPIDController   = new ProfiledPIDController( // 
@@ -691,6 +695,7 @@ public class Swerve extends SubsystemBase
   public void updateSwerveOdometry( )
   {
     m_swerveOdometry.update(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ));
+    //m_poseEstimator.update(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ));
   }
 
   public void readPeriodicInputs( )

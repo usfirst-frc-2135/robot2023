@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 import javax.xml.crypto.Data;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -48,6 +49,7 @@ public class Vision extends SubsystemBase
   private DoubleArraySubscriber m_botposeSub;
   private Transform3d           m_botposeTransform3d = new Transform3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0));
   private double[ ]             m_sendablePoseArray  = new double[3];
+  // private double[ ]             m_botposeArray;
 
   private double                m_targetID;
 
@@ -56,9 +58,11 @@ public class Vision extends SubsystemBase
   private double                m_targetArea;       // LL Target Area (0% of image to 100% of image)
   private double                m_targetSkew;       // LL Target Skew or rotation (-90 to 0 deg)
   private boolean               m_targetValid;      // LL Target Valid or not
+  private double                m_targetLatency;    // LL pipeline’s latency contribution (ms) Add at least 11ms for image capture latency. 
 
   private double                m_distLL;           // calculated distance in inches for the current y value
   private double                m_yawBotPose         = 0;
+  private double                m_poseCheck          = 0;
 
   /**
    *
@@ -91,6 +95,7 @@ public class Vision extends SubsystemBase
     SmartDashboard.putNumber("VI_area", m_targetArea);
     SmartDashboard.putNumber("VI_skew", m_targetSkew);
     SmartDashboard.putBoolean("VI_valid", m_targetValid);
+    SmartDashboard.putNumber("VI_targetLatency", m_targetLatency);
 
     m_botposeSub = m_table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[ ] { });
 
@@ -118,15 +123,23 @@ public class Vision extends SubsystemBase
       m_targetSkew = m_table.getEntry("ts").getDouble(0.0);
       m_targetValid = m_tvfilter.calculate(m_table.getEntry("tv").getDouble(0.0)) > 0.5;
       m_targetID = m_table.getEntry("tid").getDouble(-1.0);
+      m_targetLatency = m_table.getEntry("tl").getDouble(0.0);
     }
 
     m_distLL = calculateDist(m_targetVertAngle);
 
-    if (m_targetValid)
+    SwerveDrivePoseEstimator estimator = RobotContainer.getInstance( ).m_swerve.m_poseEstimator;
+
+    estimator.update(RobotContainer.getInstance( ).m_swerve.m_pigeon.getYaw( ).getWPIRotation2d( ),
+        RobotContainer.getInstance( ).m_swerve.getPositions( ));
+
+    if (m_targetID > 0)
     {
       double[ ] m_botposeArray = m_botposeSub.get( );
-      if (m_botposeArray.length == 6)
+      //DataLogManager.log(getSubsystem( ) + " : Length of botPoseArray  " + m_botposeArray.length);
+      if (!(m_botposeArray == null))
       {
+        //Defining the Transform3d of the robot
         m_botposeTransform3d = new Transform3d(new Translation3d(m_botposeArray[0], m_botposeArray[1], m_botposeArray[2]),
             new Rotation3d(m_botposeArray[3], m_botposeArray[4], m_botposeArray[5]));
 
@@ -137,9 +150,25 @@ public class Vision extends SubsystemBase
         m_yawBotPose = m_botposeArray[5];
         //DataLogManager.log(getSubsystem( ) + " : BotPose Array " + Arrays.toString(m_botposeArray) + " : angle " + m_yawBotPose);
 
-        RobotContainer.getInstance( ).m_field2d.setRobotPose(getBotPose2d( ));
+        //Adding the botPose to the SwerveDrivePositionEstimator in Swerve
+        Pose2d botPose2d = getBotPose2d( );
+
+        if (m_poseCheck == 1)
+        {
+          DataLogManager.log("VISION :  -  BOTPOSE2d - (" + botPose2d.getX( ) + ", " + botPose2d.getY( ) + ", rotation: "
+              + botPose2d.getRotation( ).getDegrees( ) + ") -- " + "Pose check " + m_poseCheck + "latency " + m_targetLatency);
+
+          estimator.addVisionMeasurement(botPose2d, m_targetLatency);
+        }
+        //DataLogManager.log(getSubsystem( ) + "MEASUREMENT ADDED");
+
+        //Setting the field to the Pose2d specified by the limelight
+        RobotContainer.getInstance( ).m_field2d.setRobotPose(estimator.getEstimatedPosition( ));
 
       }
+
+      // DataLogManager
+      //     .log("UPDATED POSITION " + RobotContainer.getInstance( ).m_swerve.m_poseEstimator.getEstimatedPosition( ).getX( ));
     }
 
     SmartDashboard.putData("Field2d", RobotContainer.getInstance( ).m_field2d);
@@ -151,6 +180,7 @@ public class Vision extends SubsystemBase
     SmartDashboard.putNumber("VI_area", m_targetArea);
     SmartDashboard.putNumber("VI_skew", m_targetSkew);
     SmartDashboard.putBoolean("VI_valid", m_targetValid);
+    SmartDashboard.putNumber("VI_targetLatency", m_targetLatency);
 
     SmartDashboard.putNumber("VI_distLL", m_distLL);
 
@@ -216,15 +246,14 @@ public class Vision extends SubsystemBase
 
   public Pose2d getBotPose2d( )
   {
-    Translation2d translation2d = new Translation2d( );
-    Rotation2d rotation2d = new Rotation2d( );
     if (m_targetValid)
     {
-      translation2d = new Translation2d(m_botposeTransform3d.getX( ), m_botposeTransform3d.getY( ));
+      Translation2d tran1 = new Translation2d(m_botposeTransform3d.getX( ), m_botposeTransform3d.getY( ));
       double degree;
+
       if (m_yawBotPose < 0)
       {
-        degree = 360 + m_yawBotPose;
+        degree = 360 + m_yawBotPose; //Adds 360 degrees to obtain a positive rotation to a negative output
 
       }
       else
@@ -232,12 +261,26 @@ public class Vision extends SubsystemBase
         degree = m_yawBotPose;
       }
       double rotation = ((Math.PI) / 180) * (degree);
+
       // DataLogManager.log("VISION: Radians sent " + rotation + " from the limelight " + m_botposeTransform3d.getRotation( ).getZ( )
       //     + " Angle : " + m_botposeTransform3d.getRotation( ).getAngle( ));
-      rotation2d = new Rotation2d(rotation);
-    }
 
-    return new Pose2d(translation2d, rotation2d);
+      m_poseCheck = 1;
+      Rotation2d rot1 = new Rotation2d(rotation);
+
+      return new Pose2d(tran1, rot1);
+    }
+    else
+    {
+      Translation2d tran2 = new Translation2d(0, 0);
+      Rotation2d rot2 = new Rotation2d(0);
+
+      DataLogManager.log(getSubsystem( ) + ": Robot Position based on Limelight does NOT exist; x value of transform "
+          + m_botposeTransform3d.getX( ));
+
+      m_poseCheck = 2;
+      return new Pose2d(tran2, rot2);
+    }
 
   }
 
