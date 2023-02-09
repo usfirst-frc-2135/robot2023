@@ -348,7 +348,7 @@ public class Arm extends SubsystemBase
     double motorOutput = 0.0;
     double manualSpeedMax = ARMConsts.kSpeedMaxManual;
 
-    yELBOWValue = -joystick.getLeftY( );
+    yELBOWValue = joystick.getLeftY( );
     if (yELBOWValue > -m_stickDeadband && yELBOWValue < m_stickDeadband)
     {
       if (m_elbowMode != ElbowMode.ELBOW_STOPPED)
@@ -391,7 +391,7 @@ public class Arm extends SubsystemBase
     double motorOutput = 0.0;
     double manualSpeedMax = ARMConsts.kSpeedMaxManual;
 
-    yWRISTValue = -joystick.getRightY( );
+    yWRISTValue = joystick.getRightY( );
     if (yWRISTValue > -m_stickDeadband && yWRISTValue < m_stickDeadband)
     {
       if (m_wristMode != WristMode.WRIST_STOPPED)
