@@ -20,6 +20,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -128,9 +129,8 @@ public class Vision extends SubsystemBase
 
     m_distLL = calculateDist(m_targetVertAngle);
 
-    SwerveDrivePoseEstimator estimator = RobotContainer.getInstance( ).m_swerve.m_poseEstimator;
-
-    estimator.update(RobotContainer.getInstance( ).m_swerve.m_pigeon.getYaw( ).getWPIRotation2d( ),
+    RobotContainer.getInstance( ).m_swerve.m_poseEstimator.updateWithTime(Timer.getFPGATimestamp( ),
+        RobotContainer.getInstance( ).m_swerve.m_pigeon.getYaw( ).getWPIRotation2d( ),
         RobotContainer.getInstance( ).m_swerve.getPositions( ));
 
     if (m_targetID > 0)
@@ -147,28 +147,25 @@ public class Vision extends SubsystemBase
         m_sendablePoseArray[1] = m_botposeArray[1]; // Y pose from the Translation3d of the "botPose"
         m_sendablePoseArray[2] = m_botposeArray[5]; // Rotation from yaw from the Rotation3d of the "botPose"
 
-        m_yawBotPose = m_botposeArray[5];
-        //DataLogManager.log(getSubsystem( ) + " : BotPose Array " + Arrays.toString(m_botposeArray) + " : angle " + m_yawBotPose);
+        m_yawBotPose = m_botposeArray[5]; //Setting the rotation of the robot
 
-        //Adding the botPose to the SwerveDrivePositionEstimator in Swerve
         Pose2d botPose2d = getBotPose2d( );
 
         if (m_poseCheck == 1)
         {
-          DataLogManager.log("VISION :  -  BOTPOSE2d - (" + botPose2d.getX( ) + ", " + botPose2d.getY( ) + ", rotation: "
-              + botPose2d.getRotation( ).getDegrees( ) + ") -- " + "Pose check " + m_poseCheck + "latency " + m_targetLatency);
+          // DataLogManager.log("VISION :  -  BOTPOSE2d - (" + botPose2d.getX( ) + ", " + botPose2d.getY( ) + ", rotation: "
+          //     + botPose2d.getRotation( ).getDegrees( ) + ") -- " + "Pose check " + m_poseCheck + "latency " + m_targetLatency);
 
-          estimator.addVisionMeasurement(botPose2d, m_targetLatency);
+          //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
+          RobotContainer.getInstance( ).m_swerve.m_poseEstimator.addVisionMeasurement(botPose2d, Timer.getFPGATimestamp( ));
+
         }
-        //DataLogManager.log(getSubsystem( ) + "MEASUREMENT ADDED");
 
         //Setting the field to the Pose2d specified by the limelight
-        RobotContainer.getInstance( ).m_field2d.setRobotPose(estimator.getEstimatedPosition( ));
+        RobotContainer.getInstance( ).m_field2d
+            .setRobotPose(RobotContainer.getInstance( ).m_swerve.m_poseEstimator.getEstimatedPosition( ));
 
       }
-
-      // DataLogManager
-      //     .log("UPDATED POSITION " + RobotContainer.getInstance( ).m_swerve.m_poseEstimator.getEstimatedPosition( ).getX( ));
     }
 
     SmartDashboard.putData("Field2d", RobotContainer.getInstance( ).m_field2d);
