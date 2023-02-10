@@ -1,22 +1,20 @@
-
-// ROBOTBUILDER TYPE: Subsystem.
-
+//
+// Power subystem - handles Power Distribution Hub readings
+//
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-/**
- *
- */
+//
+// Power subsystem class
+//
 public class Power extends SubsystemBase
 {
+  // Member objects
   private final PowerDistribution m_powerDistribution = new PowerDistribution( );;
 
-  /**
-   *
-   */
   public Power( )
   {
     setName("Power");

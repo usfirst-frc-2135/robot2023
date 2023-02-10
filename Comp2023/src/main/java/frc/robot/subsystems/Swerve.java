@@ -1,6 +1,6 @@
-
-// ROBOTBUILDER TYPE: Subsystem.
-
+//
+// Swerve subystem - handles swerve driving and path following
+//
 package frc.robot.subsystems;
 
 import java.util.ArrayList;
@@ -38,8 +38,12 @@ import frc.robot.team1678.frc2022.drivers.Pigeon;
 import frc.robot.team1678.frc2022.drivers.SwerveModule;
 import frc.robot.team254.lib.util.TimeDelayedBoolean;
 
+//
+// Swerve subsystem class
+//
 public class Swerve extends SubsystemBase
 {
+  // Member objects
   private SwerveModule[ ]          m_swerveMods          = new SwerveModule[ ]
   {
       new SwerveModule(0, Constants.SwerveConstants.Mod0.SwerveModuleConstants( )),
@@ -48,10 +52,9 @@ public class Swerve extends SubsystemBase
       new SwerveModule(3, Constants.SwerveConstants.Mod3.SwerveModuleConstants( ))
   };
 
-  private SwerveDriveOdometry      m_swerveOdometry;
-
   // Odometery and telemetry
   private Pigeon                   m_pigeon              = new Pigeon(Ports.kCANID_Pigeon2);
+  private SwerveDriveOdometry      m_swerveOdometry;
   private Field2d                  m_field               = new Field2d( );
 
   // PID objects
@@ -535,6 +538,9 @@ public class Swerve extends SubsystemBase
     }
   }
 
+  //
+  // Snap to a direction
+  //  
   public double calculateSnapValue( )
   {
     return m_snapPIDController.calculate(m_pigeon.getYaw( ).getRadians( ));
@@ -584,13 +590,13 @@ public class Swerve extends SubsystemBase
     }
   }
 
-  // Getter
+  // Getters and setters
+
   public boolean getLocked( )
   {
     return m_locked;
   }
 
-  // Setter
   public void setLocked(boolean lock)
   {
     m_locked = lock;
@@ -603,7 +609,7 @@ public class Swerve extends SubsystemBase
 
   public void resetOdometry(Pose2d pose)
   {
-    m_swerveOdometry.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPosition( ), pose);
+    m_swerveOdometry.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
     zeroGyro(pose.getRotation( ).getDegrees( ));
   }
 
@@ -628,7 +634,7 @@ public class Swerve extends SubsystemBase
     return states;
   }
 
-  public SwerveModulePosition[ ] getPosition( )
+  public SwerveModulePosition[ ] getPositions( )
   {
     SwerveModulePosition[ ] positions = new SwerveModulePosition[4];
     for (SwerveModule mod : m_swerveMods)
@@ -680,7 +686,7 @@ public class Swerve extends SubsystemBase
 
   public void updateSwerveOdometry( )
   {
-    m_swerveOdometry.update(m_pigeon.getYaw( ).getWPIRotation2d( ), getPosition( ));
+    m_swerveOdometry.update(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ));
   }
 
   public void readPeriodicInputs( )
