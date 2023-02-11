@@ -19,6 +19,7 @@ public class Gripper extends SubsystemBase
   // Member objects
   private final WPI_TalonFX mGripper17 = new WPI_TalonFX(Ports.kCANID_Gripper);
 
+  // Constructor
   public Gripper( )
   {
     setName("Gripper");

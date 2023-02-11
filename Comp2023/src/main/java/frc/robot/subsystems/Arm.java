@@ -1,7 +1,6 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
+//
+// Arm subystem - elbow and wrist joints
+//
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -35,6 +34,9 @@ import frc.robot.Constants.ARMConsts.WristMode;
 import frc.robot.Constants.Falcon500;
 import frc.robot.team2135.PhoenixUtil;
 
+//
+// Arm subsystem class
+//
 public class Arm extends SubsystemBase
 {
   // Constants
@@ -42,6 +44,7 @@ public class Arm extends SubsystemBase
   private static final int                PIDINDEX              = 0;   // PID in use (0-primary, 1-aux)
   private static final int                SLOTINDEX             = 0;   // Use first PID slot
 
+  // Member objects
   private final WPI_TalonFX               m_elbow               = new WPI_TalonFX(Constants.Ports.kCANID_Elbow);  //elbow
   private final WPI_TalonFX               m_wrist               = new WPI_TalonFX(Constants.Ports.kCANID_Wrist);  //wrist
   private final TalonFXSimCollection      m_elbowMotorSim       = new TalonFXSimCollection(m_elbow);
@@ -94,10 +97,7 @@ public class Arm extends SubsystemBase
   private double                          m_safetyTimeout;                // Seconds that the timer ran before stopping
   private Timer                           timer                 = new Timer( );
 
-  /**
-   *
-   */
-  /** Creates a new ExampleSubsystem. */
+  // Constructor
   public Arm( )
   {
     setName("Arm");
