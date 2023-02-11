@@ -208,10 +208,8 @@ public class Swerve extends SubsystemBase
     SmartDashboard.putNumber("SW: vision", m_periodicIO.vision_align_target_angle);
     SmartDashboard.putNumber("SW: snap", m_periodicIO.snap_target);
 
-    if (RobotContainer.getInstance( ).m_vision.getTargetID( ) < 0)
-    {
-      RobotContainer.getInstance( ).m_field2d.setRobotPose(getPose( ));
-    }
+    // //Setting the field to the Pose2d specified by the limelight
+    RobotContainer.getInstance( ).m_field2d.setRobotPose(m_poseEstimator.getEstimatedPosition( ));
   }
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -695,7 +693,17 @@ public class Swerve extends SubsystemBase
   public void updateSwerveOdometry( )
   {
     m_swerveOdometry.update(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ));
-    //m_poseEstimator.update(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ));
+    m_poseEstimator.updateWithTime(Timer.getFPGATimestamp( ), m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ));
+
+    if (RobotContainer.getInstance( ).m_vision.addVisionMeasurement( ))
+    {
+      Pose2d botPose2d = RobotContainer.getInstance( ).m_vision.getBotPose2d( );
+      double latency = RobotContainer.getInstance( ).m_vision.getTargetLatency( );
+
+      //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
+      RobotContainer.getInstance( ).m_swerve.m_poseEstimator.addVisionMeasurement(botPose2d,
+          Timer.getFPGATimestamp( ) - (0.001 * latency));
+    }
   }
 
   public void readPeriodicInputs( )

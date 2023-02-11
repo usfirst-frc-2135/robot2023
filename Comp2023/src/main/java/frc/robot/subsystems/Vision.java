@@ -50,20 +50,20 @@ public class Vision extends SubsystemBase
   private DoubleArraySubscriber m_botposeSub;
   private Transform3d           m_botposeTransform3d = new Transform3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0));
   private double[ ]             m_sendablePoseArray  = new double[3];
-  // private double[ ]             m_botposeArray;
 
-  private double                m_targetID;
+  private double                m_yawBotPose         = 0; // yaw of Robot based on apriltag calculated position
 
   private double                m_targetHorizAngle; // LL Target horizontal Offset from Crosshair to Target (-27 to 27 deg)
   private double                m_targetVertAngle;  // LL Target vertical Offset from Crosshair to Target (-20.5 to 20.5 deg)
   private double                m_targetArea;       // LL Target Area (0% of image to 100% of image)
   private double                m_targetSkew;       // LL Target Skew or rotation (-90 to 0 deg)
   private boolean               m_targetValid;      // LL Target Valid or not
-  private double                m_targetLatency;    // LL pipeline’s latency contribution (ms) Add at least 11ms for image capture latency. 
+  private double                m_targetLatency;    // LL pipeline’s latency contribution (ms) Add at least 11ms for image capture latency.
+  private double                m_targetID;         // ID of the primary in-view AprilTag
 
   private double                m_distLL;           // calculated distance in inches for the current y value
-  private double                m_yawBotPose         = 0;
   private double                m_poseCheck          = 0;
+  private double                m_visionDebug        = 0;
 
   /**
    *
@@ -129,10 +129,6 @@ public class Vision extends SubsystemBase
 
     m_distLL = calculateDist(m_targetVertAngle);
 
-    RobotContainer.getInstance( ).m_swerve.m_poseEstimator.updateWithTime(Timer.getFPGATimestamp( ),
-        RobotContainer.getInstance( ).m_swerve.m_pigeon.getYaw( ).getWPIRotation2d( ),
-        RobotContainer.getInstance( ).m_swerve.getPositions( ));
-
     if (m_targetID > 0)
     {
       double[ ] m_botposeArray = m_botposeSub.get( );
@@ -148,22 +144,6 @@ public class Vision extends SubsystemBase
         m_sendablePoseArray[2] = m_botposeArray[5]; // Rotation from yaw from the Rotation3d of the "botPose"
 
         m_yawBotPose = m_botposeArray[5]; //Setting the rotation of the robot
-
-        Pose2d botPose2d = getBotPose2d( );
-
-        if (m_poseCheck == 1)
-        {
-          // DataLogManager.log("VISION :  -  BOTPOSE2d - (" + botPose2d.getX( ) + ", " + botPose2d.getY( ) + ", rotation: "
-          //     + botPose2d.getRotation( ).getDegrees( ) + ") -- " + "Pose check " + m_poseCheck + "latency " + m_targetLatency);
-
-          //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
-          RobotContainer.getInstance( ).m_swerve.m_poseEstimator.addVisionMeasurement(botPose2d, Timer.getFPGATimestamp( ));
-
-        }
-
-        //Setting the field to the Pose2d specified by the limelight
-        RobotContainer.getInstance( ).m_field2d
-            .setRobotPose(RobotContainer.getInstance( ).m_swerve.m_poseEstimator.getEstimatedPosition( ));
 
       }
     }
@@ -236,6 +216,11 @@ public class Vision extends SubsystemBase
     return m_targetID;
   }
 
+  public double getTargetLatency( )
+  {
+    return m_targetLatency;
+  }
+
   public Transform3d getBotPoseTransform3d( )
   {
     return m_botposeTransform3d;
@@ -272,13 +257,33 @@ public class Vision extends SubsystemBase
       Translation2d tran2 = new Translation2d(0, 0);
       Rotation2d rot2 = new Rotation2d(0);
 
-      DataLogManager.log(getSubsystem( ) + ": Robot Position based on Limelight does NOT exist; x value of transform "
-          + m_botposeTransform3d.getX( ));
-
       m_poseCheck = 2;
       return new Pose2d(tran2, rot2);
     }
 
+  }
+
+  public boolean addVisionMeasurement( )
+  {
+
+    if ((m_poseCheck == 1) && (Timer.getFPGATimestamp( ) - (0.001 * m_targetLatency)) > 0)
+    {
+      if (m_visionDebug > 0)
+      {
+        Pose2d botPose2d = getBotPose2d( );
+
+        DataLogManager.log(getSubsystem( )                                            //  
+            + ":  -  BOTPOSE2d - (" + botPose2d.getX( ) + ", " + botPose2d.getY( )    //
+            + ", rotation: " + botPose2d.getRotation( ).getDegrees( ) + ") -- "       //
+            + "Pose check " + m_poseCheck + "latency " + m_targetLatency);            //
+
+      }
+
+      return true;
+
+    }
+
+    return false;
   }
 
   public void setLEDMode(int mode)
