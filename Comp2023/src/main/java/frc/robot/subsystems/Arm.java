@@ -4,8 +4,10 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
@@ -25,11 +27,12 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ARMConsts;
+import frc.robot.Constants.ARMConsts.ElbowHeight;
 import frc.robot.Constants.ARMConsts.ElbowMode;
+import frc.robot.Constants.ARMConsts.WristHeight;
 import frc.robot.Constants.ARMConsts.WristMode;
 import frc.robot.Constants.Falcon500;
 import frc.robot.team2135.PhoenixUtil;
@@ -78,13 +81,21 @@ public class Arm extends SubsystemBase
   private int                             m_wristAllowedError   = ARMConsts.kWRAllowedError;    // PID allowable closed loop error
   private double                          m_toleranceInches     = ARMConsts.kARMToleranceInches; // PID tolerance in inches
 
-  private double                          m_stowHeight          = ARMConsts.kStowHeight;         // Stow height
+  private double                          m_elbowStowHeight     = ARMConsts.kElbowStowHeight;    // elbow Stow height
+  private double                          m_wristStowHeight     = ARMConsts.kWristStowHeight;    // wrist Stow height
+  private double                          m_lowScoreHeight      = ARMConsts.kLowScoreHeight;     // low-peg scoring height   
+  private double                          m_midScoreHeight      = ARMConsts.kMidScoreHeight;     // mid-peg scoring height
+  private double                          m_highScoreHeight     = ARMConsts.kHighScoreHeight;    // high-peg scoring height
+  private double                          m_elbowMinHeight      = ARMConsts.kElbowMinHeight;       // minimum elbow allowable height
+  private double                          m_elbowMaxHeight      = ARMConsts.kElbowMaxHeight;       // maximum elbow allowable height
+  private double                          m_wristMinHeight      = ARMConsts.kWristMinHeight;       // minimum wrist allowable height
+  private double                          m_wristMaxHeight      = ARMConsts.kWristMaxHeight;       // maximum wrist allowable height
 
   private double                          m_stickDeadband       = ARMConsts.kStickDeadband;      // joystick deadband
   private ElbowMode                       m_elbowMode           = ElbowMode.ELBOW_INIT;          // Mode active with joysticks
   private WristMode                       m_wristMode           = WristMode.WRIST_INIT;          // Mode active with joysticks
 
-  private int                             m_climberDebug        = 1; // DEBUG flag to disable/enable extra logging calls
+  private int                             m_armDebug            = 1; // DEBUG flag to disable/enable extra logging calls
 
   private boolean                         m_calibrated          = false;  // Indicates whether the climber has been calibrated
   private double                          m_elbowTargetDegrees  = 0.0;    // Target angle in degrees
@@ -162,7 +173,8 @@ public class Arm extends SubsystemBase
   public void periodic( )
   {
     // This method will be called once per scheduler run
-    // if disabled, set LED when down
+
+    // TO-DO: if disabled, set LED when down
 
     if (m_elbowValid)
     {
@@ -437,5 +449,244 @@ public class Arm extends SubsystemBase
 
     if (m_wristValid)
       m_wrist.set(ControlMode.PercentOutput, 0.0);
+  }
+
+  ///////////////////////// MOTION MAGIC ///////////////////////////////////
+
+  public void moveElbowDistanceInit(ElbowHeight height)
+  {
+    if (m_armDebug != 0)
+    {
+      m_velocity = (int) SmartDashboard.getNumber("EL_velocity", m_velocity);
+      m_acceleration = (int) SmartDashboard.getNumber("EL_acceleration", m_acceleration);
+      m_sCurveStrength = (int) SmartDashboard.getNumber("EL_sCurveStrength", m_sCurveStrength);
+      m_pidKf = SmartDashboard.getNumber("EL_pidKf", m_pidKf);
+      m_pidKp = SmartDashboard.getNumber("EL_pidKp", m_pidKp);
+      m_pidKi = SmartDashboard.getNumber("EL_pidKi", m_pidKi);
+      m_pidKd = SmartDashboard.getNumber("EL_pidKd", m_pidKd);
+
+      m_elbow.configMotionCruiseVelocity(m_velocity);
+      m_elbow.configMotionAcceleration(m_acceleration);
+      m_elbow.configMotionSCurveStrength(m_sCurveStrength);
+      m_elbow.config_kF(SLOTINDEX, m_pidKf);
+      m_elbow.config_kP(SLOTINDEX, m_pidKp);
+      m_elbow.config_kI(SLOTINDEX, m_pidKi);
+      m_elbow.config_kD(SLOTINDEX, m_pidKd);
+    }
+
+    switch (height)
+    {
+      case ELBOW_NOCHANGE : // Do not change from current level!
+        m_elbowTargetDegrees = m_elbowCurDegrees;
+        if (m_elbowTargetDegrees < 0.25)
+          m_elbowTargetDegrees = 0.25;
+        break;
+      case ELBOW_STOW :
+        m_elbowTargetDegrees = SmartDashboard.getNumber("EL_stowHeight", m_elbowStowHeight);
+        break;
+      case ELBOW_LOW :
+        m_elbowTargetDegrees = SmartDashboard.getNumber("EL_lowScoreHeight", m_lowScoreHeight);
+        break;
+      case ELBOW_MID :
+        m_elbowTargetDegrees = SmartDashboard.getNumber("EL_midScoreHeight", m_midScoreHeight);
+        break;
+      case ELBOW_HIGH :
+        m_elbowTargetDegrees = SmartDashboard.getNumber("EL_highScoreHeight", m_highScoreHeight);
+        break;
+      default :
+        DataLogManager.log(getSubsystem( ) + ": requested height is invalid - " + height);
+        return;
+    }
+
+    if (m_calibrated)
+    {
+      // Height constraint check/soft limit for max and min height before raising
+      if (m_elbowTargetDegrees < m_elbowMinHeight)
+      {
+        DataLogManager.log("Target " + String.format("%.1f", m_elbowTargetDegrees) + " degrees is limited by "
+            + String.format("%.1f", m_elbowMinHeight) + " degrees");
+        m_elbowTargetDegrees = m_elbowMinHeight;
+      }
+
+      if (m_elbowTargetDegrees > m_elbowMaxHeight)
+      {
+        DataLogManager.log("Target " + String.format("%.1f", m_elbowTargetDegrees) + " degrees is limited by "
+            + String.format("%.1f", m_elbowMaxHeight) + " degrees");
+        m_elbowTargetDegrees = m_elbowMaxHeight;
+      }
+
+      // Start the safety timer
+      m_safetyTimeout = 1.8;
+      m_safetyTimer.reset( );
+      m_safetyTimer.start( );
+
+      m_elbow.set(ControlMode.MotionMagic, elbowDegreesToCounts(m_elbowTargetDegrees));
+
+      DataLogManager.log("elbow moving: " + String.format("%.1f", m_elbowCurDegrees) + " -> "
+          + String.format("%.1f", m_elbowTargetDegrees) + " degrees  |  counts " + elbowDegreesToCounts(m_elbowCurDegrees)
+          + " -> " + elbowDegreesToCounts(m_elbowTargetDegrees));
+    }
+    else
+    {
+      DataLogManager.log("elbow is not calibrated");
+      if (m_elbowValid)
+        m_elbow.set(ControlMode.PercentOutput, 0.0);
+    }
+  }
+
+  public boolean moveElbowDistanceIsFinished( )
+  {
+    boolean isFinished = false;
+    double errorInInches = 0.0;
+
+    errorInInches = m_elbowTargetDegrees - m_elbowCurDegrees;
+
+    if (Math.abs(errorInInches) < m_toleranceInches)
+    {
+      if (++m_withinTolerance >= 5)
+      {
+        isFinished = true;
+        DataLogManager.log("elbow move finished - Time: " + String.format("%.3f", m_safetyTimer.get( )) + "  |  Cur degrees: "
+            + String.format("%.1f", m_elbowCurDegrees));
+      }
+    }
+    else
+    {
+      m_withinTolerance = 0;
+    }
+
+    if (m_safetyTimer.get( ) >= m_safetyTimeout)
+    {
+      isFinished = true;
+      DataLogManager.log("Arm Move Safety timer has timed out");
+    }
+
+    if (isFinished)
+    {
+      m_withinTolerance = 0;
+      m_safetyTimer.stop( );
+    }
+
+    return isFinished;
+  }
+
+  public void moveWristDistanceInit(WristHeight height)
+  {
+    if (m_armDebug != 0)
+    {
+      m_velocity = (int) SmartDashboard.getNumber("WR_velocity", m_velocity);
+      m_acceleration = (int) SmartDashboard.getNumber("WR_acceleration", m_acceleration);
+      m_sCurveStrength = (int) SmartDashboard.getNumber("WR_sCurveStrength", m_sCurveStrength);
+      m_pidKf = SmartDashboard.getNumber("WR_pidKf", m_pidKf);
+      m_pidKp = SmartDashboard.getNumber("WR_pidKp", m_pidKp);
+      m_pidKi = SmartDashboard.getNumber("WR_pidKi", m_pidKi);
+      m_pidKd = SmartDashboard.getNumber("WR_pidKd", m_pidKd);
+
+      m_wrist.configMotionCruiseVelocity(m_velocity);
+      m_wrist.configMotionAcceleration(m_acceleration);
+      m_wrist.configMotionSCurveStrength(m_sCurveStrength);
+      m_wrist.config_kF(SLOTINDEX, m_pidKf);
+      m_wrist.config_kP(SLOTINDEX, m_pidKp);
+      m_wrist.config_kI(SLOTINDEX, m_pidKi);
+      m_wrist.config_kD(SLOTINDEX, m_pidKd);
+    }
+
+    switch (height)
+    {
+      case WRIST_NOCHANGE : // Do not change from current level!
+        m_wristTargetDegrees = m_elbowCurDegrees;
+        if (m_wristTargetDegrees < 0.25)
+          m_wristTargetDegrees = 0.25;
+        break;
+      case WRIST_STOW :
+        m_wristTargetDegrees = SmartDashboard.getNumber("WR_stowHeight", m_wristStowHeight);
+        break;
+      default :
+        DataLogManager.log(getSubsystem( ) + ": requested height is invalid - " + height);
+        return;
+    }
+
+    if (m_calibrated)
+    {
+      // Height constraint check/soft limit for max and min height before raising
+      if (m_wristTargetDegrees < m_wristMinHeight)
+      {
+        DataLogManager.log("Target " + String.format("%.1f", m_wristTargetDegrees) + " degrees is limited by "
+            + String.format("%.1f", m_wristMinHeight) + " degrees");
+        m_wristTargetDegrees = m_wristMinHeight;
+      }
+
+      if (m_wristTargetDegrees > m_wristMaxHeight)
+      {
+        DataLogManager.log("Target " + String.format("%.1f", m_wristTargetDegrees) + " degrees is limited by "
+            + String.format("%.1f", m_wristMaxHeight) + " degrees");
+        m_wristTargetDegrees = m_wristMaxHeight;
+      }
+
+      // Start the safety timer
+      m_safetyTimeout = 1.8;
+      m_safetyTimer.reset( );
+      m_safetyTimer.start( );
+
+      m_wrist.set(ControlMode.MotionMagic, wristDegreesToCounts(m_wristTargetDegrees));
+
+      DataLogManager.log("wrist moving: " + String.format("%.1f", m_wristCurDegrees) + " -> "
+          + String.format("%.1f", m_wristTargetDegrees) + " degrees  |  counts " + wristDegreesToCounts(m_wristCurDegrees)
+          + " -> " + wristDegreesToCounts(m_wristTargetDegrees));
+    }
+    else
+    {
+      DataLogManager.log("wrist is not calibrated");
+      if (m_wristValid)
+        m_wrist.set(ControlMode.PercentOutput, 0.0);
+    }
+  }
+
+  public boolean moveWristDistanceIsFinished( )
+  {
+    boolean isFinished = false;
+    double errorInInches = 0.0;
+
+    errorInInches = m_wristTargetDegrees - m_wristCurDegrees;
+
+    if (Math.abs(errorInInches) < m_toleranceInches)
+    {
+      if (++m_withinTolerance >= 5)
+      {
+        isFinished = true;
+        DataLogManager.log("Wrist move finished - Time: " + String.format("%.3f", m_safetyTimer.get( )) + "  |  Cur degrees: "
+            + String.format("%.1f", m_wristCurDegrees));
+      }
+    }
+    else
+    {
+      m_withinTolerance = 0;
+    }
+
+    if (m_safetyTimer.get( ) >= m_safetyTimeout)
+    {
+      isFinished = true;
+      DataLogManager.log("Arm Move Safety timer has timed out");
+    }
+
+    if (isFinished)
+    {
+      m_withinTolerance = 0;
+      m_safetyTimer.stop( );
+    }
+
+    return isFinished;
+  }
+
+  public void timerStart( )
+  {
+    timer.reset( );
+    timer.start( );
+  }
+
+  public void timerPrint( )
+  {
+    timer.stop( );
+    DataLogManager.log("Arm Time: " + String.format("%.3f", timer.get( )) + " seconds");
   }
 }

@@ -116,23 +116,19 @@ public class Constants
     public static final int    kWRAllowedError       = 0;      // Arm PID allowable closed loop error in counts
     public static final double kARMToleranceInches   = 0.25;   // Arm PID tolerance in inches
 
-    public static final double kStowHeight           = 0.10;   // 0.25 inches
-    public static final double kExtendL2             = 29.0;   // 29 inches
-    public static final double kRotateL3             = 31.25;  // 21 inches
-    public static final double kRaiseL4              = 15.0;   // 25.25 inches
-    public static final double kGatehookRestHeight   = 4.0;    // 0.35 inches
-    public static final double kArmMinHeight         = 0.0;    // Arm minimum allowable height
-    public static final double kArmMaxHeight         = 36.0;   // Arm maximum allowable height
+    public static final double kElbowStowHeight      = 0;      // TO-DO: FIGURE IT OUT
+    public static final double kWristStowHeight      = 0;      // TO-DO: FIGURE IT OUT
+    public static final double kLowScoreHeight       = 0;      // TO-DO: FIND
+    public static final double kMidScoreHeight       = 0;      // TO-DO: FIND
+    public static final double kHighScoreHeight      = 0;      // TO-DO: FIND
+    public static final double kElbowMinHeight       = 0.0;    // Arm minimum allowable height
+    public static final double kElbowMaxHeight       = 36.0;   // Arm maximum allowable height
+    public static final double kWristMinHeight       = 0.0;    // gripper minimum allowable height
+    public static final double kWristMaxHeight       = 36.0;   // gripper maximum allowable height
 
     public static final double kSpeedCalibrate       = -0.1;   // Motor percent output during calibration
     public static final double kSpeedMaxManual       = 0.3;    // Motor percent output during manual operation
     public static final double kStickDeadband        = 0.2;    // Joystick deadband for manual operaton
-
-    public static final double kClimbL2Time          = 0.5;
-    public static final double kRotateExtendL3Time   = 1.5;
-    public static final double kRotateRetractL3Time  = 2.0;
-    public static final double kClimbL3Time          = 0.5;
-    public static final double kRotateRetractL4Time  = 2.5;
 
     public enum ElbowMode
     {
@@ -142,12 +138,27 @@ public class Constants
       ELBOW_UP            // Move elbow up
     }
 
+    public enum ElbowHeight
+    {
+      ELBOW_NOCHANGE,     // No change in elbow height--maintain current position
+      ELBOW_STOW, // move arm to stow height
+      ELBOW_LOW, // move arm to low-scoring height
+      ELBOW_MID, // move arm to shelf height; slightly higher than mid-scoring height so this is used for both
+      ELBOW_HIGH, // move arm to high-scoring height
+    }
+
     public enum WristMode
     {
       WRIST_INIT,         // Initialize wrist
       WRIST_DOWN,         // Move wrist down
       WRIST_STOPPED,      // Stop and hold position
       WRIST_UP            // Move wrist up
+    }
+
+    public enum WristHeight
+    {
+      WRIST_NOCHANGE,     // No change in elbow height--maintain current position
+      WRIST_STOW          // drop to stow position
     }
   }
 
