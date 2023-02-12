@@ -65,6 +65,8 @@ public class Vision extends SubsystemBase
   private double                m_poseCheck          = 0;
   private double                m_visionDebug        = 0;
 
+  private Pose2d                m_botPose2d;
+
   /**
    *
    */
@@ -145,6 +147,7 @@ public class Vision extends SubsystemBase
 
         m_yawBotPose = m_botposeArray[5]; //Setting the rotation of the robot
 
+        m_botPose2d = getBotPose2d( );
       }
     }
 
@@ -265,16 +268,14 @@ public class Vision extends SubsystemBase
 
   public boolean addVisionMeasurement( )
   {
-
-    if ((m_poseCheck == 1) && (Timer.getFPGATimestamp( ) - (0.001 * m_targetLatency)) > 0)
+    if ((m_poseCheck == 1))
     {
       if (m_visionDebug > 0)
       {
-        Pose2d botPose2d = getBotPose2d( );
 
         DataLogManager.log(getSubsystem( )                                            //  
-            + ":  -  BOTPOSE2d - (" + botPose2d.getX( ) + ", " + botPose2d.getY( )    //
-            + ", rotation: " + botPose2d.getRotation( ).getDegrees( ) + ") -- "       //
+            + ":  -  BOTPOSE2d - (" + m_botPose2d.getX( ) + ", " + m_botPose2d.getY( )    //
+            + ", rotation: " + m_botPose2d.getRotation( ).getDegrees( ) + ") -- "       //
             + "Pose check " + m_poseCheck + "latency " + m_targetLatency);            //
 
       }
