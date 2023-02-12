@@ -5,9 +5,9 @@ package frc.robot.subsystems;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.HolonomicDriveController;
@@ -22,14 +22,16 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SWConsts;
@@ -76,6 +78,8 @@ public class Swerve extends SubsystemBase
   private boolean                  m_isSnapping;
   private double                   m_limelightVisionAlignGoal;
   private double                   m_visionAlignAdjustment;
+  private double                   pitch;
+  private Timer                    timer                 = new Timer( );
 
   // Lock Swerve wheels
   private boolean                  m_locked              = false;
@@ -371,8 +375,8 @@ public class Swerve extends SubsystemBase
     DataLogManager.log(getSubsystem( ) + ": DTR states: " + trajStates.size( ) + " dur: " + m_trajectory.getTotalTimeSeconds( ));
 
     // This initializes the odometry (where we are)
-    if (useInitialPose)
-      resetOdometry(m_trajectory.getInitialHolonomicPose( ));
+    //if (useInitialPose)
+    resetOdometry(m_trajectory.getInitialHolonomicPose( ));
 
     m_trajTimer.reset( );
     m_trajTimer.start( );
@@ -536,6 +540,59 @@ public class Swerve extends SubsystemBase
     {
       mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
     }
+  }
+
+  public void driveBalance( )
+  {
+    pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
+    DataLogManager.log("Balance Off By: " + pitch);
+
+    if (Math.abs(pitch) > 5)
+    {
+      timer.reset( );
+      while (Math.abs(pitch) > 5 || !(timer.hasElapsed(5)))
+      {
+        timer.reset( );
+        balance( );
+        if (timer.hasElapsed(5))
+        {
+          break;
+        }
+      }
+    }
+    DataLogManager.log("Final Pitch: " + pitch);
+  }
+
+  public void balance( )
+  {
+    if (pitch < 0)
+    {
+      drive(new Translation2d(-0.04 * pitch, 0), 0, true, true);
+      pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
+    }
+    else if (pitch > 0)
+    {
+      drive(new Translation2d(-0.04 * pitch, 0), 0, true, true);
+      pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
+    }
+    else if (-5 > pitch && pitch < 5)
+    {
+      timer.reset( );
+      timer.start( );
+      drive(new Translation2d(0, 0), 0, true, true);
+      pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
+      while (!(timer.hasElapsed(5)) && (-5 > pitch && pitch < 5))
+      {
+        pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
+        WaitUntilCommand(1);
+      }
+      timer.stop( );
+    }
+  }
+
+  public void WaitUntilCommand(int time)
+  {
+    new WaitUntilCommand(time);
   }
 
   //

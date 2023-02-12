@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.Constants.AutoConstants;
 import frc.robot.subsystems.Swerve;
 
 /**
@@ -15,7 +14,7 @@ import frc.robot.subsystems.Swerve;
  */
 public class AutoPathSequence extends SequentialCommandGroup
 {
-  public AutoPathSequence(Swerve drivetrain)
+  public AutoPathSequence(Swerve swerve, String pathname, String pathname2)
   {
     setName("AutoPathSequence");
 
@@ -25,18 +24,18 @@ public class AutoPathSequence extends SequentialCommandGroup
         // @formatter:off
         new PrintCommand("AUTO PATH SEQUENCE: Run first path"),
         new ParallelDeadlineGroup(
-          new WaitUntilCommand(drivetrain::driveWithPathFollowerIsFinished),
-          new AutoDrivePath (drivetrain, AutoConstants.path1, true)
+          new WaitUntilCommand(swerve::driveWithPathFollowerIsFinished),
+          new AutoDrivePath (swerve, pathname, true)
         ),
 
         new PrintCommand("AUTO: Run second path"),
         new ParallelDeadlineGroup(
-          new WaitUntilCommand(drivetrain::driveWithPathFollowerIsFinished),
-          new AutoDrivePath ( drivetrain, AutoConstants.path2, false)
+          new WaitUntilCommand(swerve::driveWithPathFollowerIsFinished),
+          new AutoDrivePath ( swerve, pathname2, false)
         ),
 
         new PrintCommand("AUTO: Hold in place"),
-        new AutoStop(drivetrain)
+        new AutoStop(swerve)
         // @formatter:on
     );
   }

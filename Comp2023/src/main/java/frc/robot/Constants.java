@@ -479,11 +479,6 @@ public class Constants
     public static final TrajectoryConfig slowSpeedConfig    =
         new TrajectoryConfig(kSlowSpeedMetersPerSecond, kSlowAccelerationMetersPerSecondSquared)
             .setKinematics(Constants.SwerveConstants.swerveKinematics).setStartVelocity(0).setEndVelocity(0);
-
-    // PathPlanner file names
-    public static final String           path1              = "forward39";
-    public static final String           path2              = "backward39";
-    public static final String           path3              = "rightAngleTurn";
   }
 
   //// 1678 Constants ///////////////////////////////////////////////////////////

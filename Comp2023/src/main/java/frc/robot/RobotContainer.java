@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -19,6 +18,9 @@ import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.commands.ArmRun;
 import frc.robot.commands.AutoDrivePath;
+import frc.robot.commands.AutoPathSequence;
+import frc.robot.commands.AutoStop;
+import frc.robot.commands.DriveBalance;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.GripperRun;
@@ -30,6 +32,7 @@ import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Power;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
+import frc.robot.team1678.frc2022.drivers.Pigeon;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -82,7 +85,14 @@ public class RobotContainer
 
   private void addSmartDashboardWidgets( )
   {
+    SmartDashboard.putData("DriveBalance", new DriveBalance(m_swerve));
+
     // SmartDashboard Buttons
+    SmartDashboard.putData("AutoStop", new AutoStop(m_swerve));
+    SmartDashboard.putData("AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveoffcommunity", true));
+
+    SmartDashboard.putData("AutoPathSequence", new AutoPathSequence(m_swerve, "forward_left", "backward1m"));
+
     SmartDashboard.putData("AutoDrivePathForward", new AutoDrivePath(m_swerve, "forward1m", true));
     SmartDashboard.putData("AutoDrivePathBackward", new AutoDrivePath(m_swerve, "backward1m", true));
     SmartDashboard.putData("AutoDrivePathForwardLeft", new AutoDrivePath(m_swerve, "forward_left", true));
@@ -219,8 +229,12 @@ public class RobotContainer
 
   private void initAutonomousChooser( )
   {
+    // Autonomous Chooser
+    m_chooser.addOption("AutoDriveForward1m", new AutoDrivePath(m_swerve, "forward1m", true));
+    m_chooser.addOption("AutoPathSequence", new AutoPathSequence(m_swerve, "forward_left", "backward1m"));
+    m_chooser.setDefaultOption("0 - AutoStop", new AutoStop(m_swerve));
+
     // Configure autonomous sendable chooser
-    m_chooser.setDefaultOption("PrintMe", new PrintCommand("Auto PrintMe Command"));
     SmartDashboard.putData("Auto Mode", m_chooser);
   }
 
