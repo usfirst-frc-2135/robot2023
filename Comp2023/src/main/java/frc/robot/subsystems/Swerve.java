@@ -55,7 +55,7 @@ public class Swerve extends SubsystemBase
   };
 
   // Odometery and telemetry
-  public Pigeon                    m_pigeon              = new Pigeon(Ports.kCANID_Pigeon2);
+  private Pigeon                   m_pigeon              = new Pigeon(Ports.kCANID_Pigeon2);
   private SwerveDriveOdometry      m_swerveOdometry;
 
   public SwerveDrivePoseEstimator  m_poseEstimator       = new SwerveDrivePoseEstimator(SwerveConstants.swerveKinematics,
@@ -103,9 +103,6 @@ public class Swerve extends SubsystemBase
   private double                   m_setPointDistance    = SWConsts.kSetPointDistance; // Optimal shooting distance
   private double                   m_angleThreshold      = SWConsts.kAngleThreshold; // Tolerance around optimal
   private double                   m_distThreshold       = SWConsts.kDistThreshold;// Tolerance around optimal
-
-  private double                   m_targetID;
-  private boolean                  m_targetValid;
 
   // DriveWithLimelight pid controller objects
   private int                      m_limelightDebug      = 0; // Debug flag to disable extra limelight logging calls
