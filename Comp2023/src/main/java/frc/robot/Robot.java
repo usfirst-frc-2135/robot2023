@@ -89,7 +89,7 @@ public class Robot extends TimedRobot
         + ", " + allianceToString(DriverStation.getAlliance( )) + " Alliance");
 
     // m_robotContainer.m_led.initialize( );
-    //m_robotContainer.m_vision.initialize( );
+    // m_robotContainer.m_vision.initialize( );
 
     // These subsystems can use LED and vision subsystems
     m_robotContainer.m_power.initialize( );
