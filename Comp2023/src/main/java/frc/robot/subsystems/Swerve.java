@@ -698,8 +698,7 @@ public class Swerve extends SubsystemBase
       double latency = RobotContainer.getInstance( ).m_vision.getTargetLatency( );
 
       //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
-      RobotContainer.getInstance( ).m_swerve.m_poseEstimator.addVisionMeasurement(botPose2d,
-          Timer.getFPGATimestamp( ) - (0.001 * latency));
+      m_poseEstimator.addVisionMeasurement(botPose2d, Timer.getFPGATimestamp( ) - (0.001 * latency));
     }
   }
 
