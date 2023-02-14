@@ -364,10 +364,7 @@ public class Swerve extends SubsystemBase
 
     m_trajectory = trajectory;
 
-    if (!RobotBase.isReal( ))
-    {
-      RobotContainer.getInstance( ).m_field2d.getObject("trajectory").setTrajectory(m_trajectory);
-    }
+    RobotContainer.getInstance( ).m_field2d.getObject("trajectory").setTrajectory(m_trajectory);
 
     List<Trajectory.State> trajStates = new ArrayList<Trajectory.State>( );
     trajStates = m_trajectory.getStates( );

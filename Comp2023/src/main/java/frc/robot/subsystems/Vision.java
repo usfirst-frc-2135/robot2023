@@ -132,7 +132,7 @@ public class Vision extends SubsystemBase
     {
       double[ ] m_botposeArray = m_botposeSub.get( );
       //DataLogManager.log(getSubsystem( ) + " : Length of botPoseArray  " + m_botposeArray.length);
-      if (!(m_botposeArray == null))
+      if (m_botposeArray != null)
       {
         //Defining the Transform3d of the robot
         m_botposeTransform3d = new Transform3d(new Translation3d(m_botposeArray[0], m_botposeArray[1], m_botposeArray[2]),
