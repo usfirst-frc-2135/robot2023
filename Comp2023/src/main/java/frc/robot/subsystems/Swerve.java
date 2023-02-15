@@ -546,21 +546,21 @@ public class Swerve extends SubsystemBase
   {
     pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
 
-    if (Math.abs(pitch) > 5)
+    if (Math.abs(pitch) > 5.0)
     {
       timer.reset( );
-      while (Math.abs(pitch) > 5 || !(timer.hasElapsed(5)))
+      while (Math.abs(pitch) > 5.0 || !(timer.hasElapsed(5.0)))
       {
         timer.reset( );
         balance( );
-        if (timer.hasElapsed(5))
+        if (timer.hasElapsed(5.0))
         {
           DataLogManager.log("Breaking: Occurs");
           break;
         }
       }
     }
-    else if (Math.abs(pitch) < 5)
+    else if (Math.abs(pitch) < 5.0)
     {
       waitandcheck( );
     }
@@ -578,7 +578,7 @@ public class Swerve extends SubsystemBase
       drive(new Translation2d(-0.04 * pitch, 0), 0, true, true);
       pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
     }
-    else if (-5 < pitch && pitch < 5)
+    else if (-5.0 < pitch && pitch < 5.0)
     {
       waitandcheck( );
     }
@@ -595,12 +595,12 @@ public class Swerve extends SubsystemBase
     timer.start( );
     drive(new Translation2d(0, 0), 0, true, true);
     pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
-    while (!(timer.hasElapsed(5)) && (-5 < pitch && pitch < 5))
+    while (!(timer.hasElapsed(5.0)) && (-5.0 < pitch && pitch < 5.0))
     {
       pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
       WaitUntilCommand(1);
       //DataLogManager.log("Timer: " + timer.get( )); - Check how long balancing takes
-      if (timer.hasElapsed(5))
+      if (timer.hasElapsed(5.0))
         timer.stop( );
     }
   }
