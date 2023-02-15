@@ -92,11 +92,11 @@ public class RobotContainer
   {
     SmartDashboard.putData("DriveBalance", new DriveBalance(m_swerve));
     SmartDashboard.putData("AutoDockOnChargeStation", new AutoChargeStation(m_swerve));
-    SmartDashboard.putData("AutoDriveToChargeStation", new AutoDrivePath(m_swerve, "drivetochargestation", true));
+    SmartDashboard.putData("AutoDriveToChargeStation", new AutoDrivePath(m_swerve, "driveToChargeStation", true));
 
     // SmartDashboard Buttons
     SmartDashboard.putData("AutoStop", new AutoStop(m_swerve));
-    SmartDashboard.putData("AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveoffcommunity", true));
+    SmartDashboard.putData("AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveOffCommunity", true));
 
     SmartDashboard.putData("AutoDrivePathForward", new AutoDrivePath(m_swerve, "forward1m", true));
     SmartDashboard.putData("AutoDrivePathBackward", new AutoDrivePath(m_swerve, "backward1m", true));
@@ -162,8 +162,10 @@ public class RobotContainer
     driverY.onTrue(new Dummy(XboxController.Button.kY.value));
     //
     // Driver - Bumpers, start, back
-    driverLeftBumper.onTrue(new Dummy(XboxController.Button.kLeftBumper.value));
-    driverRightBumper.onTrue(new Dummy(XboxController.Button.kRightBumper.value));
+    driverLeftBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
+    driverLeftBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
+    driverRightBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_EXPEL));
+    driverRightBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
     driverBack.onTrue(new ResetGyro(m_swerve, driverStart, driverBack));
     driverStart.onTrue(new ResetGyro(m_swerve, driverStart, driverBack));
     //
@@ -174,10 +176,8 @@ public class RobotContainer
     driverLeft.onTrue(new Dummy(270));
     //
     // Operator Left/Right Trigger
-    driverLeftTrigger.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
-    driverLeftTrigger.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
-    driverRightTrigger.onTrue(new GripperRun(m_gripper, GRMode.GR_EXPEL));
-    driverRightTrigger.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
+    driverLeftTrigger.onTrue(new Dummy(130));
+    driverRightTrigger.onTrue(new Dummy(131));
 
     ///////////////////////////////////////////////////////
     //
@@ -212,8 +212,10 @@ public class RobotContainer
     operY.onTrue(new Dummy(XboxController.Button.kY.value));
     //
     // Operator - Bumpers, start, back
-    operLeftBumper.onTrue(new Dummy(XboxController.Button.kLeftBumper.value));
-    operRightBumper.onTrue(new Dummy(XboxController.Button.kRightBumper.value));
+    operLeftBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
+    operLeftBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
+    operRightBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_EXPEL));
+    operRightBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
     operBack.onTrue(new Dummy(XboxController.Button.kBack.value));
     operStart.onTrue(new Dummy(XboxController.Button.kStart.value));
     //
@@ -224,10 +226,8 @@ public class RobotContainer
     operLeft.onTrue(new Dummy(270));
     //
     // Operator Left/Right Trigger
-    operLeftTrigger.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
-    operLeftTrigger.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
-    operRightTrigger.onTrue(new GripperRun(m_gripper, GRMode.GR_EXPEL));
-    operRightTrigger.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
+    operLeftTrigger.onTrue(new Dummy(130));
+    operRightTrigger.onTrue(new Dummy(131));
   }
 
   /****************************************************************************
@@ -247,7 +247,7 @@ public class RobotContainer
   private void initAutonomousChooser( )
   {
     // Autonomous Chooser
-    m_chooser.addOption("1 - AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveoffcommunity", true));
+    m_chooser.addOption("1 - AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveOffCommunity", true));
     m_chooser.addOption("2 - AutoDockOnChargeStation", new AutoChargeStation(m_swerve));
     m_chooser.addOption("AutoDriveForward1m", new AutoDrivePath(m_swerve, "forward1m", true));
     m_chooser.setDefaultOption("0 - AutoStop", new AutoStop(m_swerve));
