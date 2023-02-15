@@ -53,9 +53,9 @@ public class Arm extends SubsystemBase
   private final TalonFXSimCollection      m_elbowMotorSim       = new TalonFXSimCollection(m_elbow);
   private final TalonFXSimCollection      m_wrist16MotorSim     = new TalonFXSimCollection(m_wrist);
   private final SingleJointedArmSim       m_elbowSim            = new SingleJointedArmSim(DCMotor.getFalcon500(1),
-      ARMConsts.kElbowGearRatio, 2.0, ARMConsts.kForearmLengthMeters, 0.0, Math.PI, ARMConsts.kForearmMassKg, true);
+      ARMConsts.kElbowGearRatio, 2.0, ARMConsts.kForearmLengthMeters, 0.0, Math.PI, true);
   private final SingleJointedArmSim       m_wrist16Sim          = new SingleJointedArmSim(DCMotor.getFalcon500(1),
-      ARMConsts.kWristGearRatio, 2.0, ARMConsts.kGripperLengthMeters, 0.0, Math.PI, ARMConsts.kGripperMassKg, true);
+      ARMConsts.kWristGearRatio, 2.0, ARMConsts.kGripperLengthMeters, 0.0, Math.PI, true);
 
   private final MechanismLigament2d       m_elbowLigament;
   private final MechanismLigament2d       m_wristLigament;
@@ -70,15 +70,15 @@ public class Arm extends SubsystemBase
       Falcon500.kStatorCurrentLimit, Falcon500.kStatorTriggerCurrent, Falcon500.kStatorTriggerTime);
 
   // Declare module variables
-  private int                             m_velocity            = ARMConsts.kMMVelocity;        // motion magic velocity
-  private int                             m_acceleration        = ARMConsts.kMMAcceleration;    // motion magic acceleration
-  private int                             m_sCurveStrength      = ARMConsts.kMMSCurveStrength;  // motion magic S curve smoothing
+  private int                             m_velocity            = ARMConsts.kMMVelocity;         // motion magic velocity
+  private int                             m_acceleration        = ARMConsts.kMMAcceleration;     // motion magic acceleration
+  private int                             m_sCurveStrength      = ARMConsts.kMMSCurveStrength;   // motion magic S curve smoothing
   private double                          m_pidKf               = ARMConsts.kARMPidKf;           // PID force constant
   private double                          m_pidKp               = ARMConsts.kARMPidKp;           // PID proportional
   private double                          m_pidKi               = ARMConsts.kARMPidKi;           // PID integral
   private double                          m_pidKd               = ARMConsts.kARMPidKd;           // PID derivative
-  private int                             m_elbowAllowedError   = ARMConsts.kELAllowedError;    // PID allowable closed loop error
-  private int                             m_wristAllowedError   = ARMConsts.kWRAllowedError;    // PID allowable closed loop error
+  private int                             m_elbowAllowedError   = ARMConsts.kELAllowedError;     // PID allowable closed loop error
+  private int                             m_wristAllowedError   = ARMConsts.kWRAllowedError;     // PID allowable closed loop error
   private double                          m_toleranceInches     = ARMConsts.kARMToleranceInches; // PID tolerance in inches
 
   private double                          m_elbowStowAngle      = ARMConsts.kElbowStowAngle;    // elbow Stow Angle
@@ -175,6 +175,7 @@ public class Arm extends SubsystemBase
     // This method will be called once per scheduler run
 
     // TO-DO: if disabled, set LED when down
+
 
     if (m_elbowValid)
     {
