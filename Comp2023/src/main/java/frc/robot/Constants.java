@@ -27,6 +27,10 @@ import frc.robot.lib.util.SwerveModuleConstants;
  */
 public class Constants
 {
+  // bot serial nums
+  public static final String kcompSN           = "03238074";
+  public static final String kbbotSN           = "03260A3A";
+
   // Game controller definitions
   public static final int    kDriverPadPort    = 0;
   public static final int    kOperatorPadPort  = 1;

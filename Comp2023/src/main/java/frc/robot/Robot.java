@@ -42,13 +42,13 @@ public class Robot extends TimedRobot
     DataLogManager.start( );
     DataLogManager.log("RobotInit: RoboRIO SN:" + System.getenv("serialnum"));
 
-    if (System.getenv("serialnum").equals("03238074"))
+    if (System.getenv("serialnum").equals(Constants.kcompSN))
     {
       Constants.isComp = true;
       DataLogManager.log("COMP BOT!");
 
     }
-    else if (System.getenv("serialnum").equals("03260A3A"))
+    else if (System.getenv("serialnum").equals(Constants.kbbotSN))
     {
       Constants.isComp = false;
       DataLogManager.log("B BOT!");
