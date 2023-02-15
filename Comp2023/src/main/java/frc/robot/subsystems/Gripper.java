@@ -17,7 +17,7 @@ import frc.robot.Constants.Ports;
 public class Gripper extends SubsystemBase
 {
   // Member objects
-  private final WPI_TalonSRX mGripper17 = new WPI_TalonSRX(Ports.kCANID_Gripper);
+  private final WPI_TalonSRX mGripper = new WPI_TalonSRX(Ports.kCANID_Gripper);
 
   // Constructor
   public Gripper( )
@@ -25,8 +25,8 @@ public class Gripper extends SubsystemBase
     setName("Gripper");
     setSubsystem("Gripper");
 
-    mGripper17.setInverted(true);
-    mGripper17.setSafetyEnabled(false);
+    mGripper.setInverted(true);
+    mGripper.setSafetyEnabled(false);
 
     initialize( );
   }
@@ -78,6 +78,6 @@ public class Gripper extends SubsystemBase
     }
 
     DataLogManager.log(getSubsystem( ) + ": Set As - " + strName);
-    mGripper17.set(output);
+    mGripper.set(output);
   }
 }
