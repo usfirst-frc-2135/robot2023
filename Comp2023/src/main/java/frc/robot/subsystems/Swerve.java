@@ -584,11 +584,6 @@ public class Swerve extends SubsystemBase
     }
   }
 
-  public void WaitUntilCommand(int time)
-  {
-    new WaitUntilCommand(time);
-  }
-
   public void waitandcheck( )
   {
     timer.reset( );
@@ -598,7 +593,7 @@ public class Swerve extends SubsystemBase
     while (!(timer.hasElapsed(5.0)) && (-5.0 < pitch && pitch < 5.0))
     {
       pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
-      WaitUntilCommand(1);
+      new WaitUntilCommand(1.0);
       //DataLogManager.log("Timer: " + timer.get( )); - Check how long balancing takes
       if (timer.hasElapsed(5.0))
         timer.stop( );
