@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.commands.ArmRun;
+import frc.robot.commands.AutoChargeStation;
 import frc.robot.commands.AutoDrivePath;
 import frc.robot.commands.AutoPathSequence;
 import frc.robot.commands.AutoStop;
@@ -86,6 +87,8 @@ public class RobotContainer
   private void addSmartDashboardWidgets( )
   {
     SmartDashboard.putData("DriveBalance", new DriveBalance(m_swerve));
+    SmartDashboard.putData("AutoChargeStation", new AutoChargeStation(m_swerve));
+    SmartDashboard.putData("AutoDriveToChargeStation", new AutoDrivePath(m_swerve, "drivetochargestation", true));
 
     // SmartDashboard Buttons
     SmartDashboard.putData("AutoStop", new AutoStop(m_swerve));
@@ -166,8 +169,10 @@ public class RobotContainer
     driverLeft.onTrue(new Dummy(270));
     //
     // Operator Left/Right Trigger
-    driverLeftTrigger.onTrue(new Dummy(128));
-    driverRightTrigger.onTrue(new Dummy(129));
+    driverLeftTrigger.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
+    driverLeftTrigger.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
+    driverRightTrigger.onTrue(new GripperRun(m_gripper, GRMode.GR_EXPEL));
+    driverRightTrigger.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
 
     ///////////////////////////////////////////////////////
     // Operator Controller Assignments
@@ -200,10 +205,7 @@ public class RobotContainer
     operY.onTrue(new Dummy(XboxController.Button.kY.value));
     //
     // Operator - Bumpers, start, back
-    operLeftBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
-    operLeftBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
-    operRightBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_EXPEL));
-    operRightBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
+
     operBack.onTrue(new Dummy(XboxController.Button.kBack.value));
     operStart.onTrue(new Dummy(XboxController.Button.kStart.value));
     //
@@ -214,8 +216,10 @@ public class RobotContainer
     operLeft.onTrue(new Dummy(270));
     //
     // Operator Left/Right Trigger
-    operLeftTrigger.onTrue(new Dummy(130));
-    operRightTrigger.onTrue(new Dummy(131));
+    operLeftTrigger.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
+    operLeftTrigger.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
+    operRightTrigger.onTrue(new GripperRun(m_gripper, GRMode.GR_EXPEL));
+    operRightTrigger.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
   }
 
   // Configure the button bindings

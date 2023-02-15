@@ -1,6 +1,8 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Swerve;
 
@@ -10,6 +12,7 @@ import frc.robot.subsystems.Swerve;
 public class DriveBalance extends CommandBase
 {
   private Swerve m_swerve;
+  private Timer  m_timer = new Timer( );
 
   public DriveBalance(Swerve swerve)
   {
@@ -23,6 +26,8 @@ public class DriveBalance extends CommandBase
   public void initialize( )
   {
     DataLogManager.log("Running Drive Balance!");
+    m_timer.reset( );
+    m_timer.start( );
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -35,13 +40,18 @@ public class DriveBalance extends CommandBase
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted)
-  {}
+  {
+    m_timer.stop( );
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished( )
   {
-    return true;
+    if (m_timer.hasElapsed(15) || RobotState.isDisabled( ))
+      return true;
+    else
+      return true;
   }
 
   @Override

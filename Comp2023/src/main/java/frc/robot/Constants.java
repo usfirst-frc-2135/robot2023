@@ -155,12 +155,14 @@ public class Constants
   {
     public static final double kGRAcquireSpeed = 1.0;
     public static final double kGRExpelSpeed   = -1.0;
+    public static final double kGRHoldSpeed    = 0.1;
 
     public enum GRMode
     {
       GR_STOP,    // stop motor
       GR_ACQUIRE, // acquire game pieces
       GR_EXPEL,   // expel game pieces
+      GR_HOLD,    // hold game pieces
     }
   }
 

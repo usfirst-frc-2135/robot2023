@@ -556,11 +556,15 @@ public class Swerve extends SubsystemBase
         balance( );
         if (timer.hasElapsed(5))
         {
+          DataLogManager.log("Breaking: Occurs");
           break;
         }
       }
     }
-    DataLogManager.log("Final Pitch: " + pitch);
+    else if (Math.abs(pitch) < 5)
+    {
+      waitandcheck( );
+    }
   }
 
   public void balance( )
@@ -575,24 +579,31 @@ public class Swerve extends SubsystemBase
       drive(new Translation2d(-0.04 * pitch, 0), 0, true, true);
       pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
     }
-    else if (-5 > pitch && pitch < 5)
+    else if (-5 < pitch && pitch < 5)
     {
-      timer.reset( );
-      timer.start( );
-      drive(new Translation2d(0, 0), 0, true, true);
-      pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
-      while (!(timer.hasElapsed(5)) && (-5 > pitch && pitch < 5))
-      {
-        pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
-        WaitUntilCommand(1);
-      }
-      timer.stop( );
+      waitandcheck( );
     }
   }
 
   public void WaitUntilCommand(int time)
   {
     new WaitUntilCommand(time);
+  }
+
+  public void waitandcheck( )
+  {
+    timer.reset( );
+    timer.start( );
+    drive(new Translation2d(0, 0), 0, true, true);
+    pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
+    while (!(timer.hasElapsed(5)) && (-5 < pitch && pitch < 5))
+    {
+      pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
+      WaitUntilCommand(1);
+      DataLogManager.log("Timer: " + timer.get( ));
+      if (timer.hasElapsed(5))
+        timer.stop( );
+    }
   }
 
   //
