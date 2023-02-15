@@ -44,6 +44,8 @@ public class LED extends SubsystemBase
 
     SmartDashboard.putData("LED_Color", m_ledChooser);
     SmartDashboard.putBoolean("LED_normalMode", false);
+
+    initialize( );
   }
 
   @Override

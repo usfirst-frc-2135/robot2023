@@ -84,6 +84,10 @@ public class RobotContainer
     return m_instance;
   }
 
+  /****************************************************************************
+   * 
+   * Create general dashboard widgets for commands and subsystems
+   */
   private void addSmartDashboardWidgets( )
   {
     SmartDashboard.putData("DriveBalance", new DriveBalance(m_swerve));
@@ -116,7 +120,8 @@ public class RobotContainer
     SmartDashboard.putData("Dummy", new Dummy(2135));
   }
 
-  /**
+  /****************************************************************************
+   * 
    * Use this method to define your button->command mappings. Buttons can be created by instantiating
    * a {@link GenericHID} or one of its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or
    * {@link XboxController}), and then passing it to a
@@ -125,7 +130,9 @@ public class RobotContainer
   private void configureButtonBindings( )
   {
     ///////////////////////////////////////////////////////
+    //
     // Driver Controller Assignments
+    //
     final JoystickButton driverA = new JoystickButton(m_driverPad, XboxController.Button.kA.value);
     final JoystickButton driverB = new JoystickButton(m_driverPad, XboxController.Button.kB.value);
     final JoystickButton driverX = new JoystickButton(m_driverPad, XboxController.Button.kX.value);
@@ -175,7 +182,9 @@ public class RobotContainer
     driverRightTrigger.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
 
     ///////////////////////////////////////////////////////
+    //
     // Operator Controller Assignments
+    //
     final JoystickButton operA = new JoystickButton(m_operatorPad, XboxController.Button.kA.value);
     final JoystickButton operB = new JoystickButton(m_operatorPad, XboxController.Button.kB.value);
     final JoystickButton operX = new JoystickButton(m_operatorPad, XboxController.Button.kX.value);
@@ -222,15 +231,20 @@ public class RobotContainer
     operRightTrigger.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
   }
 
-  // Configure the button bindings
-
+  /****************************************************************************
+   * 
+   * Initialize default commands for these subsystems
+   */
   private void initDefaultCommands( )
   {
-    // Configure default commands for these subsystems
     m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_driverPad));
     m_arm.setDefaultCommand(new ArmRun(m_arm, m_operatorPad));
   }
 
+  /****************************************************************************
+   * 
+   * Set up autonomous chooser
+   */
   private void initAutonomousChooser( )
   {
     // Autonomous Chooser
