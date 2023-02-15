@@ -375,8 +375,8 @@ public class Swerve extends SubsystemBase
     DataLogManager.log(getSubsystem( ) + ": DTR states: " + trajStates.size( ) + " dur: " + m_trajectory.getTotalTimeSeconds( ));
 
     // This initializes the odometry (where we are)
-    //if (useInitialPose)
-    resetOdometry(m_trajectory.getInitialHolonomicPose( ));
+    if (useInitialPose)
+      resetOdometry(m_trajectory.getInitialHolonomicPose( ));
 
     m_trajTimer.reset( );
     m_trajTimer.start( );

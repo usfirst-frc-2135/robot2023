@@ -98,8 +98,6 @@ public class RobotContainer
     SmartDashboard.putData("AutoStop", new AutoStop(m_swerve));
     SmartDashboard.putData("AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveoffcommunity", true));
 
-    SmartDashboard.putData("AutoPathSequence", new AutoPathSequence(m_swerve, "forward_left", "backward1m"));
-
     SmartDashboard.putData("AutoDrivePathForward", new AutoDrivePath(m_swerve, "forward1m", true));
     SmartDashboard.putData("AutoDrivePathBackward", new AutoDrivePath(m_swerve, "backward1m", true));
     SmartDashboard.putData("AutoDrivePathForwardLeft", new AutoDrivePath(m_swerve, "forward_left", true));
@@ -249,8 +247,9 @@ public class RobotContainer
   private void initAutonomousChooser( )
   {
     // Autonomous Chooser
+    m_chooser.addOption("1 - AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveoffcommunity", true));
+    m_chooser.addOption("2 - AutoDockOnChargeStation", new AutoChargeStation(m_swerve));
     m_chooser.addOption("AutoDriveForward1m", new AutoDrivePath(m_swerve, "forward1m", true));
-    m_chooser.addOption("AutoPathSequence", new AutoPathSequence(m_swerve, "forward_left", "backward1m"));
     m_chooser.setDefaultOption("0 - AutoStop", new AutoStop(m_swerve));
 
     // Configure autonomous sendable chooser
