@@ -61,8 +61,10 @@ public class Constants
 
     // Other subsystem CAN IDs
     public static final int    kCANID_Elbow      = 15;
-    public static final int    kCANID_Wrist      = 16;
-    public static final int    kCANID_Gripper    = 18;
+    public static final int    kCANID_ELCANCoder = 16;
+    public static final int    kCANID_Wrist      = 17;
+    public static final int    kCANID_WRCANCoder = 18;
+    public static final int    kCANID_Gripper    = 19;
 
     public static final int    kCANID_CANdle     = 0;
 
