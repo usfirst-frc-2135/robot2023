@@ -116,15 +116,15 @@ public class Constants
     public static final int    kWRAllowedError       = 0;      // Arm PID allowable closed loop error in counts
     public static final double kARMToleranceInches   = 0.25;   // Arm PID tolerance in inches
 
-    public static final double kElbowStowHeight      = 0;      // TO-DO: FIGURE IT OUT
-    public static final double kWristStowHeight      = 0;      // TO-DO: FIGURE IT OUT
-    public static final double kLowScoreHeight       = 0;      // TO-DO: FIND
-    public static final double kMidScoreHeight       = 0;      // TO-DO: FIND
-    public static final double kHighScoreHeight      = 0;      // TO-DO: FIND
-    public static final double kElbowMinHeight       = 0.0;    // Arm minimum allowable height
-    public static final double kElbowMaxHeight       = 36.0;   // Arm maximum allowable height
-    public static final double kWristMinHeight       = 0.0;    // gripper minimum allowable height
-    public static final double kWristMaxHeight       = 36.0;   // gripper maximum allowable height
+    public static final double kElbowStowAngle       = 0;      // TO-DO: FIGURE IT OUT
+    public static final double kWristStowAngle       = 0;      // TO-DO: FIGURE IT OUT
+    public static final double kLowScoreAngle        = 0;      // TO-DO: FIND
+    public static final double kMidScoreAngle        = 0;      // TO-DO: FIND
+    public static final double kHighScoreAngle       = 0;      // TO-DO: FIND
+    public static final double kElbowMinAngle        = 0.0;    // Arm minimum allowable Angle
+    public static final double kElbowMaxAngle        = 36.0;   // Arm maximum allowable Angle
+    public static final double kWristMinAngle        = 0.0;    // gripper minimum allowable Angle
+    public static final double kWristMaxAngle        = 36.0;   // gripper maximum allowable Angle
 
     public static final double kSpeedCalibrate       = -0.1;   // Motor percent output during calibration
     public static final double kSpeedMaxManual       = 0.3;    // Motor percent output during manual operation
@@ -138,13 +138,13 @@ public class Constants
       ELBOW_UP            // Move elbow up
     }
 
-    public enum ElbowHeight
+    public enum ElbowAngle
     {
-      ELBOW_NOCHANGE,     // No change in elbow height--maintain current position
-      ELBOW_STOW, // move arm to stow height
-      ELBOW_LOW, // move arm to low-scoring height
-      ELBOW_MID, // move arm to shelf height; slightly higher than mid-scoring height so this is used for both
-      ELBOW_HIGH, // move arm to high-scoring height
+      ELBOW_NOCHANGE,     // No change in elbow Angle--maintain current position
+      ELBOW_STOW, // move arm to stow Angle
+      ELBOW_LOW, // move arm to low-scoring Angle
+      ELBOW_MID, // move arm to shelf Angle; slightly higher than mid-scoring Angle so this is used for both
+      ELBOW_HIGH, // move arm to high-scoring Angle
     }
 
     public enum WristMode
@@ -155,9 +155,9 @@ public class Constants
       WRIST_UP            // Move wrist up
     }
 
-    public enum WristHeight
+    public enum WristAngle
     {
-      WRIST_NOCHANGE,     // No change in elbow height--maintain current position
+      WRIST_NOCHANGE,     // No change in elbow Angle--maintain current position
       WRIST_STOW          // drop to stow position
     }
   }

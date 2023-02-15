@@ -30,9 +30,9 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ARMConsts;
-import frc.robot.Constants.ARMConsts.ElbowHeight;
+import frc.robot.Constants.ARMConsts.ElbowAngle;
 import frc.robot.Constants.ARMConsts.ElbowMode;
-import frc.robot.Constants.ARMConsts.WristHeight;
+import frc.robot.Constants.ARMConsts.WristAngle;
 import frc.robot.Constants.ARMConsts.WristMode;
 import frc.robot.Constants.Falcon500;
 import frc.robot.team2135.PhoenixUtil;
@@ -81,15 +81,15 @@ public class Arm extends SubsystemBase
   private int                             m_wristAllowedError   = ARMConsts.kWRAllowedError;    // PID allowable closed loop error
   private double                          m_toleranceInches     = ARMConsts.kARMToleranceInches; // PID tolerance in inches
 
-  private double                          m_elbowStowHeight     = ARMConsts.kElbowStowHeight;    // elbow Stow height
-  private double                          m_wristStowHeight     = ARMConsts.kWristStowHeight;    // wrist Stow height
-  private double                          m_lowScoreHeight      = ARMConsts.kLowScoreHeight;     // low-peg scoring height   
-  private double                          m_midScoreHeight      = ARMConsts.kMidScoreHeight;     // mid-peg scoring height
-  private double                          m_highScoreHeight     = ARMConsts.kHighScoreHeight;    // high-peg scoring height
-  private double                          m_elbowMinHeight      = ARMConsts.kElbowMinHeight;       // minimum elbow allowable height
-  private double                          m_elbowMaxHeight      = ARMConsts.kElbowMaxHeight;       // maximum elbow allowable height
-  private double                          m_wristMinHeight      = ARMConsts.kWristMinHeight;       // minimum wrist allowable height
-  private double                          m_wristMaxHeight      = ARMConsts.kWristMaxHeight;       // maximum wrist allowable height
+  private double                          m_elbowStowAngle      = ARMConsts.kElbowStowAngle;    // elbow Stow Angle
+  private double                          m_wristStowAngle      = ARMConsts.kWristStowAngle;    // wrist Stow Angle
+  private double                          m_lowScoreAngle       = ARMConsts.kLowScoreAngle;     // low-peg scoring Angle   
+  private double                          m_midScoreAngle       = ARMConsts.kMidScoreAngle;     // mid-peg scoring Angle
+  private double                          m_highScoreAngle      = ARMConsts.kHighScoreAngle;    // high-peg scoring Angle
+  private double                          m_elbowMinAngle       = ARMConsts.kElbowMinAngle;       // minimum elbow allowable Angle
+  private double                          m_elbowMaxAngle       = ARMConsts.kElbowMaxAngle;       // maximum elbow allowable Angle
+  private double                          m_wristMinAngle       = ARMConsts.kWristMinAngle;       // minimum wrist allowable Angle
+  private double                          m_wristMaxAngle       = ARMConsts.kWristMaxAngle;       // maximum wrist allowable Angle
 
   private double                          m_stickDeadband       = ARMConsts.kStickDeadband;      // joystick deadband
   private ElbowMode                       m_elbowMode           = ElbowMode.ELBOW_INIT;          // Mode active with joysticks
@@ -132,13 +132,13 @@ public class Arm extends SubsystemBase
     // SmartDashboard.putNumber("CL_pidKi", m_pidKi);
     // SmartDashboard.putNumber("CL_pidKd", m_pidKd);
 
-    // SmartDashboard.putNumber("CL_stowHeight", m_stowHeight);
+    // SmartDashboard.putNumber("CL_stowAngle", m_stowAngle);
     // SmartDashboard.putNumber("CL_extendL2", m_extendL2);
     // SmartDashboard.putNumber("CL_rotateL3", m_rotateL3);
     // SmartDashboard.putNumber("CL_raiseL4", m_raiseL4);
-    // SmartDashboard.putNumber("CL_gatehookRestHeight", m_gatehookRestHeight);
+    // SmartDashboard.putNumber("CL_gatehookRestAngle", m_gatehookRestAngle);
 
-    // Field for manually progamming climber height
+    // Field for manually progamming climber Angle
     //MAKE THESE READ DEGREES OF THE MOTORS (BOTH SEPERATE)
     SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
     SmartDashboard.putNumber("EL_targetDegrees", m_elbowTargetDegrees);
@@ -453,7 +453,7 @@ public class Arm extends SubsystemBase
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
-  public void moveElbowDistanceInit(ElbowHeight height)
+  public void moveElbowDistanceInit(ElbowAngle Angle)
   {
     if (m_armDebug != 0)
     {
@@ -474,7 +474,7 @@ public class Arm extends SubsystemBase
       m_elbow.config_kD(SLOTINDEX, m_pidKd);
     }
 
-    switch (height)
+    switch (Angle)
     {
       case ELBOW_NOCHANGE : // Do not change from current level!
         m_elbowTargetDegrees = m_elbowCurDegrees;
@@ -482,37 +482,37 @@ public class Arm extends SubsystemBase
           m_elbowTargetDegrees = 0.25;
         break;
       case ELBOW_STOW :
-        m_elbowTargetDegrees = SmartDashboard.getNumber("EL_stowHeight", m_elbowStowHeight);
+        m_elbowTargetDegrees = SmartDashboard.getNumber("EL_stowAngle", m_elbowStowAngle);
         break;
       case ELBOW_LOW :
-        m_elbowTargetDegrees = SmartDashboard.getNumber("EL_lowScoreHeight", m_lowScoreHeight);
+        m_elbowTargetDegrees = SmartDashboard.getNumber("EL_lowScoreAngle", m_lowScoreAngle);
         break;
       case ELBOW_MID :
-        m_elbowTargetDegrees = SmartDashboard.getNumber("EL_midScoreHeight", m_midScoreHeight);
+        m_elbowTargetDegrees = SmartDashboard.getNumber("EL_midScoreAngle", m_midScoreAngle);
         break;
       case ELBOW_HIGH :
-        m_elbowTargetDegrees = SmartDashboard.getNumber("EL_highScoreHeight", m_highScoreHeight);
+        m_elbowTargetDegrees = SmartDashboard.getNumber("EL_highScoreAngle", m_highScoreAngle);
         break;
       default :
-        DataLogManager.log(getSubsystem( ) + ": requested height is invalid - " + height);
+        DataLogManager.log(getSubsystem( ) + ": requested Angle is invalid - " + Angle);
         return;
     }
 
     if (m_calibrated)
     {
-      // Height constraint check/soft limit for max and min height before raising
-      if (m_elbowTargetDegrees < m_elbowMinHeight)
+      // Angle constraint check/soft limit for max and min Angle before raising
+      if (m_elbowTargetDegrees < m_elbowMinAngle)
       {
         DataLogManager.log("Target " + String.format("%.1f", m_elbowTargetDegrees) + " degrees is limited by "
-            + String.format("%.1f", m_elbowMinHeight) + " degrees");
-        m_elbowTargetDegrees = m_elbowMinHeight;
+            + String.format("%.1f", m_elbowMinAngle) + " degrees");
+        m_elbowTargetDegrees = m_elbowMinAngle;
       }
 
-      if (m_elbowTargetDegrees > m_elbowMaxHeight)
+      if (m_elbowTargetDegrees > m_elbowMaxAngle)
       {
         DataLogManager.log("Target " + String.format("%.1f", m_elbowTargetDegrees) + " degrees is limited by "
-            + String.format("%.1f", m_elbowMaxHeight) + " degrees");
-        m_elbowTargetDegrees = m_elbowMaxHeight;
+            + String.format("%.1f", m_elbowMaxAngle) + " degrees");
+        m_elbowTargetDegrees = m_elbowMaxAngle;
       }
 
       // Start the safety timer
@@ -570,7 +570,7 @@ public class Arm extends SubsystemBase
     return isFinished;
   }
 
-  public void moveWristDistanceInit(WristHeight height)
+  public void moveWristDistanceInit(WristAngle Angle)
   {
     if (m_armDebug != 0)
     {
@@ -591,7 +591,7 @@ public class Arm extends SubsystemBase
       m_wrist.config_kD(SLOTINDEX, m_pidKd);
     }
 
-    switch (height)
+    switch (Angle)
     {
       case WRIST_NOCHANGE : // Do not change from current level!
         m_wristTargetDegrees = m_elbowCurDegrees;
@@ -599,28 +599,28 @@ public class Arm extends SubsystemBase
           m_wristTargetDegrees = 0.25;
         break;
       case WRIST_STOW :
-        m_wristTargetDegrees = SmartDashboard.getNumber("WR_stowHeight", m_wristStowHeight);
+        m_wristTargetDegrees = SmartDashboard.getNumber("WR_stowAngle", m_wristStowAngle);
         break;
       default :
-        DataLogManager.log(getSubsystem( ) + ": requested height is invalid - " + height);
+        DataLogManager.log(getSubsystem( ) + ": requested Angle is invalid - " + Angle);
         return;
     }
 
     if (m_calibrated)
     {
-      // Height constraint check/soft limit for max and min height before raising
-      if (m_wristTargetDegrees < m_wristMinHeight)
+      // Angle constraint check/soft limit for max and min Angle before raising
+      if (m_wristTargetDegrees < m_wristMinAngle)
       {
         DataLogManager.log("Target " + String.format("%.1f", m_wristTargetDegrees) + " degrees is limited by "
-            + String.format("%.1f", m_wristMinHeight) + " degrees");
-        m_wristTargetDegrees = m_wristMinHeight;
+            + String.format("%.1f", m_wristMinAngle) + " degrees");
+        m_wristTargetDegrees = m_wristMinAngle;
       }
 
-      if (m_wristTargetDegrees > m_wristMaxHeight)
+      if (m_wristTargetDegrees > m_wristMaxAngle)
       {
         DataLogManager.log("Target " + String.format("%.1f", m_wristTargetDegrees) + " degrees is limited by "
-            + String.format("%.1f", m_wristMaxHeight) + " degrees");
-        m_wristTargetDegrees = m_wristMaxHeight;
+            + String.format("%.1f", m_wristMaxAngle) + " degrees");
+        m_wristTargetDegrees = m_wristMaxAngle;
       }
 
       // Start the safety timer

@@ -4,31 +4,31 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.ARMConsts.ElbowHeight;
+import frc.robot.Constants.ARMConsts.WristAngle;
 import frc.robot.subsystems.Arm;
 
 /**
  *
  */
-public class ElbowMoveToHeight extends CommandBase
+public class WristMoveToAngle extends CommandBase
 {
-  private final Arm   m_elbow;
-  private ElbowHeight m_height;
+  private final Arm  m_wrist;
+  private WristAngle m_Angle;
 
-  public ElbowMoveToHeight(Arm elbow, ElbowHeight height)
+  public WristMoveToAngle(Arm wrist, WristAngle Angle)
   {
-    m_elbow = elbow;
-    m_height = height;
+    m_wrist = wrist;
+    m_Angle = Angle;
 
-    setName("ElbowMoveToHeight");
-    addRequirements(m_elbow);
+    setName("ClimberMoveToAngle");
+    addRequirements(m_wrist);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize( )
   {
-    m_elbow.moveElbowDistanceInit(m_height);
+    m_wrist.moveWristDistanceInit(m_Angle);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
