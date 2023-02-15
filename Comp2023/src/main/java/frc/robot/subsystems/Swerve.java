@@ -545,7 +545,6 @@ public class Swerve extends SubsystemBase
   public void driveBalance( )
   {
     pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
-    DataLogManager.log("Balance Off By: " + pitch);
 
     if (Math.abs(pitch) > 5)
     {
@@ -600,7 +599,7 @@ public class Swerve extends SubsystemBase
     {
       pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
       WaitUntilCommand(1);
-      DataLogManager.log("Timer: " + timer.get( ));
+      //DataLogManager.log("Timer: " + timer.get( )); - Check how long balancing takes
       if (timer.hasElapsed(5))
         timer.stop( );
     }
