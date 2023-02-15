@@ -91,7 +91,7 @@ public class RobotContainer
   private void addSmartDashboardWidgets( )
   {
     SmartDashboard.putData("DriveBalance", new DriveBalance(m_swerve));
-    SmartDashboard.putData("AutoChargeStation", new AutoChargeStation(m_swerve));
+    SmartDashboard.putData("AutoDockOnChargeStation", new AutoChargeStation(m_swerve));
     SmartDashboard.putData("AutoDriveToChargeStation", new AutoDrivePath(m_swerve, "drivetochargestation", true));
 
     // SmartDashboard Buttons
@@ -214,7 +214,8 @@ public class RobotContainer
     operY.onTrue(new Dummy(XboxController.Button.kY.value));
     //
     // Operator - Bumpers, start, back
-
+    operLeftBumper.onTrue(new Dummy(XboxController.Button.kLeftBumper.value));
+    operRightBumper.onTrue(new Dummy(XboxController.Button.kRightBumper.value));
     operBack.onTrue(new Dummy(XboxController.Button.kBack.value));
     operStart.onTrue(new Dummy(XboxController.Button.kStart.value));
     //

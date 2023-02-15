@@ -45,13 +45,13 @@ public class Robot extends TimedRobot
     if (System.getenv("serialnum").equals(Constants.kcompSN))
     {
       Constants.isComp = true;
-      DataLogManager.log("COMP BOT!");
+      DataLogManager.log("Detected the COMPETITION (A) robot!");
 
     }
     else if (System.getenv("serialnum").equals(Constants.kbbotSN))
     {
       Constants.isComp = false;
-      DataLogManager.log("B BOT!");
+      DataLogManager.log("Detected the PRACTICE (B) robot!");
     }
 
     ctreConfigs = new CTREConfigs( );
