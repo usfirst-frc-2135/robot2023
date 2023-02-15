@@ -243,7 +243,6 @@ public class Constants
             new Pose3d(new Translation3d(-7.24310, -1.26019, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 7
             new Pose3d(new Translation3d(-7.24310, -2.74161, 0), new Rotation3d(0, 0, 0)) // AprilTag ID: 8
         ));
-
   }
 
   public static final class SIMLLConsts
