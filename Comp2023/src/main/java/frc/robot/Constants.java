@@ -266,11 +266,11 @@ public class Constants
   //// 1678 Constants ///////////////////////////////////////////////////////////
 
   // toggle constants between comp bot and practice bot (named "beta")
-  public static final boolean isComp            = true;
+  public static boolean   isComp;
 
   // Timeout constants
-  public static final int     kLongCANTimeoutMs = 100;
-  public static final int     kCANTimeoutMs     = 10;
+  public static final int kLongCANTimeoutMs = 100;
+  public static final int kCANTimeoutMs     = 10;
 
   public static final class SwerveConstants
   {
