@@ -174,6 +174,10 @@ public class Constants
 
   public static final class SWConsts
   {
+    // Constants for balance
+    public static final double kBalancedAngle    = 5.0; // Pitch values less than this stop driving
+    public static final double kBalanceKp        = -0.04; // Amount of power to apply per degree
+
     // Joystick tuning
     public static final double kDriveXScaling    = 1.0;           // 1.0 is no scaling
     public static final double kDriveYScaling    = 1.0;           // 1.0 is no scaling
