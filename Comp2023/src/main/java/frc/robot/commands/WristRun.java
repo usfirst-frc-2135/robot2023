@@ -1,40 +1,38 @@
-
-// ROBOTBUILDER TYPE: Command.
-
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.ARMConsts.WristAngle;
 import frc.robot.subsystems.Wrist;
 
 /**
  *
  */
-public class WristMoveToAngle extends CommandBase
+public class WristRun extends CommandBase
 {
-  private final Wrist m_wrist;
-  private WristAngle  m_Angle;
 
-  public WristMoveToAngle(Wrist wrist, WristAngle Angle)
+  private final Wrist    m_wrist;
+
+  private XboxController m_gamePad;
+
+  public WristRun(Wrist wrist, XboxController gamePad)
   {
     m_wrist = wrist;
-    m_Angle = Angle;
+    m_gamePad = gamePad;
 
-    setName("ClimberMoveToAngle");
     addRequirements(m_wrist);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize( )
-  {
-    m_wrist.moveWristDistanceInit(m_Angle);
-  }
+  {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute( )
-  {}
+  {
+    m_wrist.moveWristWithJoystick(m_gamePad);
+  }
 
   // Called once the command ends or is interrupted.
   @Override

@@ -5,17 +5,17 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ARMConsts.ElbowAngle;
-import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Elbow;
 
 /**
  *
  */
 public class ElbowMoveToAngle extends CommandBase
 {
-  private final Arm  m_elbow;
-  private ElbowAngle m_Angle;
+  private final Elbow m_elbow;
+  private ElbowAngle  m_Angle;
 
-  public ElbowMoveToAngle(Arm elbow, ElbowAngle Angle)
+  public ElbowMoveToAngle(Elbow elbow, ElbowAngle Angle)
   {
     m_elbow = elbow;
     m_Angle = Angle;
