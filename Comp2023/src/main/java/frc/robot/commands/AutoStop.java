@@ -3,7 +3,17 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.math.controller.HolonomicDriveController;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.Swerve;
 
 /**
@@ -13,9 +23,9 @@ public class AutoStop extends CommandBase
 {
   private final Swerve m_swerve;
 
-  public AutoStop(Swerve drivetrain)
+  public AutoStop(Swerve swerve)
   {
-    m_swerve = drivetrain;
+    m_swerve = swerve;
 
     addRequirements(m_swerve);
   }
@@ -29,7 +39,7 @@ public class AutoStop extends CommandBase
   @Override
   public void execute( )
   {
-    //m_swerve.driveStopMotors( );
+    m_swerve.drive(new Translation2d(0, 0), 0.0, true, true);
   }
 
   // Called once the command ends or is interrupted.
