@@ -27,6 +27,10 @@ import frc.robot.lib.util.SwerveModuleConstants;
  */
 public class Constants
 {
+  // bot serial nums
+  public static final String kcompSN           = "03238074";
+  public static final String kbbotSN           = "03260A3A";
+
   // Game controller definitions
   public static final int    kDriverPadPort    = 0;
   public static final int    kOperatorPadPort  = 1;
@@ -61,8 +65,10 @@ public class Constants
 
     // Other subsystem CAN IDs
     public static final int    kCANID_Elbow      = 15;
-    public static final int    kCANID_Wrist      = 16;
-    public static final int    kCANID_Gripper    = 18;
+    public static final int    kCANID_ELCANCoder = 16;
+    public static final int    kCANID_Wrist      = 17;
+    public static final int    kCANID_WRCANCoder = 18;
+    public static final int    kCANID_Gripper    = 19;
 
     public static final int    kCANID_CANdle     = 0;
 
@@ -155,17 +161,23 @@ public class Constants
   {
     public static final double kGRAcquireSpeed = 1.0;
     public static final double kGRExpelSpeed   = -1.0;
+    public static final double kGRHoldSpeed    = 0.1;
 
     public enum GRMode
     {
       GR_STOP,    // stop motor
       GR_ACQUIRE, // acquire game pieces
       GR_EXPEL,   // expel game pieces
+      GR_HOLD,    // hold game pieces
     }
   }
 
   public static final class SWConsts
   {
+    // Constants for balance
+    public static final double kBalancedAngle    = 5.0; // Pitch values less than this stop driving
+    public static final double kBalanceKp        = -0.04; // Amount of power to apply per degree
+
     // Joystick tuning
     public static final double kDriveXScaling    = 1.0;           // 1.0 is no scaling
     public static final double kDriveYScaling    = 1.0;           // 1.0 is no scaling
@@ -262,11 +274,11 @@ public class Constants
   //// 1678 Constants ///////////////////////////////////////////////////////////
 
   // toggle constants between comp bot and practice bot (named "beta")
-  public static final boolean isComp            = true;
+  public static boolean   isComp;
 
   // Timeout constants
-  public static final int     kLongCANTimeoutMs = 100;
-  public static final int     kCANTimeoutMs     = 10;
+  public static final int kLongCANTimeoutMs = 100;
+  public static final int kCANTimeoutMs     = 10;
 
   public static final class SwerveConstants
   {
@@ -478,11 +490,6 @@ public class Constants
     public static final TrajectoryConfig slowSpeedConfig    =
         new TrajectoryConfig(kSlowSpeedMetersPerSecond, kSlowAccelerationMetersPerSecondSquared)
             .setKinematics(Constants.SwerveConstants.swerveKinematics).setStartVelocity(0).setEndVelocity(0);
-
-    // PathPlanner file names
-    public static final String           path1              = "forward39";
-    public static final String           path2              = "backward39";
-    public static final String           path3              = "rightAngleTurn";
   }
 
   //// 1678 Constants ///////////////////////////////////////////////////////////

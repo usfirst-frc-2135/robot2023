@@ -3,7 +3,7 @@
 //
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -17,7 +17,7 @@ import frc.robot.Constants.Ports;
 public class Gripper extends SubsystemBase
 {
   // Member objects
-  private final WPI_TalonFX mGripper17 = new WPI_TalonFX(Ports.kCANID_Gripper);
+  private final WPI_TalonSRX m_gripper = new WPI_TalonSRX(Ports.kCANID_Gripper);
 
   // Constructor
   public Gripper( )
@@ -25,8 +25,8 @@ public class Gripper extends SubsystemBase
     setName("Gripper");
     setSubsystem("Gripper");
 
-    mGripper17.setInverted(false);
-    mGripper17.setSafetyEnabled(false);
+    m_gripper.setInverted(true);
+    m_gripper.setSafetyEnabled(false);
 
     initialize( );
   }
@@ -71,9 +71,13 @@ public class Gripper extends SubsystemBase
         strName = "EXPEL";
         output = GRConsts.kGRExpelSpeed;
         break;
+      case GR_HOLD :
+        strName = "HOLD";
+        output = GRConsts.kGRHoldSpeed;
+        break;
     }
 
     DataLogManager.log(getSubsystem( ) + ": Set As - " + strName);
-    mGripper17.set(output);
+    m_gripper.set(output);
   }
 }

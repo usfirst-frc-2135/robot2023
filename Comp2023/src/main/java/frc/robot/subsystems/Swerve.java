@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.HolonomicDriveController;
@@ -22,8 +21,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
@@ -76,6 +75,8 @@ public class Swerve extends SubsystemBase
   private boolean                  m_isSnapping;
   private double                   m_limelightVisionAlignGoal;
   private double                   m_visionAlignAdjustment;
+  private double                   pitch;
+  private Timer                    timer                 = new Timer( );
 
   // Lock Swerve wheels
   private boolean                  m_locked              = false;
@@ -536,6 +537,24 @@ public class Swerve extends SubsystemBase
     {
       mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
     }
+  }
+
+  public void driveBalanceExecute( )
+  {
+    double drivevalue;
+    pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
+    if (Math.abs(pitch) > SWConsts.kBalancedAngle)
+    {
+      drivevalue = SWConsts.kBalanceKp * pitch;
+    }
+    else
+    {
+      drivevalue = 0;
+    }
+    drive(new Translation2d(drivevalue, 0), 0, true, true);
+    DataLogManager.log(String.format("Robot pitch: %.1f degrees", pitch));
+    DataLogManager.log(String.format("Robot power applied to motors: %.1f m/s", drivevalue));
+
   }
 
   //
