@@ -29,10 +29,8 @@ public class AutoChargeStation extends SequentialCommandGroup
         ),
 
         new PrintCommand("AUTO: Balance on ChargeStation"),
-        new DriveBalance(swerve),
-
-        new PrintCommand("AUTO: Hold in place"),
-        new AutoStop(swerve)
+        new DriveBalance(swerve)
+        
         // @formatter:on
     );
   }
