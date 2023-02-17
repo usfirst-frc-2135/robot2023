@@ -72,6 +72,10 @@ public class Gripper extends SubsystemBase
         strName = "EXPEL";
         output = GRConsts.kGRExpelSpeed;
         break;
+      case GR_HOLD :
+        strName = "HOLD";
+        output = GRConsts.kGRHoldSpeed;
+        break;
     }
 
     DataLogManager.log(getSubsystem( ) + ": Set As - " + strName);

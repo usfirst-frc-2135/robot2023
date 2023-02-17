@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.lib.util.CTREConfigs;
+import frc.robot.Constants;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -40,6 +41,18 @@ public class Robot extends TimedRobot
     // Starts recording to data log
     DataLogManager.start( );
     DataLogManager.log("RobotInit: RoboRIO SN:" + System.getenv("serialnum"));
+
+    if (System.getenv("serialnum").equals(Constants.kcompSN))
+    {
+      Constants.isComp = true;
+      DataLogManager.log("Detected the COMPETITION (A) robot!");
+
+    }
+    else if (System.getenv("serialnum").equals(Constants.kbbotSN))
+    {
+      Constants.isComp = false;
+      DataLogManager.log("Detected the PRACTICE (B) robot!");
+    }
 
     ctreConfigs = new CTREConfigs( );
 
