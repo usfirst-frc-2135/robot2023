@@ -26,15 +26,14 @@ public class DriveBalance extends CommandBase
   public void initialize( )
   {
     DataLogManager.log("Running Drive Balance!");
-    m_timer.reset( );
-    m_timer.start( );
+    m_timer.restart( );
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute( )
   {
-    m_swerve.driveBalance( );
+    m_swerve.driveBalanceExecute( );
   }
 
   // Called once the command ends or is interrupted.

@@ -5,7 +5,6 @@ package frc.robot.subsystems;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
 
@@ -29,9 +28,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SWConsts;
@@ -542,62 +539,22 @@ public class Swerve extends SubsystemBase
     }
   }
 
-  public void driveBalance( )
+  public void driveBalanceExecute( )
   {
+    double drivevalue;
     pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
+    if (Math.abs(pitch) > SWConsts.kBalancedAngle)
+    {
+      drivevalue = SWConsts.kBalanceKp * pitch;
+    }
+    else
+    {
+      drivevalue = 0;
+    }
+    drive(new Translation2d(drivevalue, 0), 0, true, true);
+    DataLogManager.log(String.format("Robot pitch: %.1f degrees", pitch));
+    DataLogManager.log(String.format("Robot power applied to motors: %.1f m/s", drivevalue));
 
-    if (Math.abs(pitch) > 5.0)
-    {
-      timer.reset( );
-      while (Math.abs(pitch) > 5.0 || !(timer.hasElapsed(5.0)))
-      {
-        timer.reset( );
-        balance( );
-        if (timer.hasElapsed(5.0))
-        {
-          DataLogManager.log("Breaking: Occurs");
-          break;
-        }
-      }
-    }
-    else if (Math.abs(pitch) < 5.0)
-    {
-      waitandcheck( );
-    }
-  }
-
-  public void balance( )
-  {
-    if (pitch < 0)
-    {
-      drive(new Translation2d(-0.04 * pitch, 0), 0, true, true);
-      pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
-    }
-    else if (pitch > 0)
-    {
-      drive(new Translation2d(-0.04 * pitch, 0), 0, true, true);
-      pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
-    }
-    else if (-5.0 < pitch && pitch < 5.0)
-    {
-      waitandcheck( );
-    }
-  }
-
-  public void waitandcheck( )
-  {
-    timer.reset( );
-    timer.start( );
-    drive(new Translation2d(0, 0), 0, true, true);
-    pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
-    while (!(timer.hasElapsed(5.0)) && (-5.0 < pitch && pitch < 5.0))
-    {
-      pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
-      new WaitUntilCommand(1.0);
-      //DataLogManager.log("Timer: " + timer.get( )); - Check how long balancing takes
-      if (timer.hasElapsed(5.0))
-        timer.stop( );
-    }
   }
 
   //
