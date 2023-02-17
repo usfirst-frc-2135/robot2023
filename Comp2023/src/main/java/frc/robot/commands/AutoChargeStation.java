@@ -29,10 +29,7 @@ public class AutoChargeStation extends SequentialCommandGroup
         ),
 
         new PrintCommand("AUTO: Balance on ChargeStation"),
-        new ParallelDeadlineGroup(
-          new WaitUntilCommand(swerve::driveWithPathFollowerIsFinished),
-          new DriveBalance(swerve)
-        ),
+        new DriveBalance(swerve),
 
         new PrintCommand("AUTO: Hold in place"),
         new AutoStop(swerve)
