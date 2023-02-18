@@ -15,10 +15,10 @@ public class ElbowMoveToAngle extends CommandBase
   private final Arm  m_elbow;
   private ElbowAngle m_Angle;
 
-  public ElbowMoveToAngle(Arm elbow, ElbowAngle Angle)
+  public ElbowMoveToAngle(Arm elbow, ElbowAngle angle)
   {
     m_elbow = elbow;
-    m_Angle = Angle;
+    m_angle = angle;
 
     setName("ElbowMoveToAngle");
     addRequirements(m_elbow);
@@ -28,7 +28,7 @@ public class ElbowMoveToAngle extends CommandBase
   @Override
   public void initialize( )
   {
-    m_elbow.moveElbowDistanceInit(m_Angle);
+    m_elbow.moveElbowDistanceInit(m_angle);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
