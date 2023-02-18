@@ -40,20 +40,28 @@ public class Robot extends TimedRobot
   {
     // Starts recording to data log
     DataLogManager.start( );
-    DataLogManager.log("RobotInit: RoboRIO SN:" + System.getenv("serialnum"));
 
-    if (System.getenv("serialnum").equals(Constants.kcompSN))
+    // Detect which robot/RoboRIO
+    String serialNum = System.getenv("serialnum");
+    String robotName = "UNKNOWN";
+
+    DataLogManager.log("RobotInit: RoboRIO SN: " + serialNum);
+
+    if (serialNum == null)
+      robotName = "SIMULATION";
+    else if (serialNum.equals(Constants.kcompSN))
     {
       Constants.isComp = true;
-      DataLogManager.log("Detected the COMPETITION (A) robot!");
-
+      robotName = "COMPETITION (A)";
     }
-    else if (System.getenv("serialnum").equals(Constants.kbbotSN))
+    else if (serialNum.equals(Constants.kbbotSN))
     {
       Constants.isComp = false;
-      DataLogManager.log("Detected the PRACTICE (B) robot!");
+      robotName = "PRACTICE (B)";
     }
+    DataLogManager.log(String.format("Detected the %s robot!", robotName));
 
+    // Instantiate CTRE configurations
     ctreConfigs = new CTREConfigs( );
 
     // Instantiate RobotContainer. Performs button bindings, builds autonomous chooser on the dashboard.
