@@ -30,7 +30,7 @@ public class ResetGyro extends CommandBase
     swerve = drive;
     m_start = start;
     m_back = back;
-    setName("ResetOdmetry");
+    setName("ResetGyro");
   }
 
   // Called when the command is initially scheduled.

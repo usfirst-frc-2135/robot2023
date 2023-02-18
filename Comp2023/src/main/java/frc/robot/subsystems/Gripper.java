@@ -27,6 +27,7 @@ public class Gripper extends SubsystemBase
 
     m_gripper.setInverted(true);
     m_gripper.setSafetyEnabled(false);
+    m_gripper.set(0.0);
 
     initialize( );
   }
@@ -56,7 +57,7 @@ public class Gripper extends SubsystemBase
   public void setGripperSpeed(GRMode mode)
   {
     final String strName;
-    double output;
+    double output = 0.0; // default: off
 
     switch (mode)
     {
