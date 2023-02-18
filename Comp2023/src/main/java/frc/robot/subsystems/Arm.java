@@ -131,7 +131,7 @@ public class Arm extends SubsystemBase
 
     // SmartDashboard.putNumber("EL_stowAngle", m_stowAngle);
 
-    // Field for manually progamming climber Angle
+    // Field for manually progamming elbow angle
     //MAKE THESE READ DEGREES OF THE MOTORS (BOTH SEPERATE)
     SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
     SmartDashboard.putNumber("EL_targetDegrees", m_elbowTargetDegrees);
