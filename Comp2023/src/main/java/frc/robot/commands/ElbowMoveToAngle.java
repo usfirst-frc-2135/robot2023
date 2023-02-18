@@ -13,7 +13,7 @@ import frc.robot.subsystems.Arm;
 public class ElbowMoveToAngle extends CommandBase
 {
   private final Arm  m_elbow;
-  private ElbowAngle m_Angle;
+  private ElbowAngle m_angle;
 
   public ElbowMoveToAngle(Arm elbow, ElbowAngle angle)
   {
