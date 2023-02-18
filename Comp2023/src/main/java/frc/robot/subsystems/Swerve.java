@@ -707,13 +707,13 @@ public class Swerve extends SubsystemBase
     m_swerveOdometry.update(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ));
     m_poseEstimator.updateWithTime(Timer.getFPGATimestamp( ), m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ));
 
-    if (RobotContainer.getInstance( ).m_vision.addVisionMeasurement( ))
-    {
-      Pose2d botPose2d = RobotContainer.getInstance( ).m_vision.getBotPose2d( );
-      double latency = RobotContainer.getInstance( ).m_vision.getTargetLatency( );
+    Pose2d botPose2d = RobotContainer.getInstance( ).m_vision.getBotPose2d( );
+    double latency = RobotContainer.getInstance( ).m_vision.getTargetLatency( );
 
+    if (botPose2d != null)
+    {
       //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
-      m_poseEstimator.addVisionMeasurement(botPose2d, Timer.getFPGATimestamp( ) - (0.001 * latency));
+      m_poseEstimator.addVisionMeasurement(botPose2d, Timer.getFPGATimestamp( ) - (latency / 1000));
     }
   }
 

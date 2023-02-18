@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -59,10 +60,6 @@ public class Vision extends SubsystemBase
   private double                m_targetID;         // ID of the primary in-view AprilTag
 
   private double                m_distLL;           // calculated distance in inches for the current y value
-  private double                m_poseCheck          = 0;
-  private double                m_visionDebug        = 0;
-
-  private Pose2d                m_botPose2d;
 
   /**
    *
@@ -131,7 +128,7 @@ public class Vision extends SubsystemBase
     if (m_targetID > 0)
     {
       double[ ] m_botposeArray = m_botposeSub.get( );
-      //DataLogManager.log(getSubsystem( ) + " : Length of botPoseArray  " + m_botposeArray.length);
+
       if (m_botposeArray != null)
       {
         //Defining the Transform3d of the robot
@@ -143,9 +140,8 @@ public class Vision extends SubsystemBase
         m_sendablePoseArray[2] = m_botposeArray[5]; // Rotation from yaw from the Rotation3d of the "botPose"
 
         m_yawBotPose = m_botposeArray[5]; //Setting the rotation of the robot
-
-        m_botPose2d = getBotPose2d( );
       }
+
     }
 
     SmartDashboard.putData("Field2d", RobotContainer.getInstance( ).m_field2d);
@@ -228,60 +224,25 @@ public class Vision extends SubsystemBase
 
   public Pose2d getBotPose2d( )
   {
+    Translation2d tran;
+    Rotation2d rot;
+
+    // Perform valid checks and return null if it doesn't exist
     if (m_targetValid)
     {
-      Translation2d tran1 = new Translation2d(m_botposeTransform3d.getX( ), m_botposeTransform3d.getY( ));
-      double degree;
-
-      if (m_yawBotPose < 0)
-      {
-        degree = 360 + m_yawBotPose; //Adds 360 degrees to obtain a positive rotation to a negative output
-
-      }
-      else
-      {
-        degree = m_yawBotPose;
-      }
-      double rotation = ((Math.PI) / 180) * (degree);
-
-      // DataLogManager.log("VISION: Radians sent " + rotation + " from the limelight " + m_botposeTransform3d.getRotation( ).getZ( )
-      //     + " Angle : " + m_botposeTransform3d.getRotation( ).getAngle( ));
-
-      m_poseCheck = 1;
-      Rotation2d rot1 = new Rotation2d(rotation);
-
-      return new Pose2d(tran1, rot1);
-    }
-    else
-    {
-      Translation2d tran2 = new Translation2d(0, 0);
-      Rotation2d rot2 = new Rotation2d(0);
-
-      m_poseCheck = 2;
-      return new Pose2d(tran2, rot2);
+      tran = new Translation2d(m_botposeTransform3d.getX( ), m_botposeTransform3d.getY( ));
+      double degrees = m_yawBotPose + ((m_yawBotPose < 0) ? 360 : 0);
+      rot = new Rotation2d(Units.degreesToRadians(degrees));
+      return new Pose2d(tran, rot);
     }
 
-  }
+    // DataLogManager.log(getSubsystem( )                                         //  
+    //     + "VISION: Radians sent " + rot                                        //
+    //     + " from the limelight " + m_botposeTransform3d.getRotation( ).getZ( ) //
+    //     + " Angle : " + m_botposeTransform3d.getRotation( ).getAngle( )        //
+    // );
 
-  public boolean addVisionMeasurement( )
-  {
-    if ((m_poseCheck == 1))
-    {
-      if (m_visionDebug > 0)
-      {
-
-        DataLogManager.log(getSubsystem( )                                            //  
-            + ":  -  BOTPOSE2d - (" + m_botPose2d.getX( ) + ", " + m_botPose2d.getY( )    //
-            + ", rotation: " + m_botPose2d.getRotation( ).getDegrees( ) + ") -- "       //
-            + "Pose check " + m_poseCheck + "latency " + m_targetLatency);            //
-
-      }
-
-      return true;
-
-    }
-
-    return false;
+    return null;
   }
 
   public void setLEDMode(int mode)
