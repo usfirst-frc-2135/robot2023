@@ -4,7 +4,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.ARMConsts.ElbowAngle;
+import frc.robot.Constants.ELConsts.ElbowAngle;
 import frc.robot.subsystems.Elbow;
 
 /**

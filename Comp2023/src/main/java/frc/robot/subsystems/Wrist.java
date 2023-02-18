@@ -1,5 +1,5 @@
 //
-// Arm subystem - elbow and wrist joints
+// Arm subystem - wrist joint
 //
 package frc.robot.subsystems;
 
@@ -27,15 +27,14 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.ARMConsts;
-import frc.robot.Constants.ARMConsts.ElbowMode;
-import frc.robot.Constants.ARMConsts.WristAngle;
-import frc.robot.Constants.ARMConsts.WristMode;
 import frc.robot.Constants.Falcon500;
+import frc.robot.Constants.WRConsts;
+import frc.robot.Constants.WRConsts.WristAngle;
+import frc.robot.Constants.WRConsts.WristMode;
 import frc.robot.team2135.PhoenixUtil;
 
 //
-// Arm subsystem class
+// Wrist subsystem class
 //
 public class Wrist extends SubsystemBase
 {
@@ -45,19 +44,13 @@ public class Wrist extends SubsystemBase
   private static final int                SLOTINDEX             = 0;   // Use first PID slot
 
   // Member objects
-  private final WPI_TalonFX               m_elbow               = new WPI_TalonFX(Constants.Ports.kCANID_Elbow);  //elbow
   private final WPI_TalonFX               m_wrist               = new WPI_TalonFX(Constants.Ports.kCANID_Wrist);  //wrist
-  private final TalonFXSimCollection      m_elbowMotorSim       = new TalonFXSimCollection(m_elbow);
   private final TalonFXSimCollection      m_wrist16MotorSim     = new TalonFXSimCollection(m_wrist);
-  private final SingleJointedArmSim       m_elbowSim            = new SingleJointedArmSim(DCMotor.getFalcon500(1),
-      ARMConsts.kElbowGearRatio, 2.0, ARMConsts.kForearmLengthMeters, 0.0, Math.PI, true);
   private final SingleJointedArmSim       m_wrist16Sim          = new SingleJointedArmSim(DCMotor.getFalcon500(1),
-      ARMConsts.kWristGearRatio, 2.0, ARMConsts.kGripperLengthMeters, 0.0, Math.PI, true);
+      WRConsts.kWristGearRatio, 2.0, WRConsts.kGripperLengthMeters, 0.0, Math.PI, true);
 
-  private final MechanismLigament2d       m_elbowLigament;
   private final MechanismLigament2d       m_wristLigament;
 
-  private boolean                         m_elbowValid;               // Health indicator for climber Talon 
   private boolean                         m_wristValid;               // Health indicator for climber Talon 
 
   //Devices and simulation objs
@@ -67,43 +60,35 @@ public class Wrist extends SubsystemBase
       Falcon500.kStatorCurrentLimit, Falcon500.kStatorTriggerCurrent, Falcon500.kStatorTriggerTime);
 
   // Declare module variables
-  private int                             m_velocity            = ARMConsts.kMMVelocity;         // motion magic velocity
-  private int                             m_acceleration        = ARMConsts.kMMAcceleration;     // motion magic acceleration
-  private int                             m_sCurveStrength      = ARMConsts.kMMSCurveStrength;   // motion magic S curve smoothing
-  private double                          m_pidKf               = ARMConsts.kARMPidKf;           // PID force constant
-  private double                          m_pidKp               = ARMConsts.kARMPidKp;           // PID proportional
-  private double                          m_pidKi               = ARMConsts.kARMPidKi;           // PID integral
-  private double                          m_pidKd               = ARMConsts.kARMPidKd;           // PID derivative
-  private int                             m_elbowAllowedError   = ARMConsts.kELAllowedError;     // PID allowable closed loop error
-  private int                             m_wristAllowedError   = ARMConsts.kWRAllowedError;     // PID allowable closed loop error
-  private double                          m_toleranceInches     = ARMConsts.kARMToleranceInches; // PID tolerance in inches
+  private int                             m_velocity            = WRConsts.kWristMMVelocity;         // motion magic velocity
+  private int                             m_acceleration        = WRConsts.kWristMMAcceleration;     // motion magic acceleration
+  private int                             m_sCurveStrength      = WRConsts.kWristMMSCurveStrength;   // motion magic S curve smoothing
+  private double                          m_pidKf               = WRConsts.kWristPidKf;           // PID force constant
+  private double                          m_pidKp               = WRConsts.kWristPidKp;           // PID proportional
+  private double                          m_pidKi               = WRConsts.kWristPidKi;           // PID integral
+  private double                          m_pidKd               = WRConsts.kWristPidKd;           // PID derivative
+  private int                             m_wristAllowedError   = WRConsts.kWristAllowedError;     // PID allowable closed loop error
+  private double                          m_toleranceInches     = WRConsts.kWristToleranceDegrees; // PID tolerance in inches
 
-  private double                          m_elbowStowAngle      = ARMConsts.kElbowStowAngle;    // elbow Stow Angle
-  private double                          m_wristStowAngle      = ARMConsts.kWristStowAngle;    // wrist Stow Angle
-  private double                          m_lowScoreAngle       = ARMConsts.kLowScoreAngle;     // low-peg scoring Angle   
-  private double                          m_midScoreAngle       = ARMConsts.kMidScoreAngle;     // mid-peg scoring Angle
-  private double                          m_highScoreAngle      = ARMConsts.kHighScoreAngle;    // high-peg scoring Angle
-  private double                          m_elbowMinAngle       = ARMConsts.kElbowMinAngle;       // minimum elbow allowable Angle
-  private double                          m_elbowMaxAngle       = ARMConsts.kElbowMaxAngle;       // maximum elbow allowable Angle
-  private double                          m_wristMinAngle       = ARMConsts.kWristMinAngle;       // minimum wrist allowable Angle
-  private double                          m_wristMaxAngle       = ARMConsts.kWristMaxAngle;       // maximum wrist allowable Angle
+  private double                          m_wristStowangle      = WRConsts.kWristStowAngle;    // wrist Stow angle
+  private double                          m_lowScoreangle       = WRConsts.kWristAngleScoreLow;     // low-peg scoring angle   
+  private double                          m_midScoreangle       = WRConsts.kWristAngleScoreMid;     // mid-peg scoring angle
+  private double                          m_highScoreangle      = WRConsts.kWristAngleScoreHigh;    // high-peg scoring angle
+  private double                          m_wristMinangle       = WRConsts.kWristMinAngle;       // minimum wrist allowable angle
+  private double                          m_wristMaxangle       = WRConsts.kWristMaxAngle;       // maximum wrist allowable angle
 
-  private double                          m_stickDeadband       = ARMConsts.kStickDeadband;      // joystick deadband
-  private ElbowMode                       m_elbowMode           = ElbowMode.ELBOW_INIT;          // Mode active with joysticks
+  private double                          m_stickDeadband       = Constants.kStickDeadband;      // joystick deadband
   private WristMode                       m_wristMode           = WristMode.WRIST_INIT;          // Mode active with joysticks
 
-  private int                             m_armDebug            = 1; // DEBUG flag to disable/enable extra logging calls
+  private int                             m_wristDebug          = 1; // DEBUG flag to disable/enable extra logging calls
 
   private boolean                         m_calibrated          = false;  // Indicates whether the climber has been calibrated
-  private double                          m_elbowTargetDegrees  = 0.0;    // Target angle in degrees
-  private double                          m_elbowCurDegrees     = 0.0;    // Current angle in degrees
   private double                          m_wristTargetDegrees  = 0.0;    // Target angle in degrees
   private double                          m_wristCurDegrees     = 0.0;    // Current angle in degrees
   private int                             m_withinTolerance     = 0;      // Counter for consecutive readings within tolerance
 
   private Timer                           m_safetyTimer         = new Timer( ); // Safety timer for use in climber
   private double                          m_safetyTimeout;                // Seconds that the timer ran before stopping
-  private Timer                           timer                 = new Timer( );
 
   // Constructor
   public Wrist( )
@@ -113,29 +98,18 @@ public class Wrist extends SubsystemBase
 
     m_wristValid = PhoenixUtil.getInstance( ).talonFXInitialize(m_wrist, "wrist");
 
-    // SmartDashboard.putBoolean("HL_validCL", m_validCL);
-    // SmartDashboard.putBoolean("HL_validCL", m_validCL);
-
-    // // Check if solenoids are functional or blacklisted
-    // DataLogManager.log(getSubsystem( ) + ": CL Climber Solenoid is " + ((m_gateHook.isDisabled( )) ? "BLACKLISTED" : "OK"));
+    // SmartDashboard.putBoolean("HL_validWR", m_validWR);
 
     // // Initialize Variables
-    // SmartDashboard.putNumber("CL_velocity", m_velocity);
-    // SmartDashboard.putNumber("CL_acceleration", m_acceleration);
-    // SmartDashboard.putNumber("CL_sCurveStrength", m_sCurveStrength);
-    // SmartDashboard.putNumber("CL_pidKf", m_pidKf);
-    // SmartDashboard.putNumber("CL_pidKp", m_pidKp);
-    // SmartDashboard.putNumber("CL_pidKi", m_pidKi);
-    // SmartDashboard.putNumber("CL_pidKd", m_pidKd);
+    // SmartDashboard.putNumber("WR_velocity", m_velocity);
+    // SmartDashboard.putNumber("WR_acceleration", m_acceleration);
+    // SmartDashboard.putNumber("WR_sCurveStrength", m_sCurveStrength);
+    // SmartDashboard.putNumber("WR_pidKf", m_pidKf);
+    // SmartDashboard.putNumber("WR_pidKp", m_pidKp);
+    // SmartDashboard.putNumber("WR_pidKi", m_pidKi);
+    // SmartDashboard.putNumber("WR_pidKd", m_pidKd);
 
-    // SmartDashboard.putNumber("CL_stowAngle", m_stowAngle);
-    // SmartDashboard.putNumber("CL_extendL2", m_extendL2);
-    // SmartDashboard.putNumber("CL_rotateL3", m_rotateL3);
-    // SmartDashboard.putNumber("CL_raiseL4", m_raiseL4);
-    // SmartDashboard.putNumber("CL_gatehookRestAngle", m_gatehookRestAngle);
-
-    // Field for manually progamming climber Angle
-    //MAKE THESE READ DEGREES OF THE MOTORS (BOTH SEPERATE)
+    // SmartDashboard.putNumber("WR_stowangle", m_stowangle);
 
     SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
     SmartDashboard.putNumber("WR_targetDegrees", m_wristTargetDegrees);
@@ -145,17 +119,16 @@ public class Wrist extends SubsystemBase
       wristTalonInitialize(m_wrist, false);
 
     // the main mechanism object
-    Mechanism2d armMech = new Mechanism2d(3, 3);
+    Mechanism2d wristMech = new Mechanism2d(3, 3);
     // the mechanism root node
-    MechanismRoot2d armRoot = armMech.getRoot("arm", 1.5, 2);
+    MechanismRoot2d wristRoot = wristMech.getRoot("wrist", 1.5, 2);
 
     // MechanismLigament2d objects represent each "section"/"stage" of the mechanism, and are based
     // off the root node or another ligament object
-    m_elbowLigament = armRoot.append(new MechanismLigament2d("elbow", 1, 0));
-    m_wristLigament = m_elbowLigament.append(new MechanismLigament2d("wrist", 0.5, 90, 6, new Color8Bit(Color.kPurple)));
+    m_wristLigament = wristRoot.append(new MechanismLigament2d("wrist", 0.5, 90, 6, new Color8Bit(Color.kPurple)));
 
     // post the mechanism to the dashboard
-    SmartDashboard.putData("ArmMech2d", armMech);
+    SmartDashboard.putData("WristMech2d", wristMech);
 
     initialize( );
   }
@@ -164,8 +137,6 @@ public class Wrist extends SubsystemBase
   public void periodic( )
   {
     // This method will be called once per scheduler run
-
-    // TO-DO: if disabled, set LED when down
 
     if (m_wristValid)
     {
@@ -181,49 +152,43 @@ public class Wrist extends SubsystemBase
   {
     // This method will be called once per scheduler run during simulation
 
-    // Set input flywheel voltage from the motor setting
-
+    // Set input motor voltage from the motor setting
     m_wrist16MotorSim.setBusVoltage(RobotController.getInputVoltage( ));
     m_wrist16Sim.setInput(-m_wrist16MotorSim.getMotorOutputLeadVoltage( ));
 
     // update for 20 msec loop
-
     m_wrist16Sim.update(0.020);
 
     // Finally, we set our simulated encoder's readings and simulated battery voltage
-
     m_wrist.setSelectedSensorPosition(wristDegreesToCounts(Units.radiansToDegrees(m_wrist16Sim.getAngleRads( ))));
 
     // SimBattery estimates loaded battery voltages
-
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_wrist16Sim.getCurrentDrawAmps( )));
   }
 
   public void initialize( )
   {
-
     double curWRCounts = 0.0;
 
     DataLogManager.log(getSubsystem( ) + ": subsystem initialized!");
 
-    setARMStopped( );
+    setWristStopped( );
 
     if (m_wristValid)
       curWRCounts = m_wrist.getSelectedSensorPosition(0);
     m_wristCurDegrees = wristCountsToDegrees((int) curWRCounts);
     m_wristTargetDegrees = m_wristCurDegrees;
     DataLogManager.log(getSubsystem( ) + ": Init Target Inches: " + m_wristTargetDegrees);
-
   }
 
   private int wristDegreesToCounts(double degrees)
   {
-    return (int) (degrees / ARMConsts.kElbowDegreesPerCount);
+    return (int) (degrees / WRConsts.kWristDegreesPerCount);
   }
 
   private double wristCountsToDegrees(int counts)
   {
-    return counts * ARMConsts.kElbowDegreesPerCount;
+    return counts * WRConsts.kWristDegreesPerCount;
   }
 
   private void wristTalonInitialize(WPI_TalonFX motor, boolean inverted)
@@ -275,12 +240,12 @@ public class Wrist extends SubsystemBase
 
   public void moveWristWithJoystick(XboxController joystick)
   {
-    double yWRISTValue = 0.0;
+    double yWristValue = 0.0;
     double motorOutput = 0.0;
-    double manualSpeedMax = ARMConsts.kSpeedMaxManual;
+    double manualSpeedMax = WRConsts.kWristSpeedMaxManual;
 
-    yWRISTValue = joystick.getRightY( );
-    if (yWRISTValue > -m_stickDeadband && yWRISTValue < m_stickDeadband)
+    yWristValue = joystick.getRightY( );
+    if (yWristValue > -m_stickDeadband && yWristValue < m_stickDeadband)
     {
       if (m_wristMode != WristMode.WRIST_STOPPED)
         DataLogManager.log(getSubsystem( ) + " WRIST Stopped");
@@ -289,26 +254,26 @@ public class Wrist extends SubsystemBase
     else
     {
       // If joystick is above a value, wrist will move up
-      if (yWRISTValue > m_stickDeadband)
+      if (yWristValue > m_stickDeadband)
       {
         if (m_wristMode != WristMode.WRIST_UP)
           DataLogManager.log(getSubsystem( ) + " WRIST Up");
         m_wristMode = WristMode.WRIST_UP;
 
-        yWRISTValue -= m_stickDeadband;
-        yWRISTValue *= (1.0 / (1.0 - m_stickDeadband));
-        motorOutput = manualSpeedMax * (yWRISTValue * Math.abs(yWRISTValue));
+        yWristValue -= m_stickDeadband;
+        yWristValue *= (1.0 / (1.0 - m_stickDeadband));
+        motorOutput = manualSpeedMax * (yWristValue * Math.abs(yWristValue));
       }
       // If joystick is below a value, wrist will move down
-      else if (yWRISTValue < -m_stickDeadband)
+      else if (yWristValue < -m_stickDeadband)
       {
         if (m_wristMode != WristMode.WRIST_DOWN)
           DataLogManager.log(getSubsystem( ) + " WRIST Down");
         m_wristMode = WristMode.WRIST_DOWN;
 
-        yWRISTValue += m_stickDeadband;
-        yWRISTValue *= (1.0 / (1.0 - m_stickDeadband));
-        motorOutput = manualSpeedMax * (yWRISTValue * Math.abs(yWRISTValue));
+        yWristValue += m_stickDeadband;
+        yWristValue *= (1.0 / (1.0 - m_stickDeadband));
+        motorOutput = manualSpeedMax * (yWristValue * Math.abs(yWristValue));
       }
     }
 
@@ -316,7 +281,7 @@ public class Wrist extends SubsystemBase
       m_wrist.set(ControlMode.PercentOutput, motorOutput);
   }
 
-  public void setARMStopped( )
+  public void setWristStopped( )
   {
     DataLogManager.log(getSubsystem( ) + ": ARM Set Arm Stopped");
 
@@ -326,9 +291,9 @@ public class Wrist extends SubsystemBase
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
-  public void moveWristDistanceInit(WristAngle Angle)
+  public void moveWristDistanceInit(WristAngle angle)
   {
-    if (m_armDebug != 0)
+    if (m_wristDebug != 0)
     {
       m_velocity = (int) SmartDashboard.getNumber("WR_velocity", m_velocity);
       m_acceleration = (int) SmartDashboard.getNumber("WR_acceleration", m_acceleration);
@@ -347,36 +312,45 @@ public class Wrist extends SubsystemBase
       m_wrist.config_kD(SLOTINDEX, m_pidKd);
     }
 
-    switch (Angle)
+    switch (angle)
     {
       case WRIST_NOCHANGE : // Do not change from current level!
-        m_wristTargetDegrees = m_elbowCurDegrees;
+        m_wristTargetDegrees = m_wristCurDegrees;
         if (m_wristTargetDegrees < 0.25)
           m_wristTargetDegrees = 0.25;
         break;
       case WRIST_STOW :
-        m_wristTargetDegrees = SmartDashboard.getNumber("WR_stowAngle", m_wristStowAngle);
+        m_wristTargetDegrees = SmartDashboard.getNumber("WR_stowangle", m_wristStowangle);
+        break;
+      case WRIST_LOW :
+        m_wristTargetDegrees = SmartDashboard.getNumber("WR_lowScoreangle", m_lowScoreangle);
+        break;
+      case WRIST_MID :
+        m_wristTargetDegrees = SmartDashboard.getNumber("WR_midScoreangle", m_midScoreangle);
+        break;
+      case WRIST_HIGH :
+        m_wristTargetDegrees = SmartDashboard.getNumber("WR_highScoreangle", m_highScoreangle);
         break;
       default :
-        DataLogManager.log(getSubsystem( ) + ": requested Angle is invalid - " + Angle);
+        DataLogManager.log(getSubsystem( ) + ": requested angle is invalid - " + angle);
         return;
     }
 
     if (m_calibrated)
     {
-      // Angle constraint check/soft limit for max and min Angle before raising
-      if (m_wristTargetDegrees < m_wristMinAngle)
+      // angle constraint check/soft limit for max and min angle before raising
+      if (m_wristTargetDegrees < m_wristMinangle)
       {
         DataLogManager.log("Target " + String.format("%.1f", m_wristTargetDegrees) + " degrees is limited by "
-            + String.format("%.1f", m_wristMinAngle) + " degrees");
-        m_wristTargetDegrees = m_wristMinAngle;
+            + String.format("%.1f", m_wristMinangle) + " degrees");
+        m_wristTargetDegrees = m_wristMinangle;
       }
 
-      if (m_wristTargetDegrees > m_wristMaxAngle)
+      if (m_wristTargetDegrees > m_wristMaxangle)
       {
         DataLogManager.log("Target " + String.format("%.1f", m_wristTargetDegrees) + " degrees is limited by "
-            + String.format("%.1f", m_wristMaxAngle) + " degrees");
-        m_wristTargetDegrees = m_wristMaxAngle;
+            + String.format("%.1f", m_wristMaxangle) + " degrees");
+        m_wristTargetDegrees = m_wristMaxangle;
       }
 
       // Start the safety timer
@@ -432,17 +406,5 @@ public class Wrist extends SubsystemBase
     }
 
     return isFinished;
-  }
-
-  public void timerStart( )
-  {
-    timer.reset( );
-    timer.start( );
-  }
-
-  public void timerPrint( )
-  {
-    timer.stop( );
-    DataLogManager.log("Arm Time: " + String.format("%.3f", timer.get( )) + " seconds");
   }
 }

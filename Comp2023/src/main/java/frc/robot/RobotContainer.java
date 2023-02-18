@@ -16,26 +16,24 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.LEDConsts.LEDColor;
-import frc.robot.commands.ElbowRun;
 import frc.robot.commands.AutoChargeStation;
 import frc.robot.commands.AutoDrivePath;
-import frc.robot.commands.AutoPathSequence;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.DriveBalance;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
+import frc.robot.commands.ElbowRun;
 import frc.robot.commands.GripperRun;
 import frc.robot.commands.LEDSet;
 import frc.robot.commands.ResetGyro;
 import frc.robot.commands.WristRun;
-import frc.robot.subsystems.Wrist;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Gripper;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Power;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
-import frc.robot.team1678.frc2022.drivers.Pigeon;
+import frc.robot.subsystems.Wrist;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -103,8 +101,8 @@ public class RobotContainer
 
     SmartDashboard.putData("AutoDrivePathForward", new AutoDrivePath(m_swerve, "forward1m", true));
     SmartDashboard.putData("AutoDrivePathBackward", new AutoDrivePath(m_swerve, "backward1m", true));
-    SmartDashboard.putData("AutoDrivePathForwardLeft", new AutoDrivePath(m_swerve, "forward_left", true));
-    SmartDashboard.putData("AutoDrivePathBackwardRight", new AutoDrivePath(m_swerve, "backward_right", true));
+    SmartDashboard.putData("AutoDrivePathForwardLeft", new AutoDrivePath(m_swerve, "forwardLeft", true));
+    SmartDashboard.putData("AutoDrivePathBackwardRight", new AutoDrivePath(m_swerve, "backwardRight", true));
     SmartDashboard.putData("AutoDrivePathLeft", new AutoDrivePath(m_swerve, "left1m", true));
     SmartDashboard.putData("AutoDrivePathRight", new AutoDrivePath(m_swerve, "right1m", true));
     SmartDashboard.putData("AutoDrivePathForward2", new AutoDrivePath(m_swerve, "forward2m", true));
