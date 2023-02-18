@@ -246,6 +246,7 @@ public class Vision extends SubsystemBase
 
   public boolean getCondition(Pose2d botpose)
   {
+    //Only adding vision measurements that are already within one meter or so of the current pose estimate
     Pose2d currentPose = RobotContainer.getInstance( ).m_swerve.getPose( );
 
     // if (Math.abs(currentPose.getX( ) - botpose.getX( )) <= 1)
