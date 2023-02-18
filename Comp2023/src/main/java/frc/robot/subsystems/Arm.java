@@ -174,7 +174,7 @@ public class Arm extends SubsystemBase
       SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
       m_elbowLigament.setAngle(elbowCountsToDegrees(curCounts));
     }
-    
+
     if (m_wristValid)
     {
       int curCounts = (int) m_wrist.getSelectedSensorPosition(0);
@@ -352,7 +352,7 @@ public class Arm extends SubsystemBase
     double manualSpeedMax = ARMConsts.kSpeedMaxManual;
 
     yElbowValue = joystick.getLeftY( );
-    if (yELBOWValue > -m_stickDeadband && yElbowValue < m_stickDeadband)
+    if (yElbowValue > -m_stickDeadband && yElbowValue < m_stickDeadband)
     {
       if (m_elbowMode != ElbowMode.ELBOW_STOPPED)
         DataLogManager.log(getSubsystem( ) + " ELBOW Stopped");
@@ -369,7 +369,7 @@ public class Arm extends SubsystemBase
 
         yElbowValue -= m_stickDeadband;
         yElbowValue *= (1.0 / (1.0 - m_stickDeadband));
-        motorOutput = manualSpeedMax * (yElbowValue * Math.abs(yELBOWValue));
+        motorOutput = manualSpeedMax * (yElbowValue * Math.abs(yElbowValue));
       }
       // If joystick is below a value, elbow will move down
       else if (yElbowValue < -m_stickDeadband)
@@ -412,7 +412,7 @@ public class Arm extends SubsystemBase
 
         yWristValue -= m_stickDeadband;
         yWristValue *= (1.0 / (1.0 - m_stickDeadband));
-        motorOutput = manualSpeedMax * (yWristValue * Math.abs(yWRISTValue));
+        motorOutput = manualSpeedMax * (yWristValue * Math.abs(yWristValue));
       }
       // If joystick is below a value, wrist will move down
       else if (yWristValue < -m_stickDeadband)
@@ -423,7 +423,7 @@ public class Arm extends SubsystemBase
 
         yWristValue += m_stickDeadband;
         yWristValue *= (1.0 / (1.0 - m_stickDeadband));
-        motorOutput = manualSpeedMax * (yWristValue * Math.abs(yWRISTValue));
+        motorOutput = manualSpeedMax * (yWristValue * Math.abs(yWristValue));
       }
     }
 
