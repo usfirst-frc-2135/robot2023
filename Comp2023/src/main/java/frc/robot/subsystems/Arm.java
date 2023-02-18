@@ -117,26 +117,19 @@ public class Arm extends SubsystemBase
     m_elbowValid = PhoenixUtil.getInstance( ).talonFXInitialize(m_elbow, "elbow");
     m_wristValid = PhoenixUtil.getInstance( ).talonFXInitialize(m_wrist, "wrist");
 
-    // SmartDashboard.putBoolean("HL_validCL", m_validCL);
-    // SmartDashboard.putBoolean("HL_validCL", m_validCL);
-
-    // // Check if solenoids are functional or blacklisted
-    // DataLogManager.log(getSubsystem( ) + ": CL Climber Solenoid is " + ((m_gateHook.isDisabled( )) ? "BLACKLISTED" : "OK"));
+    // SmartDashboard.putBoolean("HL_validEL", m_validEL);
+    // SmartDashboard.putBoolean("HL_validWR", m_validWR);
 
     // // Initialize Variables
-    // SmartDashboard.putNumber("CL_velocity", m_velocity);
-    // SmartDashboard.putNumber("CL_acceleration", m_acceleration);
-    // SmartDashboard.putNumber("CL_sCurveStrength", m_sCurveStrength);
-    // SmartDashboard.putNumber("CL_pidKf", m_pidKf);
-    // SmartDashboard.putNumber("CL_pidKp", m_pidKp);
-    // SmartDashboard.putNumber("CL_pidKi", m_pidKi);
-    // SmartDashboard.putNumber("CL_pidKd", m_pidKd);
+    // SmartDashboard.putNumber("EL_velocity", m_velocity);
+    // SmartDashboard.putNumber("EL_acceleration", m_acceleration);
+    // SmartDashboard.putNumber("EL_sCurveStrength", m_sCurveStrength);
+    // SmartDashboard.putNumber("EL_pidKf", m_pidKf);
+    // SmartDashboard.putNumber("EL_pidKp", m_pidKp);
+    // SmartDashboard.putNumber("EL_pidKi", m_pidKi);
+    // SmartDashboard.putNumber("EL_pidKd", m_pidKd);
 
-    // SmartDashboard.putNumber("CL_stowAngle", m_stowAngle);
-    // SmartDashboard.putNumber("CL_extendL2", m_extendL2);
-    // SmartDashboard.putNumber("CL_rotateL3", m_rotateL3);
-    // SmartDashboard.putNumber("CL_raiseL4", m_raiseL4);
-    // SmartDashboard.putNumber("CL_gatehookRestAngle", m_gatehookRestAngle);
+    // SmartDashboard.putNumber("EL_stowAngle", m_stowAngle);
 
     // Field for manually progamming climber Angle
     //MAKE THESE READ DEGREES OF THE MOTORS (BOTH SEPERATE)
@@ -174,9 +167,6 @@ public class Arm extends SubsystemBase
   {
     // This method will be called once per scheduler run
 
-    // TO-DO: if disabled, set LED when down
-
-
     if (m_elbowValid)
     {
       int curCounts = (int) m_elbow.getSelectedSensorPosition(0);
@@ -184,6 +174,7 @@ public class Arm extends SubsystemBase
       SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
       m_elbowLigament.setAngle(elbowCountsToDegrees(curCounts));
     }
+    
     if (m_wristValid)
     {
       int curCounts = (int) m_wrist.getSelectedSensorPosition(0);
@@ -238,7 +229,6 @@ public class Arm extends SubsystemBase
     m_wristCurDegrees = wristCountsToDegrees((int) curWRCounts);
     m_wristTargetDegrees = m_wristCurDegrees;
     DataLogManager.log(getSubsystem( ) + ": Init Target Inches: " + m_wristTargetDegrees);
-
   }
 
   private int elbowDegreesToCounts(double degrees)
@@ -357,12 +347,12 @@ public class Arm extends SubsystemBase
 
   public void moveElbowWithJoystick(XboxController joystick)
   {
-    double yELBOWValue = 0.0;
+    double yElbowValue = 0.0;
     double motorOutput = 0.0;
     double manualSpeedMax = ARMConsts.kSpeedMaxManual;
 
-    yELBOWValue = joystick.getLeftY( );
-    if (yELBOWValue > -m_stickDeadband && yELBOWValue < m_stickDeadband)
+    yElbowValue = joystick.getLeftY( );
+    if (yELBOWValue > -m_stickDeadband && yElbowValue < m_stickDeadband)
     {
       if (m_elbowMode != ElbowMode.ELBOW_STOPPED)
         DataLogManager.log(getSubsystem( ) + " ELBOW Stopped");
@@ -371,26 +361,26 @@ public class Arm extends SubsystemBase
     else
     {
       // If joystick is above a value, elbow will move up
-      if (yELBOWValue > m_stickDeadband)
+      if (yElbowValue > m_stickDeadband)
       {
         if (m_elbowMode != ElbowMode.ELBOW_UP)
           DataLogManager.log(getSubsystem( ) + " ELBOW Up");
         m_elbowMode = ElbowMode.ELBOW_UP;
 
-        yELBOWValue -= m_stickDeadband;
-        yELBOWValue *= (1.0 / (1.0 - m_stickDeadband));
-        motorOutput = manualSpeedMax * (yELBOWValue * Math.abs(yELBOWValue));
+        yElbowValue -= m_stickDeadband;
+        yElbowValue *= (1.0 / (1.0 - m_stickDeadband));
+        motorOutput = manualSpeedMax * (yElbowValue * Math.abs(yELBOWValue));
       }
       // If joystick is below a value, elbow will move down
-      else if (yELBOWValue < -m_stickDeadband)
+      else if (yElbowValue < -m_stickDeadband)
       {
         if (m_elbowMode != ElbowMode.ELBOW_DOWN)
           DataLogManager.log(getSubsystem( ) + " ELBOW Down");
         m_elbowMode = ElbowMode.ELBOW_DOWN;
 
-        yELBOWValue += m_stickDeadband;
-        yELBOWValue *= (1.0 / (1.0 - m_stickDeadband));
-        motorOutput = manualSpeedMax * (yELBOWValue * Math.abs(yELBOWValue));
+        yElbowValue += m_stickDeadband;
+        yElbowValue *= (1.0 / (1.0 - m_stickDeadband));
+        motorOutput = manualSpeedMax * (yElbowValue * Math.abs(yElbowValue));
       }
     }
 
@@ -400,12 +390,12 @@ public class Arm extends SubsystemBase
 
   public void moveWristWithJoystick(XboxController joystick)
   {
-    double yWRISTValue = 0.0;
+    double yWristValue = 0.0;
     double motorOutput = 0.0;
     double manualSpeedMax = ARMConsts.kSpeedMaxManual;
 
-    yWRISTValue = joystick.getRightY( );
-    if (yWRISTValue > -m_stickDeadband && yWRISTValue < m_stickDeadband)
+    yWristValue = joystick.getRightY( );
+    if (yWristValue > -m_stickDeadband && yWristValue < m_stickDeadband)
     {
       if (m_wristMode != WristMode.WRIST_STOPPED)
         DataLogManager.log(getSubsystem( ) + " WRIST Stopped");
@@ -414,26 +404,26 @@ public class Arm extends SubsystemBase
     else
     {
       // If joystick is above a value, wrist will move up
-      if (yWRISTValue > m_stickDeadband)
+      if (yWristValue > m_stickDeadband)
       {
         if (m_wristMode != WristMode.WRIST_UP)
           DataLogManager.log(getSubsystem( ) + " WRIST Up");
         m_wristMode = WristMode.WRIST_UP;
 
-        yWRISTValue -= m_stickDeadband;
-        yWRISTValue *= (1.0 / (1.0 - m_stickDeadband));
-        motorOutput = manualSpeedMax * (yWRISTValue * Math.abs(yWRISTValue));
+        yWristValue -= m_stickDeadband;
+        yWristValue *= (1.0 / (1.0 - m_stickDeadband));
+        motorOutput = manualSpeedMax * (yWristValue * Math.abs(yWRISTValue));
       }
       // If joystick is below a value, wrist will move down
-      else if (yWRISTValue < -m_stickDeadband)
+      else if (yWristValue < -m_stickDeadband)
       {
         if (m_wristMode != WristMode.WRIST_DOWN)
           DataLogManager.log(getSubsystem( ) + " WRIST Down");
         m_wristMode = WristMode.WRIST_DOWN;
 
-        yWRISTValue += m_stickDeadband;
-        yWRISTValue *= (1.0 / (1.0 - m_stickDeadband));
-        motorOutput = manualSpeedMax * (yWRISTValue * Math.abs(yWRISTValue));
+        yWristValue += m_stickDeadband;
+        yWristValue *= (1.0 / (1.0 - m_stickDeadband));
+        motorOutput = manualSpeedMax * (yWristValue * Math.abs(yWRISTValue));
       }
     }
 
