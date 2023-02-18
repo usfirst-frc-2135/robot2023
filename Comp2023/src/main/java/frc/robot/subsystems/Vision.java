@@ -144,8 +144,7 @@ public class Vision extends SubsystemBase
 
     }
 
-    SmartDashboard.putData("Field2d", RobotContainer.getInstance( ).m_field2d);
-
+    SmartDashboard.putData("Field", RobotContainer.getInstance( ).m_field2d);
     SmartDashboard.putNumberArray("VI_RobotPose", m_sendablePoseArray);
 
     SmartDashboard.putNumber("VI_horizAngle", m_targetHorizAngle);
@@ -243,6 +242,20 @@ public class Vision extends SubsystemBase
     // );
 
     return null;
+  }
+
+  public boolean getCondition(Pose2d botpose)
+  {
+    Pose2d currentPose = RobotContainer.getInstance( ).m_swerve.getPose( );
+
+    // if (Math.abs(currentPose.getX( ) - botpose.getX( )) <= 1)
+    // {
+    //   if (Math.abs(currentPose.getY( ) - botpose.getY( )) <= 1){
+    //     return true;
+    //   }
+    // }
+
+    return true; //change to return false if uncommented
   }
 
   public void setLEDMode(int mode)

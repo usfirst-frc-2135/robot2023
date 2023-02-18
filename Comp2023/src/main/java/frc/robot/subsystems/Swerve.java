@@ -55,7 +55,7 @@ public class Swerve extends SubsystemBase
 
   // Odometery and telemetry
   private Pigeon                   m_pigeon              = new Pigeon(Ports.kCANID_Pigeon2);
-  private SwerveDriveOdometry      m_swerveOdometry;
+  public SwerveDriveOdometry       m_swerveOdometry;
 
   public SwerveDrivePoseEstimator  m_poseEstimator       = new SwerveDrivePoseEstimator(SwerveConstants.swerveKinematics,
       m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), new Pose2d( ));
@@ -712,7 +712,7 @@ public class Swerve extends SubsystemBase
     Pose2d botPose2d = RobotContainer.getInstance( ).m_vision.getBotPose2d( );
     double latency = RobotContainer.getInstance( ).m_vision.getTargetLatency( );
 
-    if (botPose2d != null)
+    if ((botPose2d != null) || RobotContainer.getInstance( ).m_vision.getCondition(botPose2d))
     {
       //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
       m_poseEstimator.addVisionMeasurement(botPose2d, Timer.getFPGATimestamp( ) - (latency / 1000));
