@@ -40,7 +40,7 @@ import frc.robot.team2135.PhoenixUtil;
 //
 // Arm subsystem class
 //
-public class Arm extends SubsystemBase
+public class Elbow extends SubsystemBase
 {
   // Constants
   private static final int                CANTIMEOUT            = 30;  // CAN timeout in msec
@@ -109,7 +109,7 @@ public class Arm extends SubsystemBase
   private Timer                           timer                 = new Timer( );
 
   // Constructor
-  public Arm( )
+  public Elbow( )
   {
     setName("Arm");
     setSubsystem("Arm");
@@ -175,7 +175,6 @@ public class Arm extends SubsystemBase
     // This method will be called once per scheduler run
 
     // TO-DO: if disabled, set LED when down
-
 
     if (m_elbowValid)
     {
