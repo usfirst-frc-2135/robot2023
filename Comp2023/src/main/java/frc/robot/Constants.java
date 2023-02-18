@@ -27,6 +27,10 @@ import frc.robot.lib.util.SwerveModuleConstants;
  */
 public class Constants
 {
+  // bot serial nums
+  public static final String kcompSN           = "03238074";
+  public static final String kbbotSN           = "03260A3A";
+
   // Game controller definitions
   public static final int    kDriverPadPort    = 0;
   public static final int    kOperatorPadPort  = 1;
@@ -61,8 +65,10 @@ public class Constants
 
     // Other subsystem CAN IDs
     public static final int    kCANID_Elbow      = 15;
-    public static final int    kCANID_Wrist      = 16;
-    public static final int    kCANID_Gripper    = 18;
+    public static final int    kCANID_ELCANCoder = 16;
+    public static final int    kCANID_Wrist      = 17;
+    public static final int    kCANID_WRCANCoder = 18;
+    public static final int    kCANID_Gripper    = 19;
 
     public static final int    kCANID_CANdle     = 0;
 
@@ -116,23 +122,19 @@ public class Constants
     public static final int    kWRAllowedError       = 0;      // Arm PID allowable closed loop error in counts
     public static final double kARMToleranceInches   = 0.25;   // Arm PID tolerance in inches
 
-    public static final double kStowHeight           = 0.10;   // 0.25 inches
-    public static final double kExtendL2             = 29.0;   // 29 inches
-    public static final double kRotateL3             = 31.25;  // 21 inches
-    public static final double kRaiseL4              = 15.0;   // 25.25 inches
-    public static final double kGatehookRestHeight   = 4.0;    // 0.35 inches
-    public static final double kArmMinHeight         = 0.0;    // Arm minimum allowable height
-    public static final double kArmMaxHeight         = 36.0;   // Arm maximum allowable height
+    public static final double kElbowStowAngle       = 0;      // TO-DO: FIGURE IT OUT
+    public static final double kWristStowAngle       = 0;      // TO-DO: FIGURE IT OUT
+    public static final double kLowScoreAngle        = 0;      // TO-DO: FIND
+    public static final double kMidScoreAngle        = 0;      // TO-DO: FIND
+    public static final double kHighScoreAngle       = 0;      // TO-DO: FIND
+    public static final double kElbowMinAngle        = 0.0;    // Arm minimum allowable Angle
+    public static final double kElbowMaxAngle        = 36.0;   // Arm maximum allowable Angle
+    public static final double kWristMinAngle        = 0.0;    // gripper minimum allowable Angle
+    public static final double kWristMaxAngle        = 36.0;   // gripper maximum allowable Angle
 
     public static final double kSpeedCalibrate       = -0.1;   // Motor percent output during calibration
     public static final double kSpeedMaxManual       = 0.3;    // Motor percent output during manual operation
     public static final double kStickDeadband        = 0.2;    // Joystick deadband for manual operaton
-
-    public static final double kClimbL2Time          = 0.5;
-    public static final double kRotateExtendL3Time   = 1.5;
-    public static final double kRotateRetractL3Time  = 2.0;
-    public static final double kClimbL3Time          = 0.5;
-    public static final double kRotateRetractL4Time  = 2.5;
 
     public enum ElbowMode
     {
@@ -142,6 +144,15 @@ public class Constants
       ELBOW_UP            // Move elbow up
     }
 
+    public enum ElbowAngle
+    {
+      ELBOW_NOCHANGE,     // No change in elbow Angle--maintain current position
+      ELBOW_STOW, // move arm to stow Angle
+      ELBOW_LOW, // move arm to low-scoring Angle
+      ELBOW_MID, // move arm to shelf Angle; slightly higher than mid-scoring Angle so this is used for both
+      ELBOW_HIGH, // move arm to high-scoring Angle
+    }
+
     public enum WristMode
     {
       WRIST_INIT,         // Initialize wrist
@@ -149,23 +160,35 @@ public class Constants
       WRIST_STOPPED,      // Stop and hold position
       WRIST_UP            // Move wrist up
     }
+
+    public enum WristAngle
+    {
+      WRIST_NOCHANGE,     // No change in elbow Angle--maintain current position
+      WRIST_STOW          // drop to stow position
+    }
   }
 
   public static final class GRConsts
   {
     public static final double kGRAcquireSpeed = 1.0;
     public static final double kGRExpelSpeed   = -1.0;
+    public static final double kGRHoldSpeed    = 0.1;
 
     public enum GRMode
     {
       GR_STOP,    // stop motor
       GR_ACQUIRE, // acquire game pieces
       GR_EXPEL,   // expel game pieces
+      GR_HOLD,    // hold game pieces
     }
   }
 
   public static final class SWConsts
   {
+    // Constants for balance
+    public static final double kBalancedAngle    = 5.0; // Pitch values less than this stop driving
+    public static final double kBalanceKp        = -0.04; // Amount of power to apply per degree
+
     // Joystick tuning
     public static final double kDriveXScaling    = 1.0;           // 1.0 is no scaling
     public static final double kDriveYScaling    = 1.0;           // 1.0 is no scaling
@@ -243,7 +266,6 @@ public class Constants
             new Pose3d(new Translation3d(-7.24310, -1.26019, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 7
             new Pose3d(new Translation3d(-7.24310, -2.74161, 0), new Rotation3d(0, 0, 0)) // AprilTag ID: 8
         ));
-
   }
 
   public static final class SIMLLConsts
@@ -263,11 +285,11 @@ public class Constants
   //// 1678 Constants ///////////////////////////////////////////////////////////
 
   // toggle constants between comp bot and practice bot (named "beta")
-  public static final boolean isComp            = true;
+  public static boolean   isComp;
 
   // Timeout constants
-  public static final int     kLongCANTimeoutMs = 100;
-  public static final int     kCANTimeoutMs     = 10;
+  public static final int kLongCANTimeoutMs = 100;
+  public static final int kCANTimeoutMs     = 10;
 
   public static final class SwerveConstants
   {
@@ -479,11 +501,6 @@ public class Constants
     public static final TrajectoryConfig slowSpeedConfig    =
         new TrajectoryConfig(kSlowSpeedMetersPerSecond, kSlowAccelerationMetersPerSecondSquared)
             .setKinematics(Constants.SwerveConstants.swerveKinematics).setStartVelocity(0).setEndVelocity(0);
-
-    // PathPlanner file names
-    public static final String           path1              = "forward39";
-    public static final String           path2              = "backward39";
-    public static final String           path3              = "rightAngleTurn";
   }
 
   //// 1678 Constants ///////////////////////////////////////////////////////////

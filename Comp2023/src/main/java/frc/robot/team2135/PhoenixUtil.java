@@ -212,6 +212,5 @@ public class PhoenixUtil
   {
     if (error != ErrorCode.OK)
       DataLogManager.log("CTRE Error code: " + error + " Message: " + message);
-
   }
 }

@@ -12,14 +12,17 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.commands.ArmRun;
+import frc.robot.commands.AutoChargeStation;
 import frc.robot.commands.AutoDrivePath;
+import frc.robot.commands.AutoPathSequence;
+import frc.robot.commands.AutoStop;
+import frc.robot.commands.DriveBalance;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.GripperRun;
@@ -31,6 +34,7 @@ import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Power;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
+import frc.robot.team1678.frc2022.drivers.Pigeon;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -84,9 +88,20 @@ public class RobotContainer
     return m_instance;
   }
 
+  /****************************************************************************
+   * 
+   * Create general dashboard widgets for commands and subsystems
+   */
   private void addSmartDashboardWidgets( )
   {
+    SmartDashboard.putData("DriveBalance", new DriveBalance(m_swerve));
+    SmartDashboard.putData("AutoDockOnChargeStation", new AutoChargeStation(m_swerve));
+    SmartDashboard.putData("AutoDriveToChargeStation", new AutoDrivePath(m_swerve, "driveToChargeStation", true));
+
     // SmartDashboard Buttons
+    SmartDashboard.putData("AutoStop", new AutoStop(m_swerve));
+    SmartDashboard.putData("AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveOffCommunity", true));
+
     SmartDashboard.putData("AutoDrivePathForward", new AutoDrivePath(m_swerve, "forward1m", true));
     SmartDashboard.putData("AutoDrivePathBackward", new AutoDrivePath(m_swerve, "backward1m", true));
     SmartDashboard.putData("AutoDrivePathForwardLeft", new AutoDrivePath(m_swerve, "forward_left", true));
@@ -109,7 +124,8 @@ public class RobotContainer
     SmartDashboard.putData("Dummy", new Dummy(2135));
   }
 
-  /**
+  /****************************************************************************
+   * 
    * Use this method to define your button->command mappings. Buttons can be created by instantiating
    * a {@link GenericHID} or one of its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or
    * {@link XboxController}), and then passing it to a
@@ -118,7 +134,9 @@ public class RobotContainer
   private void configureButtonBindings( )
   {
     ///////////////////////////////////////////////////////
+    //
     // Driver Controller Assignments
+    //
     final JoystickButton driverA = new JoystickButton(m_driverPad, XboxController.Button.kA.value);
     final JoystickButton driverB = new JoystickButton(m_driverPad, XboxController.Button.kB.value);
     final JoystickButton driverX = new JoystickButton(m_driverPad, XboxController.Button.kX.value);
@@ -150,8 +168,10 @@ public class RobotContainer
     driverY.onTrue(new Dummy(XboxController.Button.kY.value));
     //
     // Driver - Bumpers, start, back
-    driverLeftBumper.onTrue(new Dummy(XboxController.Button.kLeftBumper.value));
-    driverRightBumper.onTrue(new Dummy(XboxController.Button.kRightBumper.value));
+    driverLeftBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
+    driverLeftBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
+    driverRightBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_EXPEL));
+    driverRightBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
     driverBack.onTrue(new ResetGyro(m_swerve, driverStart, driverBack));
     driverStart.onTrue(new ResetGyro(m_swerve, driverStart, driverBack));
     //
@@ -162,11 +182,13 @@ public class RobotContainer
     driverLeft.onTrue(new Dummy(270));
     //
     // Operator Left/Right Trigger
-    driverLeftTrigger.onTrue(new Dummy(128));
-    driverRightTrigger.onTrue(new Dummy(129));
+    driverLeftTrigger.onTrue(new Dummy(130));
+    driverRightTrigger.onTrue(new Dummy(131));
 
     ///////////////////////////////////////////////////////
+    //
     // Operator Controller Assignments
+    //
     final JoystickButton operA = new JoystickButton(m_operatorPad, XboxController.Button.kA.value);
     final JoystickButton operB = new JoystickButton(m_operatorPad, XboxController.Button.kB.value);
     final JoystickButton operX = new JoystickButton(m_operatorPad, XboxController.Button.kX.value);
@@ -197,7 +219,7 @@ public class RobotContainer
     //
     // Operator - Bumpers, start, back
     operLeftBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
-    operLeftBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
+    operLeftBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
     operRightBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_EXPEL));
     operRightBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
     operBack.onTrue(new Dummy(XboxController.Button.kBack.value));
@@ -214,19 +236,29 @@ public class RobotContainer
     operRightTrigger.onTrue(new Dummy(131));
   }
 
-  // Configure the button bindings
-
+  /****************************************************************************
+   * 
+   * Initialize default commands for these subsystems
+   */
   private void initDefaultCommands( )
   {
-    // Configure default commands for these subsystems
     m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_driverPad));
     m_arm.setDefaultCommand(new ArmRun(m_arm, m_operatorPad));
   }
 
+  /****************************************************************************
+   * 
+   * Set up autonomous chooser
+   */
   private void initAutonomousChooser( )
   {
+    // Autonomous Chooser
+    m_chooser.addOption("1 - AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveOffCommunity", true));
+    m_chooser.addOption("2 - AutoDockOnChargeStation", new AutoChargeStation(m_swerve));
+    m_chooser.addOption("AutoDriveForward1m", new AutoDrivePath(m_swerve, "forward1m", true));
+    m_chooser.setDefaultOption("0 - AutoStop", new AutoStop(m_swerve));
+
     // Configure autonomous sendable chooser
-    m_chooser.setDefaultOption("PrintMe", new PrintCommand("Auto PrintMe Command"));
     SmartDashboard.putData("Auto Mode", m_chooser);
   }
 
