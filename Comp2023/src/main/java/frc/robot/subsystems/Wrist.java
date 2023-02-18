@@ -244,7 +244,7 @@ public class Wrist extends SubsystemBase
     double motorOutput = 0.0;
     double manualSpeedMax = WRConsts.kWristSpeedMaxManual;
 
-    yWristValue = joystick.getRightY( );
+    yWristValue = -joystick.getRightY( );
     if (yWristValue > -m_stickDeadband && yWristValue < m_stickDeadband)
     {
       if (m_wristMode != WristMode.WRIST_STOPPED)
@@ -278,7 +278,10 @@ public class Wrist extends SubsystemBase
     }
 
     if (m_wristValid)
+    {
       m_wrist.set(ControlMode.PercentOutput, motorOutput);
+    }
+
   }
 
   public void setWristStopped( )

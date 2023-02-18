@@ -48,12 +48,12 @@ public class Robot extends TimedRobot
 
     if (serialNum == null)
       robotName = "SIMULATION";
-    else if (serialNum.equals(Constants.kcompSN))
+    else if (serialNum.equals(Constants.kCompSN))
     {
       Constants.isComp = true;
       robotName = "COMPETITION (A)";
     }
-    else if (serialNum.equals(Constants.kbbotSN))
+    else if (serialNum.equals(Constants.kBetaSN))
     {
       Constants.isComp = false;
       robotName = "PRACTICE (B)";
