@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.lib.util.CTREConfigs;
-import frc.robot.Constants;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -49,12 +48,12 @@ public class Robot extends TimedRobot
 
     if (serialNum == null)
       robotName = "SIMULATION";
-    else if (serialNum.equals(Constants.kcompSN))
+    else if (serialNum.equals(Constants.kCompSN))
     {
       Constants.isComp = true;
       robotName = "COMPETITION (A)";
     }
-    else if (serialNum.equals(Constants.kbbotSN))
+    else if (serialNum.equals(Constants.kBetaSN))
     {
       Constants.isComp = false;
       robotName = "PRACTICE (B)";
