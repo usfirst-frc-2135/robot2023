@@ -629,6 +629,8 @@ public class Swerve extends SubsystemBase
   {
     m_swerveOdometry.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
     zeroGyro(pose.getRotation( ).getDegrees( ));
+
+    m_poseEstimator.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
   }
 
   public void resetAnglesToAbsolute( )
