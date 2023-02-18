@@ -36,6 +36,8 @@ public class Gripper extends SubsystemBase
   public void periodic( )
   {
     // This method will be called once per scheduler run
+    if (m_gripper.getStatorCurrent( ) != 0)
+      DataLogManager.log("Gripper Current: " + m_gripper.getStatorCurrent( ));
   }
 
   @Override
