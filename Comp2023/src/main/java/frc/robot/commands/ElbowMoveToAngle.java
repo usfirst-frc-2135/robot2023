@@ -28,7 +28,7 @@ public class ElbowMoveToAngle extends CommandBase
   @Override
   public void initialize( )
   {
-    m_elbow.moveElbowDistanceInit(m_angle);
+    m_elbow.moveElbowAngleInit(m_angle);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

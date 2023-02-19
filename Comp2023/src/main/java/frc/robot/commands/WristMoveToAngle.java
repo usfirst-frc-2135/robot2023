@@ -28,7 +28,7 @@ public class WristMoveToAngle extends CommandBase
   @Override
   public void initialize( )
   {
-    m_wrist.moveWristDistanceInit(m_angle);
+    m_wrist.moveWristAngleInit(m_angle);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
