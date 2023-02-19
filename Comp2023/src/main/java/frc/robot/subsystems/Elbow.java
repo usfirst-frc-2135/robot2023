@@ -116,7 +116,7 @@ public class Elbow extends SubsystemBase
     SmartDashboard.putBoolean("EL_calibrated", m_calibrated);
 
     if (m_elbowValid)
-      elbowTalonInitialize(m_elbow, false);
+      elbowTalonInitialize(m_elbow, true);
 
     // the mechanism root node
     MechanismRoot2d elbowRoot = m_elbowMech.getRoot("elbow", 1.5, 2);
