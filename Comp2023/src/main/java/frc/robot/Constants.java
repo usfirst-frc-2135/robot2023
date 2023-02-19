@@ -6,9 +6,9 @@ import java.util.List;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -283,15 +283,15 @@ public class Constants
     public static final double       kLLDistance2   = 60;    // distance from bumper in inches for second reference point
     public static final double       kLLVertOffset2 = -4.85; // LL y reading in degrees for second reference point
 
-    public static final List<Pose3d> kAprilTagPoses =
-        Collections.unmodifiableList(List.of(new Pose3d(new Translation3d(7.24310, -2.93659, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 1 
-            new Pose3d(new Translation3d(7.24310, -1.26019, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 2 
-            new Pose3d(new Translation3d(7.24310, 0.41621, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 3 
-            new Pose3d(new Translation3d(7.24310, 2.74161, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 4 
-            new Pose3d(new Translation3d(-7.24310, 2.74161, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 5 
-            new Pose3d(new Translation3d(-7.24310, 0.46272, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 6 
-            new Pose3d(new Translation3d(-7.24310, -1.26019, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 7
-            new Pose3d(new Translation3d(-7.24310, -2.74161, 0), new Rotation3d(0, 0, 0)) // AprilTag ID: 8
+    public static final List<Pose2d> kAprilTagPoses =
+        Collections.unmodifiableList(List.of(new Pose2d(new Translation2d(7.24310, -2.93659), new Rotation2d(0, 0)), // AprilTag ID: 1 
+            new Pose2d(new Translation2d(7.24310, -1.26019), new Rotation2d(0, 0)), // AprilTag ID: 2 
+            new Pose2d(new Translation2d(7.24310, 0.41621), new Rotation2d(0, 0)), // AprilTag ID: 3 
+            new Pose2d(new Translation2d(7.24310, 2.74161), new Rotation2d(0, 0)), // AprilTag ID: 4 
+            new Pose2d(new Translation2d(-7.24310, 2.74161), new Rotation2d(0, 0)), // AprilTag ID: 5 
+            new Pose2d(new Translation2d(-7.24310, 0.46272), new Rotation2d(0, 0)), // AprilTag ID: 6 
+            new Pose2d(new Translation2d(-7.24310, -1.26019), new Rotation2d(0, 0)), // AprilTag ID: 7
+            new Pose2d(new Translation2d(-7.24310, -2.74161), new Rotation2d(0, 0)) // AprilTag ID: 8
         ));
   }
 
