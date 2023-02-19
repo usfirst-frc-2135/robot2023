@@ -243,7 +243,7 @@ public class Elbow extends SubsystemBase
     double motorOutput = 0.0;
     double manualSpeedMax = ELConsts.kElbowSpeedMaxManual;
 
-    yElbowValue = joystick.getLeftY( );
+    yElbowValue = -joystick.getLeftY( );
     if (yElbowValue > -m_stickDeadband && yElbowValue < m_stickDeadband)
     {
       if (m_elbowMode != ElbowMode.ELBOW_STOPPED)
