@@ -17,24 +17,24 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.LEDConsts.LEDColor;
-import frc.robot.commands.ArmRun;
 import frc.robot.commands.AutoChargeStation;
 import frc.robot.commands.AutoDrivePath;
-import frc.robot.commands.AutoPathSequence;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.DriveBalance;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
+import frc.robot.commands.ElbowRun;
 import frc.robot.commands.GripperRun;
 import frc.robot.commands.LEDSet;
 import frc.robot.commands.ResetGyro;
-import frc.robot.subsystems.Arm;
+import frc.robot.commands.WristRun;
+import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Gripper;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Power;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
-import frc.robot.team1678.frc2022.drivers.Pigeon;
+import frc.robot.subsystems.Wrist;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -55,7 +55,8 @@ public class RobotContainer
   public final Vision           m_vision      = new Vision( );
 
   // These subsystems can use LED or vision and must be created afterward
-  public final Arm              m_arm         = new Arm( );
+  public final Elbow            m_elbow       = new Elbow( );
+  public final Wrist            m_wrist       = new Wrist( );
   public final Gripper          m_gripper     = new Gripper( );
   // public final Pneumatics       m_pneumatics  = new Pneumatics( );
   public final Power            m_power       = new Power( );
@@ -206,7 +207,7 @@ public class RobotContainer
     //
     // Xbox enums { leftX = 0, leftY = 1, leftTrigger = 2, rightTrigger = 3, rightX = 4, rightY = 5}
     final Trigger operLeftTrigger = new Trigger(( ) -> m_operatorPad.getLeftTriggerAxis( ) > Constants.kTriggerThreshold);
-    final Trigger operRightTrigger = new Trigger(( ) -> m_operatorPad.getRightTriggerAxis( ) > Constants.kTriggerThreshold);
+    // final Trigger operRightTrigger = new Trigger(( ) -> m_operatorPad.getRightTriggerAxis( ) > Constants.kTriggerThreshold);
     // Xbox on MacOS { leftX = 0, leftY = 1, rightX = 2, rightY = 3, leftTrigger = 5, rightTrigger = 4}
     // final Trigger operLeftTrigger = new Trigger(( ) -> m_operatorPad.getRightX( ) > Constants.kTriggerThreshold);
     // final Trigger operRightTrigger = new Trigger(( ) -> m_operatorPad.getRightY( ) > Constants.kTriggerThreshold);
@@ -233,7 +234,7 @@ public class RobotContainer
     //
     // Operator Left/Right Trigger
     operLeftTrigger.onTrue(new Dummy(130));
-    operRightTrigger.onTrue(new Dummy(131));
+    //operRightTrigger.onTrue(new Dummy(131));
   }
 
   /****************************************************************************
@@ -243,7 +244,9 @@ public class RobotContainer
   private void initDefaultCommands( )
   {
     m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_driverPad));
-    m_arm.setDefaultCommand(new ArmRun(m_arm, m_operatorPad));
+    m_elbow.setDefaultCommand(new ElbowRun(m_elbow, m_operatorPad));
+    m_wrist.setDefaultCommand(new WristRun(m_wrist, m_operatorPad));
+
   }
 
   /****************************************************************************

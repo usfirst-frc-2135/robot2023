@@ -68,15 +68,15 @@ public class Gripper extends SubsystemBase
         break;
       case GR_ACQUIRE :
         strName = "ACQUIRE";
-        output = GRConsts.kGRAcquireSpeed;
+        output = GRConsts.kGripperSpeedAcquire;
         break;
       case GR_EXPEL :
         strName = "EXPEL";
-        output = GRConsts.kGRExpelSpeed;
+        output = GRConsts.kGripperSpeedExpel;
         break;
       case GR_HOLD :
         strName = "HOLD";
-        output = GRConsts.kGRHoldSpeed;
+        output = GRConsts.kGripperSpeedHold;
         break;
     }
 
