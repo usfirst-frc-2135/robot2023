@@ -13,14 +13,14 @@ import frc.robot.subsystems.Wrist;
 public class WristMoveToAngle extends CommandBase
 {
   private final Wrist m_wrist;
-  private WristAngle  m_Angle;
+  private WristAngle  m_angle;
 
-  public WristMoveToAngle(Wrist wrist, WristAngle Angle)
+  public WristMoveToAngle(Wrist wrist, WristAngle angle)
   {
     m_wrist = wrist;
-    m_Angle = Angle;
+    m_angle = angle;
 
-    setName("ClimberMoveToAngle");
+    setName("WristMoveToAngle");
     addRequirements(m_wrist);
   }
 
@@ -28,7 +28,7 @@ public class WristMoveToAngle extends CommandBase
   @Override
   public void initialize( )
   {
-    m_wrist.moveWristDistanceInit(m_Angle);
+    m_wrist.moveWristDistanceInit(m_angle);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
