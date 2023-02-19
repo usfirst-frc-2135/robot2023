@@ -375,10 +375,10 @@ public class Swerve extends SubsystemBase
     m_trajTimer.start( );
   }
 
-  public void driveWithPathFollowerExecute( )
+  public void driveWithPathFollowerExecute(boolean useVision)
   {
     Trajectory.State trajState = m_trajectory.sample(m_trajTimer.get( ));
-    Pose2d currentPose = getPose( );
+    Pose2d currentPose = (useVision) ? m_poseEstimator.getEstimatedPosition( ) : getPose( );
 
     ChassisSpeeds targetChassisSpeeds = m_holonomicController.calculate(currentPose, trajState,
         m_trajectory.getEndState( ).holonomicRotation/* trajState.poseMeters.getRotation( ) */); //TODO: find out what's wrong with getting desired rotation
@@ -689,13 +689,25 @@ public class Swerve extends SubsystemBase
     m_swerveOdometry.update(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ));
     m_poseEstimator.updateWithTime(Timer.getFPGATimestamp( ), m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ));
 
-    Pose2d botPose2d = RobotContainer.getInstance( ).m_vision.getBotPose2d( );
+    applyVisionMeasurement(true);
+    DataLogManager.log(getSubsystem( ) + ":  X : " + m_poseEstimator.getEstimatedPosition( ).getX( ) + " | "
+        + m_poseEstimator.getEstimatedPosition( ).getY( ));
+
+  }
+
+  public void applyVisionMeasurement(boolean checkPosition)
+  {
+    Pose2d botPose2d = RobotContainer.getInstance( ).m_vision.getBotPose2d(checkPosition);
     double latency = RobotContainer.getInstance( ).m_vision.getTargetLatency( );
 
-    if ((botPose2d != null) || RobotContainer.getInstance( ).m_vision.getCondition(botPose2d))
+    if ((botPose2d != null))
     {
       //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
       m_poseEstimator.addVisionMeasurement(botPose2d, Timer.getFPGATimestamp( ) - (latency / 1000));
+      if (!checkPosition)
+      {
+        DataLogManager.log("ADDED IN VISION MEASUREMENT!!!!!!!!!!!!!!!!");
+      }
     }
   }
 

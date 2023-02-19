@@ -53,7 +53,7 @@ public class AutoDrivePath extends CommandBase
   @Override
   public void execute( )
   {
-    m_swerve.driveWithPathFollowerExecute( );
+    m_swerve.driveWithPathFollowerExecute(false);
   }
 
   // Called once the command ends or is interrupted.
