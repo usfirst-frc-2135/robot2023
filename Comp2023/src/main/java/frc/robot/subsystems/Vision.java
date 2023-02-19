@@ -73,7 +73,7 @@ public class Vision extends SubsystemBase
     m_table = NetworkTableInstance.getDefault( ).getTable("limelight");
 
     // Set camera and LED display
-    setLEDMode(VIConsts.LED_ON);
+    setLEDMode(VIConsts.LED_OFF);
 
     // Put all the needed widgets on the dashboard
     SmartDashboard.putNumber("VI_distance1", m_distance1);
@@ -221,7 +221,7 @@ public class Vision extends SubsystemBase
     return m_botposeTransform3d;
   }
 
-  public Pose2d getBotPose2d( )
+  public Pose2d getBotPose2d(boolean checkPosition)
   {
     Translation2d tran;
     Rotation2d rot;
@@ -232,7 +232,16 @@ public class Vision extends SubsystemBase
       tran = new Translation2d(m_botposeTransform3d.getX( ), m_botposeTransform3d.getY( ));
       double degrees = m_yawBotPose + ((m_yawBotPose < 0) ? 360 : 0);
       rot = new Rotation2d(Units.degreesToRadians(degrees));
-      return new Pose2d(tran, rot);
+      if (checkPosition)
+      {
+        if (isBotPoseValid(tran))
+          return new Pose2d(tran, rot);
+      }
+      else
+      {
+        return new Pose2d(tran, rot);
+      }
+
     }
 
     // DataLogManager.log(getSubsystem( )                                         //  
@@ -244,17 +253,18 @@ public class Vision extends SubsystemBase
     return null;
   }
 
-  public boolean getCondition(Pose2d botpose)
+  public boolean isBotPoseValid(Translation2d botpose)
   {
     //Only adding vision measurements that are already within one meter or so of the current pose estimate
-    Pose2d currentPose = RobotContainer.getInstance( ).m_swerve.getPose( );
+    Translation2d currentPose = RobotContainer.getInstance( ).m_swerve.m_poseEstimator.getEstimatedPosition( ).getTranslation( );
 
-    // if (Math.abs(currentPose.getX( ) - botpose.getX( )) <= 1)
-    // {
-    //   if (Math.abs(currentPose.getY( ) - botpose.getY( )) <= 1){
-    //     return true;
-    //   }
-    // }
+    if (Math.abs(currentPose.getX( ) - botpose.getX( )) <= 1)
+    {
+      if (Math.abs(currentPose.getY( ) - botpose.getY( )) <= 1)
+      {
+        return true;
+      }
+    }
 
     return true; //change to return false if uncommented
   }
