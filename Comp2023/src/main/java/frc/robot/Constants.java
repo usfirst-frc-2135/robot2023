@@ -278,21 +278,31 @@ public class Constants
       VISION_TOGGLE // Toggle modes
     }
 
+    //Moving the robot to the following side of the grid from the perspective of the driver: 
+
+    public enum VITargetLocations
+    {
+      TARGET_LEFT,       // Left
+      TARGET_MIDDLE,     // Middle, 
+      TARGET_RIGHT,      // Right, 
+      TARGET_SUBSTATION  // Substation
+    }
+
     public static final double       kLLDistance1   = 48;    // distance from bumper in inches for first reference point
     public static final double       kLLVertOffset1 = 0.42;  // LL y reading in degrees for first reference point
     public static final double       kLLDistance2   = 60;    // distance from bumper in inches for second reference point
     public static final double       kLLVertOffset2 = -4.85; // LL y reading in degrees for second reference point
 
-    public static final List<Pose2d> kAprilTagPoses =
-        Collections.unmodifiableList(List.of(new Pose2d(new Translation2d(7.24310, -2.93659), new Rotation2d(0, 0)), // AprilTag ID: 1 
-            new Pose2d(new Translation2d(7.24310, -1.26019), new Rotation2d(0, 0)), // AprilTag ID: 2 
-            new Pose2d(new Translation2d(7.24310, 0.41621), new Rotation2d(0, 0)), // AprilTag ID: 3 
-            new Pose2d(new Translation2d(7.24310, 2.74161), new Rotation2d(0, 0)), // AprilTag ID: 4 
-            new Pose2d(new Translation2d(-7.24310, 2.74161), new Rotation2d(0, 0)), // AprilTag ID: 5 
-            new Pose2d(new Translation2d(-7.24310, 0.46272), new Rotation2d(0, 0)), // AprilTag ID: 6 
-            new Pose2d(new Translation2d(-7.24310, -1.26019), new Rotation2d(0, 0)), // AprilTag ID: 7
-            new Pose2d(new Translation2d(-7.24310, -2.74161), new Rotation2d(0, 0)) // AprilTag ID: 8
-        ));
+    public static final List<Pose2d> kAprilTagPoses = Collections.unmodifiableList(List.of(//
+        new Pose2d(new Translation2d(15.513558, 1.071626), new Rotation2d(0, 0)), // AprilTag ID: 1 
+        new Pose2d(new Translation2d(15.513558, 2.748026), new Rotation2d(0, 0)), // AprilTag ID: 2 
+        new Pose2d(new Translation2d(15.513558, 4.424426), new Rotation2d(0, 0)), // AprilTag ID: 3 
+        new Pose2d(new Translation2d(16.178784, 6.749796), new Rotation2d(0, 0)), // AprilTag ID: 4 
+        new Pose2d(new Translation2d(0.36195, 6.749796), new Rotation2d(0, 0)), // AprilTag ID: 5 
+        new Pose2d(new Translation2d(1.0273, 4.424426), new Rotation2d(0, 0)), // AprilTag ID: 6 
+        new Pose2d(new Translation2d(1.0273, 2.748026), new Rotation2d(0, 0)), // AprilTag ID: 7
+        new Pose2d(new Translation2d(1.0273, 1.071626), new Rotation2d(0, 0)) // AprilTag ID: 8
+    ));
   }
 
   public static final class SIMLLConsts

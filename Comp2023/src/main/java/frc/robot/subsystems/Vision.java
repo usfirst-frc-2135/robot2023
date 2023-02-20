@@ -233,11 +233,11 @@ public class Vision extends SubsystemBase
       double degrees = m_yawBotPose + ((m_yawBotPose < 0) ? 360 : 0);
       rot = new Rotation2d(Units.degreesToRadians(degrees));
       if (checkPosition)
-      {
         if (isBotPoseValid(tran))
+        {
           return new Pose2d(tran, rot);
-      }
-      else
+        }
+      if (!checkPosition)
       {
         return new Pose2d(tran, rot);
       }
@@ -266,7 +266,7 @@ public class Vision extends SubsystemBase
       }
     }
 
-    return true; //change to return false if uncommented
+    return false;
   }
 
   public void setLEDMode(int mode)

@@ -5,6 +5,8 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.VIConsts;
+import frc.robot.Constants.VIConsts.VITargetLocations;
 import frc.robot.subsystems.Swerve;
 
 /**
@@ -13,14 +15,12 @@ import frc.robot.subsystems.Swerve;
 public class DriveLimelight extends CommandBase
 {
   private final Swerve m_swerve;
-  private final int    m_targetLocation;
-  private final Pose2d m_goalPose2d;
+  private final VITargetLocations    m_targetLocation;
 
-  public DriveLimelight(Swerve swerve, int targetLocation)
+  public DriveLimelight(Swerve swerve, VITargetLocations targetLocation)
   {
     m_swerve = swerve;
     m_targetLocation = targetLocation;
-    m_goalPose2d = m_swerve.calculateTarget(m_targetLocation);
 
     setName("DriveLimelight");
     addRequirements(m_swerve);
@@ -30,24 +30,28 @@ public class DriveLimelight extends CommandBase
   @Override
   public void initialize( )
   {
-    m_swerve.driveWithLimelightInit(m_goalPose2d);
+    m_swerve.driveWithLimelightInit(m_swerve.calculateTarget(m_targetLocation));
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute( )
-  {}
+  {
+    m_swerve.driveWithLimelightExecute( );
+  }
 
-  // Called once the command ends or is interrupted.
+  // Called once the command ends or is  interrupted.
   @Override
   public void end(boolean interrupted)
-  {}
+  {
+    m_swerve.driveWithLimelightEnd( );
+  }
 
-  // Returns true when the command should end.
+  // Returns true when the command  sh
   @Override
   public boolean isFinished( )
   {
-    return true;
+    return m_swerve.driveWithLimelightIsFinished( );
   }
 
   @Override

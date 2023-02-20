@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.LEDConsts.LEDColor;
+import frc.robot.Constants.VIConsts.VIRequests;
+import frc.robot.Constants.VIConsts.VITargetLocations;
 import frc.robot.commands.ApplyVisionMeasurement;
 import frc.robot.commands.AutoChargeStation;
 import frc.robot.commands.AutoDrivePath;
@@ -116,7 +118,7 @@ public class RobotContainer
 
     SmartDashboard.putData("LEDSet", new LEDSet(m_led, LEDColor.LEDCOLOR_DASH));
 
-    SmartDashboard.putData("DriveLimelight", new DriveLimelight(m_swerve, 1));
+    SmartDashboard.putData("DriveLimelight", new DriveLimelight(m_swerve, VITargetLocations.TARGET_MIDDLE));
     SmartDashboard.putData("ApplyVisionMeasurement", new ApplyVisionMeasurement(m_swerve));
     // SmartDashboard.putData("DriveLimelightStop", new DriveLimelightStop(m_swerve, m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
     // SmartDashboard.putData("DriveMotorTest", new DriveMotorTest(m_swerve, true));

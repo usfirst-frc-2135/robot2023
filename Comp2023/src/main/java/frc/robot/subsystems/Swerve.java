@@ -37,6 +37,8 @@ import frc.robot.Constants;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SWConsts;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.Constants.VIConsts;
+import frc.robot.Constants.VIConsts.VITargetLocations;
 import frc.robot.RobotContainer;
 import frc.robot.team1678.frc2022.drivers.Pigeon;
 import frc.robot.team1678.frc2022.drivers.SwerveModule;
@@ -57,10 +59,10 @@ public class Swerve extends SubsystemBase
   };
 
   // Odometery and telemetry
-  private Pigeon                   m_pigeon              = new Pigeon(Ports.kCANID_Pigeon2);
+  private Pigeon                   m_pigeon            = new Pigeon(Ports.kCANID_Pigeon2);
   public SwerveDriveOdometry       m_swerveOdometry;
 
-  public SwerveDrivePoseEstimator  m_poseEstimator       = new SwerveDrivePoseEstimator(SwerveConstants.swerveKinematics,
+  public SwerveDrivePoseEstimator  m_poseEstimator     = new SwerveDrivePoseEstimator(SwerveConstants.swerveKinematics,
       m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), new Pose2d( ));
 
   // PID objects
@@ -85,7 +87,7 @@ public class Swerve extends SubsystemBase
   private boolean                  m_locked            = false;
 
   // Path following
-  private int                      m_pathDebug         = 1;    // Debug flag to disable extra ramsete logging calls
+  private int                      m_pathDebug         = 0;    // Debug flag to disable extra ramsete logging calls
 
   // Limelight drive
   private double                   m_turnConstant      = SWConsts.kTurnConstant;
@@ -216,17 +218,23 @@ public class Swerve extends SubsystemBase
   // Limelight driving mode
   //
 
-  public Pose2d calculateTarget(int targetLocation)
+  public Pose2d calculateTarget(VIConsts.VITargetLocations targetLocation)
   {
     int targetID = (int) (RobotContainer.getInstance( ).m_vision.getTargetID( ));
     Pose2d aprilTagPose2d = Constants.VIConsts.kAprilTagPoses.get(targetID - 1);
-    if (targetLocation == 1)
-    {
-      double targetXvalue = aprilTagPose2d.getX( ) - 0.4;
-      return new Pose2d(new Translation2d(targetXvalue, aprilTagPose2d.getY( )), aprilTagPose2d.getRotation( ));
-    }
+    double targetXvalue = 0;
+    String strName;
 
-    return null;
+    switch (targetLocation)
+    {
+      default :
+      case TARGET_MIDDLE :
+        strName = "MIDDLE";
+        targetXvalue = aprilTagPose2d.getX( ) + 2;
+        break;
+    }
+    return new Pose2d(new Translation2d(targetXvalue, aprilTagPose2d.getY( )), new Rotation2d(0));
+
   }
 
   public void driveWithLimelightInit(Pose2d goalPose2d)
@@ -238,6 +246,8 @@ public class Swerve extends SubsystemBase
         new PathPoint(goalPose2d.getTranslation( ), goalPose2d.getRotation( )));
 
     driveWithPathFollowerInit(trajectory, true);
+
+    DataLogManager.log("GOAL POSE@D +++ " + goalPose2d);
   }
 
   public void driveWithLimelightExecute( )
@@ -595,8 +605,9 @@ public class Swerve extends SubsystemBase
     m_poseEstimator.updateWithTime(Timer.getFPGATimestamp( ), m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ));
 
     applyVisionMeasurement(true);
-    DataLogManager.log(getSubsystem( ) + ":  X : " + m_poseEstimator.getEstimatedPosition( ).getX( ) + " | "
-        + m_poseEstimator.getEstimatedPosition( ).getY( ));
+
+    // DataLogManager.log(getSubsystem( ) + ":  X : " + m_poseEstimator.getEstimatedPosition( ).getX( ) + " | "
+    //     + m_poseEstimator.getEstimatedPosition( ).getY( ));
 
   }
 
