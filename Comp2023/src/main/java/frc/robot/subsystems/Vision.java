@@ -5,11 +5,8 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.NetworkTable;
@@ -18,7 +15,6 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VIConsts;
-import frc.robot.RobotContainer;
 
 /**
  *
@@ -26,24 +22,22 @@ import frc.robot.RobotContainer;
 public class Vision extends SubsystemBase
 {
   // Objects
-  public MedianFilter           m_tyfilter           = new MedianFilter(5); // median filter y values to remove outliers (5 sample)
-  public MedianFilter           m_tvfilter           = new MedianFilter(5); // median filter v values to remove outliers (5 sample)
+  public MedianFilter           m_tyfilter          = new MedianFilter(5); // median filter y values to remove outliers (5 sample)
+  public MedianFilter           m_tvfilter          = new MedianFilter(5); // median filter v values to remove outliers (5 sample)
 
   // Declare module variables
-  private double                m_distance1          = VIConsts.kLLDistance1;   // x position in inches for first reference point
-  private double                m_vertOffset1        = VIConsts.kLLVertOffset1; // y reading in degrees for first reference point
-  private double                m_distance2          = VIConsts.kLLDistance2;   // x position in inches for second reference point
-  private double                m_vertOffset2        = VIConsts.kLLVertOffset2; // y reading in degrees for second reference point
+  private double                m_distance1         = VIConsts.kLLDistance1;   // x position in inches for first reference point
+  private double                m_vertOffset1       = VIConsts.kLLVertOffset1; // y reading in degrees for first reference point
+  private double                m_distance2         = VIConsts.kLLDistance2;   // x position in inches for second reference point
+  private double                m_vertOffset2       = VIConsts.kLLVertOffset2; // y reading in degrees for second reference point
   private double                m_slope;   // Linear regressions slope from calibration
   private double                m_offset;  // Linear regressions slope from calibration
 
   private NetworkTable          m_table;            // Network table reference for getting LL values
 
-  private DoubleArraySubscriber m_botposeSub;
-  private Transform3d           m_botposeTransform3d = new Transform3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0));
-  private double[ ]             m_sendablePoseArray  = new double[3];
-
-  private double                m_yawBotPose         = 0; // yaw of Robot based on apriltag calculated position
+  private DoubleArraySubscriber m_botPoseSub;
+  private Pose2d                m_botLLPose         = new Pose2d(new Translation2d(0, 0), new Rotation2d(0));
+  private double[ ]             m_sendablePoseArray = new double[3];
 
   private double                m_targetHorizAngle; // LL Target horizontal Offset from Crosshair to Target (-27 to 27 deg)
   private double                m_targetVertAngle;  // LL Target vertical Offset from Crosshair to Target (-20.5 to 20.5 deg)
@@ -88,7 +82,7 @@ public class Vision extends SubsystemBase
     SmartDashboard.putBoolean("VI_valid", m_targetValid);
     SmartDashboard.putNumber("VI_targetLatency", m_targetLatency);
 
-    m_botposeSub = m_table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[ ] { });
+    m_botPoseSub = m_table.getDoubleArrayTopic("botpose_wpiblue").subscribe(new double[ ] { });
 
     initialize( );
   }
@@ -121,19 +115,17 @@ public class Vision extends SubsystemBase
 
     if (m_targetID > 0)
     {
-      double[ ] m_botposeArray = m_botposeSub.get( );
+      double[ ] m_botposeArray = m_botPoseSub.get( );
 
       if (m_botposeArray != null)
       {
-        //Defining the Transform3d of the robot
-        m_botposeTransform3d = new Transform3d(new Translation3d(m_botposeArray[0], m_botposeArray[1], m_botposeArray[2]),
-            new Rotation3d(m_botposeArray[3], m_botposeArray[4], m_botposeArray[5]));
+        // Translate Pose3d from limelight into a Pose2d
+        // Array order: Translation (X,Y,Z) Rotation(Roll,Pitch,Yaw)
+        m_botLLPose = new Pose2d(new Translation2d(m_botposeArray[0], m_botposeArray[1]), new Rotation2d(m_botposeArray[5]));
 
         m_sendablePoseArray[0] = m_botposeArray[0]; // X pose from the Translation3d of the "botPose"
         m_sendablePoseArray[1] = m_botposeArray[1]; // Y pose from the Translation3d of the "botPose"
         m_sendablePoseArray[2] = m_botposeArray[5]; // Rotation from yaw from the Rotation3d of the "botPose"
-
-        m_yawBotPose = m_botposeArray[5]; //Setting the rotation of the robot
       }
 
     }
@@ -148,7 +140,6 @@ public class Vision extends SubsystemBase
     SmartDashboard.putNumber("VI_targetLatency", m_targetLatency);
 
     SmartDashboard.putNumber("VI_distLL", m_distLL);
-
   }
 
   @Override
@@ -209,35 +200,39 @@ public class Vision extends SubsystemBase
     return m_targetLatency;
   }
 
-  public Transform3d getBotPoseTransform3d( )
+  public Pose2d getLimelightRawPose( )
   {
-    return m_botposeTransform3d;
-  }
-
-  public Pose2d getLimelightPose( )
-  {
-    // Perform valid checks and return null if it doesn't exist
+    // If target is valid, return the limelight pose
     if (m_targetValid)
     {
-      double degrees = m_yawBotPose + ((m_yawBotPose < 0) ? 360 : 0);
+      double yawDegrees = m_botLLPose.getRotation( ).getDegrees( );
+      yawDegrees = yawDegrees + ((yawDegrees < 0) ? 360 : 0);
 
-      Translation2d tran = new Translation2d(m_botposeTransform3d.getX( ), m_botposeTransform3d.getY( ));
-      Rotation2d rot = new Rotation2d(Units.degreesToRadians(degrees));
+      Translation2d tran = new Translation2d(m_botLLPose.getX( ), m_botLLPose.getY( ));
+      Rotation2d rot = new Rotation2d(Units.degreesToRadians(yawDegrees));
 
-      Pose2d visionPose = new Pose2d(tran, rot);
-      if (isLimelightPoseValid(visionPose))
-      {
-        return visionPose;
-      }
+      return new Pose2d(tran, rot);
     }
 
     return null;
   }
 
-  public boolean isLimelightPoseValid(Pose2d visionPose)
+  public Pose2d getLimelightValidPose(Pose2d currentPose)
   {
-    Pose2d currentPose = RobotContainer.getInstance( ).m_swerve.m_poseEstimator.getEstimatedPosition( );
-    Transform2d deltaTransform = currentPose.minus(visionPose);
+    Pose2d llPose = getLimelightRawPose( );
+
+    // If sanity checks are valid, return the limelight pose
+    if (isLimelightPoseValid(llPose, currentPose))
+    {
+      return llPose;
+    }
+
+    return null;
+  }
+
+  public boolean isLimelightPoseValid(Pose2d llPose, Pose2d currentPose)
+  {
+    Transform2d deltaTransform = currentPose.minus(llPose);
 
     //Only adding vision measurements that are already within one meter or so of the current pose estimate
     // These can be done on one line as long as they are simple--if we add more checks, then separate from the return

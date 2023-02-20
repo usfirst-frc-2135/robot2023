@@ -21,14 +21,12 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -38,7 +36,6 @@ import frc.robot.Constants.Ports;
 import frc.robot.Constants.SWConsts;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.VIConsts;
-import frc.robot.Constants.VIConsts.VITargetLocations;
 import frc.robot.RobotContainer;
 import frc.robot.team1678.frc2022.drivers.Pigeon;
 import frc.robot.team1678.frc2022.drivers.SwerveModule;
@@ -60,11 +57,9 @@ public class Swerve extends SubsystemBase
 
   // Odometery and telemetry
   private Pigeon                   m_pigeon            = new Pigeon(Ports.kCANID_Pigeon2);
-  private SwerveDriveOdometry      m_swerveOdometry;
-  private Field2d                  m_field             = new Field2d( );
-
-  public SwerveDrivePoseEstimator  m_poseEstimator     = new SwerveDrivePoseEstimator(SwerveConstants.swerveKinematics,
+  private SwerveDrivePoseEstimator m_poseEstimator     = new SwerveDrivePoseEstimator(SwerveConstants.swerveKinematics,
       m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), new Pose2d( ));
+  private Field2d                  m_field             = new Field2d( );
 
   // PID objects
   private ProfiledPIDController    m_snapPIDController = new ProfiledPIDController( // 
@@ -125,15 +120,6 @@ public class Swerve extends SubsystemBase
     setSubsystem("Swerve");
 
     zeroGyro( );
-
-    m_swerveOdometry = new SwerveDriveOdometry(Constants.SwerveConstants.swerveKinematics, m_pigeon.getYaw( ).getWPIRotation2d( ),
-        new SwerveModulePosition[ ]
-        {
-            m_swerveMods[0].getPosition( ), //
-            m_swerveMods[1].getPosition( ), //
-            m_swerveMods[2].getPosition( ), //
-            m_swerveMods[3].getPosition( )
-        });
 
     m_snapPIDController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -534,15 +520,13 @@ public class Swerve extends SubsystemBase
 
   public Pose2d getPose( )
   {
-    return m_swerveOdometry.getPoseMeters( );
+    return m_poseEstimator.getEstimatedPosition( );
   }
 
   public void resetOdometry(Pose2d pose)
   {
-    m_swerveOdometry.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
-    zeroGyro(pose.getRotation( ).getDegrees( ));
-
     m_poseEstimator.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
+    zeroGyro(pose.getRotation( ).getDegrees( ));
   }
 
   public void resetAnglesToAbsolute( )
@@ -604,11 +588,10 @@ public class Swerve extends SubsystemBase
 
   public void updateSwerveOdometry( )
   {
-    m_swerveOdometry.update(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ));
     m_poseEstimator.updateWithTime(Timer.getFPGATimestamp( ), m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ));
 
     {
-      Pose2d botPose2d = RobotContainer.getInstance( ).m_vision.getLimelightPose( );
+      Pose2d botPose2d = RobotContainer.getInstance( ).m_vision.getLimelightValidPose(getPose( ));
       double latency = RobotContainer.getInstance( ).m_vision.getTargetLatency( );
 
       if ((botPose2d != null))
@@ -623,17 +606,13 @@ public class Swerve extends SubsystemBase
     // DataLogManager.log(getSubsystem( ) + ":  X : " + estimate.getX( ) + " | " + estimate.getY( ));
   }
 
-  public void setPose(Pose2d visionPose)
-  {
-    m_poseEstimator.resetPosition(visionPose.getRotation( ), getPositions( ),
-        new Pose2d(visionPose.getX( ), visionPose.getY( ), visionPose.getRotation( )));
-  }
-
   public void readPeriodicInputs( )
   {
-    m_periodicIO.odometry_pose_x = m_swerveOdometry.getPoseMeters( ).getX( );
-    m_periodicIO.odometry_pose_y = m_swerveOdometry.getPoseMeters( ).getY( );
-    m_periodicIO.odometry_pose_rot = m_swerveOdometry.getPoseMeters( ).getRotation( ).getDegrees( );
+    Pose2d position = m_poseEstimator.getEstimatedPosition( );
+
+    m_periodicIO.odometry_pose_x = position.getX( );
+    m_periodicIO.odometry_pose_y = position.getY( );
+    m_periodicIO.odometry_pose_rot = position.getRotation( ).getDegrees( );
 
     m_periodicIO.swerve_heading = MathUtil.inputModulus(m_pigeon.getYaw( ).getDegrees( ), 0, 360);
     m_periodicIO.robot_pitch = m_pigeon.getUnadjustedPitch( ).getDegrees( );

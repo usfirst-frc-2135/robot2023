@@ -29,9 +29,9 @@ public class ApplyVisionMeasurement extends CommandBase
   @Override
   public void initialize( )
   {
-    Pose2d llPose = m_vision.getLimelightPose( );
+    Pose2d llPose = m_vision.getLimelightRawPose( );
     if (llPose != null)
-      m_swerve.setPose(llPose);
+      m_swerve.resetOdometry(llPose);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
