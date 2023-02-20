@@ -22,22 +22,21 @@ import frc.robot.Constants.VIConsts;
 public class Vision extends SubsystemBase
 {
   // Objects
-  public MedianFilter           m_tyfilter          = new MedianFilter(5); // median filter y values to remove outliers (5 sample)
-  public MedianFilter           m_tvfilter          = new MedianFilter(5); // median filter v values to remove outliers (5 sample)
+  public MedianFilter           m_tyfilter    = new MedianFilter(5); // median filter y values to remove outliers (5 sample)
+  public MedianFilter           m_tvfilter    = new MedianFilter(5); // median filter v values to remove outliers (5 sample)
 
   // Declare module variables
-  private double                m_distance1         = VIConsts.kLLDistance1;   // x position in inches for first reference point
-  private double                m_vertOffset1       = VIConsts.kLLVertOffset1; // y reading in degrees for first reference point
-  private double                m_distance2         = VIConsts.kLLDistance2;   // x position in inches for second reference point
-  private double                m_vertOffset2       = VIConsts.kLLVertOffset2; // y reading in degrees for second reference point
+  private double                m_distance1   = VIConsts.kLLDistance1;   // x position in inches for first reference point
+  private double                m_vertOffset1 = VIConsts.kLLVertOffset1; // y reading in degrees for first reference point
+  private double                m_distance2   = VIConsts.kLLDistance2;   // x position in inches for second reference point
+  private double                m_vertOffset2 = VIConsts.kLLVertOffset2; // y reading in degrees for second reference point
   private double                m_slope;   // Linear regressions slope from calibration
   private double                m_offset;  // Linear regressions slope from calibration
 
   private NetworkTable          m_table;            // Network table reference for getting LL values
 
   private DoubleArraySubscriber m_botPoseSub;
-  private Pose2d                m_botLLPose         = new Pose2d(new Translation2d(0, 0), new Rotation2d(0));
-  private double[ ]             m_sendablePoseArray = new double[3];
+  private Pose2d                m_botLLPose   = new Pose2d(new Translation2d(0, 0), new Rotation2d(0));
 
   private double                m_targetHorizAngle; // LL Target horizontal Offset from Crosshair to Target (-27 to 27 deg)
   private double                m_targetVertAngle;  // LL Target vertical Offset from Crosshair to Target (-20.5 to 20.5 deg)
@@ -113,24 +112,24 @@ public class Vision extends SubsystemBase
 
     m_distLL = calculateDist(m_targetVertAngle);
 
-    if (m_targetID > 0)
+    double[ ] m_botPoseArray = m_botPoseSub.get( );
+    double[ ] robotPose = new double[ ]
     {
-      double[ ] m_botposeArray = m_botPoseSub.get( );
+        0, 0, 0
+    };
 
-      if (m_botposeArray != null)
-      {
-        // Translate Pose3d from limelight into a Pose2d
-        // Array order: Translation (X,Y,Z) Rotation(Roll,Pitch,Yaw)
-        m_botLLPose = new Pose2d(new Translation2d(m_botposeArray[0], m_botposeArray[1]), new Rotation2d(m_botposeArray[5]));
+    if ((m_targetID > 0) && (m_botPoseArray != null))
+    {
+      // Translate Pose3d sent by the limelight in an array into a Pose2d that we use
+      // Array [6] order: Translation (X, Y, Z), Rotation(Roll, Pitch, Yaw)
+      m_botLLPose = new Pose2d(new Translation2d(m_botPoseArray[0], m_botPoseArray[1]), new Rotation2d(m_botPoseArray[5]));
 
-        m_sendablePoseArray[0] = m_botposeArray[0]; // X pose from the Translation3d of the "botPose"
-        m_sendablePoseArray[1] = m_botposeArray[1]; // Y pose from the Translation3d of the "botPose"
-        m_sendablePoseArray[2] = m_botposeArray[5]; // Rotation from yaw from the Rotation3d of the "botPose"
-      }
-
+      robotPose[0] = m_botPoseArray[0];
+      robotPose[1] = m_botPoseArray[1];
+      robotPose[2] = m_botPoseArray[5];
     }
 
-    SmartDashboard.putNumberArray("VI_RobotPose", m_sendablePoseArray);
+    SmartDashboard.putNumberArray("VI_RobotPose", robotPose);
 
     SmartDashboard.putNumber("VI_horizAngle", m_targetHorizAngle);
     SmartDashboard.putNumber("VI_vertAngle", m_targetVertAngle);
@@ -200,9 +199,9 @@ public class Vision extends SubsystemBase
     return m_targetLatency;
   }
 
+  // Return the limelight pose if the limelight thinks it is valid
   public Pose2d getLimelightRawPose( )
   {
-    // If target is valid, return the limelight pose
     if (m_targetValid)
     {
       double yawDegrees = m_botLLPose.getRotation( ).getDegrees( );
@@ -217,12 +216,13 @@ public class Vision extends SubsystemBase
     return null;
   }
 
+  // Return the limelight pose if it passes all sanity checks
   public Pose2d getLimelightValidPose(Pose2d currentPose)
   {
     Pose2d llPose = getLimelightRawPose( );
 
     // If sanity checks are valid, return the limelight pose
-    if (isLimelightPoseValid(llPose, currentPose))
+    if ((llPose != null) && isLimelightPoseValid(llPose, currentPose))
     {
       return llPose;
     }
@@ -230,12 +230,13 @@ public class Vision extends SubsystemBase
     return null;
   }
 
+  // Make sanity checks on the limelight pose
+  //  - compare to see if within a specified distance of the current pose
   public boolean isLimelightPoseValid(Pose2d llPose, Pose2d currentPose)
   {
     Transform2d deltaTransform = currentPose.minus(llPose);
 
-    //Only adding vision measurements that are already within one meter or so of the current pose estimate
-    // These can be done on one line as long as they are simple--if we add more checks, then separate from the return
+    // TODO: This should probably be the magnitude of the hypotenuse of the transform (linear distance)
     return (((Math.abs(deltaTransform.getX( )) < 1.0) && ((Math.abs(deltaTransform.getY( )) < 1.0))));
   }
 
