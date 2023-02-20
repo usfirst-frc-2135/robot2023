@@ -2,12 +2,11 @@
 
 package frc.robot.subsystems;
 
-import java.util.Arrays;
-
 import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -15,16 +14,11 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.util.datalog.DataLog;
-import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.Constants.VIConsts;
+import frc.robot.RobotContainer;
 
 /**
  *
@@ -144,7 +138,6 @@ public class Vision extends SubsystemBase
 
     }
 
-    SmartDashboard.putData("Field", RobotContainer.getInstance( ).m_field2d);
     SmartDashboard.putNumberArray("VI_RobotPose", m_sendablePoseArray);
 
     SmartDashboard.putNumber("VI_horizAngle", m_targetHorizAngle);
@@ -221,52 +214,34 @@ public class Vision extends SubsystemBase
     return m_botposeTransform3d;
   }
 
-  public Pose2d getBotPose2d(boolean checkPosition)
+  public Pose2d getLimelightPose( )
   {
-    Translation2d tran;
-    Rotation2d rot;
-
     // Perform valid checks and return null if it doesn't exist
     if (m_targetValid)
     {
-      tran = new Translation2d(m_botposeTransform3d.getX( ), m_botposeTransform3d.getY( ));
       double degrees = m_yawBotPose + ((m_yawBotPose < 0) ? 360 : 0);
-      rot = new Rotation2d(Units.degreesToRadians(degrees));
-      if (checkPosition)
-        if (isBotPoseValid(tran))
-        {
-          return new Pose2d(tran, rot);
-        }
-      if (!checkPosition)
+
+      Translation2d tran = new Translation2d(m_botposeTransform3d.getX( ), m_botposeTransform3d.getY( ));
+      Rotation2d rot = new Rotation2d(Units.degreesToRadians(degrees));
+
+      Pose2d visionPose = new Pose2d(tran, rot);
+      if (isLimelightPoseValid(visionPose))
       {
-        return new Pose2d(tran, rot);
+        return visionPose;
       }
-
     }
-
-    // DataLogManager.log(getSubsystem( )                                         //  
-    //     + "VISION: Radians sent " + rot                                        //
-    //     + " from the limelight " + m_botposeTransform3d.getRotation( ).getZ( ) //
-    //     + " Angle : " + m_botposeTransform3d.getRotation( ).getAngle( )        //
-    // );
 
     return null;
   }
 
-  public boolean isBotPoseValid(Translation2d botpose)
+  public boolean isLimelightPoseValid(Pose2d visionPose)
   {
+    Pose2d currentPose = RobotContainer.getInstance( ).m_swerve.m_poseEstimator.getEstimatedPosition( );
+    Transform2d deltaTransform = currentPose.minus(visionPose);
+
     //Only adding vision measurements that are already within one meter or so of the current pose estimate
-    Translation2d currentPose = RobotContainer.getInstance( ).m_swerve.m_poseEstimator.getEstimatedPosition( ).getTranslation( );
-
-    if (Math.abs(currentPose.getX( ) - botpose.getX( )) <= 1)
-    {
-      if (Math.abs(currentPose.getY( ) - botpose.getY( )) <= 1)
-      {
-        return true;
-      }
-    }
-
-    return false;
+    // These can be done on one line as long as they are simple--if we add more checks, then separate from the return
+    return (((Math.abs(deltaTransform.getX( )) < 1.0) && ((Math.abs(deltaTransform.getY( )) < 1.0))));
   }
 
   public void setLEDMode(int mode)

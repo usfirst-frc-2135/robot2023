@@ -3,6 +3,7 @@
 //
 package frc.robot.commands;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
@@ -13,10 +14,12 @@ import frc.robot.subsystems.Vision;
 public class ApplyVisionMeasurement extends CommandBase
 {
   private final Swerve m_swerve;
+  private final Vision m_vision;
 
-  public ApplyVisionMeasurement(Swerve swerve)
+  public ApplyVisionMeasurement(Swerve swerve, Vision vision)
   {
     m_swerve = swerve;
+    m_vision = vision;
 
     setName("AppyVisionMeasurement");
     addRequirements(m_swerve);
@@ -26,7 +29,9 @@ public class ApplyVisionMeasurement extends CommandBase
   @Override
   public void initialize( )
   {
-    m_swerve.applyVisionMeasurement(false);
+    Pose2d llPose = m_vision.getLimelightPose( );
+    if (llPose != null)
+      m_swerve.setPose(llPose);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

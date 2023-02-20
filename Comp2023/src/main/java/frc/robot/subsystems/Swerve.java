@@ -60,7 +60,8 @@ public class Swerve extends SubsystemBase
 
   // Odometery and telemetry
   private Pigeon                   m_pigeon            = new Pigeon(Ports.kCANID_Pigeon2);
-  public SwerveDriveOdometry       m_swerveOdometry;
+  private SwerveDriveOdometry      m_swerveOdometry;
+  private Field2d                  m_field             = new Field2d( );
 
   public SwerveDrivePoseEstimator  m_poseEstimator     = new SwerveDrivePoseEstimator(SwerveConstants.swerveKinematics,
       m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), new Pose2d( ));
@@ -172,7 +173,9 @@ public class Swerve extends SubsystemBase
   }
 
   private void initSmartDashboard( )
-  {}
+  {
+    SmartDashboard.putData("Field", m_field);
+  }
 
   ///////////////////////////////////////////////////////////////////////////////
   //
@@ -204,8 +207,8 @@ public class Swerve extends SubsystemBase
     SmartDashboard.putNumber("SW: vision", m_periodicIO.vision_align_target_angle);
     SmartDashboard.putNumber("SW: snap", m_periodicIO.snap_target);
 
-    // //Setting the field to the Pose2d specified by the limelight
-    RobotContainer.getInstance( ).m_field2d.setRobotPose(m_poseEstimator.getEstimatedPosition( ));
+    // m_field.setRobotPose(getPose( ));
+    m_field.setRobotPose(m_poseEstimator.getEstimatedPosition( ));
   }
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -276,7 +279,7 @@ public class Swerve extends SubsystemBase
 
     m_trajectory = trajectory;
 
-    RobotContainer.getInstance( ).m_field2d.getObject("trajectory").setTrajectory(m_trajectory);
+    m_field.getObject("trajectory").setTrajectory(m_trajectory);
 
     List<Trajectory.State> trajStates = new ArrayList<Trajectory.State>( );
     trajStates = m_trajectory.getStates( );
@@ -604,27 +607,26 @@ public class Swerve extends SubsystemBase
     m_swerveOdometry.update(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ));
     m_poseEstimator.updateWithTime(Timer.getFPGATimestamp( ), m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ));
 
-    applyVisionMeasurement(true);
-
-    // DataLogManager.log(getSubsystem( ) + ":  X : " + m_poseEstimator.getEstimatedPosition( ).getX( ) + " | "
-    //     + m_poseEstimator.getEstimatedPosition( ).getY( ));
-
-  }
-
-  public void applyVisionMeasurement(boolean checkPosition)
-  {
-    Pose2d botPose2d = RobotContainer.getInstance( ).m_vision.getBotPose2d(checkPosition);
-    double latency = RobotContainer.getInstance( ).m_vision.getTargetLatency( );
-
-    if ((botPose2d != null))
     {
-      //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
-      m_poseEstimator.addVisionMeasurement(botPose2d, Timer.getFPGATimestamp( ) - (latency / 1000));
-      if (!checkPosition)
+      Pose2d botPose2d = RobotContainer.getInstance( ).m_vision.getLimelightPose( );
+      double latency = RobotContainer.getInstance( ).m_vision.getTargetLatency( );
+
+      if ((botPose2d != null))
       {
+        //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
+        m_poseEstimator.addVisionMeasurement(botPose2d, Timer.getFPGATimestamp( ) - (latency / 1000));
         DataLogManager.log("ADDED IN VISION MEASUREMENT!!!!!!!!!!!!!!!!");
       }
     }
+
+    // Pose2d estimate = m_poseEstimator.getEstimatedPosition( );
+    // DataLogManager.log(getSubsystem( ) + ":  X : " + estimate.getX( ) + " | " + estimate.getY( ));
+  }
+
+  public void setPose(Pose2d visionPose)
+  {
+    m_poseEstimator.resetPosition(visionPose.getRotation( ), getPositions( ),
+        new Pose2d(visionPose.getX( ), visionPose.getY( ), visionPose.getRotation( )));
   }
 
   public void readPeriodicInputs( )
