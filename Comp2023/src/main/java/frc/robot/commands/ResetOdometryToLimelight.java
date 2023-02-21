@@ -11,12 +11,12 @@ import frc.robot.subsystems.Vision;
 /**
  *
  */
-public class ApplyVisionMeasurement extends CommandBase
+public class ResetOdometryToLimelight extends CommandBase
 {
   private final Swerve m_swerve;
   private final Vision m_vision;
 
-  public ApplyVisionMeasurement(Swerve swerve, Vision vision)
+  public ResetOdometryToLimelight(Swerve swerve, Vision vision)
   {
     m_swerve = swerve;
     m_vision = vision;
