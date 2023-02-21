@@ -196,12 +196,8 @@ public class Vision extends SubsystemBase
 
       double[ ] robotPose = new double[ ]
       {
-          0, 0, 0
+          m_botPoseArray[0], m_botPoseArray[1], m_botPoseArray[5]
       };
-
-      robotPose[0] = m_botPoseArray[0];
-      robotPose[1] = m_botPoseArray[1];
-      robotPose[2] = m_botPoseArray[5];
 
       SmartDashboard.putNumberArray("VI_RobotPose", robotPose);
 
@@ -209,7 +205,6 @@ public class Vision extends SubsystemBase
     }
 
     return null;
-
   }
 
   // Return the limelight pose if it passes all sanity checks

@@ -223,7 +223,6 @@ public class Swerve extends SubsystemBase
         break;
     }
     return new Pose2d(new Translation2d(targetXvalue, aprilTagPose2d.getY( )), new Rotation2d(0));
-
   }
 
   public void driveWithLimelightInit(Pose2d goalPose2d)
