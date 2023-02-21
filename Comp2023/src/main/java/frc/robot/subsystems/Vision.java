@@ -44,7 +44,7 @@ public class Vision extends SubsystemBase
   private double                m_targetSkew;       // LL Target Skew or rotation (-90 to 0 deg)
   private boolean               m_targetValid;      // LL Target Valid or not
   private double                m_targetLatency;    // LL pipeline’s latency contribution (ms) Add at least 11ms for image capture latency.
-  private double                m_targetID;         // ID of the primary in-view AprilTag
+  private int                   m_targetID;         // ID of the primary in-view AprilTag
 
   private double                m_distLL;           // calculated distance in inches for the current y value
 
@@ -106,7 +106,7 @@ public class Vision extends SubsystemBase
       m_targetArea = m_table.getEntry("ta").getDouble(0.0);
       m_targetSkew = m_table.getEntry("ts").getDouble(0.0);
       m_targetValid = m_tvfilter.calculate(m_table.getEntry("tv").getDouble(0.0)) > 0.5;
-      m_targetID = m_table.getEntry("tid").getDouble(-1.0);
+      m_targetID = (int) m_table.getEntry("tid").getDouble(-1.0);
       m_targetLatency = m_table.getEntry("tl").getDouble(0.0);
     }
 
@@ -172,7 +172,7 @@ public class Vision extends SubsystemBase
     return m_distLL;
   }
 
-  public double getTargetID( )
+  public int getTargetID( )
   {
     return m_targetID;
   }

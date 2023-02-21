@@ -1,5 +1,5 @@
 //
-// LED Set command - sets CANdle to desired mode
+// Apply Vision Measurement command - resets swerve odometry to a valid limelight pose
 //
 package frc.robot.commands;
 

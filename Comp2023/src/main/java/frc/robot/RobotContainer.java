@@ -22,7 +22,7 @@ import frc.robot.commands.AutoChargeStation;
 import frc.robot.commands.AutoDrivePath;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.DriveBalance;
-import frc.robot.commands.DriveLimelight;
+import frc.robot.commands.DriveLimelightPath;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.ElbowRun;
@@ -113,7 +113,7 @@ public class RobotContainer
 
     SmartDashboard.putData("LEDSet", new LEDSet(m_led, LEDColor.LEDCOLOR_DASH));
 
-    SmartDashboard.putData("DriveLimelight", new DriveLimelight(m_swerve, VITargetLocations.TARGET_MIDDLE));
+    SmartDashboard.putData("DriveLimelightPath", new DriveLimelightPath(m_swerve, m_vision, VITargetLocations.TARGET_MIDDLE));
     SmartDashboard.putData("ApplyVisionMeasurement", new ApplyVisionMeasurement(m_swerve, m_vision));
     // SmartDashboard.putData("DriveLimelightStop", new DriveLimelightStop(m_swerve, m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
     // SmartDashboard.putData("DriveMotorTest", new DriveMotorTest(m_swerve, true));

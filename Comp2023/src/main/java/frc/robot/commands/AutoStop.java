@@ -30,7 +30,7 @@ public class AutoStop extends CommandBase
   @Override
   public void execute( )
   {
-    m_swerve.drive(new Translation2d(0, 0), 0.0, true, true);
+    m_swerve.driveStop(true);
   }
 
   // Called once the command ends or is interrupted.

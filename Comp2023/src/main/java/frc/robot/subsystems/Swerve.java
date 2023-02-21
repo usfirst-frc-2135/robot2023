@@ -6,10 +6,7 @@ package frc.robot.subsystems;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.pathplanner.lib.PathPoint;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.HolonomicDriveController;
@@ -35,7 +32,6 @@ import frc.robot.Constants;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SWConsts;
 import frc.robot.Constants.SwerveConstants;
-import frc.robot.Constants.VIConsts;
 import frc.robot.RobotContainer;
 import frc.robot.team1678.frc2022.drivers.Pigeon;
 import frc.robot.team1678.frc2022.drivers.SwerveModule;
@@ -97,10 +93,10 @@ public class Swerve extends SubsystemBase
   private double                   m_throttleMax       = SWConsts.kThrottleMax;
   private double                   m_throttleShape     = SWConsts.kThrottleShape;
 
-  private double                   m_targetAngle       = SWConsts.kTargetAngle; // Optimal shooting angle
+  private double                   m_targetAngle       = SWConsts.kTargetAngle;      // Optimal shooting angle
   private double                   m_setPointDistance  = SWConsts.kSetPointDistance; // Optimal shooting distance
-  private double                   m_angleThreshold    = SWConsts.kAngleThreshold; // Tolerance around optimal
-  private double                   m_distThreshold     = SWConsts.kDistThreshold;// Tolerance around optimal
+  private double                   m_angleThreshold    = SWConsts.kAngleThreshold;   // Tolerance around optimal
+  private double                   m_distThreshold     = SWConsts.kDistThreshold;    // Tolerance around optimal
 
   // DriveWithLimelight pid controller objects
   private int                      m_limelightDebug    = 0; // Debug flag to disable extra limelight logging calls
@@ -193,8 +189,7 @@ public class Swerve extends SubsystemBase
     SmartDashboard.putNumber("SW: vision", m_periodicIO.vision_align_target_angle);
     SmartDashboard.putNumber("SW: snap", m_periodicIO.snap_target);
 
-    // m_field.setRobotPose(getPose( ));
-    m_field.setRobotPose(m_poseEstimator.getEstimatedPosition( ));
+    m_field.setRobotPose(getPose( ));
   }
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -206,52 +201,138 @@ public class Swerve extends SubsystemBase
   //
   // Limelight driving mode
   //
-
-  public Pose2d calculateTarget(VIConsts.VITargetLocations targetLocation)
+  public void driveWithLimelightInit(boolean m_endAtTarget)
   {
-    int targetID = (int) (RobotContainer.getInstance( ).m_vision.getTargetID( ));
-    Pose2d aprilTagPose2d = Constants.VIConsts.kAprilTagPoses.get(targetID - 1);
-    double targetXvalue = 0;
-    String strName;
+    // get pid values from dashboard
+    m_turnConstant = SmartDashboard.getNumber("DTL_turnConstant", m_turnConstant);
+    m_turnPidKp = SmartDashboard.getNumber("DTL_turnPidKp", m_turnPidKp);
+    m_turnPidKi = SmartDashboard.getNumber("DTL_turnPidKi", m_turnPidKi);
+    m_turnPidKd = SmartDashboard.getNumber("DTL_turnPidKd", m_turnPidKd);
+    m_turnMax = SmartDashboard.getNumber("DTL_turnMax", m_turnMax);
 
-    switch (targetLocation)
-    {
-      default :
-      case TARGET_MIDDLE :
-        strName = "MIDDLE";
-        targetXvalue = aprilTagPose2d.getX( ) + 2;
-        break;
-    }
-    return new Pose2d(new Translation2d(targetXvalue, aprilTagPose2d.getY( )), new Rotation2d(0));
-  }
+    m_throttlePidKp = SmartDashboard.getNumber("DTL_throttlePidKp", m_throttlePidKp);
+    m_throttlePidKi = SmartDashboard.getNumber("DTL_throttlePidKi", m_throttlePidKi);
+    m_throttlePidKd = SmartDashboard.getNumber("DTL_throttlePidKd", m_throttlePidKd);
+    m_throttleMax = SmartDashboard.getNumber("DTL_throttleMax", m_throttleMax);
+    m_throttleShape = SmartDashboard.getNumber("DTL_throttleShape", m_throttleShape);
 
-  public void driveWithLimelightInit(Pose2d goalPose2d)
-  {
-    Pose2d currentPose = m_poseEstimator.getEstimatedPosition( );
+    m_targetAngle = SmartDashboard.getNumber("DTL_targetAngle", m_targetAngle);
+    m_setPointDistance = SmartDashboard.getNumber("DTL_setPointDistance", m_setPointDistance);
+    m_angleThreshold = SmartDashboard.getNumber("DTL_angleThreshold", m_angleThreshold);
+    m_distThreshold = SmartDashboard.getNumber("DTL_distThreshold", m_distThreshold);
 
-    PathPlannerTrajectory trajectory = PathPlanner.generatePath(new PathConstraints(3, 4),
-        new PathPoint(currentPose.getTranslation( ), goalPose2d.getRotation( )),
-        new PathPoint(goalPose2d.getTranslation( ), goalPose2d.getRotation( )));
+    // load in Pid constants to controller
+    m_turnPid = new PIDController(m_turnPidKp, m_turnPidKi, m_turnPidKd);
+    m_throttlePid = new PIDController(m_throttlePidKp, m_throttlePidKi, m_throttlePidKd);
 
-    driveWithPathFollowerInit(trajectory, true);
-
-    DataLogManager.log("GOAL POSE@D +++ " + goalPose2d);
+    RobotContainer rc = RobotContainer.getInstance( );
+    rc.m_vision.m_tyfilter.reset( );
+    rc.m_vision.m_tvfilter.reset( );
+    rc.m_vision.syncStateFromDashboard( );
   }
 
   public void driveWithLimelightExecute( )
   {
-    driveWithPathFollowerExecute(true);
+    RobotContainer rc = RobotContainer.getInstance( );
+    boolean tv = rc.m_vision.getTargetValid( );
+    double tx = rc.m_vision.getHorizOffsetDeg( );
+    double ty = rc.m_vision.getVertOffsetDeg( );
+
+    if (!tv)
+    {
+      driveStop(false);
+      if (m_limelightDebug >= 1)
+        DataLogManager.log(getSubsystem( ) + ": DTL TV-FALSE - SIT STILL");
+
+      return;
+    }
+
+    // get turn value - just horizontal offset from target
+    double turnOutput = -m_turnPid.calculate(tx, m_targetAngle);
+
+    if (turnOutput > 0)
+      turnOutput = turnOutput + m_turnConstant;
+    else if (turnOutput < 0)
+      turnOutput = turnOutput - m_turnConstant;
+
+    // get throttle value
+    m_limelightDistance = RobotContainer.getInstance( ).m_vision.getDistLimelight( );
+
+    double throttleDistance = m_throttlePid.calculate(m_limelightDistance, m_setPointDistance);
+    double throttleOutput = throttleDistance * Math.pow(Math.cos(turnOutput * Math.PI / 180), m_throttleShape);
+
+    // put turn and throttle outputs on the dashboard
+    SmartDashboard.putNumber("DTL_turnOutput", turnOutput);
+    SmartDashboard.putNumber("DTL_throttleOutput", throttleOutput);
+    SmartDashboard.putNumber("DTL_limeLightDist", m_limelightDistance);
+
+    // cap max turn and throttle output
+    turnOutput = MathUtil.clamp(turnOutput, -m_turnMax, m_turnMax);
+    throttleOutput = MathUtil.clamp(throttleOutput, -m_throttleMax, m_throttleMax);
+
+    // put turn and throttle outputs on the dashboard
+    SmartDashboard.putNumber("DTL_turnClamped", turnOutput);
+    SmartDashboard.putNumber("DTL_throttleClamped", throttleOutput);
+
+    Translation2d llTranslation = new Translation2d(throttleOutput, 0);
+    drive(llTranslation, turnOutput, false, true);
+
+    if (m_limelightDebug >= 1)
+      DataLogManager.log(getSubsystem( )
+      // @formatter:off
+        + ": DTL tv: " + tv 
+        + " tx: "      + String.format("%.1f", tx)
+        + " ty: "      + String.format("%.1f", ty)
+        + " lldist: "  + String.format("%.1f", m_limelightDistance)
+        + " distErr: " + String.format("%.1f", Math.abs(m_setPointDistance - m_limelightDistance))
+        // + " stopped: " + driveIsStopped( )
+        + " trnOut: "  + String.format("%.2f", turnOutput)
+        + " thrOut: "  + String.format("%.2f", throttleOutput)
+        // @formatter:on
+      );
   }
 
   public boolean driveWithLimelightIsFinished( )
   {
-    return driveWithPathFollowerIsFinished( );
+    RobotContainer rc = RobotContainer.getInstance( );
+    boolean tv = rc.m_vision.getTargetValid( );
+    double tx = rc.m_vision.getHorizOffsetDeg( );
+
+    return (tv && ((Math.abs(tx)) <= m_angleThreshold) && (Math.abs(m_setPointDistance - m_limelightDistance) <= m_distThreshold)
+    // TODO: add back in
+    // && driveIsStopped( )
+    );
   }
 
   public void driveWithLimelightEnd( )
   {
-    drive(new Translation2d(0.0, 0.0), 0.0, false, true);
-    // RobotContainer.getInstance( ).m_led.setLLColor(LEDColor.LEDCOLOR_OFF);
+    driveStop(false);
+  }
+
+  public boolean isLimelightValid(double horizAngleRange, double distRange)
+  {
+    // check whether target is valid
+    // check whether the limelight tx and ty is within a certain tolerance
+    // check whether distance is within a certain tolerance
+    RobotContainer rc = RobotContainer.getInstance( );
+    boolean tv = rc.m_vision.getTargetValid( );
+    double tx = rc.m_vision.getHorizOffsetDeg( );
+    double ty = rc.m_vision.getVertOffsetDeg( );
+    m_limelightDistance = rc.m_vision.getDistLimelight( );
+
+    boolean sanityCheck =
+        tv && (Math.abs(tx) <= horizAngleRange) && (Math.abs(m_setPointDistance - m_limelightDistance) <= distRange);
+    // && (fabs(ty) <= vertAngleRange)
+
+    DataLogManager.log(getSubsystem( ) + ": DTL tv: " + tv //
+        + " tx: " + tx //
+        + " ty: " + ty //
+        + " lldist: " + m_limelightDistance //
+        + " distErr: " + Math.abs(m_setPointDistance - m_limelightDistance) //
+        + " sanityCheck: " + ((sanityCheck) ? "PASSED" : "FAILED") //
+    );
+
+    return sanityCheck;
   }
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -278,13 +359,13 @@ public class Swerve extends SubsystemBase
     m_trajTimer.start( );
   }
 
-  public void driveWithPathFollowerExecute(boolean useVision)
+  public void driveWithPathFollowerExecute( )
   {
     Trajectory.State trajState = m_trajectory.sample(m_trajTimer.get( ));
-    Pose2d currentPose = (useVision) ? m_poseEstimator.getEstimatedPosition( ) : getPose( );
+    Pose2d currentPose = getPose( );
 
     ChassisSpeeds targetChassisSpeeds = m_holonomicController.calculate(currentPose, trajState,
-        m_trajectory.getEndState( ).holonomicRotation/* trajState.poseMeters.getRotation( ) */); //TODO: find out what's wrong with getting desired rotation
+        m_trajectory.getEndState( ).holonomicRotation/* trajState.poseMeters.getRotation( ) */); // TODO: find out what's wrong with getting desired rotation
 
     // Convert to module states
     SwerveModuleState[ ] moduleStates = Constants.SwerveConstants.swerveKinematics.toSwerveModuleStates(targetChassisSpeeds);
@@ -305,8 +386,8 @@ public class Swerve extends SubsystemBase
     double currentTrajY = currentPose.getY( );
 
     double targetHeading =
-        m_trajectory.getEndState( ).holonomicRotation.getDegrees( )/* trajState.poseMeters.getRotation( ).getDegrees( ) */; ///Maybe get in radians?
-    double currentHeading = currentPose.getRotation( ).getDegrees( ); ///Maybe get in radians?
+        m_trajectory.getEndState( ).holonomicRotation.getDegrees( )/* trajState.poseMeters.getRotation( ).getDegrees( ) */; // TODO: Maybe get in radians?
+    double currentHeading = currentPose.getRotation( ).getDegrees( ); // TODO: Maybe get in radians?
 
     setModuleStates(moduleStates);
 
@@ -332,7 +413,7 @@ public class Swerve extends SubsystemBase
                   + " "          + String.format("%.2f", currentfrontRight)
                   + " "          + String.format("%.2f", currentbackLeft)
                   + " "          + String.format("%.2f", currentbackRight)
-                + " errorXYR: "    + String.format("%.2f", targetTrajX-currentTrajX) 
+                + " errXYR: "    + String.format("%.2f", targetTrajX-currentTrajX) 
                   + " "          + String.format("%.2f", targetTrajY-currentTrajY)
                   + " "          + String.format("%.2f", targetHeading-currentHeading)); 
         // @formatter:on
@@ -413,7 +494,7 @@ public class Swerve extends SubsystemBase
     {
       swerveModuleStates = new SwerveModuleState[ ]
       {
-          new SwerveModuleState(0.1, Rotation2d.fromDegrees(45)), //
+          new SwerveModuleState(0.1, Rotation2d.fromDegrees(45)),  //
           new SwerveModuleState(0.1, Rotation2d.fromDegrees(315)), //
           new SwerveModuleState(0.1, Rotation2d.fromDegrees(135)), //
           new SwerveModuleState(0.1, Rotation2d.fromDegrees(225))
@@ -436,6 +517,11 @@ public class Swerve extends SubsystemBase
     }
   }
 
+  public void driveStop(boolean fieldRelative)
+  {
+    drive(new Translation2d(0, 0), 0.0, fieldRelative, true);
+  }
+
   public void driveBalanceExecute( )
   {
     double drivevalue;
@@ -448,9 +534,8 @@ public class Swerve extends SubsystemBase
     {
       drivevalue = 0;
     }
-    drive(new Translation2d(drivevalue, 0), 0, true, true);
+    driveStop(true);
     DataLogManager.log(String.format("Robot pitch: %.1f degrees - Robot power applied to motors: %.1f m/s", pitch, drivevalue));
-
   }
 
   //
@@ -505,8 +590,9 @@ public class Swerve extends SubsystemBase
     }
   }
 
+  //
   // Getters and setters
-
+  //
   public boolean getLocked( )
   {
     return m_locked;
@@ -590,24 +676,24 @@ public class Swerve extends SubsystemBase
     m_poseEstimator.updateWithTime(Timer.getFPGATimestamp( ), m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ));
 
     {
-      Pose2d botPose2d = RobotContainer.getInstance( ).m_vision.getLimelightValidPose(getPose( ));
+      Pose2d botLLPose = RobotContainer.getInstance( ).m_vision.getLimelightValidPose(getPose( ));
       double latency = RobotContainer.getInstance( ).m_vision.getTargetLatency( );
 
-      if ((botPose2d != null))
+      if ((botLLPose != null))
       {
         //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
-        m_poseEstimator.addVisionMeasurement(botPose2d, Timer.getFPGATimestamp( ) - (latency / 1000));
+        m_poseEstimator.addVisionMeasurement(botLLPose, Timer.getFPGATimestamp( ) - (latency / 1000));
         DataLogManager.log("ADDED IN VISION MEASUREMENT!!!!!!!!!!!!!!!!");
       }
     }
 
-    // Pose2d estimate = m_poseEstimator.getEstimatedPosition( );
+    // Pose2d estimate = getPose();
     // DataLogManager.log(getSubsystem( ) + ":  X : " + estimate.getX( ) + " | " + estimate.getY( ));
   }
 
   public void readPeriodicInputs( )
   {
-    Pose2d position = m_poseEstimator.getEstimatedPosition( );
+    Pose2d position = getPose( );
 
     m_periodicIO.odometry_pose_x = position.getX( );
     m_periodicIO.odometry_pose_y = position.getY( );
