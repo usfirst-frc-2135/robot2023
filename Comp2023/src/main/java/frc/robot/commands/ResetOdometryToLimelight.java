@@ -1,36 +1,44 @@
-
-// ROBOTBUILDER TYPE: Command.
-
+//
+// Apply Vision Measurement command - resets swerve odometry to a valid limelight pose
+//
 package frc.robot.commands;
 
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Vision;
 
 /**
  *
  */
-public class AutoStop extends CommandBase
+public class ResetOdometryToLimelight extends CommandBase
 {
   private final Swerve m_swerve;
+  private final Vision m_vision;
 
-  public AutoStop(Swerve swerve)
+  public ResetOdometryToLimelight(Swerve swerve, Vision vision)
   {
     m_swerve = swerve;
+    m_vision = vision;
 
+    setName("AppyVisionMeasurement");
     addRequirements(m_swerve);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize( )
-  {}
+  {
+    Pose2d llPose = m_vision.getLimelightRawPose( );
+    if (llPose != null)
+      m_swerve.resetOdometry(llPose);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute( )
   {
-    m_swerve.driveStop(true);
+
   }
 
   // Called once the command ends or is interrupted.
@@ -42,12 +50,12 @@ public class AutoStop extends CommandBase
   @Override
   public boolean isFinished( )
   {
-    return false;
+    return true;
   }
 
   @Override
   public boolean runsWhenDisabled( )
   {
-    return false;
+    return true;
   }
 }
