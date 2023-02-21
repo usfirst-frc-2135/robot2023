@@ -112,24 +112,7 @@ public class Vision extends SubsystemBase
 
     m_distLL = calculateDist(m_targetVertAngle);
 
-    double[ ] m_botPoseArray = m_botPoseSub.get( );
-    double[ ] robotPose = new double[ ]
-    {
-        0, 0, 0
-    };
-
-    if ((m_targetID > 0) && (m_botPoseArray != null))
-    {
-      // Translate Pose3d sent by the limelight in an array into a Pose2d that we use
-      // Array [6] order: Translation (X, Y, Z), Rotation(Roll, Pitch, Yaw)
-      m_botLLPose = new Pose2d(new Translation2d(m_botPoseArray[0], m_botPoseArray[1]), new Rotation2d(m_botPoseArray[5]));
-
-      robotPose[0] = m_botPoseArray[0];
-      robotPose[1] = m_botPoseArray[1];
-      robotPose[2] = m_botPoseArray[5];
-    }
-
-    SmartDashboard.putNumberArray("VI_RobotPose", robotPose);
+    getLimelightRawPose( );
 
     SmartDashboard.putNumber("VI_horizAngle", m_targetHorizAngle);
     SmartDashboard.putNumber("VI_vertAngle", m_targetVertAngle);
@@ -202,18 +185,31 @@ public class Vision extends SubsystemBase
   // Return the limelight pose if the limelight thinks it is valid
   public Pose2d getLimelightRawPose( )
   {
-    if (m_targetValid)
+    double[ ] m_botPoseArray = m_botPoseSub.get( );
+    if (m_targetValid && (m_botPoseArray != null))
     {
-      double yawDegrees = m_botLLPose.getRotation( ).getDegrees( );
-      yawDegrees = yawDegrees + ((yawDegrees < 0) ? 360 : 0);
+      // Translate Pose3d sent by the limelight in an array into a Pose2d that we use
+      // Array [6] order: Translation (X, Y, Z), Rotation(Roll, Pitch, Yaw)
+      double yawDegrees = m_botPoseArray[5] + ((m_botPoseArray[5] < 0) ? 360 : 0);
 
-      Translation2d tran = new Translation2d(m_botLLPose.getX( ), m_botLLPose.getY( ));
-      Rotation2d rot = new Rotation2d(Units.degreesToRadians(yawDegrees));
+      m_botLLPose = new Pose2d(new Translation2d(m_botPoseArray[0], m_botPoseArray[1]), new Rotation2d(yawDegrees));
 
-      return new Pose2d(tran, rot);
+      double[ ] robotPose = new double[ ]
+      {
+          0, 0, 0
+      };
+
+      robotPose[0] = m_botPoseArray[0];
+      robotPose[1] = m_botPoseArray[1];
+      robotPose[2] = m_botPoseArray[5];
+
+      SmartDashboard.putNumberArray("VI_RobotPose", robotPose);
+
+      return m_botLLPose;
     }
 
     return null;
+
   }
 
   // Return the limelight pose if it passes all sanity checks
