@@ -535,7 +535,7 @@ public class Swerve extends SubsystemBase
       drivevalue = 0;
     }
     driveStop(true);
-    DataLogManager.log(String.format("Robot pitch: %.1f degrees - Robot power applied to motors: %.1f m/s", pitch, drivevalue));
+    //DataLogManager.log(String.format("Robot pitch: %.1f degrees - Robot power applied to motors: %.1f m/s", pitch, drivevalue));
   }
 
   //

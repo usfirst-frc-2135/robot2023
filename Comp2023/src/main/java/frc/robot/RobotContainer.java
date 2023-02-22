@@ -256,7 +256,6 @@ public class RobotContainer
     // Autonomous Chooser
     m_chooser.addOption("1 - AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveOffCommunity", true));
     m_chooser.addOption("2 - AutoDockOnChargeStation", new AutoChargeStation(m_swerve));
-    m_chooser.addOption("AutoDriveForward1m", new AutoDrivePath(m_swerve, "forward1m", true));
     m_chooser.setDefaultOption("0 - AutoStop", new AutoStop(m_swerve));
 
     // Configure autonomous sendable chooser
