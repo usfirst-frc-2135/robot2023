@@ -20,6 +20,9 @@ import frc.robot.Constants.VIConsts.VITargetLocations;
 import frc.robot.commands.ResetOdometryToLimelight;
 import frc.robot.commands.AutoChargeStation;
 import frc.robot.commands.AutoDrivePath;
+import frc.robot.commands.AutoPreloadAndEngageChargeStation;
+import frc.robot.commands.AutoPreloadAndLeaveCommunity;
+import frc.robot.commands.AutoPreloadAndScoreAnother;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.DriveBalance;
 import frc.robot.commands.DriveLimelightPath;
@@ -97,6 +100,10 @@ public class RobotContainer
     SmartDashboard.putData("DriveBalance", new DriveBalance(m_swerve));
     SmartDashboard.putData("AutoDockOnChargeStation", new AutoChargeStation(m_swerve));
     SmartDashboard.putData("AutoDriveToChargeStation", new AutoDrivePath(m_swerve, "driveToChargeStation", true));
+
+    // SmartDashboard.putData("AutoPreloadAndLeaveCommunity", new AutoPreloadAndLeaveCommunity(m_swerve));
+    // SmartDashboard.putData("AutoPreloadAndEngageChargeStation", new AutoPreloadAndEngageChargeStation(m_swerve));
+    // SmartDashboard.putData("AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve));
 
     // SmartDashboard Buttons
     SmartDashboard.putData("AutoStop", new AutoStop(m_swerve));
@@ -256,6 +263,9 @@ public class RobotContainer
     // Autonomous Chooser
     m_chooser.addOption("1 - AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveOffCommunity", true));
     m_chooser.addOption("2 - AutoDockOnChargeStation", new AutoChargeStation(m_swerve));
+    // m_chooser.addOption("3 - AutoPreloadAndLeaveCommunity", new AutoPreloadAndLeaveCommunity(m_swerve));
+    // m_chooser.addOption("4 - AutoPreloadAndEngageChargeStation", new AutoPreloadAndEngageChargeStation(m_swerve));
+    // m_chooser.addOption("5 - AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve));
     m_chooser.setDefaultOption("0 - AutoStop", new AutoStop(m_swerve));
 
     // Configure autonomous sendable chooser
