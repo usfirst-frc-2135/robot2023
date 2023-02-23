@@ -201,7 +201,8 @@ public class Vision extends SubsystemBase
       // Array [6] order: Translation (X, Y, Z), Rotation(Roll, Pitch, Yaw)
       double yawDegrees = m_botPoseArray[5] + ((m_botPoseArray[5] < 0) ? 360 : 0);
 
-      m_botLLPose = new Pose2d(new Translation2d(m_botPoseArray[0], m_botPoseArray[1]), new Rotation2d(yawDegrees));
+      m_botLLPose =
+          new Pose2d(new Translation2d(m_botPoseArray[0], m_botPoseArray[1]), new Rotation2d(Units.degreesToRadians(yawDegrees)));
 
       double[ ] robotPose = new double[ ]
       {

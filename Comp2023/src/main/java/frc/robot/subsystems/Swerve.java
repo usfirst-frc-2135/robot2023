@@ -683,7 +683,6 @@ public class Swerve extends SubsystemBase
       {
         //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
         m_poseEstimator.addVisionMeasurement(botLLPose, Timer.getFPGATimestamp( ) - (latency / 1000));
-        DataLogManager.log("ADDED IN VISION MEASUREMENT!!!!!!!!!!!!!!!!");
       }
     }
 
