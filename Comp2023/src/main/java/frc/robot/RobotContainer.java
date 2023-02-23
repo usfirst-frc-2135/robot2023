@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.LEDConsts.LEDColor;
-import frc.robot.Constants.VIConsts.VITargetLocations;
+import frc.robot.Constants.VIConsts.VIGoalDirection;
 import frc.robot.commands.ResetOdometryToLimelight;
 import frc.robot.commands.AutoChargeStation;
 import frc.robot.commands.AutoDrivePath;
@@ -113,8 +113,17 @@ public class RobotContainer
 
     SmartDashboard.putData("LEDSet", new LEDSet(m_led, LEDColor.LEDCOLOR_DASH));
 
-    SmartDashboard.putData("DriveLimelightPath", new DriveLimelightPath(m_swerve, m_vision, VITargetLocations.TARGET_MIDDLE));
-    SmartDashboard.putData("ApplyVisionMeasurement", new ResetOdometryToLimelight(m_swerve, m_vision));
+    SmartDashboard.putData("DriveLLLeft", new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_LEFT));
+    SmartDashboard.putData("DriveLLMiddle", new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_MIDDLE));
+    SmartDashboard.putData("DriveLLRight", new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_RIGHT));
+    SmartDashboard.putData("ResetOdo1", new ResetOdometryToLimelight(m_swerve, m_vision, 1));
+    SmartDashboard.putData("ResetOdo2", new ResetOdometryToLimelight(m_swerve, m_vision, 2));
+    SmartDashboard.putData("ResetOdo3", new ResetOdometryToLimelight(m_swerve, m_vision, 3));
+    SmartDashboard.putData("ResetOdo4", new ResetOdometryToLimelight(m_swerve, m_vision, 4));
+    SmartDashboard.putData("ResetOdo5", new ResetOdometryToLimelight(m_swerve, m_vision, 5));
+    SmartDashboard.putData("ResetOdo6", new ResetOdometryToLimelight(m_swerve, m_vision, 6));
+    SmartDashboard.putData("ResetOdo7", new ResetOdometryToLimelight(m_swerve, m_vision, 7));
+    SmartDashboard.putData("ResetOdo8", new ResetOdometryToLimelight(m_swerve, m_vision, 8));
     // SmartDashboard.putData("DriveLimelightStop", new DriveLimelightStop(m_swerve, m_intake, m_floorConveyor, m_towerConveyor, m_shooter, m_vision));
     // SmartDashboard.putData("DriveMotorTest", new DriveMotorTest(m_swerve, true));
     // SmartDashboard.putData("DriveResetSensors", new DriveResetSensors(m_swerve));
@@ -162,9 +171,9 @@ public class RobotContainer
 
     // Driver - A, B, X, Y
     driverA.onTrue(new Dummy(XboxController.Button.kA.value));
-    driverB.onTrue(new Dummy(XboxController.Button.kB.value));
-    driverX.onTrue(new Dummy(XboxController.Button.kX.value));
-    driverY.onTrue(new Dummy(XboxController.Button.kY.value));
+    driverB.onTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_RIGHT));
+    driverX.onTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_LEFT));
+    driverY.onTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_MIDDLE));
     //
     // Driver - Bumpers, start, back
     driverLeftBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
