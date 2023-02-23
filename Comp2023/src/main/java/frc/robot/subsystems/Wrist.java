@@ -90,6 +90,8 @@ public class Wrist extends SubsystemBase
   private Timer                           m_safetyTimer         = new Timer( ); // Safety timer for use in wrist
   private double                          m_safetyTimeout;                // Seconds that the timer ran before stopping
 
+  private int                             maxVelocity;
+
   // Constructor
   public Wrist( )
   {
@@ -110,6 +112,9 @@ public class Wrist extends SubsystemBase
     SmartDashboard.putNumber("WR_pidKd", m_pidKd);
 
     SmartDashboard.putNumber("WR_stowangle", m_wristStowangle);
+    SmartDashboard.putNumber("WR_scoreAngleLow", m_lowScoreangle);
+    SmartDashboard.putNumber("WR_scoreAngleMid", m_midScoreangle);
+    SmartDashboard.putNumber("WR_scoreAngleHigh", m_highScoreangle);
 
     SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
     SmartDashboard.putNumber("WR_targetDegrees", m_wristTargetDegrees);
@@ -139,6 +144,11 @@ public class Wrist extends SubsystemBase
     if (m_wristValid)
     {
       int curCounts = (int) m_wrist.getSelectedSensorPosition(0);
+      int curVelocity = (int) m_wrist.getSelectedSensorVelocity(0);
+      maxVelocity = (maxVelocity > curVelocity) ? maxVelocity : curVelocity;
+      SmartDashboard.putNumber("WR_maxVelocity", maxVelocity);
+      SmartDashboard.putNumber("WR_curVelocity", curVelocity);
+      SmartDashboard.putNumber("WR_curCounts", curCounts);
       m_wristCurDegrees = wristCountsToDegrees(curCounts);
       SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
       m_wristLigament.setAngle(wristCountsToDegrees(curCounts));
@@ -314,7 +324,7 @@ public class Wrist extends SubsystemBase
       m_wrist.config_kD(SLOTINDEX, m_pidKd);
     }
 
-    switch (angle)
+    switch (angle) // Do not change from current level!
     {
       case WRIST_NOCHANGE : // Do not change from current level!
         m_wristTargetDegrees = m_wristCurDegrees;

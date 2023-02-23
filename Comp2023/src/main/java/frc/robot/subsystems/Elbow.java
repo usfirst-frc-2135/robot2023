@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.sensors.CANCoder;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -45,6 +46,7 @@ public class Elbow extends SubsystemBase
 
   // Member objects
   private final WPI_TalonFX               m_elbow               = new WPI_TalonFX(Constants.Ports.kCANID_Elbow);  //elbow
+  private final CANCoder                  m_elbowCanCoder       = new CANCoder(16);
   private final TalonFXSimCollection      m_elbowMotorSim       = new TalonFXSimCollection(m_elbow);
   private final SingleJointedArmSim       m_elbowSim            = new SingleJointedArmSim(DCMotor.getFalcon500(1),
       ELConsts.kElbowGearRatio, 2.0, ELConsts.kForearmLengthMeters, 0.0, Math.PI, true);
@@ -90,6 +92,8 @@ public class Elbow extends SubsystemBase
   private Timer                           m_safetyTimer         = new Timer( ); // Safety timer for use in elbow
   private double                          m_safetyTimeout;                // Seconds that the timer ran before stopping
 
+  private int                             maxVelocity;
+
   // Constructor
   public Elbow( )
   {
@@ -110,6 +114,9 @@ public class Elbow extends SubsystemBase
     SmartDashboard.putNumber("EL_pidKd", m_pidKd);
 
     SmartDashboard.putNumber("EL_stowangle", m_elbowStowangle);
+    SmartDashboard.putNumber("EL_scoreAngleLow", m_lowScoreangle);
+    SmartDashboard.putNumber("EL_scoreAngleMid", m_midScoreangle);
+    SmartDashboard.putNumber("EL_scoreAngleHigh", m_highScoreangle);
 
     SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
     SmartDashboard.putNumber("EL_targetDegrees", m_elbowTargetDegrees);
@@ -131,6 +138,11 @@ public class Elbow extends SubsystemBase
     initialize( );
   }
 
+  public void getElbowAngle( )
+  {
+    m_elbowCanCoder.getAbsolutePosition( );
+  }
+
   @Override
   public void periodic( )
   {
@@ -139,6 +151,11 @@ public class Elbow extends SubsystemBase
     if (m_elbowValid)
     {
       int curCounts = (int) m_elbow.getSelectedSensorPosition(0);
+      int curVelocity = (int) m_elbow.getSelectedSensorVelocity(0);
+      maxVelocity = (maxVelocity > curVelocity) ? maxVelocity : curVelocity;
+      SmartDashboard.putNumber("EL_maxVelocity", maxVelocity);
+      SmartDashboard.putNumber("EL_curVelocity", curVelocity);
+      SmartDashboard.putNumber("EL_curCounts", curCounts);
       m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
       SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
       m_elbowLigament.setAngle(elbowCountsToDegrees(curCounts));
