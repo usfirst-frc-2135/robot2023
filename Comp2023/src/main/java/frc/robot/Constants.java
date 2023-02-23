@@ -278,14 +278,12 @@ public class Constants
       VISION_TOGGLE // Toggle modes
     }
 
-    //Moving the robot to the following side of the grid from the perspective of the driver: 
-
-    public enum VITargetLocations
+    // Direction of goal relative to AprilTag 
+    public enum VIGoalDirection
     {
-      TARGET_LEFT,       // Left
-      TARGET_MIDDLE,     // Middle, 
-      TARGET_RIGHT,      // Right, 
-      TARGET_SUBSTATION  // Substation
+      DIRECTION_LEFT,   // Left
+      DIRECTION_MIDDLE, // Middle, 
+      DIRECTION_RIGHT   // Right, 
     }
 
     public static final double       kLLDistance1   = 48;    // distance from bumper in inches for first reference point
