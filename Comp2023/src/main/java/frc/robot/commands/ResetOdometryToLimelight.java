@@ -43,13 +43,13 @@ public class ResetOdometryToLimelight extends CommandBase
     {
       m_vision.setFixedTargetID(m_id);
       Pose2d atp = Constants.VIConsts.kAprilTagPoses.get(m_id);
-      double rotation = (m_id <= 4) ? Math.PI : -Math.PI;
+      double rotation = (m_id <= 4) ? 0 : Math.PI;
       Pose2d robotPose =
           new Pose2d(new Translation2d(atp.getX( ) + ((m_id <= 4) ? -3.0 : 3.0), atp.getY( )), new Rotation2d(rotation));
 
       DataLogManager.log(String.format("Set Rotation %.2f", rotation));
 
-      m_swerve.resetOdometry(robotPose);
+      m_swerve.resetSimOdometry(robotPose);
     }
   }
 

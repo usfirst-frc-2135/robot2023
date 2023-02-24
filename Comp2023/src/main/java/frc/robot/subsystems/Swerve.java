@@ -614,6 +614,12 @@ public class Swerve extends SubsystemBase
     zeroGyro(pose.getRotation( ).getDegrees( ));
   }
 
+  public void resetSimOdometry(Pose2d pose)
+  {
+    m_poseEstimator.resetPosition(pose.getRotation( ), getPositions( ), pose);
+    zeroGyro(pose.getRotation( ).getDegrees( ));
+  }
+
   public void resetAnglesToAbsolute( )
   {
     for (SwerveModule mod : m_swerveMods)
