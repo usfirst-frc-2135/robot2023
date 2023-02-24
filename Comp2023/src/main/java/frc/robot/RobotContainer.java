@@ -18,6 +18,10 @@ import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.VIConsts.VITargetLocations;
 import frc.robot.commands.ResetOdometryToLimelight;
+import frc.robot.commands.ArmSetHeightScoreHigh;
+import frc.robot.commands.ArmSetHeightScoreLow;
+import frc.robot.commands.ArmSetHeightScoreMid;
+import frc.robot.commands.ArmSetHeightStow;
 import frc.robot.commands.AutoChargeStation;
 import frc.robot.commands.AutoDrivePath;
 import frc.robot.commands.AutoPreloadAndEngageChargeStation;
@@ -232,10 +236,10 @@ public class RobotContainer
     operStart.onTrue(new Dummy(XboxController.Button.kStart.value));
     //
     // Operator - POV buttons
-    operUp.onTrue(new Dummy(0));
-    operRight.onTrue(new Dummy(90));
-    operDown.onTrue(new Dummy(180));
-    operLeft.onTrue(new Dummy(270));
+    operUp.onTrue(new ArmSetHeightScoreHigh(m_elbow, m_wrist));
+    operRight.onTrue(new ArmSetHeightScoreMid(m_elbow, m_wrist));
+    operDown.onTrue(new ArmSetHeightScoreLow(m_elbow, m_wrist));
+    operLeft.onTrue(new ArmSetHeightStow(m_elbow, m_wrist));
     //
     // Operator Left/Right Trigger
     operLeftTrigger.onTrue(new Dummy(130));

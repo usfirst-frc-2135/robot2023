@@ -384,7 +384,7 @@ public class Elbow extends SubsystemBase
       if (++m_withinTolerance >= 5)
       {
         isFinished = true;
-        DataLogManager.log("elbow move finished - Time: " + String.format("%.3f", m_safetyTimer.get( )) + "  |  Cur degrees: "
+        DataLogManager.log("Elbow move finished - Time: " + String.format("%.3f", m_safetyTimer.get( )) + "  |  Cur degrees: "
             + String.format("%.1f", m_elbowCurDegrees));
       }
     }
@@ -396,7 +396,7 @@ public class Elbow extends SubsystemBase
     if (m_safetyTimer.get( ) >= m_safetyTimeout)
     {
       isFinished = true;
-      DataLogManager.log("Arm Move Safety timer has timed out");
+      DataLogManager.log("Elbow Move Safety timer has timed out");
     }
 
     if (isFinished)
