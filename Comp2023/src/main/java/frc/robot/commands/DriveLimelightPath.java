@@ -106,9 +106,6 @@ public class DriveLimelightPath extends CommandBase
         strName = "RIGHT";
         goalYValue = targetPose.getY( ) + ((targetId <= 4) ? 1 : -1);
         break;
-      case DIRECTION_SUBSATION :
-        strName = "SUBSTATION";
-        goalYValue = targetPose.getY( ) + ((targetId <= 4) ? -1.0 : 1.0);
     }
 
     DataLogManager.log(String.format("Calculate target ID %d direction %s", targetId, strName));

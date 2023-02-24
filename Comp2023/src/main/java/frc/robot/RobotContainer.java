@@ -141,8 +141,8 @@ public class RobotContainer
     SmartDashboard.putData("ResetOdo7", new ResetOdometryToLimelight(m_swerve, m_vision, 7));
     SmartDashboard.putData("ResetOdo8", new ResetOdometryToLimelight(m_swerve, m_vision, 8));
 
-    SmartDashboard.putData("ApplyVisionMeasurement", new ResetOdometryToLimelight(m_swerve, m_vision));
-    
+    SmartDashboard.putData("ApplyVisionMeasurement", new ResetOdometryToLimelight(m_swerve, m_vision, 0));
+
     SmartDashboard.putData("ElbowStow", new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_STOW));
     SmartDashboard.putData("ElbowLow", new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_LOW));
     SmartDashboard.putData("ElbowMid", new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_MID));
