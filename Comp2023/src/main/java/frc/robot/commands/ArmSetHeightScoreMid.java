@@ -36,6 +36,7 @@ public class ArmSetHeightScoreMid extends SequentialCommandGroup
           new WaitUntilCommand(wrist::moveWristDistanceIsFinished),
           new WristMoveToAngle(wrist, WristAngle.WRIST_MID)
         )
+        //TODO: EXTEND ARM
         // @formatter:on
     );
   }

@@ -36,6 +36,7 @@ public class ArmSetHeightScoreHigh extends SequentialCommandGroup
           new WaitUntilCommand(wrist::moveWristDistanceIsFinished),
           new WristMoveToAngle(wrist, WristAngle.WRIST_HIGH)
         )
+        //TODO: EXTEND ARM
         // @formatter:on
     );
   }

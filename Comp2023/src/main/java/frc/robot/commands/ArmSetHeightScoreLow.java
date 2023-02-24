@@ -35,7 +35,8 @@ public class ArmSetHeightScoreLow extends SequentialCommandGroup
         new ParallelDeadlineGroup(
           new WaitUntilCommand(wrist::moveWristDistanceIsFinished),
           new WristMoveToAngle(wrist, WristAngle.WRIST_LOW)
-        )
+        )        
+        //TODO: EXTEND ARM
         // @formatter:on
     );
   }
