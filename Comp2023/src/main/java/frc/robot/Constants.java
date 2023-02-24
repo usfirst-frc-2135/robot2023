@@ -201,7 +201,6 @@ public class Constants
     public static final int    kWristAllowedError     = 0;      // Wrist PID allowable closed loop error in counts
     public static final double kWristToleranceDegrees = 0.25;   // Wrist PID tolerance in degrees
 
-    public static final double kWristMinAngle         = 0.0;    // Wrist minimum allowable Angle
     public static final double kWristMaxAngle         = 120.0;   // Wrist maximum allowable Angle
     public static final double kWristStowAngle        = 2.0;   // TO-DO: FIGURE IT OUT
     public static final double kWristAngleScoreLow    = 20.0;  // TO-DO: FIND
@@ -221,7 +220,7 @@ public class Constants
 
     public enum WristAngle
     {
-      WRIST_NOCHANGE,     // No change in elbow Angle--maintain current position
+      WRIST_NOCHANGE,     // No change in Wrist Angle--maintain current position
       WRIST_STOW,         // Move wrist to stow position
       WRIST_LOW,          // Move wrist to low-scoring Angle
       WRIST_MID,          // Move wrist to shelf Angle; slightly higher than mid-scoring Angle so this is used for both

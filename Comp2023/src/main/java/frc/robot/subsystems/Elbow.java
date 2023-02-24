@@ -376,13 +376,13 @@ public class Elbow extends SubsystemBase
 
       m_elbow.set(ControlMode.MotionMagic, elbowDegreesToCounts(m_elbowTargetDegrees));
 
-      DataLogManager.log("elbow moving: " + String.format("%.1f", m_elbowCurDegrees) + " -> "
+      DataLogManager.log("Elbow moving: " + String.format("%.1f", m_elbowCurDegrees) + " -> "
           + String.format("%.1f", m_elbowTargetDegrees) + " degrees  |  counts " + elbowDegreesToCounts(m_elbowCurDegrees)
           + " -> " + elbowDegreesToCounts(m_elbowTargetDegrees));
     }
     else
     {
-      DataLogManager.log("elbow is not calibrated");
+      DataLogManager.log("Elbow is not calibrated");
       if (m_elbowValid)
         m_elbow.set(ControlMode.PercentOutput, 0.0);
     }
@@ -400,7 +400,7 @@ public class Elbow extends SubsystemBase
       if (++m_withinTolerance >= 5)
       {
         isFinished = true;
-        DataLogManager.log("elbow move finished - Time: " + String.format("%.3f", m_safetyTimer.get( )) + "  |  Cur degrees: "
+        DataLogManager.log("Elbow move finished - Time: " + String.format("%.3f", m_safetyTimer.get( )) + "  |  Cur degrees: "
             + String.format("%.1f", m_elbowCurDegrees));
       }
     }
