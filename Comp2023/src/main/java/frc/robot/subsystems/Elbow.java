@@ -40,20 +40,19 @@ import frc.robot.team2135.PhoenixUtil;
 public class Elbow extends SubsystemBase
 {
   // Constants
-  private static final int                CANTIMEOUT            = 30;  // CAN timeout in msec
   private static final int                PIDINDEX              = 0;   // PID in use (0-primary, 1-aux)
   private static final int                SLOTINDEX             = 0;   // Use first PID slot
 
   // Member objects
   private final WPI_TalonFX               m_elbow               = new WPI_TalonFX(Constants.Ports.kCANID_Elbow);  //elbow
-  private final CANCoder                  m_elbowCanCoder       = new CANCoder(16);
+  private final CANCoder                  m_elbowCanCoder       = new CANCoder(Constants.Ports.kCANID_ELCANCoder);
   private final TalonFXSimCollection      m_elbowMotorSim       = new TalonFXSimCollection(m_elbow);
   private final SingleJointedArmSim       m_elbowSim            = new SingleJointedArmSim(DCMotor.getFalcon500(1),
       ELConsts.kElbowGearRatio, 2.0, ELConsts.kForearmLengthMeters, 0.0, Math.PI, true);
   private final Mechanism2d               m_elbowMech           = new Mechanism2d(3, 3);
   private final MechanismLigament2d       m_elbowLigament;
 
-  private boolean                         m_elbowValid;               // Health indicator for elbow Talon 
+  private boolean                         m_elbowValid;                // Health indicator for elbow Talon 
 
   //Devices and simulation objs
   private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true,
@@ -102,7 +101,7 @@ public class Elbow extends SubsystemBase
 
     m_elbowValid = PhoenixUtil.getInstance( ).talonFXInitialize(m_elbow, "elbow");
 
-    SmartDashboard.putBoolean("HL_validCL", m_elbowValid);
+    SmartDashboard.putBoolean("HL_validEL", m_elbowValid);
 
     // Initialize Variables
     SmartDashboard.putNumber("EL_velocity", m_velocity);
@@ -123,7 +122,7 @@ public class Elbow extends SubsystemBase
     SmartDashboard.putBoolean("EL_calibrated", m_calibrated);
 
     if (m_elbowValid)
-      elbowTalonInitialize(m_elbow, true);
+      elbowTalonInitialize(m_elbow, ELConsts.kInvertMotor);
 
     // the mechanism root node
     MechanismRoot2d elbowRoot = m_elbowMech.getRoot("elbow", 1.5, 2);
@@ -229,24 +228,24 @@ public class Elbow extends SubsystemBase
     // Configure sensor settings
     motor.setSelectedSensorPosition(0.0);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSelectedSensorPosition");
-    motor.configAllowableClosedloopError(SLOTINDEX, m_elbowAllowedError, CANTIMEOUT);
+    motor.configAllowableClosedloopError(SLOTINDEX, m_elbowAllowedError, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllowableClosedloopError");
 
-    motor.configMotionCruiseVelocity(m_velocity, CANTIMEOUT);
+    motor.configMotionCruiseVelocity(m_velocity, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionCruiseVelocity");
-    motor.configMotionAcceleration(m_acceleration, CANTIMEOUT);
+    motor.configMotionAcceleration(m_acceleration, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionAcceleration");
-    motor.configMotionSCurveStrength(m_sCurveStrength, CANTIMEOUT);
+    motor.configMotionSCurveStrength(m_sCurveStrength, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionSCurveStrength");
 
     // Configure Magic Motion settings
-    motor.config_kF(0, m_pidKf, CANTIMEOUT);
+    motor.config_kF(0, m_pidKf, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kF");
-    motor.config_kP(0, m_pidKp, CANTIMEOUT);
+    motor.config_kP(0, m_pidKp, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kP");
-    motor.config_kI(0, m_pidKi, CANTIMEOUT);
+    motor.config_kI(0, m_pidKi, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kI");
-    motor.config_kD(0, m_pidKd, CANTIMEOUT);
+    motor.config_kD(0, m_pidKd, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kD");
     motor.selectProfileSlot(SLOTINDEX, PIDINDEX);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "selectProfileSlot");

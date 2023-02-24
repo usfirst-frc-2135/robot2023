@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.sensors.CANCoder;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -39,19 +40,19 @@ import frc.robot.team2135.PhoenixUtil;
 public class Wrist extends SubsystemBase
 {
   // Constants
-  private static final int                CANTIMEOUT            = 30;  // CAN timeout in msec
   private static final int                PIDINDEX              = 0;   // PID in use (0-primary, 1-aux)
   private static final int                SLOTINDEX             = 0;   // Use first PID slot
 
   // Member objects
   private final WPI_TalonFX               m_wrist               = new WPI_TalonFX(Constants.Ports.kCANID_Wrist);  //wrist
+  private final CANCoder                  m_wristCanCoder       = new CANCoder(Constants.Ports.kCANID_WRCANCoder);
   private final TalonFXSimCollection      m_wristMotorSim       = new TalonFXSimCollection(m_wrist);
   private final SingleJointedArmSim       m_wristSim            = new SingleJointedArmSim(DCMotor.getFalcon500(1),
       WRConsts.kWristGearRatio, 2.0, WRConsts.kGripperLengthMeters, 0, Math.PI, true);
   private final Mechanism2d               m_wristMech           = new Mechanism2d(3, 3);
   private final MechanismLigament2d       m_wristLigament;
 
-  private boolean                         m_wristValid;               // Health indicator for wrist Talon 
+  private boolean                         m_wristValid;                // Health indicator for wrist Talon 
 
   //Devices and simulation objs
   private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true,
@@ -121,7 +122,7 @@ public class Wrist extends SubsystemBase
     SmartDashboard.putBoolean("WR_calibrated", m_calibrated);
 
     if (m_wristValid)
-      wristTalonInitialize(m_wrist, false);
+      wristTalonInitialize(m_wrist, WRConsts.kInvertMotor);
 
     // the mechanism root node
     MechanismRoot2d wristRoot = m_wristMech.getRoot("wrist", 1.5, 2);
@@ -222,24 +223,24 @@ public class Wrist extends SubsystemBase
     // Configure sensor settings
     motor.setSelectedSensorPosition(0.0);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSelectedSensorPosition");
-    motor.configAllowableClosedloopError(SLOTINDEX, m_wristAllowedError, CANTIMEOUT);
+    motor.configAllowableClosedloopError(SLOTINDEX, m_wristAllowedError, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllowableClosedloopError");
 
-    motor.configMotionCruiseVelocity(m_velocity, CANTIMEOUT);
+    motor.configMotionCruiseVelocity(m_velocity, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionCruiseVelocity");
-    motor.configMotionAcceleration(m_acceleration, CANTIMEOUT);
+    motor.configMotionAcceleration(m_acceleration, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionAcceleration");
-    motor.configMotionSCurveStrength(m_sCurveStrength, CANTIMEOUT);
+    motor.configMotionSCurveStrength(m_sCurveStrength, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionSCurveStrength");
 
     // Configure Magic Motion settings
-    motor.config_kF(0, m_pidKf, CANTIMEOUT);
+    motor.config_kF(0, m_pidKf, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kF");
-    motor.config_kP(0, m_pidKp, CANTIMEOUT);
+    motor.config_kP(0, m_pidKp, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kP");
-    motor.config_kI(0, m_pidKi, CANTIMEOUT);
+    motor.config_kI(0, m_pidKi, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kI");
-    motor.config_kD(0, m_pidKd, CANTIMEOUT);
+    motor.config_kD(0, m_pidKd, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kD");
     motor.selectProfileSlot(SLOTINDEX, PIDINDEX);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "selectProfileSlot");
