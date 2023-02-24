@@ -82,7 +82,7 @@ public class Wrist extends SubsystemBase
 
   private int                             m_wristDebug          = 1; // DEBUG flag to disable/enable extra logging calls
 
-  private boolean                         m_calibrated          = false;  // Indicates whether the climber has been calibrated
+  private boolean                         m_calibrated          = false;  // Indicates whether the wrist has been calibrated
   private double                          m_wristTargetDegrees  = 0.0;    // Target angle in degrees
   private double                          m_wristCurDegrees     = 0.0;    // Current angle in degrees
   private int                             m_withinTolerance     = 0;      // Counter for consecutive readings within tolerance
@@ -363,13 +363,13 @@ public class Wrist extends SubsystemBase
 
       m_wrist.set(ControlMode.MotionMagic, wristDegreesToCounts(m_wristTargetDegrees));
 
-      DataLogManager.log("wrist moving: " + String.format("%.1f", m_wristCurDegrees) + " -> "
+      DataLogManager.log("Wrist moving: " + String.format("%.1f", m_wristCurDegrees) + " -> "
           + String.format("%.1f", m_wristTargetDegrees) + " degrees  |  counts " + wristDegreesToCounts(m_wristCurDegrees)
           + " -> " + wristDegreesToCounts(m_wristTargetDegrees));
     }
     else
     {
-      DataLogManager.log("wrist is not calibrated");
+      DataLogManager.log("Wrist is not calibrated");
       if (m_wristValid)
         m_wrist.set(ControlMode.PercentOutput, 0.0);
     }

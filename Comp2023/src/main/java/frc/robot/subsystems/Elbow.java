@@ -82,7 +82,7 @@ public class Elbow extends SubsystemBase
 
   private int                             m_elbowDebug          = 1; // DEBUG flag to disable/enable extra logging calls
 
-  private boolean                         m_calibrated          = false;  // Indicates whether the climber has been calibrated
+  private boolean                         m_calibrated          = false;  // Indicates whether the elbow has been calibrated
   private double                          m_elbowTargetDegrees  = 0.0;    // Target angle in degrees
   private double                          m_elbowCurDegrees     = 0.0;    // Current angle in degrees
   private int                             m_withinTolerance     = 0;      // Counter for consecutive readings within tolerance
@@ -360,13 +360,13 @@ public class Elbow extends SubsystemBase
 
       m_elbow.set(ControlMode.MotionMagic, elbowDegreesToCounts(m_elbowTargetDegrees));
 
-      DataLogManager.log("elbow moving: " + String.format("%.1f", m_elbowCurDegrees) + " -> "
+      DataLogManager.log("Elbow moving: " + String.format("%.1f", m_elbowCurDegrees) + " -> "
           + String.format("%.1f", m_elbowTargetDegrees) + " degrees  |  counts " + elbowDegreesToCounts(m_elbowCurDegrees)
           + " -> " + elbowDegreesToCounts(m_elbowTargetDegrees));
     }
     else
     {
-      DataLogManager.log("elbow is not calibrated");
+      DataLogManager.log("Elbow is not calibrated");
       if (m_elbowValid)
         m_elbow.set(ControlMode.PercentOutput, 0.0);
     }

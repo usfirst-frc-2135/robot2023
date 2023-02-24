@@ -158,9 +158,9 @@ public class Constants
     public static final double kElbowAnglewMin        = 0.0;    // Elbow minimum allowable degrees
     public static final double kElbowAngleMax         = 36.0;   // Elbow maximum allowable degrees
     public static final double kElbowAngleStow        = 0;      // TO-DO: FIGURE IT OUT
-    public static final double kElbowAngleScoreLow    = 0;      // TO-DO: FIND
-    public static final double kElbowAngleScoreMid    = 0;      // TO-DO: FIND
-    public static final double kElbowAngleScoreHigh   = 0;      // TO-DO: FIND
+    public static final double kElbowAngleScoreLow    = 20;      // TO-DO: FIND
+    public static final double kElbowAngleScoreMid    = 40;      // TO-DO: FIND
+    public static final double kElbowAngleScoreHigh   = 60;      // TO-DO: FIND
 
     public static final double kElbowSpeedCalibrate   = -0.1;   // Motor percent output during calibration
     public static final double kElbowSpeedMaxManual   = 0.3;    // Motor percent output during manual operation
@@ -204,9 +204,9 @@ public class Constants
     public static final double kWristMinAngle         = 0.0;    // Wrist minimum allowable Angle
     public static final double kWristMaxAngle         = 36.0;   // Wrist maximum allowable Angle
     public static final double kWristStowAngle        = 0;      // TO-DO: FIGURE IT OUT
-    public static final double kWristAngleScoreLow    = 0;      // TO-DO: FIND
-    public static final double kWristAngleScoreMid    = 0;      // TO-DO: FIND
-    public static final double kWristAngleScoreHigh   = 0;      // TO-DO: FIND
+    public static final double kWristAngleScoreLow    = 60;      // TO-DO: FIND
+    public static final double kWristAngleScoreMid    = 40;      // TO-DO: FIND
+    public static final double kWristAngleScoreHigh   = 20;      // TO-DO: FIND
 
     public static final double kWristSpeedCalibrate   = -0.1;   // Motor percent output during calibration
     public static final double kWristSpeedMaxManual   = 0.3;    // Motor percent output during manual operation
@@ -221,7 +221,7 @@ public class Constants
 
     public enum WristAngle
     {
-      WRIST_NOCHANGE,     // No change in elbow Angle--maintain current position
+      WRIST_NOCHANGE,     // No change in Wrist Angle--maintain current position
       WRIST_STOW,         // Move wrist to stow position
       WRIST_LOW,          // Move wrist to low-scoring Angle
       WRIST_MID,          // Move wrist to shelf Angle; slightly higher than mid-scoring Angle so this is used for both
