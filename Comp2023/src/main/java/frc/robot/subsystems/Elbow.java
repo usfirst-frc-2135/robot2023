@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.sensors.CANCoder;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -45,13 +46,14 @@ public class Elbow extends SubsystemBase
 
   // Member objects
   private final WPI_TalonFX               m_elbow               = new WPI_TalonFX(Constants.Ports.kCANID_Elbow);  //elbow
+  private final CANCoder                  m_elbowCanCoder       = new CANCoder(16);
   private final TalonFXSimCollection      m_elbowMotorSim       = new TalonFXSimCollection(m_elbow);
   private final SingleJointedArmSim       m_elbowSim            = new SingleJointedArmSim(DCMotor.getFalcon500(1),
       ELConsts.kElbowGearRatio, 2.0, ELConsts.kForearmLengthMeters, 0.0, Math.PI, true);
-
+  private final Mechanism2d               m_elbowMech           = new Mechanism2d(3, 3);
   private final MechanismLigament2d       m_elbowLigament;
 
-  private boolean                         m_elbowValid;               // Health indicator for climber Talon 
+  private boolean                         m_elbowValid;               // Health indicator for elbow Talon 
 
   //Devices and simulation objs
   private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true,
@@ -68,7 +70,7 @@ public class Elbow extends SubsystemBase
   private double                          m_pidKi               = ELConsts.kElbowPidKi;           // PID integral
   private double                          m_pidKd               = ELConsts.kElbowPidKd;           // PID derivative
   private int                             m_elbowAllowedError   = ELConsts.kElbowAllowedError;     // PID allowable closed loop error
-  private double                          m_toleranceInches     = ELConsts.kElbowToleranceDegrees;  // PID tolerance in inches
+  private double                          m_toleranceDegrees    = ELConsts.kElbowToleranceDegrees;  // PID tolerance in inches
 
   private double                          m_elbowStowangle      = ELConsts.kElbowAngleStow;    // elbow Stow angle
   private double                          m_lowScoreangle       = ELConsts.kElbowAngleScoreLow;     // low-peg scoring angle   
@@ -82,13 +84,15 @@ public class Elbow extends SubsystemBase
 
   private int                             m_elbowDebug          = 1; // DEBUG flag to disable/enable extra logging calls
 
-  private boolean                         m_calibrated          = false;  // Indicates whether the climber has been calibrated
+  private boolean                         m_calibrated          = true;  // Indicates whether the elbow has been calibrated
   private double                          m_elbowTargetDegrees  = 0.0;    // Target angle in degrees
   private double                          m_elbowCurDegrees     = 0.0;    // Current angle in degrees
   private int                             m_withinTolerance     = 0;      // Counter for consecutive readings within tolerance
 
-  private Timer                           m_safetyTimer         = new Timer( ); // Safety timer for use in climber
+  private Timer                           m_safetyTimer         = new Timer( ); // Safety timer for use in elbow
   private double                          m_safetyTimeout;                // Seconds that the timer ran before stopping
+
+  private int                             maxVelocity;
 
   // Constructor
   public Elbow( )
@@ -98,39 +102,45 @@ public class Elbow extends SubsystemBase
 
     m_elbowValid = PhoenixUtil.getInstance( ).talonFXInitialize(m_elbow, "elbow");
 
-    // SmartDashboard.putBoolean("HL_validCL", m_validEL);
+    SmartDashboard.putBoolean("HL_validCL", m_elbowValid);
 
-    // // Initialize Variables
-    // SmartDashboard.putNumber("EL_velocity", m_velocity);
-    // SmartDashboard.putNumber("EL_acceleration", m_acceleration);
-    // SmartDashboard.putNumber("EL_sCurveStrength", m_sCurveStrength);
-    // SmartDashboard.putNumber("EL_pidKf", m_pidKf);
-    // SmartDashboard.putNumber("EL_pidKp", m_pidKp);
-    // SmartDashboard.putNumber("EL_pidKi", m_pidKi);
-    // SmartDashboard.putNumber("EL_pidKd", m_pidKd);
+    // Initialize Variables
+    SmartDashboard.putNumber("EL_velocity", m_velocity);
+    SmartDashboard.putNumber("EL_acceleration", m_acceleration);
+    SmartDashboard.putNumber("EL_sCurveStrength", m_sCurveStrength);
+    SmartDashboard.putNumber("EL_pidKf", m_pidKf);
+    SmartDashboard.putNumber("EL_pidKp", m_pidKp);
+    SmartDashboard.putNumber("EL_pidKi", m_pidKi);
+    SmartDashboard.putNumber("EL_pidKd", m_pidKd);
 
-    // SmartDashboard.putNumber("EL_stowangle", m_stowangle);
+    SmartDashboard.putNumber("EL_stowangle", m_elbowStowangle);
+    SmartDashboard.putNumber("EL_scoreAngleLow", m_lowScoreangle);
+    SmartDashboard.putNumber("EL_scoreAngleMid", m_midScoreangle);
+    SmartDashboard.putNumber("EL_scoreAngleHigh", m_highScoreangle);
 
     SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
     SmartDashboard.putNumber("EL_targetDegrees", m_elbowTargetDegrees);
     SmartDashboard.putBoolean("EL_calibrated", m_calibrated);
 
     if (m_elbowValid)
-      elbowTalonInitialize(m_elbow, false);
+      elbowTalonInitialize(m_elbow, true);
 
-    // the main mechanism object
-    Mechanism2d elbowMech = new Mechanism2d(3, 3);
     // the mechanism root node
-    MechanismRoot2d elbowRoot = elbowMech.getRoot("elbow", 1.5, 2);
+    MechanismRoot2d elbowRoot = m_elbowMech.getRoot("elbow", 1.5, 2);
 
     // MechanismLigament2d objects represent each "section"/"stage" of the mechanism, and are based
     // off the root node or another ligament object
     m_elbowLigament = elbowRoot.append(new MechanismLigament2d("elbow", 1, 0, 6, new Color8Bit(Color.kBlue)));
 
     // post the mechanism to the dashboard
-    SmartDashboard.putData("ElbowMech2d", elbowMech);
+    SmartDashboard.putData("ElbowMech2d", m_elbowMech);
 
     initialize( );
+  }
+
+  public void getElbowAngle( )
+  {
+    m_elbowCanCoder.getAbsolutePosition( );
   }
 
   @Override
@@ -141,6 +151,11 @@ public class Elbow extends SubsystemBase
     if (m_elbowValid)
     {
       int curCounts = (int) m_elbow.getSelectedSensorPosition(0);
+      int curVelocity = (int) m_elbow.getSelectedSensorVelocity(0);
+      maxVelocity = (maxVelocity > curVelocity) ? maxVelocity : curVelocity;
+      SmartDashboard.putNumber("EL_maxVelocity", maxVelocity);
+      SmartDashboard.putNumber("EL_curVelocity", curVelocity);
+      SmartDashboard.putNumber("EL_curCounts", curCounts);
       m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
       SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
       m_elbowLigament.setAngle(elbowCountsToDegrees(curCounts));
@@ -154,13 +169,14 @@ public class Elbow extends SubsystemBase
 
     // Set input motor voltage from the motor setting
     m_elbowMotorSim.setBusVoltage(RobotController.getInputVoltage( ));
-    m_elbowSim.setInput(-m_elbowMotorSim.getMotorOutputLeadVoltage( ));
+    m_elbowSim.setInput(m_elbowMotorSim.getMotorOutputLeadVoltage( ));
 
     // update for 20 msec loop
     m_elbowSim.update(0.020);
 
     // Finally, we set our simulated encoder's readings and simulated battery voltage
-    m_elbow.setSelectedSensorPosition(elbowDegreesToCounts(Units.radiansToDegrees(-m_elbowSim.getAngleRads( ))));
+    m_elbowMotorSim.setIntegratedSensorRawPosition(elbowDegreesToCounts(Units.radiansToDegrees(m_elbowSim.getAngleRads( ))));
+    m_elbowMotorSim.setIntegratedSensorVelocity(elbowDegreesToCounts(Units.radiansToDegrees(m_elbowSim.getVelocityRadPerSec( ))));
 
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_elbowSim.getCurrentDrawAmps( )));
@@ -178,7 +194,7 @@ public class Elbow extends SubsystemBase
       curELCounts = m_elbow.getSelectedSensorPosition(0);
     m_elbowCurDegrees = elbowCountsToDegrees((int) curELCounts);
     m_elbowTargetDegrees = m_elbowCurDegrees;
-    DataLogManager.log(getSubsystem( ) + ": Init Target Inches: " + m_elbowTargetDegrees);
+    DataLogManager.log(getSubsystem( ) + ": Init Target Degrees: " + m_elbowTargetDegrees);
   }
 
   private int elbowDegreesToCounts(double degrees)
@@ -244,7 +260,7 @@ public class Elbow extends SubsystemBase
     double motorOutput = 0.0;
     double manualSpeedMax = ELConsts.kElbowSpeedMaxManual;
 
-    yElbowValue = joystick.getLeftY( );
+    yElbowValue = -joystick.getLeftY( );
     if (yElbowValue > -m_stickDeadband && yElbowValue < m_stickDeadband)
     {
       if (m_elbowMode != ElbowMode.ELBOW_STOPPED)
@@ -283,7 +299,7 @@ public class Elbow extends SubsystemBase
 
   public void setElbowStopped( )
   {
-    DataLogManager.log(getSubsystem( ) + ": ARM Set Arm Stopped");
+    DataLogManager.log(getSubsystem( ) + ": Elbow now STOPPED");
 
     if (m_elbowValid)
       m_elbow.set(ControlMode.PercentOutput, 0.0);
@@ -291,7 +307,7 @@ public class Elbow extends SubsystemBase
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
-  public void moveElbowDistanceInit(ElbowAngle angle)
+  public void moveElbowAngleInit(ElbowAngle angle)
   {
     if (m_elbowDebug != 0)
     {
@@ -360,31 +376,31 @@ public class Elbow extends SubsystemBase
 
       m_elbow.set(ControlMode.MotionMagic, elbowDegreesToCounts(m_elbowTargetDegrees));
 
-      DataLogManager.log("elbow moving: " + String.format("%.1f", m_elbowCurDegrees) + " -> "
+      DataLogManager.log("Elbow moving: " + String.format("%.1f", m_elbowCurDegrees) + " -> "
           + String.format("%.1f", m_elbowTargetDegrees) + " degrees  |  counts " + elbowDegreesToCounts(m_elbowCurDegrees)
           + " -> " + elbowDegreesToCounts(m_elbowTargetDegrees));
     }
     else
     {
-      DataLogManager.log("elbow is not calibrated");
+      DataLogManager.log("Elbow is not calibrated");
       if (m_elbowValid)
         m_elbow.set(ControlMode.PercentOutput, 0.0);
     }
   }
 
-  public boolean moveElbowDistanceIsFinished( )
+  public boolean moveElbowAngleIsFinished( )
   {
     boolean isFinished = false;
-    double errorInInches = 0.0;
+    double errorInDegrees = 0.0;
 
-    errorInInches = m_elbowTargetDegrees - m_elbowCurDegrees;
+    errorInDegrees = m_elbowTargetDegrees - m_elbowCurDegrees;
 
-    if (Math.abs(errorInInches) < m_toleranceInches)
+    if (Math.abs(errorInDegrees) < m_toleranceDegrees)
     {
       if (++m_withinTolerance >= 5)
       {
         isFinished = true;
-        DataLogManager.log("elbow move finished - Time: " + String.format("%.3f", m_safetyTimer.get( )) + "  |  Cur degrees: "
+        DataLogManager.log("Elbow move finished - Time: " + String.format("%.3f", m_safetyTimer.get( )) + "  |  Cur degrees: "
             + String.format("%.1f", m_elbowCurDegrees));
       }
     }
@@ -396,7 +412,7 @@ public class Elbow extends SubsystemBase
     if (m_safetyTimer.get( ) >= m_safetyTimeout)
     {
       isFinished = true;
-      DataLogManager.log("Arm Move Safety timer has timed out");
+      DataLogManager.log("Elbow Move Safety timer has timed out!");
     }
 
     if (isFinished)
