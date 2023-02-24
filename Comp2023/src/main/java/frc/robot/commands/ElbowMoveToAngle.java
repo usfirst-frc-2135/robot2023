@@ -13,12 +13,12 @@ import frc.robot.subsystems.Elbow;
 public class ElbowMoveToAngle extends CommandBase
 {
   private final Elbow m_elbow;
-  private ElbowAngle  m_Angle;
+  private ElbowAngle  m_angle;
 
-  public ElbowMoveToAngle(Elbow elbow, ElbowAngle Angle)
+  public ElbowMoveToAngle(Elbow elbow, ElbowAngle angle)
   {
     m_elbow = elbow;
-    m_Angle = Angle;
+    m_angle = angle;
 
     setName("ElbowMoveToAngle");
     addRequirements(m_elbow);
@@ -28,7 +28,7 @@ public class ElbowMoveToAngle extends CommandBase
   @Override
   public void initialize( )
   {
-    m_elbow.moveElbowDistanceInit(m_Angle);
+    m_elbow.moveElbowAngleInit(m_angle);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
