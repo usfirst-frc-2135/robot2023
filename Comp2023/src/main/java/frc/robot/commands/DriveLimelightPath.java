@@ -9,13 +9,11 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
 import frc.robot.Constants.VIConsts;
-import frc.robot.Constants.VIConsts.VITargetLocations;
+import frc.robot.Constants.VIConsts.VIGoalDirection;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
 
@@ -24,15 +22,17 @@ import frc.robot.subsystems.Vision;
  */
 public class DriveLimelightPath extends CommandBase
 {
-  private final Swerve            m_swerve;
-  private final Vision            m_vision;
-  private final VITargetLocations m_targetLocation;
+  private final Swerve          m_swerve;
+  private final Vision          m_vision;
+  private final VIGoalDirection m_goalDirection;
+  private Pose2d                m_goalPose2d;
 
-  public DriveLimelightPath(Swerve swerve, Vision vision, VITargetLocations targetLocation)
+  public DriveLimelightPath(Swerve swerve, Vision vision, VIGoalDirection goalDirection)
   {
     m_swerve = swerve;
     m_vision = vision;
-    m_targetLocation = targetLocation;
+    m_goalDirection = goalDirection;
+    m_goalPose2d = new Pose2d( );
 
     setName("DriveLimelight");
     addRequirements(m_swerve);
@@ -42,16 +42,16 @@ public class DriveLimelightPath extends CommandBase
   @Override
   public void initialize( )
   {
-    Pose2d goalPose2d = calculateTarget(m_targetLocation);
+    m_goalPose2d = calculateTarget(m_vision.getTargetID( ), m_goalDirection);
     Pose2d currentPose = m_swerve.getPose( );
 
     PathPlannerTrajectory trajectory = PathPlanner.generatePath(new PathConstraints(3, 4),
-        new PathPoint(currentPose.getTranslation( ), goalPose2d.getRotation( )),
-        new PathPoint(goalPose2d.getTranslation( ), goalPose2d.getRotation( )));
+        new PathPoint(currentPose.getTranslation( ), currentPose.getRotation( )),
+        new PathPoint(m_goalPose2d.getTranslation( ), m_goalPose2d.getRotation( )));
 
     m_swerve.driveWithPathFollowerInit(trajectory, true);
 
-    DataLogManager.log("GOAL POSE@D +++ " + goalPose2d);
+    DataLogManager.log(String.format("LLPATH: current %s, goal %s", currentPose, m_goalPose2d));
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -82,21 +82,37 @@ public class DriveLimelightPath extends CommandBase
     return false;
   }
 
-  public Pose2d calculateTarget(VIConsts.VITargetLocations targetLocation)
+  public Pose2d calculateTarget(int targetId, VIConsts.VIGoalDirection goalDirection)
   {
-    int targetID = m_vision.getTargetID( );
-    Pose2d aprilTagPose2d = Constants.VIConsts.kAprilTagPoses.get(targetID);
-    double targetXvalue = 0;
+    Pose2d targetPose = VIConsts.kAprilTagPoses.get(targetId);
+    double goalXValue = 0;
+    double goalYValue = 0;
     String strName;
 
-    switch (targetLocation)
+    goalXValue = targetPose.getX( ) + ((targetId <= 4) ? -1.0 : 1.0);
+
+    switch (goalDirection)
     {
       default :
-      case TARGET_MIDDLE :
-        strName = "MIDDLE";
-        targetXvalue = aprilTagPose2d.getX( ) + 2;
+      case DIRECTION_LEFT :
+        strName = "LEFT";
+        goalYValue = targetPose.getY( ) + ((targetId <= 4) ? -1 : 1);
         break;
+      case DIRECTION_MIDDLE :
+        strName = "MIDDLE";
+        goalYValue = targetPose.getY( );
+        break;
+      case DIRECTION_RIGHT :
+        strName = "RIGHT";
+        goalYValue = targetPose.getY( ) + ((targetId <= 4) ? 1 : -1);
+        break;
+      case DIRECTION_SUBSATION :
+        strName = "SUBSTATION";
+        goalYValue = targetPose.getY( ) + ((targetId <= 4) ? -1.0 : 1.0);
     }
-    return new Pose2d(new Translation2d(targetXvalue, aprilTagPose2d.getY( )), new Rotation2d(0));
+
+    DataLogManager.log(String.format("Calculate target ID %d direction %s", targetId, strName));
+
+    return new Pose2d(new Translation2d(goalXValue, goalYValue), targetPose.getRotation( ));
   }
 }
