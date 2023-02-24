@@ -9,7 +9,9 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.VIConsts;
@@ -25,14 +27,12 @@ public class DriveLimelightPath extends CommandBase
   private final Swerve          m_swerve;
   private final Vision          m_vision;
   private final VIGoalDirection m_goalDirection;
-  private Pose2d                m_goalPose2d;
 
   public DriveLimelightPath(Swerve swerve, Vision vision, VIGoalDirection goalDirection)
   {
     m_swerve = swerve;
     m_vision = vision;
     m_goalDirection = goalDirection;
-    m_goalPose2d = new Pose2d( );
 
     setName("DriveLimelight");
     addRequirements(m_swerve);
@@ -42,16 +42,16 @@ public class DriveLimelightPath extends CommandBase
   @Override
   public void initialize( )
   {
-    m_goalPose2d = calculateTarget(m_vision.getTargetID( ), m_goalDirection);
+    Pose2d goalPose2d = calculateTarget(m_vision.getTargetID( ), m_goalDirection);
     Pose2d currentPose = m_swerve.getPose( );
 
     PathPlannerTrajectory trajectory = PathPlanner.generatePath(new PathConstraints(3, 4),
         new PathPoint(currentPose.getTranslation( ), currentPose.getRotation( )),
-        new PathPoint(m_goalPose2d.getTranslation( ), m_goalPose2d.getRotation( )));
+        new PathPoint(goalPose2d.getTranslation( ), goalPose2d.getRotation( )));
 
     m_swerve.driveWithPathFollowerInit(trajectory, true);
 
-    DataLogManager.log(String.format("LLPATH: current %s, goal %s", currentPose, m_goalPose2d));
+    DataLogManager.log(String.format("LLPATH: current %s, goal %s", currentPose, goalPose2d));
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -110,6 +110,7 @@ public class DriveLimelightPath extends CommandBase
 
     DataLogManager.log(String.format("Calculate target ID %d direction %s", targetId, strName));
 
-    return new Pose2d(new Translation2d(goalXValue, goalYValue), targetPose.getRotation( ));
+    return new Pose2d(new Translation2d(goalXValue, goalYValue), new Rotation2d(targetPose.getRotation( ).getRadians( ) + 3.14));
+
   }
 }
