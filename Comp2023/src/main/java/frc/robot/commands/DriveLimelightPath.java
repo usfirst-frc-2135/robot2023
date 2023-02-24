@@ -25,12 +25,14 @@ public class DriveLimelightPath extends CommandBase
   private final Swerve          m_swerve;
   private final Vision          m_vision;
   private final VIGoalDirection m_goalDirection;
+  private Pose2d                m_goalPose2d;
 
   public DriveLimelightPath(Swerve swerve, Vision vision, VIGoalDirection goalDirection)
   {
     m_swerve = swerve;
     m_vision = vision;
     m_goalDirection = goalDirection;
+    m_goalPose2d = new Pose2d( );
 
     setName("DriveLimelight");
     addRequirements(m_swerve);
@@ -40,7 +42,7 @@ public class DriveLimelightPath extends CommandBase
   @Override
   public void initialize( )
   {
-    Pose2d goalPose2d = calculateTarget(m_vision.getTargetID( ), m_goalDirection);
+    m_goalPose2d = calculateTarget(m_vision.getTargetID( ), m_goalDirection);
     Pose2d currentPose = m_swerve.getPose( );
 
     PathPlannerTrajectory trajectory = PathPlanner.generatePath(new PathConstraints(3, 4),
@@ -49,7 +51,7 @@ public class DriveLimelightPath extends CommandBase
 
     m_swerve.driveWithPathFollowerInit(trajectory, true);
 
-    DataLogManager.log(String.format("LLPATH: current %s, goal %s", currentPose, goalPose2d));
+    DataLogManager.log(String.format("LLPATH: current %s, goal %s", currentPose, m_goalPose2d));
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -71,7 +73,7 @@ public class DriveLimelightPath extends CommandBase
   @Override
   public boolean isFinished( )
   {
-    return (m_swerve.getPose( ).equals(m_goalPose2d));
+    return m_swerve.driveWithPathFollowerIsFinished( );
   }
 
   @Override
@@ -94,7 +96,7 @@ public class DriveLimelightPath extends CommandBase
       default :
       case DIRECTION_LEFT :
         strName = "LEFT";
-        goalYValue = targetPose.getY( ) + 1.0;
+        goalYValue = targetPose.getY( ) + ((targetId <= 4) ? -1 : 1);
         break;
       case DIRECTION_MIDDLE :
         strName = "MIDDLE";
@@ -102,12 +104,15 @@ public class DriveLimelightPath extends CommandBase
         break;
       case DIRECTION_RIGHT :
         strName = "RIGHT";
-        goalYValue = targetPose.getY( ) - 1.0;
+        goalYValue = targetPose.getY( ) + ((targetId <= 4) ? 1 : -1);
         break;
+      case DIRECTION_SUBSATION :
+        strName = "SUBSTATION";
+        goalYValue = targetPose.getY( ) + ((targetId <= 4) ? -1.0 : 1.0);
     }
 
     DataLogManager.log(String.format("Calculate target ID %d direction %s", targetId, strName));
 
-    return new Pose2d(new Translation2d(goalXValue, goalYValue), targetPose.getRotation( ).unaryMinus( ));
+    return new Pose2d(new Translation2d(goalXValue, goalYValue), targetPose.getRotation( ));
   }
 }

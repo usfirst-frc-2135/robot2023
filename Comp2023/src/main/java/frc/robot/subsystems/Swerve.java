@@ -353,7 +353,10 @@ public class Swerve extends SubsystemBase
 
     // This initializes the odometry (where we are)
     if (useInitialPose)
+    {
+      zeroGyro(m_trajectory.getInitialPose( ).getRotation( ).getDegrees( ));
       resetOdometry(m_trajectory.getInitialHolonomicPose( ));
+    }
 
     m_trajTimer.reset( );
     m_trajTimer.start( );
@@ -611,12 +614,6 @@ public class Swerve extends SubsystemBase
   public void resetOdometry(Pose2d pose)
   {
     m_poseEstimator.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
-    zeroGyro(pose.getRotation( ).getDegrees( ));
-  }
-
-  public void resetSimOdometry(Pose2d pose)
-  {
-    m_poseEstimator.resetPosition(pose.getRotation( ), getPositions( ), pose);
     zeroGyro(pose.getRotation( ).getDegrees( ));
   }
 
