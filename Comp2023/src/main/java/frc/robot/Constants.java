@@ -282,9 +282,8 @@ public class Constants
     public enum VIGoalDirection
     {
       DIRECTION_LEFT,   // Left
-      DIRECTION_MIDDLE, // Middle, 
-      DIRECTION_RIGHT,   // Right, 
-      DIRECTION_SUBSATION  //Substation
+      DIRECTION_MIDDLE, // Middle
+      DIRECTION_RIGHT   // Right
     }
 
     public static final double       kLLDistance1   = 48;    // distance from bumper in inches for first reference point
