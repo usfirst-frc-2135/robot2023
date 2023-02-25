@@ -22,9 +22,9 @@ public class AutoDrivePath extends CommandBase
   private PathPlannerTrajectory m_trajectory;
   private String                m_pathName;
 
-  public AutoDrivePath(Swerve drivetrain, String pathName, boolean useInitialPose)
+  public AutoDrivePath(Swerve swerve, String pathName, boolean useInitialPose)
   {
-    m_swerve = drivetrain;
+    m_swerve = swerve;
     m_useInitialPose = useInitialPose;
     m_pathName = pathName;
 

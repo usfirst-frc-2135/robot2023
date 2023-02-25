@@ -4,23 +4,23 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.ARMConsts.WristAngle;
-import frc.robot.subsystems.Arm;
+import frc.robot.Constants.WRConsts.WristAngle;
+import frc.robot.subsystems.Wrist;
 
 /**
  *
  */
 public class WristMoveToAngle extends CommandBase
 {
-  private final Arm  m_wrist;
-  private WristAngle m_angle;
+  private final Wrist m_wrist;
+  private WristAngle  m_angle;
 
-  public WristMoveToAngle(Arm wrist, WristAngle angle)
+  public WristMoveToAngle(Wrist wrist, WristAngle angle)
   {
     m_wrist = wrist;
     m_angle = angle;
 
-    setName("ClimberMoveToAngle");
+    setName("WristMoveToAngle");
     addRequirements(m_wrist);
   }
 
@@ -28,13 +28,15 @@ public class WristMoveToAngle extends CommandBase
   @Override
   public void initialize( )
   {
-    m_wrist.moveWristDistanceInit(m_angle);
+    m_wrist.moveWristAngleInit(m_angle);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute( )
-  {}
+  {
+    m_wrist.moveWristAngleExecute( );
+  }
 
   // Called once the command ends or is interrupted.
   @Override

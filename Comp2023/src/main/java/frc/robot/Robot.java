@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.lib.util.CTREConfigs;
-import frc.robot.Constants;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -40,20 +39,28 @@ public class Robot extends TimedRobot
   {
     // Starts recording to data log
     DataLogManager.start( );
-    DataLogManager.log("RobotInit: RoboRIO SN:" + System.getenv("serialnum"));
 
-    if (System.getenv("serialnum").equals(Constants.kcompSN))
+    // Detect which robot/RoboRIO
+    String serialNum = System.getenv("serialnum");
+    String robotName = "UNKNOWN";
+
+    DataLogManager.log("RobotInit: RoboRIO SN: " + serialNum);
+
+    if (serialNum == null)
+      robotName = "SIMULATION";
+    else if (serialNum.equals(Constants.kCompSN))
     {
       Constants.isComp = true;
-      DataLogManager.log("Detected the COMPETITION (A) robot!");
-
+      robotName = "COMPETITION (A)";
     }
-    else if (System.getenv("serialnum").equals(Constants.kbbotSN))
+    else if (serialNum.equals(Constants.kBetaSN))
     {
       Constants.isComp = false;
-      DataLogManager.log("Detected the PRACTICE (B) robot!");
+      robotName = "PRACTICE (B)";
     }
+    DataLogManager.log(String.format("Detected the %s robot!", robotName));
 
+    // Instantiate CTRE configurations
     ctreConfigs = new CTREConfigs( );
 
     // Instantiate RobotContainer. Performs button bindings, builds autonomous chooser on the dashboard.
@@ -100,13 +107,16 @@ public class Robot extends TimedRobot
     DataLogManager.log("DisabledInit: Match " + matchTypeToString(DriverStation.getMatchType( )) + DriverStation.getMatchNumber( )
         + ", " + allianceToString(DriverStation.getAlliance( )) + " Alliance");
 
-    // m_robotContainer.m_vision.initialize( );
+    m_robotContainer.m_vision.initialize( );
     m_robotContainer.m_led.initialize( );
 
     // These subsystems can use LED and vision subsystems
-    m_robotContainer.m_power.initialize( );
     // m_robotContainer.m_pneumatics.initialize( );
+    m_robotContainer.m_power.initialize( );
     m_robotContainer.m_swerve.initialize( );
+    m_robotContainer.m_elbow.initialize( );
+    m_robotContainer.m_wrist.initialize( );
+    m_robotContainer.m_gripper.initialize( );
   }
 
   @Override

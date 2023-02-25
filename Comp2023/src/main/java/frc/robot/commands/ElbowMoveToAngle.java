@@ -4,18 +4,18 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.ARMConsts.ElbowAngle;
-import frc.robot.subsystems.Arm;
+import frc.robot.Constants.ELConsts.ElbowAngle;
+import frc.robot.subsystems.Elbow;
 
 /**
  *
  */
 public class ElbowMoveToAngle extends CommandBase
 {
-  private final Arm  m_elbow;
-  private ElbowAngle m_angle;
+  private final Elbow m_elbow;
+  private ElbowAngle  m_angle;
 
-  public ElbowMoveToAngle(Arm elbow, ElbowAngle angle)
+  public ElbowMoveToAngle(Elbow elbow, ElbowAngle angle)
   {
     m_elbow = elbow;
     m_angle = angle;
@@ -28,13 +28,15 @@ public class ElbowMoveToAngle extends CommandBase
   @Override
   public void initialize( )
   {
-    m_elbow.moveElbowDistanceInit(m_angle);
+    m_elbow.moveElbowAngleInit(m_angle);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute( )
-  {}
+  {
+    m_elbow.moveElbowAngleExecute( );
+  }
 
   // Called once the command ends or is interrupted.
   @Override

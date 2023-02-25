@@ -2,22 +2,23 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Elbow;
 
 /**
  *
  */
-public class ArmRun extends CommandBase
+public class ElbowRun extends CommandBase
 {
-  private final Arm      m_arm;
+  private final Elbow    m_elbow;
+
   private XboxController m_gamePad;
 
-  public ArmRun(Arm arm, XboxController gamePad)
+  public ElbowRun(Elbow elbow, XboxController gamePad)
   {
-    m_arm = arm;
+    m_elbow = elbow;
     m_gamePad = gamePad;
 
-    addRequirements(m_arm);
+    addRequirements(m_elbow);
   }
 
   // Called when the command is initially scheduled.
@@ -29,8 +30,7 @@ public class ArmRun extends CommandBase
   @Override
   public void execute( )
   {
-    m_arm.moveElbowWithJoystick(m_gamePad);
-    m_arm.moveWristWithJoystick(m_gamePad);
+    m_elbow.moveElbowWithJoystick(m_gamePad);
   }
 
   // Called once the command ends or is interrupted.

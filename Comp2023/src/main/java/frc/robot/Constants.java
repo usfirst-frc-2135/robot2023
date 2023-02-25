@@ -6,9 +6,9 @@ import java.util.List;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -27,9 +27,12 @@ import frc.robot.lib.util.SwerveModuleConstants;
  */
 public class Constants
 {
+  // Toggles constants between comp robot and practice robot (named "beta")
+  public static boolean      isComp;
+
   // bot serial nums
-  public static final String kcompSN           = "03238074";
-  public static final String kbbotSN           = "03260A3A";
+  public static final String kCompSN           = "03238074";
+  public static final String kBetaSN           = "03260A3A";
 
   // Game controller definitions
   public static final int    kDriverPadPort    = 0;
@@ -38,13 +41,17 @@ public class Constants
   public static final double kStickDeadband    = 0.15;
   public static final double kTriggerThreshold = 0.25;
 
+  // Timeout constants
+  public static final int    kLongCANTimeoutMs = 100;
+  public static final int    kCANTimeoutMs     = 10;
+
   // CAN IDs and PWM IDs
   public static final class Ports
   {
     public static final String kCANCarnivore     = "canivore1";
     public static final String kCANRio           = "rio";
 
-    // Swerve IDs
+    // CANivore CAN IDs - Swerve
     public static final int    kCANID_DriveLF    = 1;
     public static final int    kCANID_TurnLF     = 2;
     public static final int    kCANID_CANCoderLF = 3;
@@ -63,17 +70,22 @@ public class Constants
 
     public static final int    kCANID_Pigeon2    = 13;
 
-    // Other subsystem CAN IDs
+    // RoboRIO CAN IDs
     public static final int    kCANID_Elbow      = 15;
     public static final int    kCANID_ELCANCoder = 16;
+
     public static final int    kCANID_Wrist      = 17;
     public static final int    kCANID_WRCANCoder = 18;
-    public static final int    kCANID_Gripper    = 19;
+
+    public static final int    kCANID_Extension  = 19;
+    public static final int    kCANID_EXCANCoder = 20;
+
+    public static final int    kCANID_Gripper    = 21;
 
     public static final int    kCANID_CANdle     = 0;
 
     // Digital I/Os
-    // public static final int    kDIO_CargoDetect  = 2;
+    // public static final int    kDIO_ExampleDetect = 2;
   }
 
   public static final class Falcon500
@@ -83,96 +95,196 @@ public class Constants
     public static final int    kTalonReqVersion      = ((22 * 256) + 0); // Talon version is 23.0
     public static final int    kPigeonReqVersion     = ((22 * 256) + 0); // Pigeon IMU version is 23.0
 
-    // Input current limit settings
+    // Input current limit settings - default
     public static final double kSupplyCurrentLimit   = 45.0;  // Default supply current limit (after trigger)
     public static final double kSupplyTriggerCurrent = 45.0;  // Trigger current that will cause limiting
     public static final double kSupplyTriggerTime    = 0.001; // Time duration of trigger that will causing limiting
 
-    // Output current limit settings
+    // Output current limit settings - default
     public static final double kStatorCurrentLimit   = 80.0;  // Default supply current limit (after trigger)
     public static final double kStatorTriggerCurrent = 80.0;  // Default trigger current that will cause limiting
     public static final double kStatorTriggerTime    = 0.001; // Default time duration of trigger that will causing limiting
   }
 
-  public static final class ARMConsts
+  public static final class SWConsts
   {
-    public static final int    kARMLeftLimitDIO      = 0;
-    public static final int    kARMRightLimitDIO     = 1;
-    public static final int    kGateHookSolenod      = 1;
-    public static final int    kARMCancoderID        = 0;
+    // Joystick tuning
+    public static final double kDriveXScaling       = 1.0;    // 1.0 is no scaling
+    public static final double kDriveYScaling       = 1.0;    // 1.0 is no scaling
+    public static final double kDriveSlowScaling    = 0.3;    // Scale by 30% of full speed
 
-    public static final double kElbowGearRatio       = 300;   // Gear reduction for elbow
-    public static final double kElbowDegreesPerCount = 360 / Falcon500.kEncoderCPR / kElbowGearRatio;
-    public static final double kForearmLengthMeters  = 1.0;
-    public static final double kForearmMassKg        = 6.5;
-    public static final double kWristGearRatio       = 300;   // Gear reduction for wrist
-    public static final double kGripperLengthMeters  = 0.3;
-    public static final double kGripperMassKg        = 4.0;
-    public static final double kWristDegreesPerCount = 360 / Falcon500.kEncoderCPR / kWristGearRatio;
+    // Teleop driving controls
+    public static final double kDriveOpenLoopRamp   = 0.5;    // CTRE: full speed in 0.5 sec
+    public static final double kDriveClosedLoopRamp = 0.0;    // CTRE: 0 is disabled
 
-    // Config file parameters
-    public static final int    kMMVelocity           = 21776;  // Arm motion magic velocity
-    public static final int    kMMAcceleration       = 43552;  // Arm motion magic acceleration
-    public static final int    kMMSCurveStrength     = 0;      // Arm motion magic S curve smoothing strength
-    public static final double kARMPidKf             = 0.0496; // Arm PID force constant
-    public static final double kARMPidKp             = 0.500;  // Arm PID proportional constant
-    public static final double kARMPidKi             = 0.0;    // Arm PID integral constant
-    public static final double kARMPidKd             = 0.0;    // Arm PID derivative constant
-    public static final int    kELAllowedError       = 0;      // Arm PID allowable closed loop error in counts
-    public static final int    kWRAllowedError       = 0;      // Arm PID allowable closed loop error in counts
-    public static final double kARMToleranceInches   = 0.25;   // Arm PID tolerance in inches
+    // Constants for balance
+    public static final double kDriveBalancedAngle  = 5.0;    // Pitch values less than this stop driving
+    public static final double kDriveBalanceKp      = -0.04;  // Amount of power to apply per degree
 
-    public static final double kElbowStowAngle       = 0;      // TO-DO: FIGURE IT OUT
-    public static final double kWristStowAngle       = 0;      // TO-DO: FIGURE IT OUT
-    public static final double kLowScoreAngle        = 0;      // TO-DO: FIND
-    public static final double kMidScoreAngle        = 0;      // TO-DO: FIND
-    public static final double kHighScoreAngle       = 0;      // TO-DO: FIND
-    public static final double kElbowMinAngle        = 0.0;    // Arm minimum allowable Angle
-    public static final double kElbowMaxAngle        = 36.0;   // Arm maximum allowable Angle
-    public static final double kWristMinAngle        = 0.0;    // gripper minimum allowable Angle
-    public static final double kWristMaxAngle        = 36.0;   // gripper maximum allowable Angle
+    // Limelight PID driving controls
+    public static final double kTurnConstant        = 0.0;
+    public static final double kTurnPidKp           = 0.005;
+    public static final double kTurnPidKi           = 0.0;
+    public static final double kTurnPidKd           = 0.0;
+    public static final double kTurnMax             = 0.4;
+    public static final double kThrottlePidKp       = 0.011;
+    public static final double kThrottlePidKi       = 0.0;
+    public static final double kThrottlePidKd       = 0.0;
+    public static final double kThrottleMax         = 0.2;
+    public static final double kThrottleShape       = 10.0;
 
-    public static final double kSpeedCalibrate       = -0.1;   // Motor percent output during calibration
-    public static final double kSpeedMaxManual       = 0.3;    // Motor percent output during manual operation
-    public static final double kStickDeadband        = 0.2;    // Joystick deadband for manual operaton
+    public static final double kTargetAngle         = 0.0;      // Optimal shooting angle
+    public static final double kSetPointDistance    = 60.0;     // Optimal shooting distance
+    public static final double kAngleThreshold      = 3.5;      // Degrees tolerance around optimal
+    public static final double kDistThreshold       = 6.0;      // Inches tolerance around optimal
+  }
+
+  public static final class ELConsts
+  {
+    // Global settings
+
+    public static final double  kElbowGearRatio         = 300;    // Gear reduction for elbow
+    public static final double  kElbowDegreesPerCount   = 360 / Falcon500.kEncoderCPR / kElbowGearRatio;
+    public static final double  kForearmLengthMeters    = 1.22;   // Sim value: 48 inches
+    public static final double  kForearmMassKg          = 6.0;    // Sim value: 13.2 lbs 
+    public static final boolean kInvertMotor            = true;   // Motor direction for positive input
+
+    // Input current limit settings - elbow
+    public static final double  kSupplyCurrentLimit     = 25.0;  // Default supply current limit (after trigger)
+    public static final double  kSupplyTriggerCurrent   = 40.0;  // Trigger current that will cause limiting
+    public static final double  kSupplyTriggerTime      = 0.001; // Time duration of trigger that will causing limiting
+
+    // Output current limit settings - elbow
+    public static final double  kStatorCurrentLimit     = 25.0;  // Default supply current limit (after trigger)
+    public static final double  kStatorTriggerCurrent   = 40.0;  // Default trigger current that will cause limiting
+    public static final double  kStatorTriggerTime      = 0.001; // Default time duration of trigger that will causing limiting
+
+    // CANCoder elbow absolute offset
+    public static final boolean kInvertCANCoder         = false;  // CANCoder direction for positive angle in relative mode
+    public static final boolean kElbowCANCoderAbsInvert = true;   // CANCoder direction for positive angle in absolute mode
+    public static final double  kCompElbowOffset        = 0.000;  // CANCoder offset angle for comp bot
+    public static final double  kBetaElbowOffset        = 251.279 - 5.0; // (TODO: Beta requires an offset) CANCoder offset angle for beta bot
+
+    public static final double  kElbowAnglewMin         = 0.0;    // Elbow minimum allowable degrees
+    public static final double  kElbowAngleMax          = 90.0;   // Elbow maximum allowable degrees
+    public static final double  kElbowAngleStow         = 3.0;    // TO-DO: Test angles
+    public static final double  kElbowAngleScoreLow     = 10.0;   // TO-DO: Test angles
+    public static final double  kElbowAngleScoreMid     = 45.0;   // TO-DO: Test angles
+    public static final double  kElbowAngleScoreHigh    = 75.0;   // TO-DO: Test angles
+
+    // Manual config parameters
 
     public enum ElbowMode
     {
       ELBOW_INIT,         // Initialize elbow
-      ELBOW_DOWN,         // Move elbow down
-      ELBOW_STOPPED,      // Stop and hold position
-      ELBOW_UP            // Move elbow up
+      ELBOW_DOWN,         // Elbow moving down
+      ELBOW_STOPPED,      // Elbow stop and hold position
+      ELBOW_UP            // Elbow moving up
     }
+
+    public static final double kElbowSpeedMaxManual = 0.3;    // Motor percent output during manual operation
+
+    // Motion Magic config parameters
 
     public enum ElbowAngle
     {
-      ELBOW_NOCHANGE,     // No change in elbow Angle--maintain current position
-      ELBOW_STOW, // move arm to stow Angle
-      ELBOW_LOW, // move arm to low-scoring Angle
-      ELBOW_MID, // move arm to shelf Angle; slightly higher than mid-scoring Angle so this is used for both
-      ELBOW_HIGH, // move arm to high-scoring Angle
+      ELBOW_NOCHANGE,     // No change in elbow angle--maintain current position
+      ELBOW_STOW,         // Move elbow to stow angle
+      ELBOW_LOW,          // Move elbow to low-scoring angle
+      ELBOW_MID,          // Move elbow to shelf Angle; slightly higher than mid-scoring angle so this is used for both
+      ELBOW_HIGH,         // Move elbow to high-scoring angle
     }
+
+    public static final int    kElbowMMVelocity       = 16646;  // Elbow motion magic velocity
+    public static final int    kElbowMMAcceleration   = 16646;  // Elbow motion magic acceleration
+    public static final int    kElbowMMSCurveStrength = 0;      // Elbow motion magic S curve smoothing strength
+    public static final double kElbowPidKf            = 0.0461; // Elbow PID force constant
+    public static final double kElbowPidKp            = 0.0246; // Elbow PID proportional constant
+    public static final double kElbowPidKi            = 0.0;    // Elbow PID integral constant
+    public static final double kElbowPidKd            = 0.0;    // Elbow PID derivative constant
+    public static final int    kElbowAllowedError     = 0;      // Elbow PID allowable closed loop error in counts
+    public static final double kElbowToleranceDegrees = 0.5;    // Elbow PID tolerance in degrees
+    public static final double kElbowArbitraryFF      = 0.070;  // Elbow motor output for arm at 90 degrees
+  }
+
+  public static final class WRConsts
+  {
+    // Global settings
+
+    public static final double  kWristGearRatio         = 305;   // Gear reduction for wrist
+    public static final double  kWristDegreesPerCount   = 360 / Falcon500.kEncoderCPR / kWristGearRatio;
+    public static final double  kGripperLengthMeters    = 0.3;   // Sim value: 11.8 in
+    public static final double  kGripperMassKg          = 3.0;   // Sim value: 6.6 lbs
+    public static final boolean kInvertMotor            = true;  // Motor direction for positive input
+
+    // Input current limit settings - wrist
+    public static final double  kSupplyCurrentLimit     = 25.0;  // Default supply current limit (after trigger)
+    public static final double  kSupplyTriggerCurrent   = 40.0;  // Trigger current that will cause limiting
+    public static final double  kSupplyTriggerTime      = 0.001; // Time duration of trigger that will causing limiting
+
+    // Output current limit settings - wrist
+    public static final double  kStatorCurrentLimit     = 25.0;  // Default supply current limit (after trigger)
+    public static final double  kStatorTriggerCurrent   = 40.0;  // Default trigger current that will cause limiting
+    public static final double  kStatorTriggerTime      = 0.001; // Default time duration of trigger that will causing limiting
+
+    // CANCoder wrist absolute offset
+    public static final boolean kInvertCANCoder         = false;  // CANCoder direction for positive angle in relative mode
+    public static final boolean kWristCANCoderAbsInvert = false;  // CANCoder direction for positive angle in absolute mode
+    public static final double  kCompWristOffset        = 0.000;  // CANCoder offset angle for comp bot
+    public static final double  kBetaWristOffset        = 0.000;  // CANCoder offset angle for beta bot
+
+    public static final double  kWristMinAngle          = 0.0;    // Wrist maximum allowable Angle
+    public static final double  kWristMaxAngle          = 135.0;  // Wrist maximum allowable Angle
+    public static final double  kWristStowAngle         = 2.0;    // TO-DO: Test angles
+    public static final double  kWristAngleScoreLow     = 10.0;   // TO-DO: Test angles
+    public static final double  kWristAngleScoreMid     = 20.0;   // TO-DO: Test angles
+    public static final double  kWristAngleScoreHigh    = 35.0;   // TO-DO: Test angles
+
+    // Manual config parameters
 
     public enum WristMode
     {
       WRIST_INIT,         // Initialize wrist
-      WRIST_DOWN,         // Move wrist down
-      WRIST_STOPPED,      // Stop and hold position
-      WRIST_UP            // Move wrist up
+      WRIST_DOWN,         // Wrist moving down
+      WRIST_STOPPED,      // Wrist stop and hold position
+      WRIST_UP            // Wrist moving up
     }
+
+    public static final double kWristSpeedMaxManual = 0.3;    // Motor percent output during manual operation
+
+    // Motion Magic config parameters
 
     public enum WristAngle
     {
-      WRIST_NOCHANGE,     // No change in elbow Angle--maintain current position
-      WRIST_STOW          // drop to stow position
+      WRIST_NOCHANGE,     // No change in Wrist Angle--maintain current position
+      WRIST_STOW,         // Move wrist to stow position
+      WRIST_LOW,          // Move wrist to low-scoring Angle
+      WRIST_MID,          // Move wrist to shelf Angle; slightly higher than mid-scoring Angle so this is used for both
+      WRIST_HIGH,         // Move wrist to high-scoring Angle
     }
+
+    public static final int    kWristMMVelocity       = 16466 * 3 / 4;  // (TODO: Slowed until new wrist) Wrist motion magic velocity
+    public static final int    kWristMMAcceleration   = 16466 * 3 / 4;  // (TODO: Slowed until new wrist) Wrist motion magic acceleration
+    public static final int    kWristMMSCurveStrength = 0;      // Wrist motion magic S curve smoothing strength
+    public static final double kWristPidKf            = 0.0466; // Wrist PID force constant
+    public static final double kWristPidKp            = 0.069;  // Wrist PID proportional constant
+    public static final double kWristPidKi            = 0.0;    // Wrist PID integral constant
+    public static final double kWristPidKd            = 0.0;    // Wrist PID derivative constant
+    public static final int    kWristAllowedError     = 0;      // Wrist PID allowable closed loop error in counts
+    public static final double kWristToleranceDegrees = 0.5;    // Wrist PID tolerance in degrees
+    public static final double kWristArbitraryFF      = 0.058;  // Wrist motor output for 90 degrees
   }
 
   public static final class GRConsts
   {
-    public static final double kGRAcquireSpeed = 1.0;
-    public static final double kGRExpelSpeed   = -1.0;
-    public static final double kGRHoldSpeed    = 0.1;
+    // Global settings
+
+    public static final boolean kInvertMotor          = true;  // Motor direction for positive input
+
+    // Input current limit settings - gripper
+    public static final double  kSupplyCurrentLimit   = 25.0;  // Default supply current limit (after trigger)
+    public static final double  kSupplyTriggerCurrent = 40.0;  // Trigger current that will cause limiting
+    public static final double  kSupplyTriggerTime    = 0.001; // Time duration of trigger that will causing limiting
 
     public enum GRMode
     {
@@ -181,40 +293,10 @@ public class Constants
       GR_EXPEL,   // expel game pieces
       GR_HOLD,    // hold game pieces
     }
-  }
 
-  public static final class SWConsts
-  {
-    // Constants for balance
-    public static final double kBalancedAngle    = 5.0; // Pitch values less than this stop driving
-    public static final double kBalanceKp        = -0.04; // Amount of power to apply per degree
-
-    // Joystick tuning
-    public static final double kDriveXScaling    = 1.0;           // 1.0 is no scaling
-    public static final double kDriveYScaling    = 1.0;           // 1.0 is no scaling
-    public static final double kDriveSlowScaling = 0.3;           // Scale by 30% of full speed
-
-    // Teleop driving controls
-    public static final double kOpenLoopRamp     = 0.5;           // CTRE: full speed in 0.5 sec
-    public static final double kClosedLoopRamp   = 0.0;           // CTRE: 0 is disabled
-    public static final double kStopTolerance    = 0.05;          // Target position tolerance (< 5cm)
-
-    // Limelight driving controls
-    public static final double kTurnConstant     = 0.0;
-    public static final double kTurnPidKp        = 0.005;
-    public static final double kTurnPidKi        = 0.0;
-    public static final double kTurnPidKd        = 0.0;
-    public static final double kTurnMax          = 0.4;
-    public static final double kThrottlePidKp    = 0.011;
-    public static final double kThrottlePidKi    = 0.0;
-    public static final double kThrottlePidKd    = 0.0;
-    public static final double kThrottleMax      = 0.2;
-    public static final double kThrottleShape    = 10.0;
-
-    public static final double kTargetAngle      = 0.0;           // Optimal shooting angle
-    public static final double kSetPointDistance = 60.0;          // Optimal shooting distance
-    public static final double kAngleThreshold   = 3.5;           // Degrees tolerance around optimal
-    public static final double kDistThreshold    = 6.0;           // Inches tolerance around optimal
+    public static final double kGripperSpeedAcquire = 1.0;  // Acquire game piece from loading station or floor
+    public static final double kGripperSpeedHold    = 0.1;  // Hold game piece while traversing the field
+    public static final double kGripperSpeedExpel   = -0.3; // Score game piece on cone node or cube shelf
   }
 
   public static final class LEDConsts
@@ -251,45 +333,33 @@ public class Constants
       VISION_TOGGLE // Toggle modes
     }
 
+    // Direction of goal relative to AprilTag 
+    public enum VIGoalDirection
+    {
+      DIRECTION_LEFT,   // Left
+      DIRECTION_MIDDLE, // Middle
+      DIRECTION_RIGHT   // Right
+    }
+
     public static final double       kLLDistance1   = 48;    // distance from bumper in inches for first reference point
     public static final double       kLLVertOffset1 = 0.42;  // LL y reading in degrees for first reference point
     public static final double       kLLDistance2   = 60;    // distance from bumper in inches for second reference point
     public static final double       kLLVertOffset2 = -4.85; // LL y reading in degrees for second reference point
 
-    public static final List<Pose3d> kAprilTagPoses =
-        Collections.unmodifiableList(List.of(new Pose3d(new Translation3d(7.24310, -2.93659, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 1 
-            new Pose3d(new Translation3d(7.24310, -1.26019, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 2 
-            new Pose3d(new Translation3d(7.24310, 0.41621, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 3 
-            new Pose3d(new Translation3d(7.24310, 2.74161, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 4 
-            new Pose3d(new Translation3d(-7.24310, 2.74161, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 5 
-            new Pose3d(new Translation3d(-7.24310, 0.46272, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 6 
-            new Pose3d(new Translation3d(-7.24310, -1.26019, 0), new Rotation3d(0, 0, 0)), // AprilTag ID: 7
-            new Pose3d(new Translation3d(-7.24310, -2.74161, 0), new Rotation3d(0, 0, 0)) // AprilTag ID: 8
-        ));
-  }
-
-  public static final class SIMLLConsts
-  {
-    // public static final double kFieldLength        = Units.feetToMeters(54.0);      // Field dimensions are 54ft x 27ft
-    // public static final double kFieldWidth         = Units.feetToMeters(27.0);
-    // public static final double kGoalPostionX       = kFieldLength / 2 - Units.feetToMeters(2.0); // Goal target on field
-    // public static final double kGoalPostionY       = kFieldWidth / 2;
-    // public static final double kGoalHeight         = Units.inchesToMeters(102.81);  // Upper hub height from floor
-    // public static final double kCameraPositionX    = Units.inchesToMeters(0.0);     // Camera position on robot (X, Y)
-    // public static final double kCameraPositionY    = Units.inchesToMeters(0.0);
-    // public static final double kCameraRotation     = Units.degreesToRadians(180.0); // Camera rotation on robot
-    // public static final double kCameraLensHeight   = Units.inchesToMeters(41.0);    // Camera lens height from floor
-    // public static final double kCameraLensBackTilt = Units.degreesToRadians(40.0);  // Camera backward tilt from normal
+    public static final List<Pose2d> kAprilTagPoses = Collections.unmodifiableList(List.of( //
+        new Pose2d(new Translation2d(0.0, 0.0), new Rotation2d(0)),        // AprilTag ID: 0 (invalid)
+        new Pose2d(new Translation2d(15.513558, 1.071626), new Rotation2d(0)), // AprilTag ID: 1 
+        new Pose2d(new Translation2d(15.513558, 2.748026), new Rotation2d(0)), // AprilTag ID: 2 
+        new Pose2d(new Translation2d(15.513558, 4.424426), new Rotation2d(0)), // AprilTag ID: 3 
+        new Pose2d(new Translation2d(16.178784, 6.749796), new Rotation2d(0)), // AprilTag ID: 4 
+        new Pose2d(new Translation2d(0.36195, 6.749796), new Rotation2d(Units.degreesToRadians(180))),   // AprilTag ID: 5 
+        new Pose2d(new Translation2d(1.0273, 4.424426), new Rotation2d(Units.degreesToRadians(180))),    // AprilTag ID: 6 
+        new Pose2d(new Translation2d(1.0273, 2.748026), new Rotation2d(Units.degreesToRadians(180))),    // AprilTag ID: 7
+        new Pose2d(new Translation2d(1.0273, 1.071626), new Rotation2d(Units.degreesToRadians(180)))     // AprilTag ID: 8
+    ));
   }
 
   //// 1678 Constants ///////////////////////////////////////////////////////////
-
-  // toggle constants between comp bot and practice bot (named "beta")
-  public static boolean   isComp;
-
-  // Timeout constants
-  public static final int kLongCANTimeoutMs = 100;
-  public static final int kCANTimeoutMs     = 10;
 
   public static final class SwerveConstants
   {
@@ -434,22 +504,6 @@ public class Constants
     public static final double                       kMaxAngularSpeedRadiansPerSecond        = 2.0 * Math.PI;
     public static final double                       kMaxAngularSpeedRadiansPerSecondSquared =
         Math.pow(kMaxAngularSpeedRadiansPerSecond, 2);
-
-    public static final TrapezoidProfile.Constraints kThetaControllerConstraints             =
-        new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
-  }
-
-  public static final class VisionAlignConstants
-  {
-    public static final double                       kP                                      = 6.37;
-    public static final double                       kI                                      = 0.0;
-    public static final double                       kD                                      = 0.10;
-    public static final double                       kTimeout                                = 0.25;
-    public static final double                       kEpsilon                                = 5.0;
-
-    // Constraints for the profiled angle controller
-    public static final double                       kMaxAngularSpeedRadiansPerSecond        = 2.0 * Math.PI;
-    public static final double                       kMaxAngularSpeedRadiansPerSecondSquared = 10.0 * Math.PI;
 
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints             =
         new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);

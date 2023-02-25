@@ -12,19 +12,18 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -32,10 +31,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SWConsts;
+import frc.robot.Constants.SwerveConstants;
 import frc.robot.RobotContainer;
 import frc.robot.team1678.frc2022.drivers.Pigeon;
 import frc.robot.team1678.frc2022.drivers.SwerveModule;
-import frc.robot.team254.lib.util.TimeDelayedBoolean;
 
 //
 // Swerve subsystem class
@@ -43,7 +42,7 @@ import frc.robot.team254.lib.util.TimeDelayedBoolean;
 public class Swerve extends SubsystemBase
 {
   // Member objects
-  private SwerveModule[ ]          m_swerveMods          = new SwerveModule[ ]
+  private SwerveModule[ ]          m_swerveMods        = new SwerveModule[ ]
   {
       new SwerveModule(0, Constants.SwerveConstants.Mod0.SwerveModuleConstants( )),
       new SwerveModule(1, Constants.SwerveConstants.Mod1.SwerveModuleConstants( )),
@@ -52,65 +51,62 @@ public class Swerve extends SubsystemBase
   };
 
   // Odometery and telemetry
-  private Pigeon                   m_pigeon              = new Pigeon(Ports.kCANID_Pigeon2);
-  private SwerveDriveOdometry      m_swerveOdometry;
-  private Field2d                  m_field               = new Field2d( );
+  private Pigeon                   m_pigeon            = new Pigeon(Ports.kCANID_Pigeon2);
+  private SwerveDrivePoseEstimator m_poseEstimator     = new SwerveDrivePoseEstimator(SwerveConstants.swerveKinematics,
+      m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), new Pose2d( ));
+  private Field2d                  m_field             = new Field2d( );
 
   // PID objects
-  private ProfiledPIDController    m_snapPIDController   = new ProfiledPIDController( // 
+  private ProfiledPIDController    m_snapPIDController = new ProfiledPIDController( // 
       Constants.SnapConstants.kP, //
       Constants.SnapConstants.kI, //
       Constants.SnapConstants.kD, //
       Constants.SnapConstants.kThetaControllerConstraints);
-  private PIDController            m_visionPIDController =
-      new PIDController(Constants.VisionAlignConstants.kP, Constants.VisionAlignConstants.kI, Constants.VisionAlignConstants.kD);
 
   // Holonomic Drive Controller objects
   private HolonomicDriveController m_holonomicController;
   private PathPlannerTrajectory    m_trajectory;
-  private Timer                    m_trajTimer           = new Timer( );
+  private Timer                    m_trajTimer         = new Timer( );
 
   // Module variables
-  private PeriodicIO               m_periodicIO          = new PeriodicIO( );
+  private PeriodicIO               m_periodicIO        = new PeriodicIO( );
   private boolean                  m_isSnapping;
   private double                   m_limelightVisionAlignGoal;
-  private double                   m_visionAlignAdjustment;
   private double                   pitch;
-  private Timer                    timer                 = new Timer( );
 
   // Lock Swerve wheels
-  private boolean                  m_locked              = false;
+  private boolean                  m_locked            = false;
 
   // Path following
-  private int                      m_pathDebug           = 1;    // Debug flag to disable extra ramsete logging calls
+  private int                      m_pathDebug         = 0;    // Debug flag to disable extra ramsete logging calls
 
   // Limelight drive
-  private double                   m_turnConstant        = SWConsts.kTurnConstant;
-  private double                   m_turnPidKp           = SWConsts.kTurnPidKp;
-  private double                   m_turnPidKi           = SWConsts.kTurnPidKi;
-  private double                   m_turnPidKd           = SWConsts.kTurnPidKd;
-  private double                   m_turnMax             = SWConsts.kTurnMax;
-  private double                   m_throttlePidKp       = SWConsts.kThrottlePidKp;
-  private double                   m_throttlePidKi       = SWConsts.kThrottlePidKi;
-  private double                   m_throttlePidKd       = SWConsts.kThrottlePidKd;
-  private double                   m_throttleMax         = SWConsts.kThrottleMax;
-  private double                   m_throttleShape       = SWConsts.kThrottleShape;
+  private double                   m_turnConstant      = SWConsts.kTurnConstant;
+  private double                   m_turnPidKp         = SWConsts.kTurnPidKp;
+  private double                   m_turnPidKi         = SWConsts.kTurnPidKi;
+  private double                   m_turnPidKd         = SWConsts.kTurnPidKd;
+  private double                   m_turnMax           = SWConsts.kTurnMax;
+  private double                   m_throttlePidKp     = SWConsts.kThrottlePidKp;
+  private double                   m_throttlePidKi     = SWConsts.kThrottlePidKi;
+  private double                   m_throttlePidKd     = SWConsts.kThrottlePidKd;
+  private double                   m_throttleMax       = SWConsts.kThrottleMax;
+  private double                   m_throttleShape     = SWConsts.kThrottleShape;
 
-  private double                   m_targetAngle         = SWConsts.kTargetAngle; // Optimal shooting angle
-  private double                   m_setPointDistance    = SWConsts.kSetPointDistance; // Optimal shooting distance
-  private double                   m_angleThreshold      = SWConsts.kAngleThreshold; // Tolerance around optimal
-  private double                   m_distThreshold       = SWConsts.kDistThreshold;// Tolerance around optimal
+  private double                   m_targetAngle       = SWConsts.kTargetAngle;      // Optimal shooting angle
+  private double                   m_setPointDistance  = SWConsts.kSetPointDistance; // Optimal shooting distance
+  private double                   m_angleThreshold    = SWConsts.kAngleThreshold;   // Tolerance around optimal
+  private double                   m_distThreshold     = SWConsts.kDistThreshold;    // Tolerance around optimal
 
   // DriveWithLimelight pid controller objects
-  private int                      m_limelightDebug      = 0; // Debug flag to disable extra limelight logging calls
-  private PIDController            m_turnPid             = new PIDController(0.0, 0.0, 0.0);
-  private PIDController            m_throttlePid         = new PIDController(0.0, 0.0, 0.0);
+  private int                      m_limelightDebug    = 0; // Debug flag to disable extra limelight logging calls
+  private PIDController            m_turnPid           = new PIDController(0.0, 0.0, 0.0);
+  private PIDController            m_throttlePid       = new PIDController(0.0, 0.0, 0.0);
   private double                   m_limelightDistance;
 
   // define theta controller for robot heading
-  PIDController                    xController           = new PIDController(1, 0, 0);
-  PIDController                    yController           = new PIDController(1, 0, 0);
-  ProfiledPIDController            thetaController       = new ProfiledPIDController(Constants.AutoConstants.kPThetaController, 0,
+  PIDController                    xController         = new PIDController(1, 0, 0);
+  PIDController                    yController         = new PIDController(1, 0, 0);
+  ProfiledPIDController            thetaController     = new ProfiledPIDController(Constants.AutoConstants.kPThetaController, 0,
       0, Constants.AutoConstants.kThetaControllerConstraints);
 
   public Swerve( )
@@ -120,19 +116,7 @@ public class Swerve extends SubsystemBase
 
     zeroGyro( );
 
-    m_swerveOdometry = new SwerveDriveOdometry(Constants.SwerveConstants.swerveKinematics, m_pigeon.getYaw( ).getWPIRotation2d( ),
-        new SwerveModulePosition[ ]
-        {
-            m_swerveMods[0].getPosition( ), //
-            m_swerveMods[1].getPosition( ), //
-            m_swerveMods[2].getPosition( ), //
-            m_swerveMods[3].getPosition( )
-        });
-
     m_snapPIDController.enableContinuousInput(-Math.PI, Math.PI);
-
-    m_visionPIDController.enableContinuousInput(-Math.PI, Math.PI);
-    m_visionPIDController.setTolerance(0.0);
 
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -255,7 +239,7 @@ public class Swerve extends SubsystemBase
 
     if (!tv)
     {
-      drive(new Translation2d(0.0, 0.0), 0.0, false, true);
+      driveStop(false);
       if (m_limelightDebug >= 1)
         DataLogManager.log(getSubsystem( ) + ": DTL TV-FALSE - SIT STILL");
 
@@ -321,9 +305,7 @@ public class Swerve extends SubsystemBase
 
   public void driveWithLimelightEnd( )
   {
-    drive(new Translation2d(0.0, 0.0), 0.0, false, true);
-
-    // RobotContainer.getInstance( ).m_led.setLLColor(LEDColor.LEDCOLOR_OFF);
+    driveStop(false);
   }
 
   public boolean isLimelightValid(double horizAngleRange, double distRange)
@@ -362,10 +344,7 @@ public class Swerve extends SubsystemBase
 
     m_trajectory = trajectory;
 
-    if (!RobotBase.isReal( ))
-    {
-      m_field.getObject("trajectory").setTrajectory(m_trajectory);
-    }
+    m_field.getObject("trajectory").setTrajectory(m_trajectory);
 
     List<Trajectory.State> trajStates = new ArrayList<Trajectory.State>( );
     trajStates = m_trajectory.getStates( );
@@ -373,7 +352,10 @@ public class Swerve extends SubsystemBase
 
     // This initializes the odometry (where we are)
     if (useInitialPose)
+    {
+      zeroGyro(m_trajectory.getInitialPose( ).getRotation( ).getDegrees( ));
       resetOdometry(m_trajectory.getInitialHolonomicPose( ));
+    }
 
     m_trajTimer.reset( );
     m_trajTimer.start( );
@@ -385,13 +367,13 @@ public class Swerve extends SubsystemBase
     Pose2d currentPose = getPose( );
 
     ChassisSpeeds targetChassisSpeeds = m_holonomicController.calculate(currentPose, trajState,
-        m_trajectory.getEndState( ).holonomicRotation/* trajState.poseMeters.getRotation( ) */); //TODO: find out what's wrong with getting desired rotation
+        m_trajectory.getEndState( ).holonomicRotation/* trajState.poseMeters.getRotation( ) */); // TODO: find out what's wrong with getting desired rotation
 
     // Convert to module states
     SwerveModuleState[ ] moduleStates = Constants.SwerveConstants.swerveKinematics.toSwerveModuleStates(targetChassisSpeeds);
 
-    double targetfrontLeft = (moduleStates[0].speedMetersPerSecond); //TODO: Add MPS ??
-    double targetfrontRight = (moduleStates[1].speedMetersPerSecond); //TODO: Add MPS ??
+    double targetfrontLeft = (moduleStates[0].speedMetersPerSecond);
+    double targetfrontRight = (moduleStates[1].speedMetersPerSecond);
     double targetbackLeft = (moduleStates[2].speedMetersPerSecond);
     double targetbackRight = (moduleStates[3].speedMetersPerSecond);
 
@@ -406,10 +388,8 @@ public class Swerve extends SubsystemBase
     double currentTrajY = currentPose.getY( );
 
     double targetHeading =
-        m_trajectory.getEndState( ).holonomicRotation.getDegrees( )/* trajState.poseMeters.getRotation( ).getDegrees( ) */; ///Maybe get in radians?
-    double currentHeading = currentPose.getRotation( ).getDegrees( ); ///Maybe get in radians?
-
-    //TODO: feedWatchDog
+        m_trajectory.getEndState( ).holonomicRotation.getDegrees( )/* trajState.poseMeters.getRotation( ).getDegrees( ) */; // TODO: Maybe get in radians?
+    double currentHeading = currentPose.getRotation( ).getDegrees( ); // TODO: Maybe get in radians?
 
     setModuleStates(moduleStates);
 
@@ -435,7 +415,7 @@ public class Swerve extends SubsystemBase
                   + " "          + String.format("%.2f", currentfrontRight)
                   + " "          + String.format("%.2f", currentbackLeft)
                   + " "          + String.format("%.2f", currentbackRight)
-                + " errorXYR: "    + String.format("%.2f", targetTrajX-currentTrajX) 
+                + " errXYR: "    + String.format("%.2f", targetTrajX-currentTrajX) 
                   + " "          + String.format("%.2f", targetTrajY-currentTrajY)
                   + " "          + String.format("%.2f", targetHeading-currentHeading)); 
         // @formatter:on
@@ -502,12 +482,12 @@ public class Swerve extends SubsystemBase
     {
       if (Math.abs(rotation) == 0.0)
       {
-        maybeStopSnap(false);
-        rotation = calculateSnapValue( );
+        driveIsSnapFinished(false);
+        rotation = driveSnapCalculate( );
       }
       else
       {
-        maybeStopSnap(true);
+        driveIsSnapFinished(true);
       }
     }
 
@@ -516,7 +496,7 @@ public class Swerve extends SubsystemBase
     {
       swerveModuleStates = new SwerveModuleState[ ]
       {
-          new SwerveModuleState(0.1, Rotation2d.fromDegrees(45)), //
+          new SwerveModuleState(0.1, Rotation2d.fromDegrees(45)),  //
           new SwerveModuleState(0.1, Rotation2d.fromDegrees(315)), //
           new SwerveModuleState(0.1, Rotation2d.fromDegrees(135)), //
           new SwerveModuleState(0.1, Rotation2d.fromDegrees(225))
@@ -539,59 +519,57 @@ public class Swerve extends SubsystemBase
     }
   }
 
+  public void driveStop(boolean fieldRelative)
+  {
+    drive(new Translation2d(0, 0), 0.0, fieldRelative, true);
+  }
+
   public void driveBalanceExecute( )
   {
     double drivevalue;
     pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
-    if (Math.abs(pitch) > SWConsts.kBalancedAngle)
+    if (Math.abs(pitch) > SWConsts.kDriveBalancedAngle)
     {
-      drivevalue = SWConsts.kBalanceKp * pitch;
+      drivevalue = SWConsts.kDriveBalanceKp * pitch;
     }
     else
     {
       drivevalue = 0;
     }
-    drive(new Translation2d(drivevalue, 0), 0, true, true);
-    DataLogManager.log(String.format("Robot pitch: %.1f degrees", pitch));
-    DataLogManager.log(String.format("Robot power applied to motors: %.1f m/s", drivevalue));
-
+    driveStop(true);
+    //DataLogManager.log(String.format("Robot pitch: %.1f degrees - Robot power applied to motors: %.1f m/s", pitch, drivevalue));
   }
 
   //
   // Snap to a direction
   //  
-  public double calculateSnapValue( )
-  {
-    return m_snapPIDController.calculate(m_pigeon.getYaw( ).getRadians( ));
-  }
-
-  public void startSnap(double snapAngle)
+  public void driveSnapInit(double snapAngle)
   {
     m_snapPIDController.reset(m_pigeon.getYaw( ).getRadians( ));
     m_snapPIDController.setGoal(new TrapezoidProfile.State(Math.toRadians(snapAngle), 0.0));
     m_isSnapping = true;
   }
 
-  TimeDelayedBoolean delayedBoolean = new TimeDelayedBoolean( );
-
-  private boolean snapComplete( )
+  public double driveSnapCalculate( )
   {
-    double error = m_snapPIDController.getGoal( ).position - m_pigeon.getYaw( ).getRadians( );
-    return delayedBoolean.update(Math.abs(error) < Math.toRadians(Constants.SnapConstants.kEpsilon),
-        Constants.SnapConstants.kTimeout);
+    return m_snapPIDController.calculate(m_pigeon.getYaw( ).getRadians( ));
   }
 
-  public void maybeStopSnap(boolean force)
+  private boolean isSnapComplete( )
   {
-    if (!m_isSnapping)
-    {
-      return;
-    }
-    if (force || snapComplete( ))
+    double error = m_snapPIDController.getGoal( ).position - m_pigeon.getYaw( ).getRadians( );
+    return (Math.abs(error) < Math.toRadians(Constants.SnapConstants.kEpsilon));
+  }
+
+  public boolean driveIsSnapFinished(boolean force)
+  {
+    if (m_isSnapping && (force || isSnapComplete( )))
     {
       m_isSnapping = false;
       m_snapPIDController.reset(m_pigeon.getYaw( ).getRadians( ));
     }
+
+    return !m_isSnapping;
   }
 
   /* Used by SwerveControllerCommand in Auto */
@@ -609,8 +587,9 @@ public class Swerve extends SubsystemBase
     }
   }
 
+  //
   // Getters and setters
-
+  //
   public boolean getLocked( )
   {
     return m_locked;
@@ -623,12 +602,12 @@ public class Swerve extends SubsystemBase
 
   public Pose2d getPose( )
   {
-    return m_swerveOdometry.getPoseMeters( );
+    return m_poseEstimator.getEstimatedPosition( );
   }
 
   public void resetOdometry(Pose2d pose)
   {
-    m_swerveOdometry.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
+    m_poseEstimator.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
     zeroGyro(pose.getRotation( ).getDegrees( ));
   }
 
@@ -679,19 +658,6 @@ public class Swerve extends SubsystemBase
     return m_swerveMods[index].getAnglePIDValues( );
   }
 
-  public void setVisionAlignPIDValues(double kP, double kI, double kD)
-  {
-    m_visionPIDController.setPID(kP, kI, kD);
-  }
-
-  public double[ ] getVisionAlignPIDValues( )
-  {
-    return new double[ ]
-    {
-        m_visionPIDController.getP( ), m_visionPIDController.getI( ), m_visionPIDController.getD( )
-    };
-  }
-
   public void zeroGyro( )
   {
     zeroGyro(0.0);
@@ -700,19 +666,34 @@ public class Swerve extends SubsystemBase
   public void zeroGyro(double reset)
   {
     m_pigeon.setYaw(reset);
-    m_visionPIDController.reset( );
   }
 
   public void updateSwerveOdometry( )
   {
-    m_swerveOdometry.update(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ));
+    m_poseEstimator.updateWithTime(Timer.getFPGATimestamp( ), m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ));
+
+    {
+      Pose2d botLLPose = RobotContainer.getInstance( ).m_vision.getLimelightValidPose(getPose( ));
+      double latency = RobotContainer.getInstance( ).m_vision.getTargetLatency( );
+
+      if ((botLLPose != null))
+      {
+        //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
+        m_poseEstimator.addVisionMeasurement(botLLPose, Timer.getFPGATimestamp( ) - (latency / 1000));
+      }
+    }
+
+    // Pose2d estimate = getPose();
+    // DataLogManager.log(getSubsystem( ) + ":  X : " + estimate.getX( ) + " | " + estimate.getY( ));
   }
 
   public void readPeriodicInputs( )
   {
-    m_periodicIO.odometry_pose_x = m_swerveOdometry.getPoseMeters( ).getX( );
-    m_periodicIO.odometry_pose_y = m_swerveOdometry.getPoseMeters( ).getY( );
-    m_periodicIO.odometry_pose_rot = m_swerveOdometry.getPoseMeters( ).getRotation( ).getDegrees( );
+    Pose2d position = getPose( );
+
+    m_periodicIO.odometry_pose_x = position.getX( );
+    m_periodicIO.odometry_pose_y = position.getY( );
+    m_periodicIO.odometry_pose_rot = position.getRotation( ).getDegrees( );
 
     m_periodicIO.swerve_heading = MathUtil.inputModulus(m_pigeon.getYaw( ).getDegrees( ), 0, 360);
     m_periodicIO.robot_pitch = m_pigeon.getUnadjustedPitch( ).getDegrees( );

@@ -12,25 +12,31 @@ import frc.robot.subsystems.Swerve;
 /**
  *
  */
-public class AutoChargeStation extends SequentialCommandGroup
+public class AutoPreloadAndEngageChargeStation extends SequentialCommandGroup
 {
-  public AutoChargeStation(Swerve swerve)
+  public AutoPreloadAndEngageChargeStation(Swerve swerve)
   {
-    setName("AutoChargeStation");
+    setName("AutoPreloadAndEngageChargeStation");
 
     addCommands(
         // Add Commands here:
 
         // @formatter:off
-        new PrintCommand("AUTO PATH SEQUENCE: go to ChargeStation"),
+        new PrintCommand("AUTO PATH SEQUENCE: Run first path"),
+        /* TODO: DRIVE BACKWARD + PRELOAD PATHS / COMMANDS
         new ParallelDeadlineGroup(
           new WaitUntilCommand(swerve::driveWithPathFollowerIsFinished),
           new AutoDrivePath (swerve, "driveOffCommunity", true)
         ),
+        */
+        new PrintCommand("AUTO: Run second path"),
+        new ParallelDeadlineGroup(
+          new WaitUntilCommand(swerve::driveWithPathFollowerIsFinished),
+          new AutoDrivePath ( swerve, "driveOffCommunity", false)
+        ),
 
-        new PrintCommand("AUTO: Balance on ChargeStation"),
-        new DriveBalance(swerve)
-        
+        new PrintCommand("AUTO: Hold in place"),
+        new AutoStop(swerve)
         // @formatter:on
     );
   }

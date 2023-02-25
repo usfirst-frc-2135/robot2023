@@ -1,23 +1,25 @@
-
-// ROBOTBUILDER TYPE: Command.
-
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Wrist;
 
 /**
  *
  */
-public class AutoStop extends CommandBase
+public class WristRun extends CommandBase
 {
-  private final Swerve m_swerve;
 
-  public AutoStop(Swerve swerve)
+  private final Wrist    m_wrist;
+
+  private XboxController m_gamePad;
+
+  public WristRun(Wrist wrist, XboxController gamePad)
   {
-    m_swerve = swerve;
+    m_wrist = wrist;
+    m_gamePad = gamePad;
 
-    addRequirements(m_swerve);
+    addRequirements(m_wrist);
   }
 
   // Called when the command is initially scheduled.
@@ -29,7 +31,7 @@ public class AutoStop extends CommandBase
   @Override
   public void execute( )
   {
-    m_swerve.driveStop(true);
+    m_wrist.moveWristWithJoystick(m_gamePad);
   }
 
   // Called once the command ends or is interrupted.
