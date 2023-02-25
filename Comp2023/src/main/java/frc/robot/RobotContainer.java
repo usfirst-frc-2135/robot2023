@@ -246,10 +246,10 @@ public class RobotContainer
     // final Trigger operRightTrigger = new Trigger(( ) -> m_operatorPad.getRightY( ) > Constants.kTriggerThreshold);
 
     // Operator - A, B, X, Y
-    operA.toggleOnTrue(new WristRun(m_wrist, m_operatorPad));
-    operB.toggleOnTrue(new ElbowRun(m_elbow, m_operatorPad));
-    operX.onTrue(new Dummy(XboxController.Button.kX.value));
-    operY.onTrue(new Dummy(XboxController.Button.kY.value));
+    operA.toggleOnTrue(new ArmSetHeightScoreLow(m_elbow, m_wrist));
+    operB.toggleOnTrue(new ArmSetHeightScoreMid(m_elbow, m_wrist));
+    operX.onTrue(new ArmSetHeightStow(m_elbow, m_wrist));
+    operY.onTrue(new ArmSetHeightScoreHigh(m_elbow, m_wrist));
     //
     // Operator - Bumpers, start, back
     operLeftBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
@@ -260,10 +260,10 @@ public class RobotContainer
     operStart.onTrue(new Dummy(XboxController.Button.kStart.value));
     //
     // Operator - POV buttons
-    operUp.onTrue(new ArmSetHeightScoreHigh(m_elbow, m_wrist));
-    operRight.onTrue(new ArmSetHeightScoreMid(m_elbow, m_wrist));
-    operDown.onTrue(new ArmSetHeightScoreLow(m_elbow, m_wrist));
-    operLeft.onTrue(new ArmSetHeightStow(m_elbow, m_wrist));
+    operUp.onTrue(new Dummy(126));
+    operRight.onTrue(new Dummy(127));
+    operDown.onTrue(new Dummy(128));
+    operLeft.onTrue(new Dummy(129));
     //
     // Operator Left/Right Trigger
     operLeftTrigger.onTrue(new Dummy(130));
