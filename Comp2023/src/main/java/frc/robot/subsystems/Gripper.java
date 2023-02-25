@@ -3,13 +3,19 @@
 //
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.GRConsts;
 import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.Ports;
+import frc.robot.team2135.PhoenixUtil;
 
 //
 // Gripper subsystem class
@@ -17,7 +23,13 @@ import frc.robot.Constants.Ports;
 public class Gripper extends SubsystemBase
 {
   // Member objects
-  private final WPI_TalonSRX m_gripper = new WPI_TalonSRX(Ports.kCANID_Gripper);
+  private final WPI_TalonSRX              m_gripper             = new WPI_TalonSRX(Ports.kCANID_Gripper);
+
+  private boolean                         m_gripperValid;  // Health indicator for gripper Talon 
+
+  //Devices and simulation objs
+  private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true,
+      GRConsts.kSupplyCurrentLimit, GRConsts.kSupplyTriggerCurrent, GRConsts.kSupplyTriggerTime);
 
   // Constructor
   public Gripper( )
@@ -25,9 +37,11 @@ public class Gripper extends SubsystemBase
     setName("Gripper");
     setSubsystem("Gripper");
 
-    m_gripper.setInverted(true);
-    m_gripper.setSafetyEnabled(false);
-    m_gripper.set(0.0);
+    m_gripperValid = PhoenixUtil.getInstance( ).talonSRXInitialize(m_gripper, "gripper");
+
+    SmartDashboard.putBoolean("HL_validGR", m_gripperValid);
+
+    gripperTalonInitialize(m_gripper, GRConsts.kInvertMotor);
 
     initialize( );
   }
@@ -52,6 +66,26 @@ public class Gripper extends SubsystemBase
   {
     DataLogManager.log(getSubsystem( ) + ": subsystem initialized!");
     setGripperSpeed(GRMode.GR_STOP);
+  }
+
+  private void gripperTalonInitialize(WPI_TalonSRX motor, boolean inverted)
+  {
+    motor.setInverted(inverted);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "setInverted");
+    motor.setNeutralMode(NeutralMode.Coast);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
+    motor.setSafetyEnabled(false);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "setSafetyEnabled");
+
+    motor.configVoltageCompSaturation(12.0);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "configVoltageCompSaturation");
+    motor.enableVoltageCompensation(true);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "enableVoltageCompensation");
+
+    motor.configSupplyCurrentLimit(m_supplyCurrentLimits);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "configSupplyCurrentLimits");
+
+    motor.set(ControlMode.PercentOutput, 0.0);
   }
 
   public void setGripperSpeed(GRMode mode)

@@ -4,12 +4,16 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -31,6 +35,8 @@ import frc.robot.Constants.Falcon500;
 import frc.robot.Constants.WRConsts;
 import frc.robot.Constants.WRConsts.WristAngle;
 import frc.robot.Constants.WRConsts.WristMode;
+import frc.robot.lib.math.Conversions;
+import frc.robot.lib.util.CTREConfigs;
 import frc.robot.team2135.PhoenixUtil;
 
 //
@@ -39,19 +45,20 @@ import frc.robot.team2135.PhoenixUtil;
 public class Wrist extends SubsystemBase
 {
   // Constants
-  private static final int                CANTIMEOUT            = 30;  // CAN timeout in msec
   private static final int                PIDINDEX              = 0;   // PID in use (0-primary, 1-aux)
   private static final int                SLOTINDEX             = 0;   // Use first PID slot
 
   // Member objects
   private final WPI_TalonFX               m_wrist               = new WPI_TalonFX(Constants.Ports.kCANID_Wrist);  //wrist
+  private final CANCoder                  m_wristCANCoder       = new CANCoder(Constants.Ports.kCANID_WRCANCoder);
   private final TalonFXSimCollection      m_wristMotorSim       = new TalonFXSimCollection(m_wrist);
   private final SingleJointedArmSim       m_wristSim            = new SingleJointedArmSim(DCMotor.getFalcon500(1),
       WRConsts.kWristGearRatio, 2.0, WRConsts.kGripperLengthMeters, 0, Math.PI, true);
   private final Mechanism2d               m_wristMech           = new Mechanism2d(3, 3);
   private final MechanismLigament2d       m_wristLigament;
 
-  private boolean                         m_wristValid;               // Health indicator for wrist Talon 
+  private boolean                         m_wristValid;                // Health indicator for wrist Talon 
+  private double                          m_wristAngleOffset;
 
   //Devices and simulation objs
   private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true,
@@ -63,22 +70,23 @@ public class Wrist extends SubsystemBase
   private int                             m_velocity            = WRConsts.kWristMMVelocity;         // motion magic velocity
   private int                             m_acceleration        = WRConsts.kWristMMAcceleration;     // motion magic acceleration
   private int                             m_sCurveStrength      = WRConsts.kWristMMSCurveStrength;   // motion magic S curve smoothing
-  private double                          m_pidKf               = WRConsts.kWristPidKf;           // PID force constant
-  private double                          m_pidKp               = WRConsts.kWristPidKp;           // PID proportional
-  private double                          m_pidKi               = WRConsts.kWristPidKi;           // PID integral
-  private double                          m_pidKd               = WRConsts.kWristPidKd;           // PID derivative
-  private int                             m_wristAllowedError   = WRConsts.kWristAllowedError;     // PID allowable closed loop error
-  private double                          m_toleranceDegrees    = WRConsts.kWristToleranceDegrees; // PID tolerance in Degrees
+  private double                          m_pidKf               = WRConsts.kWristPidKf;              // PID force constant
+  private double                          m_pidKp               = WRConsts.kWristPidKp;              // PID proportional
+  private double                          m_pidKi               = WRConsts.kWristPidKi;              // PID integral
+  private double                          m_pidKd               = WRConsts.kWristPidKd;              // PID derivative
+  private int                             m_wristAllowedError   = WRConsts.kWristAllowedError;       // PID allowable closed loop error
+  private double                          m_toleranceDegrees    = WRConsts.kWristToleranceDegrees;   // PID tolerance in Degrees
+  private double                          m_arbitraryFF         = WRConsts.kWristArbitraryFF;        // Arbitrary Feedfoward (elevators and arms))
 
-  private double                          m_wristStowangle      = WRConsts.kWristStowAngle;    // wrist Stow angle
-  private double                          m_lowScoreangle       = WRConsts.kWristAngleScoreLow;     // low-peg scoring angle   
-  private double                          m_midScoreangle       = WRConsts.kWristAngleScoreMid;     // mid-peg scoring angle
-  private double                          m_highScoreangle      = WRConsts.kWristAngleScoreHigh;    // high-peg scoring angle
-  private double                          m_wristMinangle       = WRConsts.kWristMinAngle;       // minimum wrist allowable angle
-  private double                          m_wristMaxangle       = WRConsts.kWristMaxAngle;       // maximum wrist allowable angle
+  private double                          m_wristStowangle      = WRConsts.kWristStowAngle;          // wrist Stow angle
+  private double                          m_lowScoreangle       = WRConsts.kWristAngleScoreLow;      // low-peg scoring angle   
+  private double                          m_midScoreangle       = WRConsts.kWristAngleScoreMid;      // mid-peg scoring angle
+  private double                          m_highScoreangle      = WRConsts.kWristAngleScoreHigh;     // high-peg scoring angle
+  private double                          m_wristMinangle       = WRConsts.kWristMinAngle;           // minimum wrist allowable angle
+  private double                          m_wristMaxangle       = WRConsts.kWristMaxAngle;           // maximum wrist allowable angle
 
-  private double                          m_stickDeadband       = Constants.kStickDeadband;      // joystick deadband
-  private WristMode                       m_wristMode           = WristMode.WRIST_INIT;          // Mode active with joysticks
+  private double                          m_stickDeadband       = Constants.kStickDeadband;          // joystick deadband
+  private WristMode                       m_wristMode           = WristMode.WRIST_INIT;              // Mode active with joysticks
 
   private int                             m_wristDebug          = 1; // DEBUG flag to disable/enable extra logging calls
 
@@ -121,7 +129,14 @@ public class Wrist extends SubsystemBase
     SmartDashboard.putBoolean("WR_calibrated", m_calibrated);
 
     if (m_wristValid)
-      wristTalonInitialize(m_wrist, false);
+      wristTalonInitialize(m_wrist, WRConsts.kInvertMotor);
+
+    m_wristAngleOffset = (Constants.isComp) ? WRConsts.kCompWristOffset : WRConsts.kBetaWristOffset;
+    m_wristCANCoder.configFactoryDefault( );
+    m_wristCANCoder.configAllSettings(CTREConfigs.wristCancoderConfig( ));
+    m_wristCANCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
+    m_wristCANCoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 255);
+    resetToAbsolute( );
 
     // the mechanism root node
     MechanismRoot2d wristRoot = m_wristMech.getRoot("wrist", 1.5, 2);
@@ -190,6 +205,18 @@ public class Wrist extends SubsystemBase
     DataLogManager.log(getSubsystem( ) + ": Init Target Degrees: " + m_wristTargetDegrees);
   }
 
+  public Rotation2d getCanCoder( )
+  {
+    return Rotation2d.fromDegrees(m_wristCANCoder.getAbsolutePosition( ));
+  }
+
+  public void resetToAbsolute( )
+  {
+    double absolutePosition = ((WRConsts.kWristCANCoderAbsInvert) ? -1.0 : 1.0)
+        * Conversions.degreesToFalcon(getCanCoder( ).getDegrees( ) - m_wristAngleOffset, WRConsts.kWristGearRatio);
+    m_wrist.setSelectedSensorPosition(absolutePosition);
+  }
+
   private int wristDegreesToCounts(double degrees)
   {
     return (int) (degrees / WRConsts.kWristDegreesPerCount);
@@ -222,24 +249,24 @@ public class Wrist extends SubsystemBase
     // Configure sensor settings
     motor.setSelectedSensorPosition(0.0);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSelectedSensorPosition");
-    motor.configAllowableClosedloopError(SLOTINDEX, m_wristAllowedError, CANTIMEOUT);
+    motor.configAllowableClosedloopError(SLOTINDEX, m_wristAllowedError, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllowableClosedloopError");
 
-    motor.configMotionCruiseVelocity(m_velocity, CANTIMEOUT);
+    motor.configMotionCruiseVelocity(m_velocity, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionCruiseVelocity");
-    motor.configMotionAcceleration(m_acceleration, CANTIMEOUT);
+    motor.configMotionAcceleration(m_acceleration, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionAcceleration");
-    motor.configMotionSCurveStrength(m_sCurveStrength, CANTIMEOUT);
+    motor.configMotionSCurveStrength(m_sCurveStrength, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionSCurveStrength");
 
     // Configure Magic Motion settings
-    motor.config_kF(0, m_pidKf, CANTIMEOUT);
+    motor.config_kF(0, m_pidKf, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kF");
-    motor.config_kP(0, m_pidKp, CANTIMEOUT);
+    motor.config_kP(0, m_pidKp, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kP");
-    motor.config_kI(0, m_pidKi, CANTIMEOUT);
+    motor.config_kI(0, m_pidKi, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kI");
-    motor.config_kD(0, m_pidKd, CANTIMEOUT);
+    motor.config_kD(0, m_pidKd, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kD");
     motor.selectProfileSlot(SLOTINDEX, PIDINDEX);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "selectProfileSlot");
@@ -285,6 +312,9 @@ public class Wrist extends SubsystemBase
         motorOutput = manualSpeedMax * (yWristValue * Math.abs(yWristValue));
       }
     }
+
+    if (m_wristCurDegrees < m_wristMinangle || m_wristCurDegrees > m_wristMaxangle)
+      DataLogManager.log(getSubsystem( ) + ": Wrist movement OUT OF RANGE!");
 
     if (m_wristValid)
     {
@@ -382,6 +412,13 @@ public class Wrist extends SubsystemBase
       if (m_wristValid)
         m_wrist.set(ControlMode.PercentOutput, 0.0);
     }
+  }
+
+  public void moveWristAngleExecute( )
+  {
+    if (m_wristValid && m_calibrated)
+      m_wrist.set(ControlMode.MotionMagic, wristDegreesToCounts(m_wristTargetDegrees), DemandType.ArbitraryFeedForward,
+          m_arbitraryFF * Math.sin(Units.degreesToRadians((m_wristCurDegrees))));
   }
 
   public boolean moveWristAngleIsFinished( )

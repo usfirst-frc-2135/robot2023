@@ -4,13 +4,16 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -32,6 +35,8 @@ import frc.robot.Constants.ELConsts;
 import frc.robot.Constants.ELConsts.ElbowAngle;
 import frc.robot.Constants.ELConsts.ElbowMode;
 import frc.robot.Constants.Falcon500;
+import frc.robot.lib.math.Conversions;
+import frc.robot.lib.util.CTREConfigs;
 import frc.robot.team2135.PhoenixUtil;
 
 //
@@ -40,20 +45,20 @@ import frc.robot.team2135.PhoenixUtil;
 public class Elbow extends SubsystemBase
 {
   // Constants
-  private static final int                CANTIMEOUT            = 30;  // CAN timeout in msec
   private static final int                PIDINDEX              = 0;   // PID in use (0-primary, 1-aux)
   private static final int                SLOTINDEX             = 0;   // Use first PID slot
 
   // Member objects
   private final WPI_TalonFX               m_elbow               = new WPI_TalonFX(Constants.Ports.kCANID_Elbow);  //elbow
-  private final CANCoder                  m_elbowCanCoder       = new CANCoder(16);
+  private final CANCoder                  m_elbowCANCoder       = new CANCoder(Constants.Ports.kCANID_ELCANCoder);
   private final TalonFXSimCollection      m_elbowMotorSim       = new TalonFXSimCollection(m_elbow);
   private final SingleJointedArmSim       m_elbowSim            = new SingleJointedArmSim(DCMotor.getFalcon500(1),
       ELConsts.kElbowGearRatio, 2.0, ELConsts.kForearmLengthMeters, 0.0, Math.PI, true);
   private final Mechanism2d               m_elbowMech           = new Mechanism2d(3, 3);
   private final MechanismLigament2d       m_elbowLigament;
 
-  private boolean                         m_elbowValid;               // Health indicator for elbow Talon 
+  private boolean                         m_elbowValid;                // Health indicator for elbow Talon 
+  private double                          m_elbowAngleOffset;
 
   //Devices and simulation objs
   private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true,
@@ -62,25 +67,26 @@ public class Elbow extends SubsystemBase
       Falcon500.kStatorCurrentLimit, Falcon500.kStatorTriggerCurrent, Falcon500.kStatorTriggerTime);
 
   // Declare module variables
-  private int                             m_velocity            = ELConsts.kElbowMMVelocity;         // motion magic velocity
-  private int                             m_acceleration        = ELConsts.kElbowMMAcceleration;     // motion magic acceleration
-  private int                             m_sCurveStrength      = ELConsts.kElbowMMSCurveStrength;   // motion magic S curve smoothing
-  private double                          m_pidKf               = ELConsts.kElbowPidKf;           // PID force constant
-  private double                          m_pidKp               = ELConsts.kElbowPidKp;           // PID proportional
-  private double                          m_pidKi               = ELConsts.kElbowPidKi;           // PID integral
-  private double                          m_pidKd               = ELConsts.kElbowPidKd;           // PID derivative
-  private int                             m_elbowAllowedError   = ELConsts.kElbowAllowedError;     // PID allowable closed loop error
+  private int                             m_velocity            = ELConsts.kElbowMMVelocity;        // motion magic velocity
+  private int                             m_acceleration        = ELConsts.kElbowMMAcceleration;    // motion magic acceleration
+  private int                             m_sCurveStrength      = ELConsts.kElbowMMSCurveStrength;  // motion magic S curve smoothing
+  private double                          m_pidKf               = ELConsts.kElbowPidKf;             // PID force constant
+  private double                          m_pidKp               = ELConsts.kElbowPidKp;             // PID proportional
+  private double                          m_pidKi               = ELConsts.kElbowPidKi;             // PID integral
+  private double                          m_pidKd               = ELConsts.kElbowPidKd;             // PID derivative
+  private int                             m_elbowAllowedError   = ELConsts.kElbowAllowedError;      // PID allowable closed loop error
   private double                          m_toleranceDegrees    = ELConsts.kElbowToleranceDegrees;  // PID tolerance in inches
+  private double                          m_arbitraryFF         = ELConsts.kElbowArbitraryFF;       // Arbitrary Feedfoward (elevators and arms)
 
-  private double                          m_elbowStowangle      = ELConsts.kElbowAngleStow;    // elbow Stow angle
+  private double                          m_elbowStowangle      = ELConsts.kElbowAngleStow;         // elbow Stow angle
   private double                          m_lowScoreangle       = ELConsts.kElbowAngleScoreLow;     // low-peg scoring angle   
   private double                          m_midScoreangle       = ELConsts.kElbowAngleScoreMid;     // mid-peg scoring angle
   private double                          m_highScoreangle      = ELConsts.kElbowAngleScoreHigh;    // high-peg scoring angle
-  private double                          m_elbowMinangle       = ELConsts.kElbowAnglewMin;       // minimum elbow allowable angle
-  private double                          m_elbowMaxangle       = ELConsts.kElbowAngleMax;       // maximum elbow allowable angle
+  private double                          m_elbowMinangle       = ELConsts.kElbowAnglewMin;         // minimum elbow allowable angle
+  private double                          m_elbowMaxangle       = ELConsts.kElbowAngleMax;          // maximum elbow allowable angle
 
-  private double                          m_stickDeadband       = Constants.kStickDeadband;      // joystick deadband
-  private ElbowMode                       m_elbowMode           = ElbowMode.ELBOW_INIT;          // Mode active with joysticks
+  private double                          m_stickDeadband       = Constants.kStickDeadband;         // joystick deadband
+  private ElbowMode                       m_elbowMode           = ElbowMode.ELBOW_INIT;             // Mode active with joysticks
 
   private int                             m_elbowDebug          = 1; // DEBUG flag to disable/enable extra logging calls
 
@@ -102,7 +108,7 @@ public class Elbow extends SubsystemBase
 
     m_elbowValid = PhoenixUtil.getInstance( ).talonFXInitialize(m_elbow, "elbow");
 
-    SmartDashboard.putBoolean("HL_validCL", m_elbowValid);
+    SmartDashboard.putBoolean("HL_validEL", m_elbowValid);
 
     // Initialize Variables
     SmartDashboard.putNumber("EL_velocity", m_velocity);
@@ -123,7 +129,14 @@ public class Elbow extends SubsystemBase
     SmartDashboard.putBoolean("EL_calibrated", m_calibrated);
 
     if (m_elbowValid)
-      elbowTalonInitialize(m_elbow, true);
+      elbowTalonInitialize(m_elbow, ELConsts.kInvertMotor);
+
+    m_elbowAngleOffset = (Constants.isComp) ? ELConsts.kCompElbowOffset : ELConsts.kBetaElbowOffset;
+    m_elbowCANCoder.configFactoryDefault( );
+    m_elbowCANCoder.configAllSettings(CTREConfigs.wristCancoderConfig( ));
+    m_elbowCANCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
+    m_elbowCANCoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 255);
+    resetToAbsolute( );
 
     // the mechanism root node
     MechanismRoot2d elbowRoot = m_elbowMech.getRoot("elbow", 1.5, 2);
@@ -136,11 +149,6 @@ public class Elbow extends SubsystemBase
     SmartDashboard.putData("ElbowMech2d", m_elbowMech);
 
     initialize( );
-  }
-
-  public void getElbowAngle( )
-  {
-    m_elbowCanCoder.getAbsolutePosition( );
   }
 
   @Override
@@ -197,6 +205,18 @@ public class Elbow extends SubsystemBase
     DataLogManager.log(getSubsystem( ) + ": Init Target Degrees: " + m_elbowTargetDegrees);
   }
 
+  public Rotation2d getCanCoder( )
+  {
+    return Rotation2d.fromDegrees(m_elbowCANCoder.getAbsolutePosition( ));
+  }
+
+  public void resetToAbsolute( )
+  {
+    double absolutePosition = ((ELConsts.kElbowCANCoderAbsInvert) ? -1.0 : 1.0)
+        * Conversions.degreesToFalcon(getCanCoder( ).getDegrees( ) - m_elbowAngleOffset, ELConsts.kElbowGearRatio);
+    m_elbow.setSelectedSensorPosition(absolutePosition);
+  }
+
   private int elbowDegreesToCounts(double degrees)
   {
     return (int) (degrees / ELConsts.kElbowDegreesPerCount);
@@ -229,24 +249,24 @@ public class Elbow extends SubsystemBase
     // Configure sensor settings
     motor.setSelectedSensorPosition(0.0);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSelectedSensorPosition");
-    motor.configAllowableClosedloopError(SLOTINDEX, m_elbowAllowedError, CANTIMEOUT);
+    motor.configAllowableClosedloopError(SLOTINDEX, m_elbowAllowedError, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllowableClosedloopError");
 
-    motor.configMotionCruiseVelocity(m_velocity, CANTIMEOUT);
+    motor.configMotionCruiseVelocity(m_velocity, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionCruiseVelocity");
-    motor.configMotionAcceleration(m_acceleration, CANTIMEOUT);
+    motor.configMotionAcceleration(m_acceleration, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionAcceleration");
-    motor.configMotionSCurveStrength(m_sCurveStrength, CANTIMEOUT);
+    motor.configMotionSCurveStrength(m_sCurveStrength, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionSCurveStrength");
 
     // Configure Magic Motion settings
-    motor.config_kF(0, m_pidKf, CANTIMEOUT);
+    motor.config_kF(0, m_pidKf, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kF");
-    motor.config_kP(0, m_pidKp, CANTIMEOUT);
+    motor.config_kP(0, m_pidKp, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kP");
-    motor.config_kI(0, m_pidKi, CANTIMEOUT);
+    motor.config_kI(0, m_pidKi, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kI");
-    motor.config_kD(0, m_pidKd, CANTIMEOUT);
+    motor.config_kD(0, m_pidKd, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kD");
     motor.selectProfileSlot(SLOTINDEX, PIDINDEX);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "selectProfileSlot");
@@ -292,6 +312,9 @@ public class Elbow extends SubsystemBase
         motorOutput = manualSpeedMax * (yElbowValue * Math.abs(yElbowValue));
       }
     }
+
+    if (m_elbowCurDegrees < m_elbowMinangle || m_elbowCurDegrees > m_elbowMaxangle)
+      DataLogManager.log(getSubsystem( ) + ": Elbow movement OUT OF RANGE!");
 
     if (m_elbowValid)
       m_elbow.set(ControlMode.PercentOutput, motorOutput);
@@ -386,6 +409,13 @@ public class Elbow extends SubsystemBase
       if (m_elbowValid)
         m_elbow.set(ControlMode.PercentOutput, 0.0);
     }
+  }
+
+  public void moveElbowAngleExecute( )
+  {
+    if (m_elbowValid && m_calibrated)
+      m_elbow.set(ControlMode.MotionMagic, elbowDegreesToCounts(m_elbowTargetDegrees), DemandType.ArbitraryFeedForward,
+          m_arbitraryFF * Math.sin(Units.degreesToRadians((m_elbowCurDegrees))));
   }
 
   public boolean moveElbowAngleIsFinished( )

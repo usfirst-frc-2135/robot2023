@@ -18,20 +18,17 @@ import frc.robot.Constants.ELConsts.ElbowAngle;
 import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.VIConsts.VIGoalDirection;
-import frc.robot.commands.ResetOdometryToLimelight;
+import frc.robot.Constants.WRConsts.WristAngle;
 import frc.robot.commands.ArmSetHeightScoreHigh;
 import frc.robot.commands.ArmSetHeightScoreLow;
 import frc.robot.commands.ArmSetHeightScoreMid;
 import frc.robot.commands.ArmSetHeightStow;
-import frc.robot.Constants.WRConsts.WristAngle;
 import frc.robot.commands.AutoChargeStation;
 import frc.robot.commands.AutoDrivePath;
-import frc.robot.commands.AutoPreloadAndEngageChargeStation;
-import frc.robot.commands.AutoPreloadAndLeaveCommunity;
-import frc.robot.commands.AutoPreloadAndScoreAnother;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.DriveBalance;
 import frc.robot.commands.DriveLimelightPath;
+import frc.robot.commands.DriveSnap;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.ElbowMoveToAngle;
@@ -213,10 +210,10 @@ public class RobotContainer
     driverStart.onTrue(new ResetGyro(m_swerve, driverStart, driverBack));
     //
     // Driver - POV buttons
-    driverUp.onTrue(new Dummy(0));
-    driverRight.onTrue(new Dummy(90));
-    driverDown.onTrue(new Dummy(180));
-    driverLeft.onTrue(new Dummy(270));
+    driverUp.onTrue(new DriveSnap(m_swerve, 0));
+    driverRight.onTrue(new DriveSnap(m_swerve, 90));
+    driverDown.onTrue(new DriveSnap(m_swerve, 180));
+    driverLeft.onTrue(new DriveSnap(m_swerve, 270));
     //
     // Operator Left/Right Trigger
     driverLeftTrigger.onTrue(new Dummy(130));
