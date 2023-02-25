@@ -256,8 +256,8 @@ public class RobotContainer
     operLeftBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
     operRightBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_EXPEL));
     operRightBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
-    operBack.onTrue(new Dummy(XboxController.Button.kBack.value));
-    operStart.onTrue(new Dummy(XboxController.Button.kStart.value));
+    operBack.onTrue(new ElbowRun(m_elbow, m_operatorPad));
+    operStart.onTrue(new WristRun(m_wrist, m_operatorPad));
     //
     // Operator - POV buttons
     operUp.onTrue(new Dummy(126));
