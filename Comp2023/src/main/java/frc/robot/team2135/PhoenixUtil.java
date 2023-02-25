@@ -3,20 +3,21 @@ package frc.robot.team2135;
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.Faults;
 import com.ctre.phoenix.motorcontrol.StickyFaults;
+import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.ctre.phoenix.sensors.PigeonIMU_Faults;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Constants;
 import frc.robot.Constants.Falcon500;
 
 public class PhoenixUtil
 {
-  private static final int   CANTIMEOUT = 30;  // CAN timeout in msec
-
-  private static PhoenixUtil instance   = null;
-  private static final int   m_retries  = 4;    // Number of version check attempts
+  private static PhoenixUtil instance  = null;
+  private static final int   m_retries = 4;    // Number of version check attempts
 
   PhoenixUtil( )
   {}
@@ -29,7 +30,19 @@ public class PhoenixUtil
     return instance;
   }
 
-  public boolean talonFXInitialize(WPI_TalonFX talon, String motorName)
+  // Talon FX and SRX handlers
+
+  public ErrorCode checkTalonError(BaseMotorController talon, String message)
+  {
+    ErrorCode errorCode = talon.getLastError( );
+
+    if (errorCode != ErrorCode.OK)
+      DataLogManager.log("Talon ID " + talon.getDeviceID( ) + " error " + errorCode + " Message: " + message);
+
+    return errorCode;
+  }
+
+  private boolean talonInitialize(BaseMotorController talon, String motorName)
   {
     ErrorCode error = ErrorCode.OK;
     int deviceID = 0;
@@ -85,6 +98,16 @@ public class PhoenixUtil
     return talonValid && initialized;
   }
 
+  public boolean talonFXInitialize(WPI_TalonFX talon, String motorName)
+  {
+    return talonInitialize(talon, motorName);
+  }
+
+  public boolean talonSRXInitialize(WPI_TalonSRX talon, String motorName)
+  {
+    return talonInitialize(talon, motorName);
+  }
+
   public void talonFXFaultDump(WPI_TalonFX talon, String motorName)
   {
     String baseStr = "Talon " + motorName + ": ";
@@ -98,6 +121,18 @@ public class PhoenixUtil
 
     DataLogManager.log(baseStr + "faults - " + ((faults.hasAnyFault( )) ? faults.toString( ) : "none"));
     DataLogManager.log(baseStr + "sticky faults - " + ((sticky.hasAnyFault( )) ? sticky.toString( ) : "none"));
+  }
+
+  // Pigeon IMU handlers
+
+  private ErrorCode checkPigeonError(PigeonIMU pigeon, String message)
+  {
+    ErrorCode errorCode = pigeon.getLastError( );
+
+    if (errorCode != ErrorCode.OK)
+      DataLogManager.log("Pigeon ID " + pigeon.getDeviceID( ) + " error " + errorCode + " Message: " + message);
+
+    return errorCode;
   }
 
   public boolean pigeonIMUInitialize(PigeonIMU pigeon)
@@ -153,10 +188,10 @@ public class PhoenixUtil
 
         DataLogManager.log("Pigeon ID " + deviceID + " " + baseStr + "fused heading: " + headingDeg + ", ready: " + angleIsGood);
 
-        pigeon.setYaw(0.0, CANTIMEOUT);
+        pigeon.setYaw(0.0, Constants.kLongCANTimeoutMs);
         error = checkPigeonError(pigeon, baseStr + "setYaw error");
 
-        pigeon.setFusedHeading(0.0, CANTIMEOUT);
+        pigeon.setFusedHeading(0.0, Constants.kLongCANTimeoutMs);
         error = checkPigeonError(pigeon, baseStr + "setFusedHeading error");
 
         initialized = true;
@@ -186,28 +221,9 @@ public class PhoenixUtil
     DataLogManager.log(baseStr + "sticky faults: " + ((sticky.hasAnyFault( )) ? sticky.toString( ) : "none"));
   }
 
-  public ErrorCode checkTalonError(WPI_TalonFX talon, String message)
-  {
-    ErrorCode errorCode = talon.getLastError( );
-
-    if (errorCode != ErrorCode.OK)
-      DataLogManager.log("Talon ID " + talon.getDeviceID( ) + " error " + errorCode + " Message: " + message);
-
-    return errorCode;
-  }
-
-  public ErrorCode checkPigeonError(PigeonIMU pigeon, String message)
-  {
-    ErrorCode errorCode = pigeon.getLastError( );
-
-    if (errorCode != ErrorCode.OK)
-      DataLogManager.log("Pigeon ID " + pigeon.getDeviceID( ) + " error " + errorCode + " Message: " + message);
-
-    return errorCode;
-  }
-
   // Deprecated - use methods above
 
+  @Deprecated
   public static void checkError(ErrorCode error, String message)
   {
     if (error != ErrorCode.OK)
