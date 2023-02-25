@@ -353,7 +353,10 @@ public class Swerve extends SubsystemBase
 
     // This initializes the odometry (where we are)
     if (useInitialPose)
+    {
+      zeroGyro(m_trajectory.getInitialPose( ).getRotation( ).getDegrees( ));
       resetOdometry(m_trajectory.getInitialHolonomicPose( ));
+    }
 
     m_trajTimer.reset( );
     m_trajTimer.start( );
@@ -535,7 +538,7 @@ public class Swerve extends SubsystemBase
       drivevalue = 0;
     }
     driveStop(true);
-    DataLogManager.log(String.format("Robot pitch: %.1f degrees - Robot power applied to motors: %.1f m/s", pitch, drivevalue));
+    //DataLogManager.log(String.format("Robot pitch: %.1f degrees - Robot power applied to motors: %.1f m/s", pitch, drivevalue));
   }
 
   //
@@ -683,7 +686,6 @@ public class Swerve extends SubsystemBase
       {
         //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
         m_poseEstimator.addVisionMeasurement(botLLPose, Timer.getFPGATimestamp( ) - (latency / 1000));
-        DataLogManager.log("ADDED IN VISION MEASUREMENT!!!!!!!!!!!!!!!!");
       }
     }
 

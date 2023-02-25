@@ -17,10 +17,18 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ELConsts.ElbowAngle;
 import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.LEDConsts.LEDColor;
-import frc.robot.Constants.VIConsts.VITargetLocations;
+import frc.robot.Constants.VIConsts.VIGoalDirection;
+import frc.robot.commands.ResetOdometryToLimelight;
+import frc.robot.commands.ArmSetHeightScoreHigh;
+import frc.robot.commands.ArmSetHeightScoreLow;
+import frc.robot.commands.ArmSetHeightScoreMid;
+import frc.robot.commands.ArmSetHeightStow;
 import frc.robot.Constants.WRConsts.WristAngle;
 import frc.robot.commands.AutoChargeStation;
 import frc.robot.commands.AutoDrivePath;
+import frc.robot.commands.AutoPreloadAndEngageChargeStation;
+import frc.robot.commands.AutoPreloadAndLeaveCommunity;
+import frc.robot.commands.AutoPreloadAndScoreAnother;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.DriveBalance;
 import frc.robot.commands.DriveLimelightPath;
@@ -102,6 +110,10 @@ public class RobotContainer
     SmartDashboard.putData("AutoDockOnChargeStation", new AutoChargeStation(m_swerve));
     SmartDashboard.putData("AutoDriveToChargeStation", new AutoDrivePath(m_swerve, "driveToChargeStation", true));
 
+    // SmartDashboard.putData("AutoPreloadAndLeaveCommunity", new AutoPreloadAndLeaveCommunity(m_swerve));
+    // SmartDashboard.putData("AutoPreloadAndEngageChargeStation", new AutoPreloadAndEngageChargeStation(m_swerve));
+    // SmartDashboard.putData("AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve));
+
     // SmartDashboard Buttons
     SmartDashboard.putData("AutoStop", new AutoStop(m_swerve));
     SmartDashboard.putData("AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveOffCommunity", true));
@@ -117,8 +129,20 @@ public class RobotContainer
 
     SmartDashboard.putData("LEDSet", new LEDSet(m_led, LEDColor.LEDCOLOR_DASH));
 
-    SmartDashboard.putData("DriveLimelightPath", new DriveLimelightPath(m_swerve, m_vision, VITargetLocations.TARGET_MIDDLE));
-    SmartDashboard.putData("ApplyVisionMeasurement", new ResetOdometryToLimelight(m_swerve, m_vision));
+    SmartDashboard.putData("DriveLLLeft", new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_LEFT));
+    SmartDashboard.putData("DriveLLMiddle", new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_MIDDLE));
+    SmartDashboard.putData("DriveLLRight", new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_RIGHT));
+    SmartDashboard.putData("ResetOdo1", new ResetOdometryToLimelight(m_swerve, m_vision, 1));
+    SmartDashboard.putData("ResetOdo2", new ResetOdometryToLimelight(m_swerve, m_vision, 2));
+    SmartDashboard.putData("ResetOdo3", new ResetOdometryToLimelight(m_swerve, m_vision, 3));
+    SmartDashboard.putData("ResetOdo4", new ResetOdometryToLimelight(m_swerve, m_vision, 4));
+    SmartDashboard.putData("ResetOdo5", new ResetOdometryToLimelight(m_swerve, m_vision, 5));
+    SmartDashboard.putData("ResetOdo6", new ResetOdometryToLimelight(m_swerve, m_vision, 6));
+    SmartDashboard.putData("ResetOdo7", new ResetOdometryToLimelight(m_swerve, m_vision, 7));
+    SmartDashboard.putData("ResetOdo8", new ResetOdometryToLimelight(m_swerve, m_vision, 8));
+
+    SmartDashboard.putData("ApplyVisionMeasurement", new ResetOdometryToLimelight(m_swerve, m_vision, 0));
+
     SmartDashboard.putData("ElbowStow", new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_STOW));
     SmartDashboard.putData("ElbowLow", new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_LOW));
     SmartDashboard.putData("ElbowMid", new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_MID));
@@ -176,9 +200,9 @@ public class RobotContainer
 
     // Driver - A, B, X, Y
     driverA.onTrue(new Dummy(XboxController.Button.kA.value));
-    driverB.onTrue(new Dummy(XboxController.Button.kB.value));
-    driverX.onTrue(new Dummy(XboxController.Button.kX.value));
-    driverY.onTrue(new Dummy(XboxController.Button.kY.value));
+    driverB.onTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_RIGHT));
+    driverX.onTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_LEFT));
+    driverY.onTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_MIDDLE));
     //
     // Driver - Bumpers, start, back
     driverLeftBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
@@ -239,10 +263,10 @@ public class RobotContainer
     operStart.onTrue(new Dummy(XboxController.Button.kStart.value));
     //
     // Operator - POV buttons
-    operUp.onTrue(new Dummy(0));
-    operRight.onTrue(new Dummy(90));
-    operDown.onTrue(new Dummy(180));
-    operLeft.onTrue(new Dummy(270));
+    operUp.onTrue(new ArmSetHeightScoreHigh(m_elbow, m_wrist));
+    operRight.onTrue(new ArmSetHeightScoreMid(m_elbow, m_wrist));
+    operDown.onTrue(new ArmSetHeightScoreLow(m_elbow, m_wrist));
+    operLeft.onTrue(new ArmSetHeightStow(m_elbow, m_wrist));
     //
     // Operator Left/Right Trigger
     operLeftTrigger.onTrue(new Dummy(130));
@@ -270,7 +294,9 @@ public class RobotContainer
     // Autonomous Chooser
     m_chooser.addOption("1 - AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveOffCommunity", true));
     m_chooser.addOption("2 - AutoDockOnChargeStation", new AutoChargeStation(m_swerve));
-    m_chooser.addOption("AutoDriveForward1m", new AutoDrivePath(m_swerve, "forward1m", true));
+    // m_chooser.addOption("3 - AutoPreloadAndLeaveCommunity", new AutoPreloadAndLeaveCommunity(m_swerve));
+    // m_chooser.addOption("4 - AutoPreloadAndEngageChargeStation", new AutoPreloadAndEngageChargeStation(m_swerve));
+    // m_chooser.addOption("5 - AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve));
     m_chooser.setDefaultOption("0 - AutoStop", new AutoStop(m_swerve));
 
     // Configure autonomous sendable chooser
