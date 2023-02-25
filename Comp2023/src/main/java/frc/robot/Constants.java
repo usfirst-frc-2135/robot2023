@@ -143,32 +143,34 @@ public class Constants
   {
     // Global settings
 
-    public static final double  kElbowGearRatio       = 300;    // Gear reduction for elbow
-    public static final double  kElbowDegreesPerCount = 360 / Falcon500.kEncoderCPR / kElbowGearRatio;
-    public static final double  kForearmLengthMeters  = 1.22;   // Sim value: 48 inches
-    public static final double  kForearmMassKg        = 6.0;    // Sim value: 13.2 lbs 
-    public static final boolean kInvertMotor          = true;   // Motor direction for positive input
+    public static final double  kElbowGearRatio         = 300;    // Gear reduction for elbow
+    public static final double  kElbowDegreesPerCount   = 360 / Falcon500.kEncoderCPR / kElbowGearRatio;
+    public static final double  kForearmLengthMeters    = 1.22;   // Sim value: 48 inches
+    public static final double  kForearmMassKg          = 6.0;    // Sim value: 13.2 lbs 
+    public static final boolean kInvertMotor            = true;   // Motor direction for positive input
 
     // Input current limit settings - elbow
-    public static final double  kSupplyCurrentLimit   = 25.0;  // Default supply current limit (after trigger)
-    public static final double  kSupplyTriggerCurrent = 40.0;  // Trigger current that will cause limiting
-    public static final double  kSupplyTriggerTime    = 0.001; // Time duration of trigger that will causing limiting
+    public static final double  kSupplyCurrentLimit     = 25.0;  // Default supply current limit (after trigger)
+    public static final double  kSupplyTriggerCurrent   = 40.0;  // Trigger current that will cause limiting
+    public static final double  kSupplyTriggerTime      = 0.001; // Time duration of trigger that will causing limiting
 
     // Output current limit settings - elbow
-    public static final double  kStatorCurrentLimit   = 25.0;  // Default supply current limit (after trigger)
-    public static final double  kStatorTriggerCurrent = 40.0;  // Default trigger current that will cause limiting
-    public static final double  kStatorTriggerTime    = 0.001; // Default time duration of trigger that will causing limiting
+    public static final double  kStatorCurrentLimit     = 25.0;  // Default supply current limit (after trigger)
+    public static final double  kStatorTriggerCurrent   = 40.0;  // Default trigger current that will cause limiting
+    public static final double  kStatorTriggerTime      = 0.001; // Default time duration of trigger that will causing limiting
 
     // CANCoder elbow absolute offset
-    public static final double  kCompElbowOffset      = 0.000;  // CANCoder offset angle for comp bot
-    public static final double  kBetaElbowOffset      = 0.000;  // CANCoder offset angle for beta bot
+    public static final boolean kInvertCANCoder         = false;  // CANCoder direction for positive angle in relative mode
+    public static final boolean kElbowCANCoderAbsInvert = true;   // CANCoder direction for positive angle in absolute mode
+    public static final double  kCompElbowOffset        = 0.000;  // CANCoder offset angle for comp bot
+    public static final double  kBetaElbowOffset        = 251.279 - 5.0; // (TODO: Beta requires an offset) CANCoder offset angle for beta bot
 
-    public static final double  kElbowAnglewMin       = 0.0;    // Elbow minimum allowable degrees
-    public static final double  kElbowAngleMax        = 90.0;   // Elbow maximum allowable degrees
-    public static final double  kElbowAngleStow       = 3.0;    // TO-DO: Test angles
-    public static final double  kElbowAngleScoreLow   = 10.0;   // TO-DO: Test angles
-    public static final double  kElbowAngleScoreMid   = 20.0;   // TO-DO: Test angles
-    public static final double  kElbowAngleScoreHigh  = 35.0;   // TO-DO: Test angles
+    public static final double  kElbowAnglewMin         = 0.0;    // Elbow minimum allowable degrees
+    public static final double  kElbowAngleMax          = 90.0;   // Elbow maximum allowable degrees
+    public static final double  kElbowAngleStow         = 3.0;    // TO-DO: Test angles
+    public static final double  kElbowAngleScoreLow     = 10.0;   // TO-DO: Test angles
+    public static final double  kElbowAngleScoreMid     = 45.0;   // TO-DO: Test angles
+    public static final double  kElbowAngleScoreHigh    = 75.0;   // TO-DO: Test angles
 
     // Manual config parameters
 
@@ -202,38 +204,41 @@ public class Constants
     public static final double kElbowPidKd            = 0.0;    // Elbow PID derivative constant
     public static final int    kElbowAllowedError     = 0;      // Elbow PID allowable closed loop error in counts
     public static final double kElbowToleranceDegrees = 0.5;    // Elbow PID tolerance in degrees
+    public static final double kElbowArbitraryFF      = 0.070;  // Elbow motor output for arm at 90 degrees
   }
 
   public static final class WRConsts
   {
     // Global settings
 
-    public static final double  kWristGearRatio       = 305;    // Gear reduction for wrist
-    public static final double  kWristDegreesPerCount = 360 / Falcon500.kEncoderCPR / kWristGearRatio;
-    public static final double  kGripperLengthMeters  = 0.3;    // Sim value: 11.8 in
-    public static final double  kGripperMassKg        = 3.0;    // Sim value: 6.6 lbs
-    public static final boolean kInvertMotor          = true;  // Motor direction for positive input
+    public static final double  kWristGearRatio         = 305;   // Gear reduction for wrist
+    public static final double  kWristDegreesPerCount   = 360 / Falcon500.kEncoderCPR / kWristGearRatio;
+    public static final double  kGripperLengthMeters    = 0.3;   // Sim value: 11.8 in
+    public static final double  kGripperMassKg          = 3.0;   // Sim value: 6.6 lbs
+    public static final boolean kInvertMotor            = true;  // Motor direction for positive input
 
     // Input current limit settings - wrist
-    public static final double  kSupplyCurrentLimit   = 25.0;  // Default supply current limit (after trigger)
-    public static final double  kSupplyTriggerCurrent = 40.0;  // Trigger current that will cause limiting
-    public static final double  kSupplyTriggerTime    = 0.001; // Time duration of trigger that will causing limiting
+    public static final double  kSupplyCurrentLimit     = 25.0;  // Default supply current limit (after trigger)
+    public static final double  kSupplyTriggerCurrent   = 40.0;  // Trigger current that will cause limiting
+    public static final double  kSupplyTriggerTime      = 0.001; // Time duration of trigger that will causing limiting
 
     // Output current limit settings - wrist
-    public static final double  kStatorCurrentLimit   = 25.0;  // Default supply current limit (after trigger)
-    public static final double  kStatorTriggerCurrent = 40.0;  // Default trigger current that will cause limiting
-    public static final double  kStatorTriggerTime    = 0.001; // Default time duration of trigger that will causing limiting
+    public static final double  kStatorCurrentLimit     = 25.0;  // Default supply current limit (after trigger)
+    public static final double  kStatorTriggerCurrent   = 40.0;  // Default trigger current that will cause limiting
+    public static final double  kStatorTriggerTime      = 0.001; // Default time duration of trigger that will causing limiting
 
     // CANCoder wrist absolute offset
-    public static final double  kCompWristOffset      = 0.000;  // CANCoder offset angle for comp bot
-    public static final double  kBetaWristOffset      = 0.000;  // CANCoder offset angle for beta bot
+    public static final boolean kInvertCANCoder         = false;  // CANCoder direction for positive angle in relative mode
+    public static final boolean kWristCANCoderAbsInvert = false;  // CANCoder direction for positive angle in absolute mode
+    public static final double  kCompWristOffset        = 0.000;  // CANCoder offset angle for comp bot
+    public static final double  kBetaWristOffset        = 0.000;  // CANCoder offset angle for beta bot
 
-    public static final double  kWristMinAngle        = 0.0;    // Wrist maximum allowable Angle
-    public static final double  kWristMaxAngle        = 135.0;  // Wrist maximum allowable Angle
-    public static final double  kWristStowAngle       = 2.0;    // TO-DO: Test angles
-    public static final double  kWristAngleScoreLow   = 10.0;   // TO-DO: Test angles
-    public static final double  kWristAngleScoreMid   = 20.0;   // TO-DO: Test angles
-    public static final double  kWristAngleScoreHigh  = 35.0;   // TO-DO: Test angles
+    public static final double  kWristMinAngle          = 0.0;    // Wrist maximum allowable Angle
+    public static final double  kWristMaxAngle          = 135.0;  // Wrist maximum allowable Angle
+    public static final double  kWristStowAngle         = 2.0;    // TO-DO: Test angles
+    public static final double  kWristAngleScoreLow     = 10.0;   // TO-DO: Test angles
+    public static final double  kWristAngleScoreMid     = 20.0;   // TO-DO: Test angles
+    public static final double  kWristAngleScoreHigh    = 35.0;   // TO-DO: Test angles
 
     // Manual config parameters
 
@@ -258,8 +263,8 @@ public class Constants
       WRIST_HIGH,         // Move wrist to high-scoring Angle
     }
 
-    public static final int    kWristMMVelocity       = 16466;  // Wrist motion magic velocity
-    public static final int    kWristMMAcceleration   = 16466;  // Wrist motion magic acceleration
+    public static final int    kWristMMVelocity       = 16466 * 3 / 4;  // (TODO: Slowed until new wrist) Wrist motion magic velocity
+    public static final int    kWristMMAcceleration   = 16466 * 3 / 4;  // (TODO: Slowed until new wrist) Wrist motion magic acceleration
     public static final int    kWristMMSCurveStrength = 0;      // Wrist motion magic S curve smoothing strength
     public static final double kWristPidKf            = 0.0466; // Wrist PID force constant
     public static final double kWristPidKp            = 0.069;  // Wrist PID proportional constant
@@ -267,6 +272,7 @@ public class Constants
     public static final double kWristPidKd            = 0.0;    // Wrist PID derivative constant
     public static final int    kWristAllowedError     = 0;      // Wrist PID allowable closed loop error in counts
     public static final double kWristToleranceDegrees = 0.5;    // Wrist PID tolerance in degrees
+    public static final double kWristArbitraryFF      = 0.058;  // Wrist motor output for 90 degrees
   }
 
   public static final class GRConsts
