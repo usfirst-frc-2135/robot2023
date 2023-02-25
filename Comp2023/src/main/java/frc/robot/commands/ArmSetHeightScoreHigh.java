@@ -27,13 +27,13 @@ public class ArmSetHeightScoreHigh extends SequentialCommandGroup
         // @formatter:off
         new PrintCommand("Moving Elbow"),
         new ParallelDeadlineGroup(
-          new WaitUntilCommand(elbow::moveElbowDistanceIsFinished),
+          new WaitUntilCommand(elbow::moveElbowAngleIsFinished),
           new ElbowMoveToAngle(elbow, ElbowAngle.ELBOW_HIGH)
         ),
 
         new PrintCommand("Moving Wrist"),
         new ParallelDeadlineGroup(
-          new WaitUntilCommand(wrist::moveWristDistanceIsFinished),
+          new WaitUntilCommand(wrist::moveWristAngleIsFinished),
           new WristMoveToAngle(wrist, WristAngle.WRIST_HIGH)
         )
         //TODO: EXTEND ARM

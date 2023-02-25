@@ -145,25 +145,25 @@ public class Constants
     public static final double kForearmMassKg         = 6.5;
 
     // Talon FX config parameters
-    public static final int    kElbowMMVelocity       = 21776;  // Elbow motion magic velocity
-    public static final int    kElbowMMAcceleration   = 43552;  // Elbow motion magic acceleration
+    public static final int    kElbowMMVelocity       = 16646;  // Elbow motion magic velocity
+    public static final int    kElbowMMAcceleration   = 16646;  // Elbow motion magic acceleration
     public static final int    kElbowMMSCurveStrength = 0;      // Elbow motion magic S curve smoothing strength
-    public static final double kElbowPidKf            = 0.0496; // Elbow PID force constant
-    public static final double kElbowPidKp            = 0.500;  // Elbow PID proportional constant
+    public static final double kElbowPidKf            = 0.0461; // Elbow PID force constant
+    public static final double kElbowPidKp            = 0.0246;  // Elbow PID proportional constant
     public static final double kElbowPidKi            = 0.0;    // Elbow PID integral constant
     public static final double kElbowPidKd            = 0.0;    // Elbow PID derivative constant
     public static final int    kElbowAllowedError     = 0;      // Elbow PID allowable closed loop error in counts
     public static final double kElbowToleranceDegrees = 0.25;   // Elbow PID tolerance in degrees
 
     public static final double kElbowAnglewMin        = 0.0;    // Elbow minimum allowable degrees
-    public static final double kElbowAngleMax         = 36.0;   // Elbow maximum allowable degrees
-    public static final double kElbowAngleStow        = 0;      // TO-DO: FIGURE IT OUT
-    public static final double kElbowAngleScoreLow    = 20;      // TO-DO: FIND
-    public static final double kElbowAngleScoreMid    = 40;      // TO-DO: FIND
-    public static final double kElbowAngleScoreHigh   = 60;      // TO-DO: FIND
+    public static final double kElbowAngleMax         = 90.0;   // Elbow maximum allowable degrees
+    public static final double kElbowAngleStow        = 3.0;    // TO-DO: FIGURE IT OUT
+    public static final double kElbowAngleScoreLow    = 20.0;   // TO-DO: FIND
+    public static final double kElbowAngleScoreMid    = 40.0;   // TO-DO: FIND
+    public static final double kElbowAngleScoreHigh   = 75.0;   // TO-DO: FIND
 
     public static final double kElbowSpeedCalibrate   = -0.1;   // Motor percent output during calibration
-    public static final double kElbowSpeedMaxManual   = 0.3;    // Motor percent output during manual operation
+    public static final double kElbowSpeedMaxManual   = 1.0;    // Motor percent output during manual operation
 
     public enum ElbowMode
     {
@@ -191,25 +191,25 @@ public class Constants
     public static final double kGripperMassKg         = 4.0;
 
     // Talon FX config parameters
-    public static final int    kWristMMVelocity       = 21776;  // Wrist motion magic velocity
-    public static final int    kWristMMAcceleration   = 43552;  // Wrist motion magic acceleration
+    public static final int    kWristMMVelocity       = 16466;  // Wrist motion magic velocity
+    public static final int    kWristMMAcceleration   = 16466;  // Wrist motion magic acceleration
     public static final int    kWristMMSCurveStrength = 0;      // Wrist motion magic S curve smoothing strength
-    public static final double kWristPidKf            = 0.0496; // Wrist PID force constant
-    public static final double kWristPidKp            = 0.500;  // Wrist PID proportional constant
+    public static final double kWristPidKf            = 0.0466; // Wrist PID force constant
+    public static final double kWristPidKp            = 0.069;  // Wrist PID proportional constant
     public static final double kWristPidKi            = 0.0;    // Wrist PID integral constant
     public static final double kWristPidKd            = 0.0;    // Wrist PID derivative constant
     public static final int    kWristAllowedError     = 0;      // Wrist PID allowable closed loop error in counts
     public static final double kWristToleranceDegrees = 0.25;   // Wrist PID tolerance in degrees
 
-    public static final double kWristMinAngle         = 0.0;    // Wrist minimum allowable Angle
-    public static final double kWristMaxAngle         = 36.0;   // Wrist maximum allowable Angle
-    public static final double kWristStowAngle        = 0;      // TO-DO: FIGURE IT OUT
-    public static final double kWristAngleScoreLow    = 60;      // TO-DO: FIND
-    public static final double kWristAngleScoreMid    = 40;      // TO-DO: FIND
-    public static final double kWristAngleScoreHigh   = 20;      // TO-DO: FIND
+    public static final double kWristMinAngle         = 0.0;   // Wrist maximum allowable Angle
+    public static final double kWristMaxAngle         = 120.0; // Wrist maximum allowable Angle
+    public static final double kWristStowAngle        = 2.0;   // TO-DO: FIGURE IT OUT
+    public static final double kWristAngleScoreLow    = 20.0;  // TO-DO: FIND
+    public static final double kWristAngleScoreMid    = 40.0;  // TO-DO: FIND
+    public static final double kWristAngleScoreHigh   = 75.0;  // TO-DO: FIND
 
     public static final double kWristSpeedCalibrate   = -0.1;   // Motor percent output during calibration
-    public static final double kWristSpeedMaxManual   = 0.3;    // Motor percent output during manual operation
+    public static final double kWristSpeedMaxManual   = 1.0;    // Motor percent output during manual operation
 
     public enum WristMode
     {
@@ -278,14 +278,12 @@ public class Constants
       VISION_TOGGLE // Toggle modes
     }
 
-    //Moving the robot to the following side of the grid from the perspective of the driver: 
-
-    public enum VITargetLocations
+    // Direction of goal relative to AprilTag 
+    public enum VIGoalDirection
     {
-      TARGET_LEFT,       // Left
-      TARGET_MIDDLE,     // Middle, 
-      TARGET_RIGHT,      // Right, 
-      TARGET_SUBSTATION  // Substation
+      DIRECTION_LEFT,   // Left
+      DIRECTION_MIDDLE, // Middle
+      DIRECTION_RIGHT   // Right
     }
 
     public static final double       kLLDistance1   = 48;    // distance from bumper in inches for first reference point
@@ -294,15 +292,15 @@ public class Constants
     public static final double       kLLVertOffset2 = -4.85; // LL y reading in degrees for second reference point
 
     public static final List<Pose2d> kAprilTagPoses = Collections.unmodifiableList(List.of( //
-        new Pose2d(new Translation2d(0.0, 0.0), new Rotation2d(0.0, 0.0)),        // AprilTag ID: 0 (invalid)
-        new Pose2d(new Translation2d(15.513558, 1.071626), new Rotation2d(0, 0)), // AprilTag ID: 1 
-        new Pose2d(new Translation2d(15.513558, 2.748026), new Rotation2d(0, 0)), // AprilTag ID: 2 
-        new Pose2d(new Translation2d(15.513558, 4.424426), new Rotation2d(0, 0)), // AprilTag ID: 3 
-        new Pose2d(new Translation2d(16.178784, 6.749796), new Rotation2d(0, 0)), // AprilTag ID: 4 
-        new Pose2d(new Translation2d(0.36195, 6.749796), new Rotation2d(0, 0)),   // AprilTag ID: 5 
-        new Pose2d(new Translation2d(1.0273, 4.424426), new Rotation2d(0, 0)),    // AprilTag ID: 6 
-        new Pose2d(new Translation2d(1.0273, 2.748026), new Rotation2d(0, 0)),    // AprilTag ID: 7
-        new Pose2d(new Translation2d(1.0273, 1.071626), new Rotation2d(0, 0))     // AprilTag ID: 8
+        new Pose2d(new Translation2d(0.0, 0.0), new Rotation2d(0)),        // AprilTag ID: 0 (invalid)
+        new Pose2d(new Translation2d(15.513558, 1.071626), new Rotation2d(0)), // AprilTag ID: 1 
+        new Pose2d(new Translation2d(15.513558, 2.748026), new Rotation2d(0)), // AprilTag ID: 2 
+        new Pose2d(new Translation2d(15.513558, 4.424426), new Rotation2d(0)), // AprilTag ID: 3 
+        new Pose2d(new Translation2d(16.178784, 6.749796), new Rotation2d(0)), // AprilTag ID: 4 
+        new Pose2d(new Translation2d(0.36195, 6.749796), new Rotation2d(Units.degreesToRadians(180))),   // AprilTag ID: 5 
+        new Pose2d(new Translation2d(1.0273, 4.424426), new Rotation2d(Units.degreesToRadians(180))),    // AprilTag ID: 6 
+        new Pose2d(new Translation2d(1.0273, 2.748026), new Rotation2d(Units.degreesToRadians(180))),    // AprilTag ID: 7
+        new Pose2d(new Translation2d(1.0273, 1.071626), new Rotation2d(Units.degreesToRadians(180)))     // AprilTag ID: 8
     ));
   }
 
