@@ -41,8 +41,6 @@ public class ResetOdometryToLimelight extends CommandBase
     {
       //m_swerve.resetOdometry(new Pose2d(new Translation2d(llPose.getX( ) + 2, llPose.getY( )), llPose.getRotation( )));
       m_swerve.resetOdometry(llPose);
-      DataLogManager
-          .log(" ROTATION of LL - " + llPose.getRotation( ) + "|  ROTATION OF SW: " + m_swerve.getPose( ).getRotation( ));
     }
     else if ((m_id > 0) && (m_id < 9))
     {
