@@ -3,6 +3,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.SnapConstants;
@@ -19,6 +20,8 @@ public class DriveSnap extends CommandBase
 
   public DriveSnap(Swerve swerve, double snapAngle)
   {
+    setName("DriveSnap");
+
     m_swerve = swerve;
     m_snapAngle = snapAngle;
 
@@ -50,7 +53,10 @@ public class DriveSnap extends CommandBase
   @Override
   public boolean isFinished( )
   {
-    return m_swerve.driveIsSnapFinished(m_safetyTimer.hasElapsed(SnapConstants.kTimeout));
+    boolean timedOut = m_safetyTimer.hasElapsed(SnapConstants.kTimeout);
+    if (timedOut)
+      DataLogManager.log(getName( ) + " has timed out!");
+    return m_swerve.driveIsSnapFinished(timedOut);
   }
 
   @Override

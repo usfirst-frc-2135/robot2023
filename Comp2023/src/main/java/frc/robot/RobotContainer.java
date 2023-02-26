@@ -211,9 +211,9 @@ public class RobotContainer
     //
     // Driver - POV buttons
     driverUp.onTrue(new DriveSnap(m_swerve, 0));
-    driverRight.onTrue(new DriveSnap(m_swerve, 90));
+    driverRight.onTrue(new DriveSnap(m_swerve, -90));
     driverDown.onTrue(new DriveSnap(m_swerve, 180));
-    driverLeft.onTrue(new DriveSnap(m_swerve, 270));
+    driverLeft.onTrue(new DriveSnap(m_swerve, 90));
     //
     // Operator Left/Right Trigger
     driverLeftTrigger.onTrue(new Dummy(130));

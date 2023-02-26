@@ -479,7 +479,7 @@ public class Swerve extends SubsystemBase
   {
     if (m_isSnapping)
     {
-      if (Math.abs(rotation) == 0.0)
+      if (Math.abs(rotation) <= Constants.kStickDeadband)
       {
         driveIsSnapFinished(false);
         rotation = driveSnapCalculate( );

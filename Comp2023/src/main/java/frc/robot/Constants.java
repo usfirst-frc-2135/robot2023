@@ -497,7 +497,7 @@ public class Constants
     public static final double                       kP                                      = 5.0;
     public static final double                       kI                                      = 0;
     public static final double                       kD                                      = 0.0;
-    public static final double                       kTimeout                                = 0.25;
+    public static final double                       kTimeout                                = 0.75;
     public static final double                       kEpsilon                                = 1.0;
 
     // Constraints for the profiled angle controller
