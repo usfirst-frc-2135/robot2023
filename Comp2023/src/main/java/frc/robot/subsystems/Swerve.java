@@ -354,8 +354,11 @@ public class Swerve extends SubsystemBase
     // This initializes the odometry (where we are)
     if (useInitialPose)
     {
-      zeroGyro(m_trajectory.getInitialPose( ).getRotation( ).getDegrees( ));
+      //zeroGyro(m_trajectory.getInitialPose( ).getRotation( ).getDegrees( ));
+      DataLogManager.log("YAW: " + m_pigeon.getYaw( ) + " | UNADJECT: " + m_pigeon.getUnadjustedYaw( ));
       resetOdometry(m_trajectory.getInitialHolonomicPose( ));
+      DataLogManager.log("INITIAL HOLONOMIC POSE: " + m_trajectory.getInitialHolonomicPose( ));
+
     }
 
     m_trajTimer.reset( );
