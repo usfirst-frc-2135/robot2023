@@ -46,8 +46,8 @@ public class DriveLimelightPath extends CommandBase
     Pose2d currentPose = m_swerve.getPose( );
 
     PathPlannerTrajectory trajectory = PathPlanner.generatePath(new PathConstraints(3, 4),
-        new PathPoint(currentPose.getTranslation( ), currentPose.getRotation( )),
-        new PathPoint(goalPose2d.getTranslation( ), goalPose2d.getRotation( )));
+        new PathPoint(currentPose.getTranslation( ), currentPose.getRotation( ), currentPose.getRotation( )),
+        new PathPoint(goalPose2d.getTranslation( ), goalPose2d.getRotation( ), goalPose2d.getRotation( )));
 
     m_swerve.driveWithPathFollowerInit(trajectory, true);
 
