@@ -360,15 +360,19 @@ public class Elbow extends SubsystemBase
         break;
       case ELBOW_STOW :
         m_elbowTargetDegrees = SmartDashboard.getNumber("EL_stowangle", m_elbowStowangle);
+        DataLogManager.log("ELBOW TARGET ANGLE: " + m_elbowTargetDegrees);
         break;
       case ELBOW_LOW :
         m_elbowTargetDegrees = SmartDashboard.getNumber("EL_lowScoreangle", m_lowScoreangle);
+        DataLogManager.log("ELBOW TARGET ANGLE: " + m_elbowTargetDegrees);
         break;
       case ELBOW_MID :
         m_elbowTargetDegrees = SmartDashboard.getNumber("EL_midScoreangle", m_midScoreangle);
+        DataLogManager.log("ELBOW TARGET ANGLE: " + m_elbowTargetDegrees);
         break;
       case ELBOW_HIGH :
         m_elbowTargetDegrees = SmartDashboard.getNumber("EL_highScoreangle", m_highScoreangle);
+        DataLogManager.log("ELBOW TARGET ANGLE: " + m_elbowTargetDegrees);
         break;
       default :
         DataLogManager.log(getSubsystem( ) + ": requested angle is invalid - " + angle);

@@ -149,10 +149,12 @@ public class Constants
     public static final double  kForearmMassKg          = 6.0;    // Sim value: 13.2 lbs 
     public static final boolean kInvertMotor            = true;   // Motor direction for positive input
 
-    // Input current limit settings - elbow
-    public static final double  kSupplyCurrentLimit     = 25.0;  // Default supply current limit (after trigger)
-    public static final double  kSupplyTriggerCurrent   = 40.0;  // Trigger current that will cause limiting
-    public static final double  kSupplyTriggerTime      = 0.001; // Time duration of trigger that will causing limiting
+    public static final double  kElbowAnglewMin         = 0.0;    // Elbow minimum allowable degrees
+    public static final double  kElbowAngleMax          = 90.0;   // Elbow maximum allowable degrees
+    public static final double  kElbowAngleStow         = 0.0;    // TO-DO: FIGURE IT OUT
+    public static final double  kElbowAngleScoreLow     = 15.0;   // TO-DO: FIND
+    public static final double  kElbowAngleScoreMid     = 40.0;   // TO-DO: FIND
+    public static final double  kElbowAngleScoreHigh    = 75.0;   // TO-DO: FIND
 
     // Output current limit settings - elbow
     public static final double  kStatorCurrentLimit     = 25.0;  // Default supply current limit (after trigger)
@@ -164,13 +166,6 @@ public class Constants
     public static final boolean kElbowCANCoderAbsInvert = true;   // CANCoder direction for positive angle in absolute mode
     public static final double  kCompElbowOffset        = 0.000;  // CANCoder offset angle for comp bot
     public static final double  kBetaElbowOffset        = 251.279 - 5.0; // (TODO: Beta requires an offset) CANCoder offset angle for beta bot
-
-    public static final double  kElbowAnglewMin         = 0.0;    // Elbow minimum allowable degrees
-    public static final double  kElbowAngleMax          = 90.0;   // Elbow maximum allowable degrees
-    public static final double  kElbowAngleStow         = 3.0;    // TO-DO: Test angles
-    public static final double  kElbowAngleScoreLow     = 10.0;   // TO-DO: Test angles
-    public static final double  kElbowAngleScoreMid     = 45.0;   // TO-DO: Test angles
-    public static final double  kElbowAngleScoreHigh    = 75.0;   // TO-DO: Test angles
 
     // Manual config parameters
 
@@ -217,10 +212,12 @@ public class Constants
     public static final double  kGripperMassKg          = 3.0;   // Sim value: 6.6 lbs
     public static final boolean kInvertMotor            = true;  // Motor direction for positive input
 
-    // Input current limit settings - wrist
-    public static final double  kSupplyCurrentLimit     = 25.0;  // Default supply current limit (after trigger)
-    public static final double  kSupplyTriggerCurrent   = 40.0;  // Trigger current that will cause limiting
-    public static final double  kSupplyTriggerTime      = 0.001; // Time duration of trigger that will causing limiting
+    public static final double  kWristMinAngle          = 0.0;   // Wrist maximum allowable Angle
+    public static final double  kWristMaxAngle          = 120.0; // Wrist maximum allowable Angle
+    public static final double  kWristStowAngle         = 0.0;   // TO-DO: FIGURE IT OUT
+    public static final double  kWristAngleScoreLow     = 15.0;  // TO-DO: FIND
+    public static final double  kWristAngleScoreMid     = 40.0;  // TO-DO: FIND
+    public static final double  kWristAngleScoreHigh    = 75.0;  // TO-DO: FIND
 
     // Output current limit settings - wrist
     public static final double  kStatorCurrentLimit     = 25.0;  // Default supply current limit (after trigger)
@@ -232,13 +229,6 @@ public class Constants
     public static final boolean kWristCANCoderAbsInvert = false;  // CANCoder direction for positive angle in absolute mode
     public static final double  kCompWristOffset        = 0.000;  // CANCoder offset angle for comp bot
     public static final double  kBetaWristOffset        = 0.000;  // CANCoder offset angle for beta bot
-
-    public static final double  kWristMinAngle          = 0.0;    // Wrist maximum allowable Angle
-    public static final double  kWristMaxAngle          = 135.0;  // Wrist maximum allowable Angle
-    public static final double  kWristStowAngle         = 2.0;    // TO-DO: Test angles
-    public static final double  kWristAngleScoreLow     = 10.0;   // TO-DO: Test angles
-    public static final double  kWristAngleScoreMid     = 20.0;   // TO-DO: Test angles
-    public static final double  kWristAngleScoreHigh    = 35.0;   // TO-DO: Test angles
 
     // Manual config parameters
 
