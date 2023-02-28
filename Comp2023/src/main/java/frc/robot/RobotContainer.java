@@ -69,7 +69,6 @@ public class RobotContainer
   public final Elbow            m_elbow       = new Elbow( );
   public final Wrist            m_wrist       = new Wrist( );
   public final Gripper          m_gripper     = new Gripper( );
-  // public final Pneumatics       m_pneumatics  = new Pneumatics( );
   public final Power            m_power       = new Power( );
   public final Swerve           m_swerve      = new Swerve( );
 
@@ -279,7 +278,6 @@ public class RobotContainer
     m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_driverPad));
     m_elbow.setDefaultCommand(new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_NOCHANGE));
     m_wrist.setDefaultCommand(new WristMoveToAngle(m_wrist, WristAngle.WRIST_NOCHANGE));
-
   }
 
   /****************************************************************************

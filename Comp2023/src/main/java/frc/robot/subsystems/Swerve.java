@@ -144,14 +144,10 @@ public class Swerve extends SubsystemBase
   // Put methods for controlling this subsystem here. Call these from Commands.
 
   public void initialize( )
-  {
-
-  }
+  {}
 
   public void faultDump( )
-  {
-
-  }
+  {}
 
   private void initSmartDashboard( )
   {

@@ -111,7 +111,6 @@ public class Robot extends TimedRobot
     m_robotContainer.m_led.initialize( );
 
     // These subsystems can use LED and vision subsystems
-    // m_robotContainer.m_pneumatics.initialize( );
     m_robotContainer.m_power.initialize( );
     m_robotContainer.m_swerve.initialize( );
     m_robotContainer.m_elbow.initialize( );
@@ -245,9 +244,9 @@ public class Robot extends TimedRobot
   {
     // Print out talon faults and clear sticky ones
     DataLogManager.log("----- DUMP FAULTS --------------");
-    // m_robotContainer.m_led.faultDump( );
+
+    m_robotContainer.m_led.faultDump( );
     m_robotContainer.m_power.faultDump( );
-    // m_robotContainer.m_pneumatics.faultDump( );
     m_robotContainer.m_swerve.faultDump( );
   }
 }

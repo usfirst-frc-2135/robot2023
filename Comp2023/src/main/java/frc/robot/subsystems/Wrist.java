@@ -320,7 +320,6 @@ public class Wrist extends SubsystemBase
     {
       m_wrist.set(ControlMode.PercentOutput, motorOutput);
     }
-
   }
 
   public void setWristStopped( )
