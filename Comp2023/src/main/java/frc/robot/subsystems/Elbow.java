@@ -34,7 +34,6 @@ import frc.robot.Constants;
 import frc.robot.Constants.ELConsts;
 import frc.robot.Constants.ELConsts.ElbowAngle;
 import frc.robot.Constants.ELConsts.ElbowMode;
-import frc.robot.Constants.Falcon500;
 import frc.robot.lib.math.Conversions;
 import frc.robot.lib.util.CTREConfigs;
 import frc.robot.team2135.PhoenixUtil;
@@ -53,9 +52,13 @@ public class Elbow extends SubsystemBase
   private final CANCoder                  m_elbowCANCoder       = new CANCoder(Constants.Ports.kCANID_ELCANCoder);
   private final TalonFXSimCollection      m_elbowMotorSim       = new TalonFXSimCollection(m_elbow);
   private final SingleJointedArmSim       m_elbowSim            = new SingleJointedArmSim(DCMotor.getFalcon500(1),
-      ELConsts.kElbowGearRatio, 2.0, ELConsts.kForearmLengthMeters, 0.0, Math.PI, true);
+      ELConsts.kElbowGearRatio, 2.0, ELConsts.kForearmLengthMeters, 0.0, Math.PI, false);
+
+  // Mechanism2d
   private final Mechanism2d               m_elbowMech           = new Mechanism2d(3, 3);
-  private final MechanismLigament2d       m_elbowLigament;
+  private final MechanismRoot2d           m_elbowRoot           = m_elbowMech.getRoot("elbow", 1.5, 2);
+  private MechanismLigament2d             m_elbowLigament       =
+      m_elbowRoot.append(new MechanismLigament2d("elbow", 1, 0, 6, new Color8Bit(Color.kBlue)));
 
   private boolean                         m_elbowValid;                // Health indicator for elbow Talon 
   private double                          m_elbowAngleOffset;          // CANCoder angle measured at reference point
@@ -78,10 +81,10 @@ public class Elbow extends SubsystemBase
   private double                          m_toleranceDegrees    = ELConsts.kElbowToleranceDegrees;  // PID tolerance in inches
   private double                          m_arbitraryFF         = ELConsts.kElbowArbitraryFF;       // Arbitrary Feedfoward (elevators and arms)
 
-  private double                          m_elbowStowangle      = ELConsts.kElbowAngleStow;         // elbow Stow angle
-  private double                          m_lowScoreangle       = ELConsts.kElbowAngleScoreLow;     // low-peg scoring angle   
-  private double                          m_midScoreangle       = ELConsts.kElbowAngleScoreMid;     // mid-peg scoring angle
-  private double                          m_highScoreangle      = ELConsts.kElbowAngleScoreHigh;    // high-peg scoring angle
+  private double                          m_elbowAngleStow      = ELConsts.kElbowAngleStow;         // elbow Stow angle
+  private double                          m_elbowAngleLow       = ELConsts.kElbowAngleScoreLow;     // low-peg scoring angle   
+  private double                          m_elbowAngleMid       = ELConsts.kElbowAngleScoreMid;     // mid-peg scoring angle
+  private double                          m_elbowAngleHigh      = ELConsts.kElbowAngleScoreHigh;    // high-peg scoring angle
   private double                          m_elbowMinAngle       = ELConsts.kElbowAngleMin;          // minimum elbow allowable angle
   private double                          m_elbowMaxAngle       = ELConsts.kElbowAngleMax;          // maximum elbow allowable angle
 
@@ -107,27 +110,6 @@ public class Elbow extends SubsystemBase
 
     m_elbowValid = PhoenixUtil.getInstance( ).talonFXInitialize(m_elbow, "elbow");
 
-    SmartDashboard.putBoolean("HL_validEL", m_elbowValid);
-
-    // Initialize Variables
-    SmartDashboard.putNumber("EL_velocity", m_velocity);
-    SmartDashboard.putNumber("EL_acceleration", m_acceleration);
-    SmartDashboard.putNumber("EL_sCurveStrength", m_sCurveStrength);
-    SmartDashboard.putNumber("EL_pidKf", m_pidKf);
-    SmartDashboard.putNumber("EL_pidKp", m_pidKp);
-    SmartDashboard.putNumber("EL_pidKi", m_pidKi);
-    SmartDashboard.putNumber("EL_pidKd", m_pidKd);
-
-    SmartDashboard.putNumber("EL_stowangle", m_elbowStowangle);
-    SmartDashboard.putNumber("EL_scoreAngleLow", m_lowScoreangle);
-    SmartDashboard.putNumber("EL_scoreAngleMid", m_midScoreangle);
-    SmartDashboard.putNumber("EL_scoreAngleHigh", m_highScoreangle);
-
-    SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
-    SmartDashboard.putNumber("EL_targetDegrees", m_elbowTargetDegrees);
-    SmartDashboard.putBoolean("EL_calibrated", ELConsts.kElbowCalibrated);
-    SmartDashboard.putBoolean("EL_normalMode", !m_elbowDebug);
-
     if (m_elbowValid)
       elbowTalonInitialize(m_elbow, ELConsts.kInvertMotor);
 
@@ -138,15 +120,7 @@ public class Elbow extends SubsystemBase
     m_elbowCANCoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 255);
     resetToAbsolute( );
 
-    // the mechanism root node
-    MechanismRoot2d elbowRoot = m_elbowMech.getRoot("elbow", 1.5, 2);
-
-    // MechanismLigament2d objects represent each "section"/"stage" of the mechanism, and are based
-    // off the root node or another ligament object
-    m_elbowLigament = elbowRoot.append(new MechanismLigament2d("elbow", 1, 0, 6, new Color8Bit(Color.kBlue)));
-
-    // post the mechanism to the dashboard
-    SmartDashboard.putData("ElbowMech2d", m_elbowMech);
+    initSmartDashboard( );
 
     initialize( );
   }
@@ -172,7 +146,7 @@ public class Elbow extends SubsystemBase
 
       m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
       SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
-      m_elbowLigament.setAngle(elbowCountsToDegrees(curCounts));
+      m_elbowLigament.setAngle(m_elbowCurDegrees);
     }
   }
 
@@ -194,6 +168,33 @@ public class Elbow extends SubsystemBase
 
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_elbowSim.getCurrentDrawAmps( )));
+  }
+
+  private void initSmartDashboard( )
+  {
+    SmartDashboard.putBoolean("HL_validEL", m_elbowValid);
+
+    // Initialize Variables
+    SmartDashboard.putNumber("EL_velocity", m_velocity);
+    SmartDashboard.putNumber("EL_acceleration", m_acceleration);
+    SmartDashboard.putNumber("EL_sCurveStrength", m_sCurveStrength);
+    SmartDashboard.putNumber("EL_pidKf", m_pidKf);
+    SmartDashboard.putNumber("EL_pidKp", m_pidKp);
+    SmartDashboard.putNumber("EL_pidKi", m_pidKi);
+    SmartDashboard.putNumber("EL_pidKd", m_pidKd);
+
+    SmartDashboard.putNumber("EL_stowangle", m_elbowAngleStow);
+    SmartDashboard.putNumber("EL_scoreAngleLow", m_elbowAngleLow);
+    SmartDashboard.putNumber("EL_scoreAngleMid", m_elbowAngleMid);
+    SmartDashboard.putNumber("EL_scoreAngleHigh", m_elbowAngleHigh);
+
+    SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
+    SmartDashboard.putNumber("EL_targetDegrees", m_elbowTargetDegrees);
+    SmartDashboard.putBoolean("EL_calibrated", ELConsts.kElbowCalibrated);
+    SmartDashboard.putBoolean("EL_normalMode", !m_elbowDebug);
+
+    // post the mechanism to the dashboard
+    SmartDashboard.putData("ElbowMech", m_elbowMech);
   }
 
   public void initialize( )
@@ -363,6 +364,11 @@ public class Elbow extends SubsystemBase
       m_elbow.config_kP(SLOTINDEX, m_pidKp);
       m_elbow.config_kI(SLOTINDEX, m_pidKi);
       m_elbow.config_kD(SLOTINDEX, m_pidKd);
+
+      m_elbowAngleStow = SmartDashboard.getNumber("EL_stowangle", m_elbowAngleStow);
+      m_elbowAngleLow = SmartDashboard.getNumber("EL_stowangle", m_elbowAngleLow);
+      m_elbowAngleMid = SmartDashboard.getNumber("EL_stowangle", m_elbowAngleMid);
+      m_elbowAngleHigh = SmartDashboard.getNumber("EL_stowangle", m_elbowAngleHigh);
     }
 
     switch (angle)
@@ -373,16 +379,19 @@ public class Elbow extends SubsystemBase
           m_elbowTargetDegrees = 0.25;
         break;
       case ELBOW_STOW :
-        m_elbowTargetDegrees = SmartDashboard.getNumber("EL_stowangle", m_elbowStowangle);
+        m_elbowTargetDegrees = m_elbowAngleStow;
         break;
       case ELBOW_LOW :
-        m_elbowTargetDegrees = SmartDashboard.getNumber("EL_lowScoreangle", m_lowScoreangle);
+        m_elbowTargetDegrees = m_elbowAngleLow;
         break;
       case ELBOW_MID :
-        m_elbowTargetDegrees = SmartDashboard.getNumber("EL_midScoreangle", m_midScoreangle);
+        m_elbowTargetDegrees = m_elbowAngleMid;
         break;
       case ELBOW_HIGH :
-        m_elbowTargetDegrees = SmartDashboard.getNumber("EL_highScoreangle", m_highScoreangle);
+        m_elbowTargetDegrees = m_elbowAngleHigh;
+        break;
+      case ELBOW_SHELF :
+        m_elbowTargetDegrees = m_elbowAngleHigh;
         break;
       default :
         DataLogManager.log(String.format("%s: requested angle is invalid - %.1f", getSubsystem( ), angle));

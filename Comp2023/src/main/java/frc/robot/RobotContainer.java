@@ -23,10 +23,10 @@ import frc.robot.commands.ArmSetHeightScoreHigh;
 import frc.robot.commands.ArmSetHeightScoreLow;
 import frc.robot.commands.ArmSetHeightScoreMid;
 import frc.robot.commands.ArmSetHeightStow;
-import frc.robot.commands.AutoEngageChargeStation;
-import frc.robot.commands.AutoDrivePath;
-import frc.robot.commands.AutoStop;
 import frc.robot.commands.AutoDriveBalance;
+import frc.robot.commands.AutoDrivePath;
+import frc.robot.commands.AutoEngageChargeStation;
+import frc.robot.commands.AutoStop;
 import frc.robot.commands.DriveLimelightPath;
 import frc.robot.commands.DriveSnap;
 import frc.robot.commands.DriveTeleop;
@@ -103,6 +103,10 @@ public class RobotContainer
   private void addSmartDashboardWidgets( )
   {
     // SmartDashboard Buttons
+
+    // For future work to set up Shuffleboard layout from code
+    // ShuffleboardTab m_autoTab = Shuffleboard.getTab("Auto");
+    // ComplexWidget autoStopEntry = m_autoTab.add("AutoStop", new AutoStop(m_swerve)).withSize(3, 2).withPosition(0, 0);
 
     // Autonomous buttons  for main routines- chooser order
     SmartDashboard.putData("AutoStop", new AutoStop(m_swerve));
