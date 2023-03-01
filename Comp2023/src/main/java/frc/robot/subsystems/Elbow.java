@@ -62,9 +62,9 @@ public class Elbow extends SubsystemBase
 
   //Devices and simulation objs
   private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true,
-      Falcon500.kSupplyCurrentLimit, Falcon500.kSupplyTriggerCurrent, Falcon500.kSupplyTriggerTime);
+      ELConsts.kSupplyCurrentLimit, ELConsts.kSupplyTriggerCurrent, ELConsts.kSupplyTriggerTime);
   private StatorCurrentLimitConfiguration m_statorCurrentLimits = new StatorCurrentLimitConfiguration(true,
-      Falcon500.kStatorCurrentLimit, Falcon500.kStatorTriggerCurrent, Falcon500.kStatorTriggerTime);
+      ELConsts.kStatorCurrentLimit, ELConsts.kStatorTriggerCurrent, ELConsts.kStatorTriggerTime);
 
   // Declare module variables
   private int                             m_velocity            = ELConsts.kElbowMMVelocity;        // motion magic velocity
