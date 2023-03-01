@@ -22,13 +22,13 @@ public class AutoChargeStation extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
-        new PrintCommand("AUTO PATH SEQUENCE: go to ChargeStation"),
+        new PrintCommand(getName() + ": AUTO PATH SEQUENCE: go to ChargeStation"),
         new ParallelDeadlineGroup(
           new WaitUntilCommand(swerve::driveWithPathFollowerIsFinished),
           new AutoDrivePath (swerve, "driveOffCommunity", true)
         ),
 
-        new PrintCommand("AUTO: Balance on ChargeStation"),
+        new PrintCommand(getName() + ": AUTO: Balance on ChargeStation"),
         new DriveBalance(swerve)
         
         // @formatter:on

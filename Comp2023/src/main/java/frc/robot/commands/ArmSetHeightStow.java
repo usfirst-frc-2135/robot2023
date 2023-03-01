@@ -25,13 +25,13 @@ public class ArmSetHeightStow extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
-        new PrintCommand("Moving Wrist"),
+        new PrintCommand(getName() + ": Moving Wrist"),
         new ParallelDeadlineGroup(
           new WaitUntilCommand(wrist::moveWristAngleIsFinished),
           new WristMoveToAngle(wrist, WristAngle.WRIST_STOW)
         ),
         //TODO: RETRACT EXTENSION
-        new PrintCommand("Moving Elbow"),
+        new PrintCommand(getName() + ": Moving Elbow"),
         new ParallelDeadlineGroup(
           new WaitUntilCommand(elbow::moveElbowAngleIsFinished),
           new ElbowMoveToAngle(elbow, ElbowAngle.ELBOW_STOW)
