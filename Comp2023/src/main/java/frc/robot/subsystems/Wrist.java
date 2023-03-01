@@ -88,7 +88,7 @@ public class Wrist extends SubsystemBase
   private double                          m_stickDeadband       = Constants.kStickDeadband;          // joystick deadband
   private WristMode                       m_wristMode           = WristMode.WRIST_INIT;              // Mode active with joysticks
 
-  private int                             m_wristDebug          = 1; // DEBUG flag to disable/enable extra logging calls
+  private boolean                         m_wristDebug          = false;  // DEBUG flag to disable/enable extra logging calls
 
   private double                          m_wristTargetDegrees  = 0.0;    // Target angle in degrees
   private double                          m_wristCurDegrees     = 0.0;    // Current angle in degrees
@@ -126,6 +126,7 @@ public class Wrist extends SubsystemBase
     SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
     SmartDashboard.putNumber("WR_targetDegrees", m_wristTargetDegrees);
     SmartDashboard.putBoolean("WR_calibrated", WRConsts.kWristCalibrated);
+    SmartDashboard.putBoolean("WR_normalMode", !m_wristDebug);
 
     if (m_wristValid)
       wristTalonInitialize(m_wrist, WRConsts.kInvertMotor);
@@ -158,11 +159,16 @@ public class Wrist extends SubsystemBase
     if (m_wristValid)
     {
       int curCounts = (int) m_wrist.getSelectedSensorPosition(0);
-      int curVelocity = (int) m_wrist.getSelectedSensorVelocity(0);
-      maxVelocity = (maxVelocity > curVelocity) ? maxVelocity : curVelocity;
-      SmartDashboard.putNumber("WR_maxVelocity", maxVelocity);
-      SmartDashboard.putNumber("WR_curVelocity", curVelocity);
-      SmartDashboard.putNumber("WR_curCounts", curCounts);
+
+      if (m_wristDebug)
+      {
+        int curVelocity = (int) m_wrist.getSelectedSensorVelocity(0);
+        maxVelocity = (maxVelocity > curVelocity) ? maxVelocity : curVelocity;
+        SmartDashboard.putNumber("WR_maxVelocity", maxVelocity);
+        SmartDashboard.putNumber("WR_curVelocity", curVelocity);
+        SmartDashboard.putNumber("WR_curCounts", curCounts);
+      }
+
       m_wristCurDegrees = wristCountsToDegrees(curCounts);
       SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
       m_wristLigament.setAngle(wristCountsToDegrees(curCounts));
@@ -339,7 +345,7 @@ public class Wrist extends SubsystemBase
 
   public void moveWristAngleInit(WristAngle angle)
   {
-    if (m_wristDebug != 0)
+    if (m_wristDebug)
     {
       m_velocity = (int) SmartDashboard.getNumber("WR_velocity", m_velocity);
       m_acceleration = (int) SmartDashboard.getNumber("WR_acceleration", m_acceleration);

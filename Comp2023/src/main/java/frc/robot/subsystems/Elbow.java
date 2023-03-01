@@ -88,7 +88,7 @@ public class Elbow extends SubsystemBase
   private double                          m_stickDeadband       = Constants.kStickDeadband;         // joystick deadband
   private ElbowMode                       m_elbowMode           = ElbowMode.ELBOW_INIT;             // Mode active with joysticks
 
-  private int                             m_elbowDebug          = 1; // DEBUG flag to disable/enable extra logging calls
+  private boolean                         m_elbowDebug          = true;   // DEBUG flag to disable/enable extra logging calls
 
   private double                          m_elbowTargetDegrees  = 0.0;    // Target angle in degrees
   private double                          m_elbowCurDegrees     = 0.0;    // Current angle in degrees
@@ -126,6 +126,7 @@ public class Elbow extends SubsystemBase
     SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
     SmartDashboard.putNumber("EL_targetDegrees", m_elbowTargetDegrees);
     SmartDashboard.putBoolean("EL_calibrated", ELConsts.kElbowCalibrated);
+    SmartDashboard.putBoolean("EL_normalMode", !m_elbowDebug);
 
     if (m_elbowValid)
       elbowTalonInitialize(m_elbow, ELConsts.kInvertMotor);
@@ -158,11 +159,17 @@ public class Elbow extends SubsystemBase
     if (m_elbowValid)
     {
       int curCounts = (int) m_elbow.getSelectedSensorPosition(0);
-      int curVelocity = (int) m_elbow.getSelectedSensorVelocity(0);
-      maxVelocity = (maxVelocity > curVelocity) ? maxVelocity : curVelocity;
-      SmartDashboard.putNumber("EL_maxVelocity", maxVelocity);
-      SmartDashboard.putNumber("EL_curVelocity", curVelocity);
-      SmartDashboard.putNumber("EL_curCounts", curCounts);
+
+      if (m_elbowDebug)
+      {
+        int curVelocity = (int) m_elbow.getSelectedSensorVelocity(0);
+        maxVelocity = (maxVelocity > curVelocity) ? maxVelocity : curVelocity;
+
+        SmartDashboard.putNumber("EL_maxVelocity", maxVelocity);
+        SmartDashboard.putNumber("EL_curVelocity", curVelocity);
+        SmartDashboard.putNumber("EL_curCounts", curCounts);
+      }
+
       m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
       SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
       m_elbowLigament.setAngle(elbowCountsToDegrees(curCounts));
@@ -339,7 +346,7 @@ public class Elbow extends SubsystemBase
 
   public void moveElbowAngleInit(ElbowAngle angle)
   {
-    if (m_elbowDebug != 0)
+    if (m_elbowDebug)
     {
       m_velocity = (int) SmartDashboard.getNumber("EL_velocity", m_velocity);
       m_acceleration = (int) SmartDashboard.getNumber("EL_acceleration", m_acceleration);

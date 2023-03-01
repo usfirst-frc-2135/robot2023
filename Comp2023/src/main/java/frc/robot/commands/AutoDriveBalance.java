@@ -8,16 +8,16 @@ import frc.robot.subsystems.Swerve;
 /**
  *
  */
-public class DriveBalance extends CommandBase
+public class AutoDriveBalance extends CommandBase
 {
   private Swerve m_swerve;
   private Timer  m_timer = new Timer( );
 
-  public DriveBalance(Swerve swerve)
+  public AutoDriveBalance(Swerve swerve)
   {
     m_swerve = swerve;
 
-    setName("DriveBalance");
+    setName("AutoDriveBalance");
     addRequirements(m_swerve);
   }
 

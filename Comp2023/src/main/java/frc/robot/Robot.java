@@ -58,7 +58,7 @@ public class Robot extends TimedRobot
       Constants.isComp = false;
       robotName = "PRACTICE (B)";
     }
-    DataLogManager.log("robotInit: Detected the %s robot!" + robotName);
+    DataLogManager.log("robotInit: Detected the %s robot! " + robotName);
 
     // Instantiate CTRE configurations
     ctreConfigs = new CTREConfigs( );

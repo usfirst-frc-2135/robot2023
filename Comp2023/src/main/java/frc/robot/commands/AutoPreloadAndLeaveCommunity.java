@@ -32,7 +32,7 @@ public class AutoPreloadAndLeaveCommunity extends SequentialCommandGroup
         new PrintCommand(getName() + ": AUTO: Run second path"),
         new ParallelDeadlineGroup(
           new WaitUntilCommand(swerve::driveWithPathFollowerIsFinished),
-          new AutoChargeStation(swerve)
+          new AutoEngageChargeStation(swerve)
         ),
 
         new PrintCommand(getName() + ": AUTO: Hold in place"),

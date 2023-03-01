@@ -12,11 +12,11 @@ import frc.robot.subsystems.Swerve;
 /**
  *
  */
-public class AutoChargeStation extends SequentialCommandGroup
+public class AutoEngageChargeStation extends SequentialCommandGroup
 {
-  public AutoChargeStation(Swerve swerve)
+  public AutoEngageChargeStation(Swerve swerve)
   {
-    setName("AutoChargeStation");
+    setName("AutoEngageChargeStation");
 
     addCommands(
         // Add Commands here:
@@ -29,7 +29,7 @@ public class AutoChargeStation extends SequentialCommandGroup
         ),
 
         new PrintCommand(getName() + ": AUTO: Balance on ChargeStation"),
-        new DriveBalance(swerve)
+        new AutoDriveBalance(swerve)
         
         // @formatter:on
     );
