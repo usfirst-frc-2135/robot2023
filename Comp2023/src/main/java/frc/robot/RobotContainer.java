@@ -55,25 +55,25 @@ import frc.robot.subsystems.Wrist;
  */
 public class RobotContainer
 {
-  private static RobotContainer m_instance;
+  private static RobotContainer    m_instance;
 
   // Joysticks
-  private final XboxController  m_driverPad   = new XboxController(Constants.kDriverPadPort);
-  private final XboxController  m_operatorPad = new XboxController(Constants.kOperatorPadPort);
+  private final XboxController     m_driverPad   = new XboxController(Constants.kDriverPadPort);
+  private final XboxController     m_operatorPad = new XboxController(Constants.kOperatorPadPort);
 
   // The robot's shared subsystems
-  public final LED              m_led         = new LED( );
-  public final Vision           m_vision      = new Vision( );
+  public final LED                 m_led         = new LED( );
+  public final Vision              m_vision      = new Vision( );
 
   // These subsystems can use LED or vision and must be created afterward
-  public final Elbow            m_elbow       = new Elbow( );
-  public final Wrist            m_wrist       = new Wrist( );
-  public final Gripper          m_gripper     = new Gripper( );
-  public final Power            m_power       = new Power( );
-  public final Swerve           m_swerve      = new Swerve( );
+  public final Elbow               m_elbow       = new Elbow( );
+  public final Wrist               m_wrist       = new Wrist( );
+  public final Gripper             m_gripper     = new Gripper( );
+  public final Power               m_power       = new Power( );
+  public final Swerve              m_swerve      = new Swerve( );
 
   // A chooser for autonomous commands
-  SendableChooser<Command>      m_chooser     = new SendableChooser<>( );
+  private SendableChooser<Command> m_autoChooser = new SendableChooser<>( );
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -301,15 +301,15 @@ public class RobotContainer
   private void initAutonomousChooser( )
   {
     // Autonomous Chooser
-    m_chooser.addOption("1 - AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveOffCommunity", true));
-    m_chooser.addOption("2 - AutoEngageChargeStation", new AutoEngageChargeStation(m_swerve));
-    // m_chooser.addOption("3 - AutoPreloadAndLeaveCommunity", new AutoPreloadAndLeaveCommunity(m_swerve));
-    // m_chooser.addOption("4 - AutoPreloadAndEngageChargeStation", new AutoPreloadAndEngageChargeStation(m_swerve));
-    // m_chooser.addOption("5 - AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve));
-    m_chooser.setDefaultOption("0 - AutoStop", new AutoStop(m_swerve));
+    m_autoChooser.addOption("1 - AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveOffCommunity", true));
+    m_autoChooser.addOption("2 - AutoEngageChargeStation", new AutoEngageChargeStation(m_swerve));
+    // m_autoChooser.addOption("3 - AutoPreloadAndLeaveCommunity", new AutoPreloadAndLeaveCommunity(m_swerve));
+    // m_autoChooser.addOption("4 - AutoPreloadAndEngageChargeStation", new AutoPreloadAndEngageChargeStation(m_swerve));
+    // m_autoChooser.addOption("5 - AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve));
+    m_autoChooser.setDefaultOption("0 - AutoStop", new AutoStop(m_swerve));
 
     // Configure autonomous sendable chooser
-    SmartDashboard.putData("Auto Mode", m_chooser);
+    SmartDashboard.putData("Auto Mode", m_autoChooser);
   }
 
   public XboxController getDriver( )
@@ -330,6 +330,6 @@ public class RobotContainer
   public Command getAutonomousCommand( )
   {
     // The selected command will be run in autonomous
-    return m_chooser.getSelected( );
+    return m_autoChooser.getSelected( );
   }
 }

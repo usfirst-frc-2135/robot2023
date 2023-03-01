@@ -25,8 +25,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -439,8 +437,8 @@ public class Swerve extends SubsystemBase
     double currentTrajX = currentPose.getX( );
     double currentTrajY = currentPose.getY( );
 
-    double targetHeading = m_trajectory.getEndState( ).holonomicRotation.getDegrees( ); // TODO: Maybe get in radians?
-    double currentHeading = currentPose.getRotation( ).getDegrees( ); // TODO: Maybe get in radians?
+    double targetHeading = m_trajectory.getEndState( ).holonomicRotation.getDegrees( );
+    double currentHeading = currentPose.getRotation( ).getDegrees( );
 
     setModuleStates(moduleStates);
 
