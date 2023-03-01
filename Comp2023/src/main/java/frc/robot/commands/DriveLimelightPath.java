@@ -81,6 +81,11 @@ public class DriveLimelightPath extends CommandBase
     return false;
   }
 
+  public int getSignFromId(int targetId)
+  {
+    return (targetId <= 4) ? -1 : 1;
+  }
+
   public Pose2d calculateTarget(int targetId, VIConsts.VIGoalDirection goalDirection)
   {
     Pose2d targetPose = VIConsts.kAprilTagPoses.get(targetId);
@@ -88,14 +93,14 @@ public class DriveLimelightPath extends CommandBase
     double goalYValue = 0;
     String strName;
 
-    goalXValue = targetPose.getX( ) + ((targetId <= 4) ? -1.0 : 1.0);
+    goalXValue = targetPose.getX( ) + getSignFromId(targetId) * VIConsts.kAdjustPathX;
 
     switch (goalDirection)
     {
       default :
       case DIRECTION_LEFT :
         strName = "LEFT";
-        goalYValue = targetPose.getY( ) + ((targetId <= 4) ? -1 : 1);
+        goalYValue = targetPose.getY( ) + getSignFromId(targetId) * VIConsts.kAdjustPathY;
         break;
       case DIRECTION_MIDDLE :
         strName = "MIDDLE";
@@ -103,7 +108,7 @@ public class DriveLimelightPath extends CommandBase
         break;
       case DIRECTION_RIGHT :
         strName = "RIGHT";
-        goalYValue = targetPose.getY( ) + ((targetId <= 4) ? 1 : -1);
+        goalYValue = targetPose.getY( ) - getSignFromId(targetId) * VIConsts.kAdjustPathY;
         break;
     }
 
