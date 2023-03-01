@@ -25,6 +25,7 @@ public class DriveSnap extends CommandBase
     m_swerve = swerve;
     m_snapAngle = snapAngle;
 
+    setName("DriveSnap");
     // Does NOT require swerve, since this works together with DriveTelop
     // addRequirements(m_swerve);
   }
@@ -55,7 +56,7 @@ public class DriveSnap extends CommandBase
   {
     boolean timedOut = m_safetyTimer.hasElapsed(SnapConstants.kTimeout);
     if (timedOut)
-      DataLogManager.log(getName( ) + " has timed out!");
+      DataLogManager.log(getName( ) + ": has timed out!");
     return m_swerve.driveIsSnapFinished(timedOut);
   }
 

@@ -45,6 +45,9 @@ public class Constants
   public static final int    kLongCANTimeoutMs = 100;
   public static final int    kCANTimeoutMs     = 10;
 
+  // PDH constatns
+  public static final double kMinCurrent       = 0.125; // Minimum detectable current
+
   // CAN IDs and PWM IDs
   public static final class Ports
   {
@@ -149,21 +152,22 @@ public class Constants
     public static final double  kForearmMassKg          = 6.0;    // Sim value: 13.2 lbs 
     public static final boolean kInvertMotor            = true;   // Motor direction for positive input
 
-    public static final double  kElbowAnglewMin         = 0.0;    // Elbow minimum allowable degrees
-    public static final double  kElbowAngleMax          = 90.0;   // Elbow maximum allowable degrees
-    public static final double  kElbowAngleStow         = 0.0;    // TO-DO: FIGURE IT OUT
-    public static final double  kElbowAngleScoreLow     = 15.0;   // TO-DO: FIND
-    public static final double  kElbowAngleScoreMid     = 40.0;   // TO-DO: FIND
-    public static final double  kElbowAngleScoreHigh    = 75.0;   // TO-DO: FIND
+    public static final double  kElbowAngleMin          = -3.0;   // Elbow minimum allowable degrees
+    public static final double  kElbowAngleMax          = 110.0;  // Elbow maximum allowable degrees
+    public static final double  kElbowAngleStow         = 0.0;    // TODO: FIGURE IT OUT
+    public static final double  kElbowAngleScoreLow     = 20.0;   // TODO: FIND
+    public static final double  kElbowAngleScoreMid     = 91.0;   // From Mech Design
+    public static final double  kElbowAngleScoreHigh    = 103.0;  // From Mech Design
 
     // Output current limit settings - elbow
     public static final double  kStatorCurrentLimit     = 25.0;  // Default supply current limit (after trigger)
-    public static final double  kStatorTriggerCurrent   = 40.0;  // Default trigger current that will cause limiting
+    public static final double  kStatorTriggerCurrent   = 25.0;  // Default trigger current that will cause limiting
     public static final double  kStatorTriggerTime      = 0.001; // Default time duration of trigger that will causing limiting
 
     // CANCoder elbow absolute offset
     public static final boolean kInvertCANCoder         = false;  // CANCoder direction for positive angle in relative mode
     public static final boolean kElbowCANCoderAbsInvert = true;   // CANCoder direction for positive angle in absolute mode
+    public static final boolean kElbowCalibrated        = false;   // Indicates whether the elbow has been calibrated by CANCoder
     public static final double  kCompElbowOffset        = 0.000;  // CANCoder offset angle for comp bot
     public static final double  kBetaElbowOffset        = 251.279 - 5.0; // (TODO: Beta requires an offset) CANCoder offset angle for beta bot
 
@@ -214,7 +218,7 @@ public class Constants
 
     public static final double  kWristMinAngle          = 0.0;   // Wrist maximum allowable Angle
     public static final double  kWristMaxAngle          = 120.0; // Wrist maximum allowable Angle
-    public static final double  kWristStowAngle         = 0.0;   // TO-DO: FIGURE IT OUT
+    public static final double  kWristAngleStow         = 0.0;   // TO-DO: FIGURE IT OUT
     public static final double  kWristAngleScoreLow     = 15.0;  // TO-DO: FIND
     public static final double  kWristAngleScoreMid     = 40.0;  // TO-DO: FIND
     public static final double  kWristAngleScoreHigh    = 75.0;  // TO-DO: FIND
@@ -227,6 +231,7 @@ public class Constants
     // CANCoder wrist absolute offset
     public static final boolean kInvertCANCoder         = false;  // CANCoder direction for positive angle in relative mode
     public static final boolean kWristCANCoderAbsInvert = false;  // CANCoder direction for positive angle in absolute mode
+    public static final boolean kWristCalibrated        = false;  // Indicates whether the wrist has been calibrated by CANCoder
     public static final double  kCompWristOffset        = 0.000;  // CANCoder offset angle for comp bot
     public static final double  kBetaWristOffset        = 0.000;  // CANCoder offset angle for beta bot
 
@@ -273,7 +278,7 @@ public class Constants
 
     // Input current limit settings - gripper
     public static final double  kSupplyCurrentLimit   = 25.0;  // Default supply current limit (after trigger)
-    public static final double  kSupplyTriggerCurrent = 40.0;  // Trigger current that will cause limiting
+    public static final double  kSupplyTriggerCurrent = 30.0;  // Trigger current that will cause limiting
     public static final double  kSupplyTriggerTime    = 0.001; // Time duration of trigger that will causing limiting
 
     public enum GRMode

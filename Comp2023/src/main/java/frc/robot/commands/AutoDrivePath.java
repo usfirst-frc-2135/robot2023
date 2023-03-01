@@ -32,9 +32,6 @@ public class AutoDrivePath extends CommandBase
     addRequirements(m_swerve);
 
     // Get our trajectory
-    //m_trajectoryJSON = Filesystem.getDeployDirectory( ).getAbsolutePath( ).toString( ) + "/pathplanner/" + pathName + ".path";
-
-    //DataLogManager.log(String.format("%s: TrajPath %s", getName( ), m_trajectoryJSON));
     m_trajectory = PathPlanner.loadPath(pathName, new PathConstraints(4, 3));
     DataLogManager.log(String.format("%s: '%s' has %2d states Total time - %.3f secs", getName( ), pathName,
         m_trajectory.getStates( ).size( ), m_trajectory.getTotalTimeSeconds( )));
@@ -44,7 +41,7 @@ public class AutoDrivePath extends CommandBase
   @Override
   public void initialize( )
   {
-    DataLogManager.log(String.format("%s: Running '%s", getName( ), m_pathName));
+    DataLogManager.log(String.format("%s: Running '%s'", getName( ), m_pathName));
     m_swerve.driveWithPathFollowerInit(m_trajectory, m_useInitialPose);
   }
 

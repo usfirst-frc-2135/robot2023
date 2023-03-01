@@ -34,7 +34,7 @@ public class DriveLimelightPath extends CommandBase
     m_vision = vision;
     m_goalDirection = goalDirection;
 
-    setName("DriveLimelight");
+    setName("DriveLimelightPath");
     addRequirements(m_swerve);
   }
 
@@ -51,7 +51,7 @@ public class DriveLimelightPath extends CommandBase
 
     m_swerve.driveWithPathFollowerInit(trajectory, true);
 
-    DataLogManager.log(String.format("LLPATH: current %s, goal %s", currentPose, goalPose2d));
+    DataLogManager.log(String.format("%s: current %s, goal %s", getName( ), currentPose, goalPose2d));
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -108,7 +108,7 @@ public class DriveLimelightPath extends CommandBase
         break;
     }
 
-    DataLogManager.log(String.format("Calculate target ID %d direction %s", targetId, strName));
+    DataLogManager.log(String.format("%s: Calculate target ID %d direction %s", getName( ), targetId, strName));
 
     return new Pose2d(new Translation2d(goalXValue, goalYValue), new Rotation2d(targetPose.getRotation( ).getRadians( ) + 3.14));
 

@@ -136,7 +136,7 @@ public class Vision extends SubsystemBase
 
   public void initialize( )
   {
-    DataLogManager.log(getSubsystem( ) + ": subsystem initialized!");
+    DataLogManager.log(getSubsystem( ) + ": Subsystem initialized!");
 
     //setLEDMode(VIConsts.LED_OFF);
     //setCameraDisplay(VIConsts.PIP_SECONDARY);
@@ -246,14 +246,6 @@ public class Vision extends SubsystemBase
   {
     DataLogManager.log(getSubsystem( ) + ": setLedMode " + mode);
     m_table.getEntry("ledMode").setValue(mode);
-  }
-
-  public int getLEDMode( )
-  {
-    int mode = m_table.getEntry("ledMode").getNumber(0.0).intValue( );
-
-    DataLogManager.log(getSubsystem( ) + "getLedMode :" + mode);
-    return mode;
   }
 
   public void setCameraDisplay(int stream)

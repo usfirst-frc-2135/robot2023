@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -18,6 +17,7 @@ public class DriveBalance extends CommandBase
   {
     m_swerve = swerve;
 
+    setName("DriveBalance");
     addRequirements(m_swerve);
   }
 
@@ -25,7 +25,6 @@ public class DriveBalance extends CommandBase
   @Override
   public void initialize( )
   {
-    DataLogManager.log("Running Drive Balance!");
     m_timer.restart( );
   }
 

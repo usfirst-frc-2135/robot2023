@@ -28,9 +28,7 @@ public class ResetGyro extends CommandBase
   // Called when the command is initially scheduled.
   @Override
   public void initialize( )
-  {
-    DataLogManager.log(String.format("%s Init", getName( )));
-  }
+  {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override

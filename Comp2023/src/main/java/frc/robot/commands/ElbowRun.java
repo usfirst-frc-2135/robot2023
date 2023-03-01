@@ -18,6 +18,7 @@ public class ElbowRun extends CommandBase
     m_elbow = elbow;
     m_gamePad = gamePad;
 
+    setName("ElbowRun");
     addRequirements(m_elbow);
   }
 
