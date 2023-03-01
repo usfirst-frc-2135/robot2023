@@ -300,10 +300,8 @@ public class Swerve extends SubsystemBase
     boolean tv = rc.m_vision.getTargetValid( );
     double tx = rc.m_vision.getHorizOffsetDeg( );
 
-    return (tv && ((Math.abs(tx)) <= m_angleThreshold) && (Math.abs(m_setPointDistance - m_limelightDistance) <= m_distThreshold)
-    // TODO: add back in
-    // && driveIsStopped( )
-    );
+    return (tv && ((Math.abs(tx)) <= m_angleThreshold)
+        && (Math.abs(m_setPointDistance - m_limelightDistance) <= m_distThreshold));
   }
 
   public void driveWithLimelightEnd( )
@@ -394,8 +392,7 @@ public class Swerve extends SubsystemBase
     double currentTrajX = currentPose.getX( );
     double currentTrajY = currentPose.getY( );
 
-    double targetHeading =
-        m_trajectory.getEndState( ).holonomicRotation.getDegrees( )/* trajState.poseMeters.getRotation( ).getDegrees( ) */; // TODO: Maybe get in radians?
+    double targetHeading = m_trajectory.getEndState( ).holonomicRotation.getDegrees( ); // TODO: Maybe get in radians?
     double currentHeading = currentPose.getRotation( ).getDegrees( ); // TODO: Maybe get in radians?
 
     setModuleStates(moduleStates);
@@ -541,14 +538,14 @@ public class Swerve extends SubsystemBase
     if (Math.abs(pitch) > SWConsts.kDriveBalancedAngle)
     {
       motorOutput = SWConsts.kDriveBalanceKp * pitch;
+      drive(new Translation2d(motorOutput, 0), 0, true, true);
     }
     else
     {
-      motorOutput = 0;
+      driveStop(true);
     }
 
     // DataLogManager.log(String.format("%s: pitch: %.1f degrees - output power: %.1f m/s", getSubsystem( ), pitch, motorOutput));
-    driveStop(true);
   }
 
   //
