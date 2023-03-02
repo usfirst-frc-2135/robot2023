@@ -244,9 +244,9 @@ public class Constants
     public enum ExtensionMode
     {
       EXTENSION_INIT,         // Initialize extension
-      EXTENSION_DOWN,         // Extension moving down
+      EXTENSION_OUT,         // Extension moving out
       EXTENSION_STOPPED,      // Extension stop and hold position
-      EXTENSION_UP            // Extension moving up
+      EXTENSION_IN            // Extension moving in
     }
 
     public static final double kExtensionSpeedMaxManual = 0.3;    // Motor percent output during manual operation

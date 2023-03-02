@@ -290,12 +290,12 @@ public class Extension extends SubsystemBase
 
   public void moveExtensionWithJoystick(XboxController joystick)
   {
-    double yExtensionValue = 0.0;
+    double xExtensionValue = 0.0;
     double motorOutput = 0.0;
     double manualSpeedMax = EXConsts.kExtensionSpeedMaxManual;
 
-    yExtensionValue = -joystick.getLeftY( );
-    if (yExtensionValue > -m_stickDeadband && yExtensionValue < m_stickDeadband)
+    xExtensionValue = -joystick.getRightX( );
+    if (xExtensionValue > -m_stickDeadband && xExtensionValue < m_stickDeadband)
     {
       if (m_extensionMode != ExtensionMode.EXTENSION_STOPPED)
         DataLogManager.log(getSubsystem( ) + ": move Stopped");
@@ -304,26 +304,26 @@ public class Extension extends SubsystemBase
     else
     {
       // If joystick is above a value, extension will move up
-      if (yExtensionValue > m_stickDeadband)
+      if (xExtensionValue > m_stickDeadband)
       {
-        if (m_extensionMode != ExtensionMode.EXTENSION_UP)
-          DataLogManager.log(getSubsystem( ) + ": move Up");
-        m_extensionMode = ExtensionMode.EXTENSION_UP;
+        if (m_extensionMode != ExtensionMode.EXTENSION_IN)
+          DataLogManager.log(getSubsystem( ) + ": move Out");
+        m_extensionMode = ExtensionMode.EXTENSION_IN;
 
-        yExtensionValue -= m_stickDeadband;
-        yExtensionValue *= (1.0 / (1.0 - m_stickDeadband));
-        motorOutput = manualSpeedMax * (yExtensionValue * Math.abs(yExtensionValue));
+        xExtensionValue -= m_stickDeadband;
+        xExtensionValue *= (1.0 / (1.0 - m_stickDeadband));
+        motorOutput = manualSpeedMax * (xExtensionValue * Math.abs(xExtensionValue));
       }
       // If joystick is below a value, extension will move down
-      else if (yExtensionValue < -m_stickDeadband)
+      else if (xExtensionValue < -m_stickDeadband)
       {
-        if (m_extensionMode != ExtensionMode.EXTENSION_DOWN)
-          DataLogManager.log(getSubsystem( ) + ": move Down");
-        m_extensionMode = ExtensionMode.EXTENSION_DOWN;
+        if (m_extensionMode != ExtensionMode.EXTENSION_OUT)
+          DataLogManager.log(getSubsystem( ) + ": move In");
+        m_extensionMode = ExtensionMode.EXTENSION_OUT;
 
-        yExtensionValue += m_stickDeadband;
-        yExtensionValue *= (1.0 / (1.0 - m_stickDeadband));
-        motorOutput = manualSpeedMax * (yExtensionValue * Math.abs(yExtensionValue));
+        xExtensionValue += m_stickDeadband;
+        xExtensionValue *= (1.0 / (1.0 - m_stickDeadband));
+        motorOutput = manualSpeedMax * (xExtensionValue * Math.abs(xExtensionValue));
       }
     }
 
