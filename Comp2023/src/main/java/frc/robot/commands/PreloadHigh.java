@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Elbow;
+import frc.robot.subsystems.Extension;
 import frc.robot.subsystems.Gripper;
 import frc.robot.subsystems.Wrist;
 
@@ -15,7 +16,7 @@ import frc.robot.subsystems.Wrist;
  */
 public class PreloadHigh extends SequentialCommandGroup
 {
-  public PreloadHigh(Gripper gripper, Wrist wrist, Elbow elbow)
+  public PreloadHigh(Gripper gripper, Wrist wrist, Extension extension, Elbow elbow)
   {
     setName("PreloadHigh");
 
@@ -25,7 +26,7 @@ public class PreloadHigh extends SequentialCommandGroup
         // @formatter:off
         new PrintCommand(getName() + ": MOVE ARM"),
         new ParallelDeadlineGroup(
-          new ArmSetHeightScoreHigh(elbow, wrist)
+          new ArmSetHeightScoreHigh(elbow, extension, wrist)
           )
         //TODO: ADD COMMAND TO SCORE GAME PIECE - EXPEL WITH GRIPPER (?)
         /* 
