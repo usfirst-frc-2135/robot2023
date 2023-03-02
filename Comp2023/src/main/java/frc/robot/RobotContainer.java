@@ -213,7 +213,7 @@ public class RobotContainer
     // @formatter:on
 
     // Driver - A, B, X, Y
-    driverA.onTrue(new ArmSetHeightStow(m_elbow, m_wrist));
+    driverA.onTrue(new ArmSetHeightStow(m_elbow, m_extension, m_wrist));
     driverB.onTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_RIGHT));
     driverX.onTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_LEFT));
     driverY.onTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_MIDDLE));
@@ -263,10 +263,10 @@ public class RobotContainer
     // final Trigger operRightTrigger = new Trigger(( ) -> m_operatorPad.getRightY( ) > Constants.kTriggerThreshold);
 
     // Operator - A, B, X, Y
-    operA.toggleOnTrue(new ArmSetHeightScoreLow(m_elbow, m_wrist));
-    operB.toggleOnTrue(new ArmSetHeightScoreMid(m_elbow, m_wrist));
-    operX.onTrue(new ArmSetHeightStow(m_elbow, m_wrist));
-    operY.onTrue(new ArmSetHeightScoreHigh(m_elbow, m_wrist));
+    operA.toggleOnTrue(new ArmSetHeightScoreLow(m_elbow, m_extension, m_wrist));
+    operB.toggleOnTrue(new ArmSetHeightScoreMid(m_elbow, m_extension, m_wrist));
+    operX.onTrue(new ArmSetHeightStow(m_elbow, m_extension, m_wrist));
+    operY.onTrue(new ArmSetHeightScoreHigh(m_elbow, m_extension, m_wrist));
     //
     // Operator - Bumpers, start, back
     operLeftBumper.onTrue(new Dummy("left bumper"));

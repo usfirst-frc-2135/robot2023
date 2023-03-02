@@ -8,8 +8,10 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.ELConsts.ElbowAngle;
+import frc.robot.Constants.EXConsts.ExtensionLength;
 import frc.robot.Constants.WRConsts.WristAngle;
 import frc.robot.subsystems.Elbow;
+import frc.robot.subsystems.Extension;
 import frc.robot.subsystems.Wrist;
 
 /**
@@ -17,7 +19,7 @@ import frc.robot.subsystems.Wrist;
  */
 public class ArmSetHeightScoreMid extends SequentialCommandGroup
 {
-  public ArmSetHeightScoreMid(Elbow elbow, Wrist wrist)
+  public ArmSetHeightScoreMid(Elbow elbow, Extension extension, Wrist wrist)
   {
     setName("ArmSetHeightScoreMid");
 
@@ -30,11 +32,15 @@ public class ArmSetHeightScoreMid extends SequentialCommandGroup
           new WaitUntilCommand(elbow::moveElbowAngleIsFinished),
           new ElbowMoveToAngle(elbow, ElbowAngle.ELBOW_MID)
         ),
-
         new PrintCommand(getName() + ": Moving Wrist"),
         new ParallelDeadlineGroup(
           new WaitUntilCommand(wrist::moveWristAngleIsFinished),
           new WristMoveToAngle(wrist, WristAngle.WRIST_MID)
+        ),
+        new PrintCommand(getName() + ": Moving Extension"),
+        new ParallelDeadlineGroup(
+          new WaitUntilCommand(extension::moveExtensionLengthIsFinished),
+          new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_MID)
         )
         //TODO: EXTEND ARM
         // @formatter:on
