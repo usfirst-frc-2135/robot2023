@@ -181,7 +181,7 @@ public class Wrist extends SubsystemBase
     SmartDashboard.putNumber("WR_pidKi", m_pidKi);
     SmartDashboard.putNumber("WR_pidKd", m_pidKd);
 
-    SmartDashboard.putNumber("WR_stowangle", m_wristAngleStow);
+    SmartDashboard.putNumber("WR_stowAngle", m_wristAngleStow);
     SmartDashboard.putNumber("WR_scoreAngleLow", m_wristAngleLow);
     SmartDashboard.putNumber("WR_scoreAngleMid", m_wristAngleMid);
     SmartDashboard.putNumber("WR_scoreAngleHigh", m_wristAngleHigh);
@@ -192,7 +192,7 @@ public class Wrist extends SubsystemBase
     SmartDashboard.putBoolean("WR_normalMode", !m_wristDebug);
 
     // post the mechanism to the dashboard
-    SmartDashboard.putData("WristMech2d", m_wristMech);
+    SmartDashboard.putData("WristMech", m_wristMech);
   }
 
   public void initialize( )
@@ -363,10 +363,10 @@ public class Wrist extends SubsystemBase
       m_wrist.config_kI(SLOTINDEX, m_pidKi);
       m_wrist.config_kD(SLOTINDEX, m_pidKd);
 
-      m_wristAngleStow = SmartDashboard.getNumber("WR_stowangle", m_wristAngleStow);
-      m_wristAngleLow = SmartDashboard.getNumber("WR_lowScoreangle", m_wristAngleLow);
-      m_wristAngleMid = SmartDashboard.getNumber("WR_midScoreangle", m_wristAngleMid);
-      m_wristAngleHigh = SmartDashboard.getNumber("WR_highScoreangle", m_wristAngleHigh);
+      m_wristAngleStow = SmartDashboard.getNumber("WR_stowAngle", m_wristAngleStow);
+      m_wristAngleLow = SmartDashboard.getNumber("WR_scoreAngleLow", m_wristAngleLow);
+      m_wristAngleMid = SmartDashboard.getNumber("WR_scoreAngleMid", m_wristAngleMid);
+      m_wristAngleHigh = SmartDashboard.getNumber("WR_scoreAngleHigh", m_wristAngleHigh);
     }
 
     switch (angle) // Do not change from current level!
@@ -417,8 +417,8 @@ public class Wrist extends SubsystemBase
         if (m_wristValid)
           m_wrist.set(ControlMode.MotionMagic, wristDegreesToCounts(m_wristTargetDegrees));
 
-        DataLogManager.log(String.format("%s: moving: %.1f -> %.1f degrees | counts %d -> %d", getSubsystem( ), m_wristCurDegrees,
-            m_wristTargetDegrees, m_wristCurDegrees, m_wristTargetDegrees));
+        DataLogManager
+            .log(String.format("%s: moving: %.1f -> %.1f degrees", getSubsystem( ), m_wristCurDegrees, m_wristTargetDegrees));
       }
       else
       {

@@ -183,7 +183,7 @@ public class Elbow extends SubsystemBase
     SmartDashboard.putNumber("EL_pidKi", m_pidKi);
     SmartDashboard.putNumber("EL_pidKd", m_pidKd);
 
-    SmartDashboard.putNumber("EL_stowangle", m_elbowAngleStow);
+    SmartDashboard.putNumber("EL_stowAngle", m_elbowAngleStow);
     SmartDashboard.putNumber("EL_scoreAngleLow", m_elbowAngleLow);
     SmartDashboard.putNumber("EL_scoreAngleMid", m_elbowAngleMid);
     SmartDashboard.putNumber("EL_scoreAngleHigh", m_elbowAngleHigh);
@@ -365,10 +365,10 @@ public class Elbow extends SubsystemBase
       m_elbow.config_kI(SLOTINDEX, m_pidKi);
       m_elbow.config_kD(SLOTINDEX, m_pidKd);
 
-      m_elbowAngleStow = SmartDashboard.getNumber("EL_stowangle", m_elbowAngleStow);
-      m_elbowAngleLow = SmartDashboard.getNumber("EL_stowangle", m_elbowAngleLow);
-      m_elbowAngleMid = SmartDashboard.getNumber("EL_stowangle", m_elbowAngleMid);
-      m_elbowAngleHigh = SmartDashboard.getNumber("EL_stowangle", m_elbowAngleHigh);
+      m_elbowAngleStow = SmartDashboard.getNumber("EL_stowAngle", m_elbowAngleStow);
+      m_elbowAngleLow = SmartDashboard.getNumber("EL_scoreAngleLow", m_elbowAngleLow);
+      m_elbowAngleMid = SmartDashboard.getNumber("EL_scoreAngleMid", m_elbowAngleMid);
+      m_elbowAngleHigh = SmartDashboard.getNumber("EL_scoreAngleHigh", m_elbowAngleHigh);
     }
 
     switch (angle)
@@ -419,8 +419,8 @@ public class Elbow extends SubsystemBase
         if (m_elbowValid)
           m_elbow.set(ControlMode.MotionMagic, elbowDegreesToCounts(m_elbowTargetDegrees));
 
-        DataLogManager.log(String.format("%s: moving: %.1f -> %.1f degrees | counts %d -> %d", getSubsystem( ), m_elbowCurDegrees,
-            m_elbowTargetDegrees, m_elbowCurDegrees, m_elbowTargetDegrees));
+        DataLogManager
+            .log(String.format("%s: moving: %.1f -> %.1f degrees", getSubsystem( ), m_elbowCurDegrees, m_elbowTargetDegrees));
       }
       else
       {
