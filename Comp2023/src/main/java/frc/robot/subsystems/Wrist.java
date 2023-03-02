@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -59,8 +60,9 @@ public class Wrist extends SubsystemBase
   private final MechanismLigament2d       m_wristLigament       =
       m_wristRoot.append(new MechanismLigament2d("wrist", 0.5, 0, 6, new Color8Bit(Color.kPurple)));
 
-  private boolean                         m_wristValid;                // Health indicator for wrist Talon 
-  private double                          m_wristAngleOffset;          // CANCoder angle measured at reference point
+  private boolean                         m_wristValid;                 // Health indicator for wrist Talon 
+  private boolean                         m_wristCCValid;               // Health indicator for wrist CANCoder 
+  private double                          m_wristAngleOffset    = 0.0;  // CANCoder angle measured at reference point
 
   //Devices and simulation objs
   private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true,
@@ -90,7 +92,7 @@ public class Wrist extends SubsystemBase
   private double                          m_stickDeadband       = Constants.kStickDeadband;          // joystick deadband
   private WristMode                       m_wristMode           = WristMode.WRIST_INIT;              // Mode active with joysticks
 
-  private boolean                         m_wristDebug          = false;  // DEBUG flag to disable/enable extra logging calls
+  private boolean                         m_wristDebug          = true;   // DEBUG flag to disable/enable extra logging calls
 
   private double                          m_wristTargetDegrees  = 0.0;    // Target angle in degrees
   private double                          m_wristCurDegrees     = 0.0;    // Current angle in degrees
@@ -112,12 +114,21 @@ public class Wrist extends SubsystemBase
     if (m_wristValid)
       wristTalonInitialize(m_wrist, WRConsts.kInvertMotor);
 
-    m_wristAngleOffset = (Constants.isComp) ? WRConsts.kCompWristOffset : WRConsts.kBetaWristOffset;
-    m_wristCANCoder.configFactoryDefault( );
-    m_wristCANCoder.configAllSettings(CTREConfigs.wristCancoderConfig( ));
-    m_wristCANCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
-    m_wristCANCoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 255);
-    resetToAbsolute( );
+    m_wristCCValid = PhoenixUtil.getInstance( ).canCoderInitialize(m_wristCANCoder, "wrist");
+
+    if (m_wristCCValid)
+    {
+      m_wristCANCoder.configAllSettings(CTREConfigs.wristCancoderConfig( ));
+      m_wristCANCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
+      m_wristCANCoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 255);
+      m_wristAngleOffset = (Constants.isComp) ? WRConsts.kCompWristOffset : WRConsts.kBetaWristOffset;
+      m_wristAngleOffset *= ((WRConsts.kWristCANCoderAbsInvert) ? -1.0 : 1.0);
+      double absolutePosition =
+          Conversions.degreesToFalcon(getCanCoder( ).getDegrees( ) - m_wristAngleOffset, WRConsts.kWristGearRatio);
+
+      if (RobotBase.isReal( ))
+        m_wrist.setSelectedSensorPosition(absolutePosition);
+    }
 
     initSmartDashboard( );
 
@@ -213,13 +224,6 @@ public class Wrist extends SubsystemBase
   public Rotation2d getCanCoder( )
   {
     return Rotation2d.fromDegrees(m_wristCANCoder.getAbsolutePosition( ));
-  }
-
-  public void resetToAbsolute( )
-  {
-    double absolutePosition = ((WRConsts.kWristCANCoderAbsInvert) ? -1.0 : 1.0)
-        * Conversions.degreesToFalcon(getCanCoder( ).getDegrees( ) - m_wristAngleOffset, WRConsts.kWristGearRatio);
-    m_wrist.setSelectedSensorPosition(absolutePosition);
   }
 
   private int wristDegreesToCounts(double degrees)

@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -60,8 +61,9 @@ public class Elbow extends SubsystemBase
   private MechanismLigament2d             m_elbowLigament       =
       m_elbowRoot.append(new MechanismLigament2d("elbow", 1, 0, 6, new Color8Bit(Color.kBlue)));
 
-  private boolean                         m_elbowValid;                // Health indicator for elbow Talon 
-  private double                          m_elbowAngleOffset;          // CANCoder angle measured at reference point
+  private boolean                         m_elbowValid;                 // Health indicator for elbow Talon 
+  private boolean                         m_elbowCCValid;               // Health indicator for elbow CANCoder 
+  private double                          m_elbowAngleOffset    = 0.0;  // CANCoder angle measured at reference point
 
   //Devices and simulation objs
   private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true,
@@ -113,12 +115,23 @@ public class Elbow extends SubsystemBase
     if (m_elbowValid)
       elbowTalonInitialize(m_elbow, ELConsts.kInvertMotor);
 
-    m_elbowAngleOffset = (Constants.isComp) ? ELConsts.kCompElbowOffset : ELConsts.kBetaElbowOffset;
-    m_elbowCANCoder.configFactoryDefault( );
-    m_elbowCANCoder.configAllSettings(CTREConfigs.elbowCancoderConfig( ));
-    m_elbowCANCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
-    m_elbowCANCoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 255);
-    resetToAbsolute( );
+    m_elbowCCValid = PhoenixUtil.getInstance( ).canCoderInitialize(m_elbowCANCoder, "elbow");
+
+    if (m_elbowCCValid)
+    {
+      m_elbowCANCoder.configAllSettings(CTREConfigs.elbowCancoderConfig( ));
+      m_elbowCANCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
+      m_elbowCANCoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 255);
+
+      m_elbowAngleOffset = (Constants.isComp) ? ELConsts.kCompElbowOffset : ELConsts.kBetaElbowOffset;
+      m_elbowAngleOffset *= ((ELConsts.kElbowCANCoderAbsInvert) ? -1.0 : 1.0);
+
+      double absolutePosition =
+          Conversions.degreesToFalcon(getCanCoder( ).getDegrees( ) - m_elbowAngleOffset, ELConsts.kElbowGearRatio);
+
+      if (RobotBase.isReal( ))
+        m_elbow.setSelectedSensorPosition(absolutePosition);
+    }
 
     initSmartDashboard( );
 
@@ -215,13 +228,6 @@ public class Elbow extends SubsystemBase
   public Rotation2d getCanCoder( )
   {
     return Rotation2d.fromDegrees(m_elbowCANCoder.getAbsolutePosition( ));
-  }
-
-  public void resetToAbsolute( )
-  {
-    double absolutePosition = ((ELConsts.kElbowCANCoderAbsInvert) ? -1.0 : 1.0)
-        * Conversions.degreesToFalcon(getCanCoder( ).getDegrees( ) - m_elbowAngleOffset, ELConsts.kElbowGearRatio);
-    m_elbow.setSelectedSensorPosition(absolutePosition);
   }
 
   private int elbowDegreesToCounts(double degrees)
