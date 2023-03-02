@@ -347,7 +347,7 @@ public class Extension extends SubsystemBase
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
-  public void moveExtensioLengthInit(ExtensionLength length)
+  public void moveExtensionLengthInit(ExtensionLength length)
   {
     if (m_extensionDebug)
     {
