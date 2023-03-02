@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ELConsts.ElbowAngle;
+import frc.robot.Constants.EXConsts.ExtensionLength;
 import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.VIConsts.VIGoalDirection;
@@ -33,6 +34,7 @@ import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.ElbowMoveToAngle;
 import frc.robot.commands.ElbowRun;
+import frc.robot.commands.ExtensionMoveToLength;
 import frc.robot.commands.GripperRun;
 import frc.robot.commands.LEDSet;
 import frc.robot.commands.ResetGyro;
@@ -40,6 +42,7 @@ import frc.robot.commands.ResetOdometryToLimelight;
 import frc.robot.commands.WristMoveToAngle;
 import frc.robot.commands.WristRun;
 import frc.robot.subsystems.Elbow;
+import frc.robot.subsystems.Extension;
 import frc.robot.subsystems.Gripper;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Power;
@@ -67,6 +70,7 @@ public class RobotContainer
 
   // These subsystems can use LED or vision and must be created afterward
   public final Elbow               m_elbow       = new Elbow( );
+  public final Extension           m_extension   = new Extension( );
   public final Wrist               m_wrist       = new Wrist( );
   public final Gripper             m_gripper     = new Gripper( );
   public final Power               m_power       = new Power( );
@@ -209,7 +213,7 @@ public class RobotContainer
     // @formatter:on
 
     // Driver - A, B, X, Y
-    driverA.onTrue(new ArmSetHeightStow(m_elbow, m_wrist));
+    driverA.onTrue(new ArmSetHeightStow(m_elbow, m_extension, m_wrist));
     driverB.onTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_RIGHT));
     driverX.onTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_LEFT));
     driverY.onTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_MIDDLE));
@@ -259,10 +263,10 @@ public class RobotContainer
     // final Trigger operRightTrigger = new Trigger(( ) -> m_operatorPad.getRightY( ) > Constants.kTriggerThreshold);
 
     // Operator - A, B, X, Y
-    operA.toggleOnTrue(new ArmSetHeightScoreLow(m_elbow, m_wrist));
-    operB.toggleOnTrue(new ArmSetHeightScoreMid(m_elbow, m_wrist));
-    operX.onTrue(new ArmSetHeightStow(m_elbow, m_wrist));
-    operY.onTrue(new ArmSetHeightScoreHigh(m_elbow, m_wrist));
+    operA.toggleOnTrue(new ArmSetHeightScoreLow(m_elbow, m_extension, m_wrist));
+    operB.toggleOnTrue(new ArmSetHeightScoreMid(m_elbow, m_extension, m_wrist));
+    operX.onTrue(new ArmSetHeightStow(m_elbow, m_extension, m_wrist));
+    operY.onTrue(new ArmSetHeightScoreHigh(m_elbow, m_extension, m_wrist));
     //
     // Operator - Bumpers, start, back
     operLeftBumper.onTrue(new Dummy("left bumper"));
@@ -291,6 +295,7 @@ public class RobotContainer
   {
     m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_driverPad));
     m_elbow.setDefaultCommand(new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_NOCHANGE));
+    m_extension.setDefaultCommand(new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_NOCHANGE));
     m_wrist.setDefaultCommand(new WristMoveToAngle(m_wrist, WristAngle.WRIST_NOCHANGE));
   }
 
