@@ -28,7 +28,7 @@ public class ResetOdometryToLimelight extends CommandBase
     m_vision = vision;
     m_id = id;
 
-    setName("AppyVisionMeasurement");
+    setName("ResetOdometryToLimelight");
     addRequirements(m_swerve);
   }
 
@@ -38,8 +38,10 @@ public class ResetOdometryToLimelight extends CommandBase
   {
     Pose2d llPose = m_vision.getLimelightRawPose( );
     if (llPose != null)
+    {
       //m_swerve.resetOdometry(new Pose2d(new Translation2d(llPose.getX( ) + 2, llPose.getY( )), llPose.getRotation( )));
       m_swerve.resetOdometry(llPose);
+    }
     else if ((m_id > 0) && (m_id < 9))
     {
       m_vision.setFixedTargetID(m_id);
@@ -48,7 +50,7 @@ public class ResetOdometryToLimelight extends CommandBase
       Pose2d robotPose =
           new Pose2d(new Translation2d(atp.getX( ) + ((m_id <= 4) ? -3.0 : 3.0), atp.getY( )), new Rotation2d(rotation));
 
-      DataLogManager.log(String.format("Set Rotation %.2f", rotation));
+      DataLogManager.log(String.format("%s: Set Rotation: %.1f", getName( ), rotation));
 
       m_swerve.zeroGyro(Units.radiansToDegrees(rotation));
       m_swerve.resetOdometry(robotPose);
@@ -58,9 +60,7 @@ public class ResetOdometryToLimelight extends CommandBase
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute( )
-  {
-
-  }
+  {}
 
   // Called once the command ends or is interrupted.
   @Override

@@ -44,7 +44,7 @@ public class Robot extends TimedRobot
     String serialNum = System.getenv("serialnum");
     String robotName = "UNKNOWN";
 
-    DataLogManager.log("RobotInit: RoboRIO SN: " + serialNum);
+    DataLogManager.log("robotInit: RoboRIO SN: " + serialNum);
 
     if (serialNum == null)
       robotName = "SIMULATION";
@@ -58,7 +58,7 @@ public class Robot extends TimedRobot
       Constants.isComp = false;
       robotName = "PRACTICE (B)";
     }
-    DataLogManager.log(String.format("Detected the %s robot!", robotName));
+    DataLogManager.log("robotInit: Detected the %s robot! " + robotName);
 
     // Instantiate CTRE configurations
     ctreConfigs = new CTREConfigs( );
@@ -104,14 +104,13 @@ public class Robot extends TimedRobot
   @Override
   public void disabledInit( )
   {
-    DataLogManager.log("DisabledInit: Match " + matchTypeToString(DriverStation.getMatchType( )) + DriverStation.getMatchNumber( )
+    DataLogManager.log("disabledInit: Match " + matchTypeToString(DriverStation.getMatchType( )) + DriverStation.getMatchNumber( )
         + ", " + allianceToString(DriverStation.getAlliance( )) + " Alliance");
 
     m_robotContainer.m_vision.initialize( );
     m_robotContainer.m_led.initialize( );
 
     // These subsystems can use LED and vision subsystems
-    // m_robotContainer.m_pneumatics.initialize( );
     m_robotContainer.m_power.initialize( );
     m_robotContainer.m_swerve.initialize( );
     m_robotContainer.m_elbow.initialize( );
@@ -141,7 +140,7 @@ public class Robot extends TimedRobot
   @Override
   public void autonomousInit( )
   {
-    DataLogManager.log("AutonomousInit: Match " + matchTypeToString(DriverStation.getMatchType( ))
+    DataLogManager.log("autonomousInit: Match " + matchTypeToString(DriverStation.getMatchType( ))
         + DriverStation.getMatchNumber( ) + ", " + allianceToString(DriverStation.getAlliance( )) + " Alliance");
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand( );
@@ -163,7 +162,7 @@ public class Robot extends TimedRobot
   @Override
   public void teleopInit( )
   {
-    DataLogManager.log("TeleopInit: Match " + matchTypeToString(DriverStation.getMatchType( )) + DriverStation.getMatchNumber( )
+    DataLogManager.log("teleopInit: Match " + matchTypeToString(DriverStation.getMatchType( )) + DriverStation.getMatchNumber( )
         + ", " + allianceToString(DriverStation.getAlliance( )) + " Alliance");
 
     // This makes sure that the autonomous stops running when teleop starts running. 
@@ -244,10 +243,10 @@ public class Robot extends TimedRobot
   private void robotFaultDump( )
   {
     // Print out talon faults and clear sticky ones
-    DataLogManager.log("----- DUMP FAULTS --------------");
-    // m_robotContainer.m_led.faultDump( );
+    DataLogManager.log("robotFaultDump:  ----- DUMP FAULTS --------------");
+
+    m_robotContainer.m_led.faultDump( );
     m_robotContainer.m_power.faultDump( );
-    // m_robotContainer.m_pneumatics.faultDump( );
     m_robotContainer.m_swerve.faultDump( );
   }
 }

@@ -136,7 +136,7 @@ public class Vision extends SubsystemBase
 
   public void initialize( )
   {
-    DataLogManager.log(getSubsystem( ) + ": subsystem initialized!");
+    DataLogManager.log(getSubsystem( ) + ": Subsystem initialized!");
 
     //setLEDMode(VIConsts.LED_OFF);
     //setCameraDisplay(VIConsts.PIP_SECONDARY);
@@ -196,6 +196,7 @@ public class Vision extends SubsystemBase
   public Pose2d getLimelightRawPose( )
   {
     double[ ] m_botPoseArray = m_botPoseSub.get( );
+
     if (m_targetValid && (m_botPoseArray != null))
     {
       // Translate Pose3d sent by the limelight in an array into a Pose2d that we use
@@ -246,14 +247,6 @@ public class Vision extends SubsystemBase
   {
     DataLogManager.log(getSubsystem( ) + ": setLedMode " + mode);
     m_table.getEntry("ledMode").setValue(mode);
-  }
-
-  public int getLEDMode( )
-  {
-    int mode = m_table.getEntry("ledMode").getNumber(0.0).intValue( );
-
-    DataLogManager.log(getSubsystem( ) + "getLedMode :" + mode);
-    return mode;
   }
 
   public void setCameraDisplay(int stream)

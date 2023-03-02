@@ -9,6 +9,7 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.PathPoint;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -25,16 +26,14 @@ public class DriveLimelightPath extends CommandBase
   private final Swerve          m_swerve;
   private final Vision          m_vision;
   private final VIGoalDirection m_goalDirection;
-  private Pose2d                m_goalPose2d;
 
   public DriveLimelightPath(Swerve swerve, Vision vision, VIGoalDirection goalDirection)
   {
     m_swerve = swerve;
     m_vision = vision;
     m_goalDirection = goalDirection;
-    m_goalPose2d = new Pose2d( );
 
-    setName("DriveLimelight");
+    setName("DriveLimelightPath");
     addRequirements(m_swerve);
   }
 
@@ -42,16 +41,16 @@ public class DriveLimelightPath extends CommandBase
   @Override
   public void initialize( )
   {
-    m_goalPose2d = calculateTarget(m_vision.getTargetID( ), m_goalDirection);
+    Pose2d goalPose2d = calculateTarget(m_vision.getTargetID( ), m_goalDirection);
     Pose2d currentPose = m_swerve.getPose( );
 
     PathPlannerTrajectory trajectory = PathPlanner.generatePath(new PathConstraints(3, 4),
-        new PathPoint(currentPose.getTranslation( ), currentPose.getRotation( )),
-        new PathPoint(m_goalPose2d.getTranslation( ), m_goalPose2d.getRotation( )));
+        new PathPoint(currentPose.getTranslation( ), currentPose.getRotation( ), currentPose.getRotation( )),
+        new PathPoint(goalPose2d.getTranslation( ), goalPose2d.getRotation( ), goalPose2d.getRotation( )));
 
     m_swerve.driveWithPathFollowerInit(trajectory, true);
 
-    DataLogManager.log(String.format("LLPATH: current %s, goal %s", currentPose, m_goalPose2d));
+    DataLogManager.log(String.format("%s: current %s, goal %s", getName( ), currentPose, goalPose2d));
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -82,6 +81,11 @@ public class DriveLimelightPath extends CommandBase
     return false;
   }
 
+  public int getSignFromId(int targetId)
+  {
+    return (targetId <= 4) ? -1 : 1;
+  }
+
   public Pose2d calculateTarget(int targetId, VIConsts.VIGoalDirection goalDirection)
   {
     Pose2d targetPose = VIConsts.kAprilTagPoses.get(targetId);
@@ -89,14 +93,14 @@ public class DriveLimelightPath extends CommandBase
     double goalYValue = 0;
     String strName;
 
-    goalXValue = targetPose.getX( ) + ((targetId <= 4) ? -1.0 : 1.0);
+    goalXValue = targetPose.getX( ) + getSignFromId(targetId) * VIConsts.kAdjustPathX;
 
     switch (goalDirection)
     {
       default :
       case DIRECTION_LEFT :
         strName = "LEFT";
-        goalYValue = targetPose.getY( ) + ((targetId <= 4) ? -1 : 1);
+        goalYValue = targetPose.getY( ) + getSignFromId(targetId) * VIConsts.kAdjustPathY;
         break;
       case DIRECTION_MIDDLE :
         strName = "MIDDLE";
@@ -104,12 +108,13 @@ public class DriveLimelightPath extends CommandBase
         break;
       case DIRECTION_RIGHT :
         strName = "RIGHT";
-        goalYValue = targetPose.getY( ) + ((targetId <= 4) ? 1 : -1);
+        goalYValue = targetPose.getY( ) - getSignFromId(targetId) * VIConsts.kAdjustPathY;
         break;
     }
 
-    DataLogManager.log(String.format("Calculate target ID %d direction %s", targetId, strName));
+    DataLogManager.log(String.format("%s: Calculate target ID %d direction %s", getName( ), targetId, strName));
 
-    return new Pose2d(new Translation2d(goalXValue, goalYValue), targetPose.getRotation( ));
+    return new Pose2d(new Translation2d(goalXValue, goalYValue), new Rotation2d(targetPose.getRotation( ).getRadians( ) + 3.14));
+
   }
 }
