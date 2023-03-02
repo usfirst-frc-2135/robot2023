@@ -34,7 +34,7 @@ public class DriveLimelightPath extends CommandBase
     m_vision = vision;
     m_goalDirection = goalDirection;
 
-    setName("DriveLimelight");
+    setName("DriveLimelightPath");
     addRequirements(m_swerve);
   }
 
@@ -54,8 +54,7 @@ public class DriveLimelightPath extends CommandBase
           new PathPoint(currentPose.getTranslation( ), currentPose.getRotation( ), currentPose.getRotation( )),
           new PathPoint(m_goalPose.getTranslation( ), m_goalPose.getRotation( ), m_goalPose.getRotation( )));
 
-      m_swerve.driveWithPathFollowerInit(trajectory, true);
-    }
+    DataLogManager.log(String.format("%s: current %s, goal %s", getName( ), currentPose, goalPose2d));
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -88,7 +87,12 @@ public class DriveLimelightPath extends CommandBase
     return false;
   }
 
-  public Pose2d getGoalPose(VIConsts.VIGoalDirection goalDirection)
+  public int getSignFromId(int targetId)
+  {
+    return (targetId <= 4) ? -1 : 1;
+  }
+
+  public Pose2d calculateTarget(int targetId, VIConsts.VIGoalDirection goalDirection)
   {
     int targetId = m_vision.getTargetID( );
 
@@ -100,8 +104,7 @@ public class DriveLimelightPath extends CommandBase
     double goalYValue = 0;
     String strName;
 
-    // TODO: Need to add a named constant for the X distance from AprilTag location to robot center
-    goalXValue = targetPose.getX( ) + ((targetId <= 4) ? -1.0 : 1.0);
+    goalXValue = targetPose.getX( ) + getSignFromId(targetId) * VIConsts.kAdjustPathX;
 
     // TODO: Need to add a named constant for the left/right offset to align with cone poles
     switch (goalDirection)
@@ -109,7 +112,7 @@ public class DriveLimelightPath extends CommandBase
       default :
       case DIRECTION_LEFT :
         strName = "LEFT";
-        goalYValue = targetPose.getY( ) + ((targetId <= 4) ? -1.0 : 1.0);
+        goalYValue = targetPose.getY( ) + getSignFromId(targetId) * VIConsts.kAdjustPathY;
         break;
       case DIRECTION_MIDDLE :
         strName = "MIDDLE";
@@ -117,11 +120,11 @@ public class DriveLimelightPath extends CommandBase
         break;
       case DIRECTION_RIGHT :
         strName = "RIGHT";
-        goalYValue = targetPose.getY( ) + ((targetId <= 4) ? 1.0 : -1.0);
+        goalYValue = targetPose.getY( ) - getSignFromId(targetId) * VIConsts.kAdjustPathY;
         break;
     }
 
-    DataLogManager.log(String.format("Calculate target ID %d direction %s", targetId, strName));
+    DataLogManager.log(String.format("%s: Calculate target ID %d direction %s", getName( ), targetId, strName));
 
     return new Pose2d(new Translation2d(goalXValue, goalYValue),
         new Rotation2d(targetPose.getRotation( ).getRadians( ) + Math.PI));

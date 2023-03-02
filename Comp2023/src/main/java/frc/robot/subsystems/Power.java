@@ -18,6 +18,8 @@ public class Power extends SubsystemBase
   public Power( )
   {
     setName("Power");
+    setSubsystem("Power");
+
     addChild("PowerDistribution", m_powerDistribution);
 
     initialize( );
@@ -39,6 +41,7 @@ public class Power extends SubsystemBase
 
   public void initialize( )
   {
+    DataLogManager.log(getSubsystem( ) + ": Subsystem initialized!");
     DataLogManager.log(getSubsystem( ) + ": Init Voltage is " + String.format("%.1f", m_powerDistribution.getVoltage( )));
   }
 

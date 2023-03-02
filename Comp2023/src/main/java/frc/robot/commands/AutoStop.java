@@ -17,6 +17,7 @@ public class AutoStop extends CommandBase
   {
     m_swerve = swerve;
 
+    setName("AutoStop");
     addRequirements(m_swerve);
   }
 

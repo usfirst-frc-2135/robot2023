@@ -11,11 +11,11 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
  */
 public class Dummy extends CommandBase
 {
-  private final int m_statusCode;
+  private final String m_string;
 
-  public Dummy(int statusCode)
+  public Dummy(String string)
   {
-    m_statusCode = statusCode;
+    m_string = string;
 
     setName("Dummy");
   }
@@ -24,7 +24,7 @@ public class Dummy extends CommandBase
   @Override
   public void initialize( )
   {
-    DataLogManager.log(getName( ) + " status code - " + m_statusCode);
+    DataLogManager.log(getName( ) + ": key pressed - " + m_string);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

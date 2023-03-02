@@ -3,7 +3,6 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -26,13 +25,13 @@ public class ArmSetHeightScoreHigh extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
-        new PrintCommand("Moving Elbow"),
+        new PrintCommand(getName() + ": Moving Elbow"),
         new ParallelDeadlineGroup(
           new WaitUntilCommand(elbow::moveElbowAngleIsFinished),
           new ElbowMoveToAngle(elbow, ElbowAngle.ELBOW_HIGH)
         ),
 
-        new PrintCommand("Moving Wrist"),
+        new PrintCommand(getName() + ": Moving Wrist"),
         new ParallelDeadlineGroup(
           new WaitUntilCommand(wrist::moveWristAngleIsFinished),
           new WristMoveToAngle(wrist, WristAngle.WRIST_HIGH)
