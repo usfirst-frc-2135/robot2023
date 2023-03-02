@@ -133,7 +133,7 @@ public class Elbow extends SubsystemBase
 
     m_elbowAngleOffset = (Constants.isComp) ? ELConsts.kCompElbowOffset : ELConsts.kBetaElbowOffset;
     m_elbowCANCoder.configFactoryDefault( );
-    m_elbowCANCoder.configAllSettings(CTREConfigs.wristCancoderConfig( ));
+    m_elbowCANCoder.configAllSettings(CTREConfigs.elbowCancoderConfig( ));
     m_elbowCANCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
     m_elbowCANCoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 255);
     resetToAbsolute( );

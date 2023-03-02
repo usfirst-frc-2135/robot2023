@@ -353,7 +353,6 @@ public class Swerve extends SubsystemBase
     // This initializes the odometry (where we are)
     if (useInitialPose)
     {
-      zeroGyro(m_trajectory.getInitialPose( ).getRotation( ).getDegrees( ));
       resetOdometry(m_trajectory.getInitialHolonomicPose( ));
     }
 

@@ -38,8 +38,10 @@ public class ResetOdometryToLimelight extends CommandBase
   {
     Pose2d llPose = m_vision.getLimelightRawPose( );
     if (llPose != null)
+    {
       //m_swerve.resetOdometry(new Pose2d(new Translation2d(llPose.getX( ) + 2, llPose.getY( )), llPose.getRotation( )));
       m_swerve.resetOdometry(llPose);
+    }
     else if ((m_id > 0) && (m_id < 9))
     {
       m_vision.setFixedTargetID(m_id);
