@@ -206,6 +206,75 @@ public class Constants
     public static final double kElbowArbitraryFF      = 0.070;  // Elbow motor output for arm at 90 degrees
   }
 
+  public static final class EXConsts
+  {
+    // Global settings
+
+    public static final double  kExtensionGearRatio         = 300;    // Gear reduction for elbow
+    public static final double  kExtensionDegreesPerCount   = 360 / Falcon500.kEncoderCPR / kExtensionGearRatio;
+    public static final double  kForearmLengthMeters        = 1.22;   // Sim value: 48 inches
+    public static final double  kForearmMassKg              = 6.0;    // Sim value: 13.2 lbs 
+    public static final boolean kInvertMotor                = true;   // Motor direction for positive input
+
+    public static final double  kExtensionLengthMin         = -3.0;   // Extension minimum allowable degrees
+    public static final double  kExtensionLengthMax         = 110.0;  // Extension maximum allowable degrees
+    public static final double  kExtensionLengthStow        = 0.0;    // TODO: FIGURE IT OUT
+    public static final double  kExtensionLengthScoreLow    = 20.0;   // From Mech Design (floor, feet art 5" high)
+    public static final double  kExtensionLengthScoreMid    = 91.0;   // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube)
+    public static final double  kExtensionLengthScoreHigh   = 103.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube)
+    public static final double  kExtensionLengthSubstation  = 103.0;  // From Mech Design (3'1-38" above floor)
+
+    // Current limit settings - elbow
+    public static final double  kSupplyCurrentLimit         = 25.0;  // Supply current limit (after trigger)
+    public static final double  kSupplyTriggerCurrent       = 25.0;  // Supply trigger current that will cause limiting
+    public static final double  kSupplyTriggerTime          = 0.001; // Supply time duration of trigger that will causing limiting
+    public static final double  kStatorCurrentLimit         = 25.0;  // Stator current limit (after trigger)
+    public static final double  kStatorTriggerCurrent       = 25.0;  // Stator trigger current that will cause limiting
+    public static final double  kStatorTriggerTime          = 0.001; // Stator time duration of trigger that will causing limiting
+
+    // CANCoder elbow absolute offset
+    public static final boolean kInvertCANCoder             = false;  // CANCoder direction for positive angle in relative mode
+    public static final boolean kExtensionCANCoderAbsInvert = true;   // CANCoder direction for positive angle in absolute mode
+    public static final boolean kExtensionCalibrated        = false;  // Indicates whether the elbow has been calibrated by CANCoder
+    public static final double  kCompExtensionOffset        = 0.000;  // CANCoder offset angle for comp bot
+    public static final double  kBetaExtensionOffset        = 251.279 - 5.0; // (TODO: Beta requires an offset) CANCoder offset angle for beta bot
+
+    // Manual config parameters
+
+    public enum ExtensionMode
+    {
+      EXTENSION_INIT,         // Initialize elbow
+      EXTENSION_DOWN,         // Extension moving down
+      EXTENSION_STOPPED,      // Extension stop and hold position
+      EXTENSION_UP            // Extension moving up
+    }
+
+    public static final double kExtensionSpeedMaxManual = 0.3;    // Motor percent output during manual operation
+
+    // Motion Magic config parameters
+
+    public enum ExtensionLength
+    {
+      EXTENSION_NOCHANGE,     // No change in elbow angle--maintain current position
+      EXTENSION_STOW,         // Move elbow to stow angle
+      EXTENSION_LOW,          // Move elbow to low-scoring angle
+      EXTENSION_MID,          // Move elbow to shelf Length; slightly higher than mid-scoring angle so this is used for both
+      EXTENSION_HIGH,         // Move elbow to high-scoring angle
+      EXTENSION_SHELF         // Move elbow to substation loading shelf angle
+    }
+
+    public static final int    kExtensionMMVelocity       = 16646;  // Extension motion magic velocity
+    public static final int    kExtensionMMAcceleration   = 16646;  // Extension motion magic acceleration
+    public static final int    kExtensionMMSCurveStrength = 0;      // Extension motion magic S curve smoothing strength
+    public static final double kExtensionPidKf            = 0.0461; // Extension PID force constant
+    public static final double kExtensionPidKp            = 0.0246; // Extension PID proportional constant
+    public static final double kExtensionPidKi            = 0.0;    // Extension PID integral constant
+    public static final double kExtensionPidKd            = 0.0;    // Extension PID derivative constant
+    public static final int    kExtensionAllowedError     = 0;      // Extension PID allowable closed loop error in counts
+    public static final double kExtensionToleranceDegrees = 1.0;    // Extension PID tolerance in degrees (1 deg is 1" at 48" extension)
+    public static final double kExtensionArbitraryFF      = 0.070;  // Extension motor output for arm at 90 degrees
+  }
+
   public static final class WRConsts
   {
     // Global settings
