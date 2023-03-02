@@ -392,9 +392,6 @@ public class Extension extends SubsystemBase
       case EXTENSION_HIGH :
         m_extensionTargetDegrees = m_extensionLengthHigh;
         break;
-      case EXTENSION_SHELF :
-        m_extensionTargetDegrees = m_extensionLengthHigh;
-        break;
       default :
         DataLogManager.log(String.format("%s: requested length is invalid - %.1f", getSubsystem( ), length));
         return;
