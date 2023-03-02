@@ -19,6 +19,7 @@ public class WristRun extends CommandBase
     m_wrist = wrist;
     m_gamePad = gamePad;
 
+    setName("WristRun");
     addRequirements(m_wrist);
   }
 

@@ -22,20 +22,20 @@ public class AutoPreloadAndLeaveCommunity extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
-        new PrintCommand("AUTO PATH SEQUENCE: Run first path"),
+        new PrintCommand(getName() + ": AUTO PATH SEQUENCE: Run first path"),
         /* TODO: DRIVE BACKWARD + PRELOAD PATHS / COMMANDS
         new ParallelDeadlineGroup(
           new WaitUntilCommand(swerve::driveWithPathFollowerIsFinished),
           new AutoDrivePath (swerve, "driveOffCommunity", true)
         ),
         */
-        new PrintCommand("AUTO: Run second path"),
+        new PrintCommand(getName() + ": AUTO: Run second path"),
         new ParallelDeadlineGroup(
           new WaitUntilCommand(swerve::driveWithPathFollowerIsFinished),
-          new AutoChargeStation(swerve)
+          new AutoEngageChargeStation(swerve)
         ),
 
-        new PrintCommand("AUTO: Hold in place"),
+        new PrintCommand(getName() + ": AUTO: Hold in place"),
         new AutoStop(swerve)
         // @formatter:on
     );

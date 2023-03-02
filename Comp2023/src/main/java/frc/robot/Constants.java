@@ -45,7 +45,14 @@ public class Constants
   public static final int    kLongCANTimeoutMs = 100;
   public static final int    kCANTimeoutMs     = 10;
 
+  // PDH constatns
+  public static final double kMinCurrent       = 0.125;  // Minimum detectable current from PDH
+
+  // Field constants
+  public static final double kGridNodeSpacing  = 0.4667; // 18.375 inches between cube node and peg nodes
+
   // CAN IDs and PWM IDs
+
   public static final class Ports
   {
     public static final String kCANCarnivore     = "canivore1";
@@ -90,53 +97,44 @@ public class Constants
 
   public static final class Falcon500
   {
-    public static int          kMaxRPM               = 6380;             // free speed for Falcon 500 motor
-    public static final double kEncoderCPR           = 2048;             // CPR is 2048 from Falcon 500 Manual
-    public static final int    kTalonReqVersion      = ((22 * 256) + 0); // Talon version is 23.0
-    public static final int    kPigeonReqVersion     = ((22 * 256) + 0); // Pigeon IMU version is 23.0
+    public static int          kMaxRPM           = 6380;             // free speed for Falcon 500 motor
+    public static final double kEncoderCPR       = 2048;             // CPR is 2048 from Falcon 500 Manual
+    public static final int    kTalonReqVersion  = ((22 * 256) + 0); // Talon version is 23.0
+    public static final int    kPigeonReqVersion = ((22 * 256) + 0); // Pigeon IMU version is 23.0
 
-    // Input current limit settings - default
-    public static final double kSupplyCurrentLimit   = 45.0;  // Default supply current limit (after trigger)
-    public static final double kSupplyTriggerCurrent = 45.0;  // Trigger current that will cause limiting
-    public static final double kSupplyTriggerTime    = 0.001; // Time duration of trigger that will causing limiting
+    // // Input current limit settings - default
+    // public static final double kSupplyCurrentLimit   = 45.0;  // Default supply current limit (after trigger)
+    // public static final double kSupplyTriggerCurrent = 45.0;  // Trigger current that will cause limiting
+    // public static final double kSupplyTriggerTime    = 0.001; // Time duration of trigger that will causing limiting
 
-    // Output current limit settings - default
-    public static final double kStatorCurrentLimit   = 80.0;  // Default supply current limit (after trigger)
-    public static final double kStatorTriggerCurrent = 80.0;  // Default trigger current that will cause limiting
-    public static final double kStatorTriggerTime    = 0.001; // Default time duration of trigger that will causing limiting
+    // // Output current limit settings - default
+    // public static final double kStatorCurrentLimit   = 80.0;  // Default supply current limit (after trigger)
+    // public static final double kStatorTriggerCurrent = 80.0;  // Default trigger current that will cause limiting
+    // public static final double kStatorTriggerTime    = 0.001; // Default time duration of trigger that will causing limiting
   }
 
   public static final class SWConsts
   {
-    // Joystick tuning
-    public static final double kDriveXScaling       = 1.0;    // 1.0 is no scaling
-    public static final double kDriveYScaling       = 1.0;    // 1.0 is no scaling
-    public static final double kDriveSlowScaling    = 0.3;    // Scale by 30% of full speed
-
-    // Teleop driving controls
-    public static final double kDriveOpenLoopRamp   = 0.5;    // CTRE: full speed in 0.5 sec
-    public static final double kDriveClosedLoopRamp = 0.0;    // CTRE: 0 is disabled
-
     // Constants for balance
-    public static final double kDriveBalancedAngle  = 5.0;    // Pitch values less than this stop driving
-    public static final double kDriveBalanceKp      = -0.04;  // Amount of power to apply per degree
+    public static final double kDriveBalancedAngle = 5.0;    // Pitch values less than this stop driving
+    public static final double kDriveBalanceKp     = -0.04;  // Amount of power to apply per degree
 
     // Limelight PID driving controls
-    public static final double kTurnConstant        = 0.0;
-    public static final double kTurnPidKp           = 0.005;
-    public static final double kTurnPidKi           = 0.0;
-    public static final double kTurnPidKd           = 0.0;
-    public static final double kTurnMax             = 0.4;
-    public static final double kThrottlePidKp       = 0.011;
-    public static final double kThrottlePidKi       = 0.0;
-    public static final double kThrottlePidKd       = 0.0;
-    public static final double kThrottleMax         = 0.2;
-    public static final double kThrottleShape       = 10.0;
+    public static final double kTurnConstant       = 0.0;
+    public static final double kTurnPidKp          = 0.005;
+    public static final double kTurnPidKi          = 0.0;
+    public static final double kTurnPidKd          = 0.0;
+    public static final double kTurnMax            = 0.4;
+    public static final double kThrottlePidKp      = 0.011;
+    public static final double kThrottlePidKi      = 0.0;
+    public static final double kThrottlePidKd      = 0.0;
+    public static final double kThrottleMax        = 0.2;
+    public static final double kThrottleShape      = 10.0;
 
-    public static final double kTargetAngle         = 0.0;      // Optimal shooting angle
-    public static final double kSetPointDistance    = 60.0;     // Optimal shooting distance
-    public static final double kAngleThreshold      = 3.5;      // Degrees tolerance around optimal
-    public static final double kDistThreshold       = 6.0;      // Inches tolerance around optimal
+    public static final double kTargetAngle        = 0.0;      // Optimal shooting angle
+    public static final double kSetPointDistance   = 60.0;     // Optimal shooting distance
+    public static final double kAngleThreshold     = 3.5;      // Degrees tolerance around optimal
+    public static final double kDistThreshold      = 6.0;      // Inches tolerance around optimal
   }
 
   public static final class ELConsts
@@ -149,28 +147,28 @@ public class Constants
     public static final double  kForearmMassKg          = 6.0;    // Sim value: 13.2 lbs 
     public static final boolean kInvertMotor            = true;   // Motor direction for positive input
 
-    // Input current limit settings - elbow
-    public static final double  kSupplyCurrentLimit     = 25.0;  // Default supply current limit (after trigger)
-    public static final double  kSupplyTriggerCurrent   = 40.0;  // Trigger current that will cause limiting
-    public static final double  kSupplyTriggerTime      = 0.001; // Time duration of trigger that will causing limiting
+    public static final double  kElbowAngleMin          = -3.0;   // Elbow minimum allowable degrees
+    public static final double  kElbowAngleMax          = 110.0;  // Elbow maximum allowable degrees
+    public static final double  kElbowAngleStow         = 0.0;    // TODO: FIGURE IT OUT
+    public static final double  kElbowAngleScoreLow     = 20.0;   // From Mech Design (floor, feet art 5" high)
+    public static final double  kElbowAngleScoreMid     = 91.0;   // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube)
+    public static final double  kElbowAngleScoreHigh    = 103.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube)
+    public static final double  kElbowAngleSubstation   = 103.0;  // From Mech Design (3'1-38" above floor)
 
-    // Output current limit settings - elbow
-    public static final double  kStatorCurrentLimit     = 25.0;  // Default supply current limit (after trigger)
-    public static final double  kStatorTriggerCurrent   = 40.0;  // Default trigger current that will cause limiting
-    public static final double  kStatorTriggerTime      = 0.001; // Default time duration of trigger that will causing limiting
+    // Current limit settings - elbow
+    public static final double  kSupplyCurrentLimit     = 25.0;  // Supply current limit (after trigger)
+    public static final double  kSupplyTriggerCurrent   = 25.0;  // Supply trigger current that will cause limiting
+    public static final double  kSupplyTriggerTime      = 0.001; // Supply time duration of trigger that will causing limiting
+    public static final double  kStatorCurrentLimit     = 25.0;  // Stator current limit (after trigger)
+    public static final double  kStatorTriggerCurrent   = 25.0;  // Stator trigger current that will cause limiting
+    public static final double  kStatorTriggerTime      = 0.001; // Stator time duration of trigger that will causing limiting
 
     // CANCoder elbow absolute offset
     public static final boolean kInvertCANCoder         = false;  // CANCoder direction for positive angle in relative mode
     public static final boolean kElbowCANCoderAbsInvert = true;   // CANCoder direction for positive angle in absolute mode
+    public static final boolean kElbowCalibrated        = false;  // Indicates whether the elbow has been calibrated by CANCoder
     public static final double  kCompElbowOffset        = 0.000;  // CANCoder offset angle for comp bot
     public static final double  kBetaElbowOffset        = 251.279 - 5.0; // (TODO: Beta requires an offset) CANCoder offset angle for beta bot
-
-    public static final double  kElbowAnglewMin         = 0.0;    // Elbow minimum allowable degrees
-    public static final double  kElbowAngleMax          = 90.0;   // Elbow maximum allowable degrees
-    public static final double  kElbowAngleStow         = 3.0;    // TO-DO: Test angles
-    public static final double  kElbowAngleScoreLow     = 10.0;   // TO-DO: Test angles
-    public static final double  kElbowAngleScoreMid     = 45.0;   // TO-DO: Test angles
-    public static final double  kElbowAngleScoreHigh    = 75.0;   // TO-DO: Test angles
 
     // Manual config parameters
 
@@ -193,6 +191,7 @@ public class Constants
       ELBOW_LOW,          // Move elbow to low-scoring angle
       ELBOW_MID,          // Move elbow to shelf Angle; slightly higher than mid-scoring angle so this is used for both
       ELBOW_HIGH,         // Move elbow to high-scoring angle
+      ELBOW_SHELF         // Move elbow to substation loading shelf angle
     }
 
     public static final int    kElbowMMVelocity       = 16646;  // Elbow motion magic velocity
@@ -203,7 +202,7 @@ public class Constants
     public static final double kElbowPidKi            = 0.0;    // Elbow PID integral constant
     public static final double kElbowPidKd            = 0.0;    // Elbow PID derivative constant
     public static final int    kElbowAllowedError     = 0;      // Elbow PID allowable closed loop error in counts
-    public static final double kElbowToleranceDegrees = 0.5;    // Elbow PID tolerance in degrees
+    public static final double kElbowToleranceDegrees = 1.0;    // Elbow PID tolerance in degrees (1 deg is 1" at 48" extension)
     public static final double kElbowArbitraryFF      = 0.070;  // Elbow motor output for arm at 90 degrees
   }
 
@@ -217,28 +216,28 @@ public class Constants
     public static final double  kGripperMassKg          = 3.0;   // Sim value: 6.6 lbs
     public static final boolean kInvertMotor            = true;  // Motor direction for positive input
 
-    // Input current limit settings - wrist
-    public static final double  kSupplyCurrentLimit     = 25.0;  // Default supply current limit (after trigger)
-    public static final double  kSupplyTriggerCurrent   = 40.0;  // Trigger current that will cause limiting
-    public static final double  kSupplyTriggerTime      = 0.001; // Time duration of trigger that will causing limiting
+    public static final double  kWristMinAngle          = -3.0;  // Wrist maximum allowable Angle
+    public static final double  kWristMaxAngle          = 110.0; // Wrist maximum allowable Angle
+    public static final double  kWristAngleStow         = 0.0;   // TO-DO: FIGURE IT OUT
+    public static final double  kWristAngleScoreLow     = 20.0;  // From Mech Design (floor, feet art 5" high)
+    public static final double  kWristAngleScoreMid     = 91.0;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube)
+    public static final double  kWristAngleScoreHigh    = 103.0; // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube)
+    public static final double  kWristAngleSubstation   = 103.0; // From Mech Design (3'1-38" above floor)
 
-    // Output current limit settings - wrist
-    public static final double  kStatorCurrentLimit     = 25.0;  // Default supply current limit (after trigger)
-    public static final double  kStatorTriggerCurrent   = 40.0;  // Default trigger current that will cause limiting
-    public static final double  kStatorTriggerTime      = 0.001; // Default time duration of trigger that will causing limiting
+    // Current limit settings - wrist
+    public static final double  kSupplyCurrentLimit     = 25.0;  // Supply current limit (after trigger)
+    public static final double  kSupplyTriggerCurrent   = 25.0;  // Supply trigger current that will cause limiting
+    public static final double  kSupplyTriggerTime      = 0.001; // Supply time duration of trigger that will causing limiting
+    public static final double  kStatorCurrentLimit     = 25.0;  // Stator current limit (after trigger)
+    public static final double  kStatorTriggerCurrent   = 25.0;  // Stator trigger current that will cause limiting
+    public static final double  kStatorTriggerTime      = 0.001; // Stator time duration of trigger that will causing limiting
 
     // CANCoder wrist absolute offset
     public static final boolean kInvertCANCoder         = false;  // CANCoder direction for positive angle in relative mode
     public static final boolean kWristCANCoderAbsInvert = false;  // CANCoder direction for positive angle in absolute mode
+    public static final boolean kWristCalibrated        = false;  // Indicates whether the wrist has been calibrated by CANCoder
     public static final double  kCompWristOffset        = 0.000;  // CANCoder offset angle for comp bot
     public static final double  kBetaWristOffset        = 0.000;  // CANCoder offset angle for beta bot
-
-    public static final double  kWristMinAngle          = 0.0;    // Wrist maximum allowable Angle
-    public static final double  kWristMaxAngle          = 135.0;  // Wrist maximum allowable Angle
-    public static final double  kWristStowAngle         = 2.0;    // TO-DO: Test angles
-    public static final double  kWristAngleScoreLow     = 10.0;   // TO-DO: Test angles
-    public static final double  kWristAngleScoreMid     = 20.0;   // TO-DO: Test angles
-    public static final double  kWristAngleScoreHigh    = 35.0;   // TO-DO: Test angles
 
     // Manual config parameters
 
@@ -261,6 +260,7 @@ public class Constants
       WRIST_LOW,          // Move wrist to low-scoring Angle
       WRIST_MID,          // Move wrist to shelf Angle; slightly higher than mid-scoring Angle so this is used for both
       WRIST_HIGH,         // Move wrist to high-scoring Angle
+      WRIST_SHELF         // Move wrist to substation loading shelf angle
     }
 
     public static final int    kWristMMVelocity       = 16466 * 3 / 4;  // (TODO: Slowed until new wrist) Wrist motion magic velocity
@@ -271,7 +271,7 @@ public class Constants
     public static final double kWristPidKi            = 0.0;    // Wrist PID integral constant
     public static final double kWristPidKd            = 0.0;    // Wrist PID derivative constant
     public static final int    kWristAllowedError     = 0;      // Wrist PID allowable closed loop error in counts
-    public static final double kWristToleranceDegrees = 0.5;    // Wrist PID tolerance in degrees
+    public static final double kWristToleranceDegrees = 1.0;    // Wrist PID tolerance in degrees (1 deg is 0.25" at 15" length)
     public static final double kWristArbitraryFF      = 0.058;  // Wrist motor output for 90 degrees
   }
 
@@ -282,8 +282,8 @@ public class Constants
     public static final boolean kInvertMotor          = true;  // Motor direction for positive input
 
     // Input current limit settings - gripper
-    public static final double  kSupplyCurrentLimit   = 25.0;  // Default supply current limit (after trigger)
-    public static final double  kSupplyTriggerCurrent = 40.0;  // Trigger current that will cause limiting
+    public static final double  kSupplyCurrentLimit   = 30.0;  // Default supply current limit (after trigger)
+    public static final double  kSupplyTriggerCurrent = 30.0;  // Trigger current that will cause limiting
     public static final double  kSupplyTriggerTime    = 0.001; // Time duration of trigger that will causing limiting
 
     public enum GRMode
@@ -295,7 +295,7 @@ public class Constants
     }
 
     public static final double kGripperSpeedAcquire = 1.0;  // Acquire game piece from loading station or floor
-    public static final double kGripperSpeedHold    = 0.1;  // Hold game piece while traversing the field
+    public static final double kGripperSpeedHold    = 0.1;  // Hold game piece while traversing the field (must be < 2V equiv)
     public static final double kGripperSpeedExpel   = -0.3; // Score game piece on cone node or cube shelf
   }
 
@@ -341,12 +341,17 @@ public class Constants
       DIRECTION_RIGHT   // Right
     }
 
-    public static final double       kLLDistance1   = 48;    // distance from bumper in inches for first reference point
-    public static final double       kLLVertOffset1 = 0.42;  // LL y reading in degrees for first reference point
-    public static final double       kLLDistance2   = 60;    // distance from bumper in inches for second reference point
-    public static final double       kLLVertOffset2 = -4.85; // LL y reading in degrees for second reference point
+    public static final double       kLLDistance1        = 48;    // distance from bumper in inches for first reference point
+    public static final double       kLLVertOffset1      = 0.42;  // LL y reading in degrees for first reference point
+    public static final double       kLLDistance2        = 60;    // distance from bumper in inches for second reference point
+    public static final double       kLLVertOffset2      = -4.85; // LL y reading in degrees for second reference point
 
-    public static final List<Pose2d> kAprilTagPoses = Collections.unmodifiableList(List.of( //
+    public static final double       kATagDepthInGrid    = Units.inchesToMeters(14.25); // Depth from front of grid to AprilTag - 1'2-1/4"
+    public static final double       kRobotCenterToFront = Units.inchesToMeters((28.0 + 6.0) / 2); // Depth from limelight to front robot edge
+    public static final double       kAdjustPathX        = kATagDepthInGrid + kRobotCenterToFront;
+    public static final double       kAdjustPathY        = Units.inchesToMeters(18.25 / 2 + 18.5 / 2);
+
+    public static final List<Pose2d> kAprilTagPoses      = Collections.unmodifiableList(List.of( //
         new Pose2d(new Translation2d(0.0, 0.0), new Rotation2d(0)),        // AprilTag ID: 0 (invalid)
         new Pose2d(new Translation2d(15.513558, 1.071626), new Rotation2d(Units.degreesToRadians(180))), // AprilTag ID: 1 
         new Pose2d(new Translation2d(15.513558, 2.748026), new Rotation2d(Units.degreesToRadians(180))), // AprilTag ID: 2 
@@ -497,7 +502,7 @@ public class Constants
     public static final double                       kP                                      = 5.0;
     public static final double                       kI                                      = 0;
     public static final double                       kD                                      = 0.0;
-    public static final double                       kTimeout                                = 0.25;
+    public static final double                       kTimeout                                = 0.75;
     public static final double                       kEpsilon                                = 1.0;
 
     // Constraints for the profiled angle controller
