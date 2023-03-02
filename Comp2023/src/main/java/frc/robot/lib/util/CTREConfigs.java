@@ -53,4 +53,25 @@ public final class CTREConfigs
     config.sensorTimeBase = SensorTimeBase.PerSecond;
     return config;
   }
+
+  public static CANCoderConfiguration elbowCancoderConfig( )
+  {
+    CANCoderConfiguration config = new CANCoderConfiguration( );
+    config.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
+    config.sensorDirection = Constants.ELConsts.kInvertCANCoder;
+    config.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
+    config.sensorTimeBase = SensorTimeBase.PerSecond;
+    return config;
+  }
+
+  public static CANCoderConfiguration wristCancoderConfig( )
+  {
+    CANCoderConfiguration config = new CANCoderConfiguration( );
+    config.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
+    config.sensorDirection = Constants.WRConsts.kInvertCANCoder;
+    config.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
+    config.sensorTimeBase = SensorTimeBase.PerSecond;
+    return config;
+  }
+
 }

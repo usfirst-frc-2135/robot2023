@@ -72,7 +72,7 @@ public class DriveTeleop extends CommandBase
    * @param fieldRelative
    *          Whether the provided x and y speeds are relative to the field.
    */
-  public void driveWithGamepad(Swerve swerve, XboxController driverPad, boolean fieldRelative)
+  public void driveWithGamepad2(Swerve swerve, XboxController driverPad, boolean fieldRelative)
   {
     // Get x speed. Invert this because Xbox controllers return negative values when pushing forward.
     final var xSpeed = -m_xSpeedLimiter.calculate(MathUtil.applyDeadband(driverPad.getLeftY( ), Constants.kStickDeadband))
@@ -94,7 +94,7 @@ public class DriveTeleop extends CommandBase
     swerve.drive(swerveTranslation, rot, fieldRelative, true);
   }
 
-  public void driveWithGamepad2(Swerve swerve, XboxController driverPad, boolean fieldRelative)
+  public void driveWithGamepad(Swerve swerve, XboxController driverPad, boolean fieldRelative)
   {
     Translation2d swerveTranslation = new Translation2d( );
     double rot = 0.0;

@@ -107,13 +107,16 @@ public class Robot extends TimedRobot
     DataLogManager.log("DisabledInit: Match " + matchTypeToString(DriverStation.getMatchType( )) + DriverStation.getMatchNumber( )
         + ", " + allianceToString(DriverStation.getAlliance( )) + " Alliance");
 
-    // m_robotContainer.m_vision.initialize( );
+    m_robotContainer.m_vision.initialize( );
     m_robotContainer.m_led.initialize( );
 
     // These subsystems can use LED and vision subsystems
-    m_robotContainer.m_power.initialize( );
     // m_robotContainer.m_pneumatics.initialize( );
+    m_robotContainer.m_power.initialize( );
     m_robotContainer.m_swerve.initialize( );
+    m_robotContainer.m_elbow.initialize( );
+    m_robotContainer.m_wrist.initialize( );
+    m_robotContainer.m_gripper.initialize( );
   }
 
   @Override

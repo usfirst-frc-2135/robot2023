@@ -35,7 +35,6 @@ import frc.robot.Constants.SwerveConstants;
 import frc.robot.RobotContainer;
 import frc.robot.team1678.frc2022.drivers.Pigeon;
 import frc.robot.team1678.frc2022.drivers.SwerveModule;
-import frc.robot.team254.lib.util.TimeDelayedBoolean;
 
 //
 // Swerve subsystem class
@@ -482,12 +481,12 @@ public class Swerve extends SubsystemBase
     {
       if (Math.abs(rotation) == 0.0)
       {
-        maybeStopSnap(false);
-        rotation = calculateSnapValue( );
+        driveIsSnapFinished(false);
+        rotation = driveSnapCalculate( );
       }
       else
       {
-        maybeStopSnap(true);
+        driveIsSnapFinished(true);
       }
     }
 
@@ -543,38 +542,33 @@ public class Swerve extends SubsystemBase
   //
   // Snap to a direction
   //  
-  public double calculateSnapValue( )
-  {
-    return m_snapPIDController.calculate(m_pigeon.getYaw( ).getRadians( ));
-  }
-
-  public void startSnap(double snapAngle)
+  public void driveSnapInit(double snapAngle)
   {
     m_snapPIDController.reset(m_pigeon.getYaw( ).getRadians( ));
     m_snapPIDController.setGoal(new TrapezoidProfile.State(Math.toRadians(snapAngle), 0.0));
     m_isSnapping = true;
   }
 
-  TimeDelayedBoolean delayedBoolean = new TimeDelayedBoolean( );
-
-  private boolean snapComplete( )
+  public double driveSnapCalculate( )
   {
-    double error = m_snapPIDController.getGoal( ).position - m_pigeon.getYaw( ).getRadians( );
-    return delayedBoolean.update(Math.abs(error) < Math.toRadians(Constants.SnapConstants.kEpsilon),
-        Constants.SnapConstants.kTimeout);
+    return m_snapPIDController.calculate(m_pigeon.getYaw( ).getRadians( ));
   }
 
-  public void maybeStopSnap(boolean force)
+  private boolean isSnapComplete( )
   {
-    if (!m_isSnapping)
-    {
-      return;
-    }
-    if (force || snapComplete( ))
+    double error = m_snapPIDController.getGoal( ).position - m_pigeon.getYaw( ).getRadians( );
+    return (Math.abs(error) < Math.toRadians(Constants.SnapConstants.kEpsilon));
+  }
+
+  public boolean driveIsSnapFinished(boolean force)
+  {
+    if (m_isSnapping && (force || isSnapComplete( )))
     {
       m_isSnapping = false;
       m_snapPIDController.reset(m_pigeon.getYaw( ).getRadians( ));
     }
+
+    return !m_isSnapping;
   }
 
   /* Used by SwerveControllerCommand in Auto */
