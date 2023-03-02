@@ -23,10 +23,10 @@ import frc.robot.commands.ArmSetHeightScoreHigh;
 import frc.robot.commands.ArmSetHeightScoreLow;
 import frc.robot.commands.ArmSetHeightScoreMid;
 import frc.robot.commands.ArmSetHeightStow;
-import frc.robot.commands.AutoEngageChargeStation;
-import frc.robot.commands.AutoDrivePath;
-import frc.robot.commands.AutoStop;
 import frc.robot.commands.AutoDriveBalance;
+import frc.robot.commands.AutoDrivePath;
+import frc.robot.commands.AutoEngageChargeStation;
+import frc.robot.commands.AutoStop;
 import frc.robot.commands.DriveLimelightPath;
 import frc.robot.commands.DriveSnap;
 import frc.robot.commands.DriveTeleop;
@@ -55,25 +55,25 @@ import frc.robot.subsystems.Wrist;
  */
 public class RobotContainer
 {
-  private static RobotContainer m_instance;
+  private static RobotContainer    m_instance;
 
   // Joysticks
-  private final XboxController  m_driverPad   = new XboxController(Constants.kDriverPadPort);
-  private final XboxController  m_operatorPad = new XboxController(Constants.kOperatorPadPort);
+  private final XboxController     m_driverPad   = new XboxController(Constants.kDriverPadPort);
+  private final XboxController     m_operatorPad = new XboxController(Constants.kOperatorPadPort);
 
   // The robot's shared subsystems
-  public final LED              m_led         = new LED( );
-  public final Vision           m_vision      = new Vision( );
+  public final LED                 m_led         = new LED( );
+  public final Vision              m_vision      = new Vision( );
 
   // These subsystems can use LED or vision and must be created afterward
-  public final Elbow            m_elbow       = new Elbow( );
-  public final Wrist            m_wrist       = new Wrist( );
-  public final Gripper          m_gripper     = new Gripper( );
-  public final Power            m_power       = new Power( );
-  public final Swerve           m_swerve      = new Swerve( );
+  public final Elbow               m_elbow       = new Elbow( );
+  public final Wrist               m_wrist       = new Wrist( );
+  public final Gripper             m_gripper     = new Gripper( );
+  public final Power               m_power       = new Power( );
+  public final Swerve              m_swerve      = new Swerve( );
 
   // A chooser for autonomous commands
-  SendableChooser<Command>      m_chooser     = new SendableChooser<>( );
+  private SendableChooser<Command> m_autoChooser = new SendableChooser<>( );
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -103,6 +103,10 @@ public class RobotContainer
   private void addSmartDashboardWidgets( )
   {
     // SmartDashboard Buttons
+
+    // For future work to set up Shuffleboard layout from code
+    // ShuffleboardTab m_autoTab = Shuffleboard.getTab("Auto");
+    // ComplexWidget autoStopEntry = m_autoTab.add("AutoStop", new AutoStop(m_swerve)).withSize(3, 2).withPosition(0, 0);
 
     // Autonomous buttons  for main routines- chooser order
     SmartDashboard.putData("AutoStop", new AutoStop(m_swerve));
@@ -164,7 +168,7 @@ public class RobotContainer
     // LED (CANdle) test
     SmartDashboard.putData("LEDSet", new LEDSet(m_led, LEDColor.LEDCOLOR_DASH));
 
-    SmartDashboard.putData("Dummy", new Dummy(2135)); // Used to test smartdashboard operation
+    SmartDashboard.putData("Dummy", new Dummy("2135 is here!")); // Used to test smartdashboard operation
   }
 
   /****************************************************************************
@@ -187,8 +191,8 @@ public class RobotContainer
     //
     final JoystickButton driverLeftBumper = new JoystickButton(m_driverPad, XboxController.Button.kLeftBumper.value);
     final JoystickButton driverRightBumper = new JoystickButton(m_driverPad, XboxController.Button.kRightBumper.value);
-    final JoystickButton driverBack = new JoystickButton(m_driverPad, XboxController.Button.kBack.value);
-    final JoystickButton driverStart = new JoystickButton(m_driverPad, XboxController.Button.kStart.value);
+    final JoystickButton driverBack = new JoystickButton(m_driverPad, XboxController.Button.kBack.value); // aka View
+    final JoystickButton driverStart = new JoystickButton(m_driverPad, XboxController.Button.kStart.value); // aka Menu
     //
     final POVButton driverUp = new POVButton(m_driverPad, 0);
     final POVButton driverRight = new POVButton(m_driverPad, 90);
@@ -205,18 +209,17 @@ public class RobotContainer
     // @formatter:on
 
     // Driver - A, B, X, Y
-    driverA.onTrue(new Dummy(XboxController.Button.kA.value));
+    driverA.onTrue(new ArmSetHeightStow(m_elbow, m_wrist));
     driverB.onTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_RIGHT));
     driverX.onTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_LEFT));
     driverY.onTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_MIDDLE));
     //
     // Driver - Bumpers, start, back
-    driverLeftBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
-    driverLeftBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
-    driverRightBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_EXPEL));
-    driverRightBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
-    driverBack.onTrue(new ResetGyro(m_swerve, driverStart, driverBack));
-    driverStart.onTrue(new ResetGyro(m_swerve, driverStart, driverBack));
+    driverLeftBumper.onTrue(new Dummy("left bumper"));
+    driverRightBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
+    driverRightBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
+    driverBack.onTrue(new ResetGyro(m_swerve, driverStart, driverBack)); // aka View
+    driverStart.onTrue(new ResetGyro(m_swerve, driverStart, driverBack)); // aka Menu
     //
     // Driver - POV buttons
     driverUp.onTrue(new DriveSnap(m_swerve, 0));
@@ -225,8 +228,9 @@ public class RobotContainer
     driverLeft.onTrue(new DriveSnap(m_swerve, 90));
     //
     // Operator Left/Right Trigger
-    driverLeftTrigger.onTrue(new Dummy(130));
-    driverRightTrigger.onTrue(new Dummy(131));
+    driverLeftTrigger.onTrue(new Dummy("left trigger"));
+    driverRightTrigger.onTrue(new GripperRun(m_gripper, GRMode.GR_EXPEL));
+    driverRightTrigger.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
 
     ///////////////////////////////////////////////////////
     //
@@ -239,8 +243,8 @@ public class RobotContainer
     //
     final JoystickButton operLeftBumper = new JoystickButton(m_operatorPad, XboxController.Button.kLeftBumper.value);
     final JoystickButton operRightBumper = new JoystickButton(m_operatorPad, XboxController.Button.kRightBumper.value);
-    final JoystickButton operBack = new JoystickButton(m_operatorPad, XboxController.Button.kBack.value);
-    final JoystickButton operStart = new JoystickButton(m_operatorPad, XboxController.Button.kStart.value);
+    final JoystickButton operBack = new JoystickButton(m_operatorPad, XboxController.Button.kBack.value); // aka View
+    final JoystickButton operStart = new JoystickButton(m_operatorPad, XboxController.Button.kStart.value); // aka Menu
     //
     final POVButton operUp = new POVButton(m_operatorPad, 0);
     final POVButton operRight = new POVButton(m_operatorPad, 90);
@@ -261,22 +265,22 @@ public class RobotContainer
     operY.onTrue(new ArmSetHeightScoreHigh(m_elbow, m_wrist));
     //
     // Operator - Bumpers, start, back
-    operLeftBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
-    operLeftBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
-    operRightBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_EXPEL));
-    operRightBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
-    operBack.onTrue(new ElbowRun(m_elbow, m_operatorPad));
-    operStart.onTrue(new WristRun(m_wrist, m_operatorPad));
+    operLeftBumper.onTrue(new Dummy("left bumper"));
+    operRightBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
+    operRightBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
+    operBack.onTrue(new ElbowRun(m_elbow, m_operatorPad)); // aka View
+    operStart.onTrue(new WristRun(m_wrist, m_operatorPad)); // aka Menu
     //
     // Operator - POV buttons
-    operUp.onTrue(new Dummy(126));
-    operRight.onTrue(new Dummy(127));
-    operDown.onTrue(new Dummy(128));
-    operLeft.onTrue(new Dummy(129));
+    operUp.onTrue(new Dummy("POV up"));
+    operRight.onTrue(new Dummy("POV right"));
+    operDown.onTrue(new Dummy("POV down"));
+    operLeft.onTrue(new Dummy("POV left"));
     //
     // Operator Left/Right Trigger
-    operLeftTrigger.onTrue(new Dummy(130));
-    operRightTrigger.onTrue(new Dummy(131));
+    operLeftTrigger.onTrue(new Dummy("right trigger"));
+    operRightTrigger.onTrue(new GripperRun(m_gripper, GRMode.GR_EXPEL));
+    operRightTrigger.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
   }
 
   /****************************************************************************
@@ -297,15 +301,15 @@ public class RobotContainer
   private void initAutonomousChooser( )
   {
     // Autonomous Chooser
-    m_chooser.addOption("1 - AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveOffCommunity", true));
-    m_chooser.addOption("2 - AutoEngageChargeStation", new AutoEngageChargeStation(m_swerve));
-    // m_chooser.addOption("3 - AutoPreloadAndLeaveCommunity", new AutoPreloadAndLeaveCommunity(m_swerve));
-    // m_chooser.addOption("4 - AutoPreloadAndEngageChargeStation", new AutoPreloadAndEngageChargeStation(m_swerve));
-    // m_chooser.addOption("5 - AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve));
-    m_chooser.setDefaultOption("0 - AutoStop", new AutoStop(m_swerve));
+    m_autoChooser.addOption("1 - AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveOffCommunity", true));
+    m_autoChooser.addOption("2 - AutoEngageChargeStation", new AutoEngageChargeStation(m_swerve));
+    // m_autoChooser.addOption("3 - AutoPreloadAndLeaveCommunity", new AutoPreloadAndLeaveCommunity(m_swerve));
+    // m_autoChooser.addOption("4 - AutoPreloadAndEngageChargeStation", new AutoPreloadAndEngageChargeStation(m_swerve));
+    // m_autoChooser.addOption("5 - AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve));
+    m_autoChooser.setDefaultOption("0 - AutoStop", new AutoStop(m_swerve));
 
     // Configure autonomous sendable chooser
-    SmartDashboard.putData("Auto Mode", m_chooser);
+    SmartDashboard.putData("Auto Mode", m_autoChooser);
   }
 
   public XboxController getDriver( )
@@ -326,6 +330,6 @@ public class RobotContainer
   public Command getAutonomousCommand( )
   {
     // The selected command will be run in autonomous
-    return m_chooser.getSelected( );
+    return m_autoChooser.getSelected( );
   }
 }

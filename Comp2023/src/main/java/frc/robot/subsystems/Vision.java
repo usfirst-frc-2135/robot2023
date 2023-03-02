@@ -196,6 +196,7 @@ public class Vision extends SubsystemBase
   public Pose2d getLimelightRawPose( )
   {
     double[ ] m_botPoseArray = m_botPoseSub.get( );
+
     if (m_targetValid && (m_botPoseArray != null))
     {
       // Translate Pose3d sent by the limelight in an array into a Pose2d that we use

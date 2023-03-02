@@ -31,7 +31,6 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.Falcon500;
 import frc.robot.Constants.WRConsts;
 import frc.robot.Constants.WRConsts.WristAngle;
 import frc.robot.Constants.WRConsts.WristMode;
@@ -53,9 +52,12 @@ public class Wrist extends SubsystemBase
   private final CANCoder                  m_wristCANCoder       = new CANCoder(Constants.Ports.kCANID_WRCANCoder);
   private final TalonFXSimCollection      m_wristMotorSim       = new TalonFXSimCollection(m_wrist);
   private final SingleJointedArmSim       m_wristSim            = new SingleJointedArmSim(DCMotor.getFalcon500(1),
-      WRConsts.kWristGearRatio, 2.0, WRConsts.kGripperLengthMeters, 0, Math.PI, true);
+      WRConsts.kWristGearRatio, 2.0, WRConsts.kGripperLengthMeters, 0, Math.PI, false);
+
   private final Mechanism2d               m_wristMech           = new Mechanism2d(3, 3);
-  private final MechanismLigament2d       m_wristLigament;
+  private final MechanismRoot2d           m_wristRoot           = m_wristMech.getRoot("wrist", 1.5, 2);
+  private final MechanismLigament2d       m_wristLigament       =
+      m_wristRoot.append(new MechanismLigament2d("wrist", 0.5, 0, 6, new Color8Bit(Color.kPurple)));
 
   private boolean                         m_wristValid;                // Health indicator for wrist Talon 
   private double                          m_wristAngleOffset;          // CANCoder angle measured at reference point
@@ -78,10 +80,10 @@ public class Wrist extends SubsystemBase
   private double                          m_toleranceDegrees    = WRConsts.kWristToleranceDegrees;   // PID tolerance in Degrees
   private double                          m_arbitraryFF         = WRConsts.kWristArbitraryFF;        // Arbitrary Feedfoward (elevators and arms))
 
-  private double                          m_wristStowangle      = WRConsts.kWristAngleStow;          // wrist Stow angle
-  private double                          m_lowScoreangle       = WRConsts.kWristAngleScoreLow;      // low-peg scoring angle   
-  private double                          m_midScoreangle       = WRConsts.kWristAngleScoreMid;      // mid-peg scoring angle
-  private double                          m_highScoreangle      = WRConsts.kWristAngleScoreHigh;     // high-peg scoring angle
+  private double                          m_wristAngleStow      = WRConsts.kWristAngleStow;          // wrist Stow angle
+  private double                          m_wristAngleLow       = WRConsts.kWristAngleScoreLow;      // low-peg scoring angle   
+  private double                          m_wristAngleMid       = WRConsts.kWristAngleScoreMid;      // mid-peg scoring angle
+  private double                          m_wristAngleHigh      = WRConsts.kWristAngleScoreHigh;     // high-peg scoring angle
   private double                          m_wristMinAngle       = WRConsts.kWristMinAngle;           // minimum wrist allowable angle
   private double                          m_wristMaxAngle       = WRConsts.kWristMaxAngle;           // maximum wrist allowable angle
 
@@ -107,27 +109,6 @@ public class Wrist extends SubsystemBase
 
     m_wristValid = PhoenixUtil.getInstance( ).talonFXInitialize(m_wrist, "wrist");
 
-    SmartDashboard.putBoolean("HL_validWR", m_wristValid);
-
-    // Initialize Variables
-    SmartDashboard.putNumber("WR_velocity", m_velocity);
-    SmartDashboard.putNumber("WR_acceleration", m_acceleration);
-    SmartDashboard.putNumber("WR_sCurveStrength", m_sCurveStrength);
-    SmartDashboard.putNumber("WR_pidKf", m_pidKf);
-    SmartDashboard.putNumber("WR_pidKp", m_pidKp);
-    SmartDashboard.putNumber("WR_pidKi", m_pidKi);
-    SmartDashboard.putNumber("WR_pidKd", m_pidKd);
-
-    SmartDashboard.putNumber("WR_stowangle", m_wristStowangle);
-    SmartDashboard.putNumber("WR_scoreAngleLow", m_lowScoreangle);
-    SmartDashboard.putNumber("WR_scoreAngleMid", m_midScoreangle);
-    SmartDashboard.putNumber("WR_scoreAngleHigh", m_highScoreangle);
-
-    SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
-    SmartDashboard.putNumber("WR_targetDegrees", m_wristTargetDegrees);
-    SmartDashboard.putBoolean("WR_calibrated", WRConsts.kWristCalibrated);
-    SmartDashboard.putBoolean("WR_normalMode", !m_wristDebug);
-
     if (m_wristValid)
       wristTalonInitialize(m_wrist, WRConsts.kInvertMotor);
 
@@ -138,15 +119,7 @@ public class Wrist extends SubsystemBase
     m_wristCANCoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 255);
     resetToAbsolute( );
 
-    // the mechanism root node
-    MechanismRoot2d wristRoot = m_wristMech.getRoot("wrist", 1.5, 2);
-
-    // MechanismLigament2d objects represent each "section"/"stage" of the mechanism, and are based
-    // off the root node or another ligament object
-    m_wristLigament = wristRoot.append(new MechanismLigament2d("wrist", 0.5, 0, 6, new Color8Bit(Color.kPurple)));
-
-    // post the mechanism to the dashboard
-    SmartDashboard.putData("WristMech2d", m_wristMech);
+    initSmartDashboard( );
 
     initialize( );
   }
@@ -171,7 +144,7 @@ public class Wrist extends SubsystemBase
 
       m_wristCurDegrees = wristCountsToDegrees(curCounts);
       SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
-      m_wristLigament.setAngle(wristCountsToDegrees(curCounts));
+      m_wristLigament.setAngle(m_wristCurDegrees);
     }
   }
 
@@ -193,6 +166,33 @@ public class Wrist extends SubsystemBase
 
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_wristSim.getCurrentDrawAmps( )));
+  }
+
+  private void initSmartDashboard( )
+  {
+    SmartDashboard.putBoolean("HL_validWR", m_wristValid);
+
+    // Initialize Variables
+    SmartDashboard.putNumber("WR_velocity", m_velocity);
+    SmartDashboard.putNumber("WR_acceleration", m_acceleration);
+    SmartDashboard.putNumber("WR_sCurveStrength", m_sCurveStrength);
+    SmartDashboard.putNumber("WR_pidKf", m_pidKf);
+    SmartDashboard.putNumber("WR_pidKp", m_pidKp);
+    SmartDashboard.putNumber("WR_pidKi", m_pidKi);
+    SmartDashboard.putNumber("WR_pidKd", m_pidKd);
+
+    SmartDashboard.putNumber("WR_stowangle", m_wristAngleStow);
+    SmartDashboard.putNumber("WR_scoreAngleLow", m_wristAngleLow);
+    SmartDashboard.putNumber("WR_scoreAngleMid", m_wristAngleMid);
+    SmartDashboard.putNumber("WR_scoreAngleHigh", m_wristAngleHigh);
+
+    SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
+    SmartDashboard.putNumber("WR_targetDegrees", m_wristTargetDegrees);
+    SmartDashboard.putBoolean("WR_calibrated", WRConsts.kWristCalibrated);
+    SmartDashboard.putBoolean("WR_normalMode", !m_wristDebug);
+
+    // post the mechanism to the dashboard
+    SmartDashboard.putData("WristMech2d", m_wristMech);
   }
 
   public void initialize( )
@@ -362,6 +362,11 @@ public class Wrist extends SubsystemBase
       m_wrist.config_kP(SLOTINDEX, m_pidKp);
       m_wrist.config_kI(SLOTINDEX, m_pidKi);
       m_wrist.config_kD(SLOTINDEX, m_pidKd);
+
+      m_wristAngleStow = SmartDashboard.getNumber("WR_stowangle", m_wristAngleStow);
+      m_wristAngleLow = SmartDashboard.getNumber("WR_lowScoreangle", m_wristAngleLow);
+      m_wristAngleMid = SmartDashboard.getNumber("WR_midScoreangle", m_wristAngleMid);
+      m_wristAngleHigh = SmartDashboard.getNumber("WR_highScoreangle", m_wristAngleHigh);
     }
 
     switch (angle) // Do not change from current level!
@@ -372,16 +377,19 @@ public class Wrist extends SubsystemBase
           m_wristTargetDegrees = 0.25;
         break;
       case WRIST_STOW :
-        m_wristTargetDegrees = SmartDashboard.getNumber("WR_stowangle", m_wristStowangle);
+        m_wristTargetDegrees = m_wristAngleStow;
         break;
       case WRIST_LOW :
-        m_wristTargetDegrees = SmartDashboard.getNumber("WR_lowScoreangle", m_lowScoreangle);
+        m_wristTargetDegrees = m_wristAngleLow;
         break;
       case WRIST_MID :
-        m_wristTargetDegrees = SmartDashboard.getNumber("WR_midScoreangle", m_midScoreangle);
+        m_wristTargetDegrees = m_wristAngleMid;
         break;
       case WRIST_HIGH :
-        m_wristTargetDegrees = SmartDashboard.getNumber("WR_highScoreangle", m_highScoreangle);
+        m_wristTargetDegrees = m_wristAngleHigh;
+        break;
+      case WRIST_SHELF :
+        m_wristTargetDegrees = m_wristAngleHigh;
         break;
       default :
         DataLogManager.log(String.format("%s: requested angle is invalid - %.1f", getSubsystem( ), angle));

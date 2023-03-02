@@ -25,8 +25,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -155,8 +153,9 @@ public class Swerve extends SubsystemBase
 
   private void initSmartDashboard( )
   {
-    ShuffleboardTab swTab = Shuffleboard.getTab("Swerve");
-    swTab.add("SWM0_Velocity", m_swerveMods[0].getState( ).speedMetersPerSecond).withPosition(0, 0).withSize(2, 1);
+    // For future work to set up Shuffleboard layout from code
+    // ShuffleboardTab swTab = Shuffleboard.getTab("Swerve");
+    // swTab.add("SWM0_Velocity", m_swerveMods[0].getState( ).speedMetersPerSecond).withPosition(0, 0).withSize(2, 1);
 
     SmartDashboard.putData("Field", m_field);
   }
@@ -165,6 +164,38 @@ public class Swerve extends SubsystemBase
   //
   // Periodic helper methods
   //
+  public class PeriodicIO
+  {
+    // inputs
+    public double odometry_pose_x;
+    public double odometry_pose_y;
+    public double odometry_pose_rot;
+
+    public double swerve_heading;
+    public double robot_pitch;
+    public double robot_roll;
+    public double vision_align_target_angle;
+
+    // outputs
+    public double snap_target;
+  }
+
+  public void readPeriodicInputs( )
+  {
+    Pose2d position = getPose( );
+
+    m_periodicIO.odometry_pose_x = position.getX( );
+    m_periodicIO.odometry_pose_y = position.getY( );
+    m_periodicIO.odometry_pose_rot = position.getRotation( ).getDegrees( );
+
+    m_periodicIO.swerve_heading = MathUtil.inputModulus(m_pigeon.getYaw( ).getDegrees( ), 0, 360);
+    m_periodicIO.robot_pitch = m_pigeon.getUnadjustedPitch( ).getDegrees( );
+    m_periodicIO.robot_roll = m_pigeon.getRoll( ).getDegrees( );
+
+    m_periodicIO.vision_align_target_angle = Math.toDegrees(m_limelightVisionAlignGoal);
+    m_periodicIO.snap_target = Math.toDegrees(m_snapPIDController.getGoal( ).position);
+  }
+
   private void updateSmartDashboard( )
   {
     SmartDashboard.putNumber("SWMod: 0 - Speed", m_swerveMods[0].getState( ).speedMetersPerSecond);
@@ -194,10 +225,24 @@ public class Swerve extends SubsystemBase
     m_field.setRobotPose(getPose( ));
   }
 
-  ///////////////////////////////////////////////////////////////////////////////
-  //
-  // Teleop driving mode
-  //
+  public void updateSwerveOdometry( )
+  {
+    m_poseEstimator.updateWithTime(Timer.getFPGATimestamp( ), m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ));
+
+    {
+      Pose2d botLLPose = RobotContainer.getInstance( ).m_vision.getLimelightValidPose(getPose( ));
+      double latency = RobotContainer.getInstance( ).m_vision.getTargetLatency( );
+
+      if ((botLLPose != null))
+      {
+        //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
+        m_poseEstimator.addVisionMeasurement(botLLPose, Timer.getFPGATimestamp( ) - (latency / 1000));
+      }
+    }
+
+    // Pose2d estimate = getPose();
+    // DataLogManager.log(String.format("%$: X : %.3f Y %.3f", getSubsystem( ), estimate.getX( ), estimate.getY( )));
+  }
 
   ///////////////////////////////////////////////////////////////////////////////
   //
@@ -392,8 +437,8 @@ public class Swerve extends SubsystemBase
     double currentTrajX = currentPose.getX( );
     double currentTrajY = currentPose.getY( );
 
-    double targetHeading = m_trajectory.getEndState( ).holonomicRotation.getDegrees( ); // TODO: Maybe get in radians?
-    double currentHeading = currentPose.getRotation( ).getDegrees( ); // TODO: Maybe get in radians?
+    double targetHeading = m_trajectory.getEndState( ).holonomicRotation.getDegrees( );
+    double currentHeading = currentPose.getRotation( ).getDegrees( );
 
     setModuleStates(moduleStates);
 
@@ -674,57 +719,6 @@ public class Swerve extends SubsystemBase
   public void zeroGyro(double reset)
   {
     m_pigeon.setYaw(reset);
-  }
-
-  public void updateSwerveOdometry( )
-  {
-    m_poseEstimator.updateWithTime(Timer.getFPGATimestamp( ), m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ));
-
-    {
-      Pose2d botLLPose = RobotContainer.getInstance( ).m_vision.getLimelightValidPose(getPose( ));
-      double latency = RobotContainer.getInstance( ).m_vision.getTargetLatency( );
-
-      if ((botLLPose != null))
-      {
-        //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
-        m_poseEstimator.addVisionMeasurement(botLLPose, Timer.getFPGATimestamp( ) - (latency / 1000));
-      }
-    }
-
-    // Pose2d estimate = getPose();
-    // DataLogManager.log(String.format("%$: X : %.3f Y %.3f", getSubsystem( ), estimate.getX( ), estimate.getY( )));
-  }
-
-  public void readPeriodicInputs( )
-  {
-    Pose2d position = getPose( );
-
-    m_periodicIO.odometry_pose_x = position.getX( );
-    m_periodicIO.odometry_pose_y = position.getY( );
-    m_periodicIO.odometry_pose_rot = position.getRotation( ).getDegrees( );
-
-    m_periodicIO.swerve_heading = MathUtil.inputModulus(m_pigeon.getYaw( ).getDegrees( ), 0, 360);
-    m_periodicIO.robot_pitch = m_pigeon.getUnadjustedPitch( ).getDegrees( );
-    m_periodicIO.robot_roll = m_pigeon.getRoll( ).getDegrees( );
-
-    m_periodicIO.vision_align_target_angle = Math.toDegrees(m_limelightVisionAlignGoal);
-    m_periodicIO.snap_target = Math.toDegrees(m_snapPIDController.getGoal( ).position);
-  }
-
-  public class PeriodicIO
-  {
-    // inputs
-    public double odometry_pose_x;
-    public double odometry_pose_y;
-    public double odometry_pose_rot;
-
-    public double swerve_heading;
-    public double robot_pitch;
-    public double robot_roll;
-    public double vision_align_target_angle;
-
-    // outputs
-    public double snap_target;
   }
 
   //// 1678 Swerve //////////////////////////////////////////////////////////////

@@ -341,12 +341,17 @@ public class Constants
       DIRECTION_RIGHT   // Right
     }
 
-    public static final double       kLLDistance1   = 48;    // distance from bumper in inches for first reference point
-    public static final double       kLLVertOffset1 = 0.42;  // LL y reading in degrees for first reference point
-    public static final double       kLLDistance2   = 60;    // distance from bumper in inches for second reference point
-    public static final double       kLLVertOffset2 = -4.85; // LL y reading in degrees for second reference point
+    public static final double       kLLDistance1        = 48;    // distance from bumper in inches for first reference point
+    public static final double       kLLVertOffset1      = 0.42;  // LL y reading in degrees for first reference point
+    public static final double       kLLDistance2        = 60;    // distance from bumper in inches for second reference point
+    public static final double       kLLVertOffset2      = -4.85; // LL y reading in degrees for second reference point
 
-    public static final List<Pose2d> kAprilTagPoses = Collections.unmodifiableList(List.of( //
+    public static final double       kATagDepthInGrid    = Units.inchesToMeters(14.25); // Depth from front of grid to AprilTag - 1'2-1/4"
+    public static final double       kRobotCenterToFront = Units.inchesToMeters((28.0 + 6.0) / 2); // Depth from limelight to front robot edge
+    public static final double       kAdjustPathX        = kATagDepthInGrid + kRobotCenterToFront;
+    public static final double       kAdjustPathY        = Units.inchesToMeters(18.25 / 2 + 18.5 / 2);
+
+    public static final List<Pose2d> kAprilTagPoses      = Collections.unmodifiableList(List.of( //
         new Pose2d(new Translation2d(0.0, 0.0), new Rotation2d(0)),        // AprilTag ID: 0 (invalid)
         new Pose2d(new Translation2d(15.513558, 1.071626), new Rotation2d(Units.degreesToRadians(180))), // AprilTag ID: 1 
         new Pose2d(new Translation2d(15.513558, 2.748026), new Rotation2d(Units.degreesToRadians(180))), // AprilTag ID: 2 
