@@ -58,13 +58,13 @@ public class Wrist extends SubsystemBase
   private final MechanismLigament2d       m_wristLigament;
 
   private boolean                         m_wristValid;                // Health indicator for wrist Talon 
-  private double                          m_wristAngleOffset;
+  private double                          m_wristAngleOffset;          // CANCoder angle measured at reference point
 
   //Devices and simulation objs
   private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true,
-      Falcon500.kSupplyCurrentLimit, Falcon500.kSupplyTriggerCurrent, Falcon500.kSupplyTriggerTime);
+      WRConsts.kSupplyCurrentLimit, WRConsts.kSupplyTriggerCurrent, WRConsts.kSupplyTriggerTime);
   private StatorCurrentLimitConfiguration m_statorCurrentLimits = new StatorCurrentLimitConfiguration(true,
-      Falcon500.kStatorCurrentLimit, Falcon500.kStatorTriggerCurrent, Falcon500.kStatorTriggerTime);
+      WRConsts.kStatorCurrentLimit, WRConsts.kStatorTriggerCurrent, WRConsts.kStatorTriggerTime);
 
   // Declare module variables
   private int                             m_velocity            = WRConsts.kWristMMVelocity;         // motion magic velocity
@@ -78,19 +78,18 @@ public class Wrist extends SubsystemBase
   private double                          m_toleranceDegrees    = WRConsts.kWristToleranceDegrees;   // PID tolerance in Degrees
   private double                          m_arbitraryFF         = WRConsts.kWristArbitraryFF;        // Arbitrary Feedfoward (elevators and arms))
 
-  private double                          m_wristStowangle      = WRConsts.kWristStowAngle;          // wrist Stow angle
+  private double                          m_wristStowangle      = WRConsts.kWristAngleStow;          // wrist Stow angle
   private double                          m_lowScoreangle       = WRConsts.kWristAngleScoreLow;      // low-peg scoring angle   
   private double                          m_midScoreangle       = WRConsts.kWristAngleScoreMid;      // mid-peg scoring angle
   private double                          m_highScoreangle      = WRConsts.kWristAngleScoreHigh;     // high-peg scoring angle
-  private double                          m_wristMinangle       = WRConsts.kWristMinAngle;           // minimum wrist allowable angle
-  private double                          m_wristMaxangle       = WRConsts.kWristMaxAngle;           // maximum wrist allowable angle
+  private double                          m_wristMinAngle       = WRConsts.kWristMinAngle;           // minimum wrist allowable angle
+  private double                          m_wristMaxAngle       = WRConsts.kWristMaxAngle;           // maximum wrist allowable angle
 
   private double                          m_stickDeadband       = Constants.kStickDeadband;          // joystick deadband
   private WristMode                       m_wristMode           = WristMode.WRIST_INIT;              // Mode active with joysticks
 
-  private int                             m_wristDebug          = 1; // DEBUG flag to disable/enable extra logging calls
+  private boolean                         m_wristDebug          = false;  // DEBUG flag to disable/enable extra logging calls
 
-  private boolean                         m_calibrated          = true;  // Indicates whether the wrist has been calibrated
   private double                          m_wristTargetDegrees  = 0.0;    // Target angle in degrees
   private double                          m_wristCurDegrees     = 0.0;    // Current angle in degrees
   private int                             m_withinTolerance     = 0;      // Counter for consecutive readings within tolerance
@@ -126,7 +125,8 @@ public class Wrist extends SubsystemBase
 
     SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
     SmartDashboard.putNumber("WR_targetDegrees", m_wristTargetDegrees);
-    SmartDashboard.putBoolean("WR_calibrated", m_calibrated);
+    SmartDashboard.putBoolean("WR_calibrated", WRConsts.kWristCalibrated);
+    SmartDashboard.putBoolean("WR_normalMode", !m_wristDebug);
 
     if (m_wristValid)
       wristTalonInitialize(m_wrist, WRConsts.kInvertMotor);
@@ -159,11 +159,16 @@ public class Wrist extends SubsystemBase
     if (m_wristValid)
     {
       int curCounts = (int) m_wrist.getSelectedSensorPosition(0);
-      int curVelocity = (int) m_wrist.getSelectedSensorVelocity(0);
-      maxVelocity = (maxVelocity > curVelocity) ? maxVelocity : curVelocity;
-      SmartDashboard.putNumber("WR_maxVelocity", maxVelocity);
-      SmartDashboard.putNumber("WR_curVelocity", curVelocity);
-      SmartDashboard.putNumber("WR_curCounts", curCounts);
+
+      if (m_wristDebug)
+      {
+        int curVelocity = (int) m_wrist.getSelectedSensorVelocity(0);
+        maxVelocity = (maxVelocity > curVelocity) ? maxVelocity : curVelocity;
+        SmartDashboard.putNumber("WR_maxVelocity", maxVelocity);
+        SmartDashboard.putNumber("WR_curVelocity", curVelocity);
+        SmartDashboard.putNumber("WR_curCounts", curCounts);
+      }
+
       m_wristCurDegrees = wristCountsToDegrees(curCounts);
       SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
       m_wristLigament.setAngle(wristCountsToDegrees(curCounts));
@@ -194,7 +199,7 @@ public class Wrist extends SubsystemBase
   {
     double curWRCounts = 0.0;
 
-    DataLogManager.log(getSubsystem( ) + ": subsystem initialized!");
+    DataLogManager.log(getSubsystem( ) + ": Subsystem initialized!");
 
     setWristStopped( );
 
@@ -202,7 +207,7 @@ public class Wrist extends SubsystemBase
       curWRCounts = m_wrist.getSelectedSensorPosition(0);
     m_wristCurDegrees = wristCountsToDegrees((int) curWRCounts);
     m_wristTargetDegrees = m_wristCurDegrees;
-    DataLogManager.log(getSubsystem( ) + ": Init Target Degrees: " + m_wristTargetDegrees);
+    DataLogManager.log(String.format("%s: Init Target Degrees: %.1f", getSubsystem( ), m_wristTargetDegrees));
   }
 
   public Rotation2d getCanCoder( )
@@ -225,6 +230,11 @@ public class Wrist extends SubsystemBase
   private double wristCountsToDegrees(int counts)
   {
     return counts * WRConsts.kWristDegreesPerCount;
+  }
+
+  public boolean moveIsInRange(double degrees)
+  {
+    return degrees > m_wristMinAngle && degrees < m_wristMaxAngle;
   }
 
   private void wristTalonInitialize(WPI_TalonFX motor, boolean inverted)
@@ -284,7 +294,7 @@ public class Wrist extends SubsystemBase
     if (yWristValue > -m_stickDeadband && yWristValue < m_stickDeadband)
     {
       if (m_wristMode != WristMode.WRIST_STOPPED)
-        DataLogManager.log(getSubsystem( ) + " WRIST Stopped");
+        DataLogManager.log(getSubsystem( ) + ": move Stopped");
       m_wristMode = WristMode.WRIST_STOPPED;
     }
     else
@@ -293,7 +303,7 @@ public class Wrist extends SubsystemBase
       if (yWristValue > m_stickDeadband)
       {
         if (m_wristMode != WristMode.WRIST_UP)
-          DataLogManager.log(getSubsystem( ) + " WRIST Up");
+          DataLogManager.log(getSubsystem( ) + ": move Up");
         m_wristMode = WristMode.WRIST_UP;
 
         yWristValue -= m_stickDeadband;
@@ -304,7 +314,7 @@ public class Wrist extends SubsystemBase
       else if (yWristValue < -m_stickDeadband)
       {
         if (m_wristMode != WristMode.WRIST_DOWN)
-          DataLogManager.log(getSubsystem( ) + " WRIST Down");
+          DataLogManager.log(getSubsystem( ) + " : move Down");
         m_wristMode = WristMode.WRIST_DOWN;
 
         yWristValue += m_stickDeadband;
@@ -313,19 +323,19 @@ public class Wrist extends SubsystemBase
       }
     }
 
-    if (m_wristCurDegrees < m_wristMinangle || m_wristCurDegrees > m_wristMaxangle)
-      DataLogManager.log(getSubsystem( ) + ": Wrist movement OUT OF RANGE!");
-
-    if (m_wristValid)
+    if (!moveIsInRange(m_wristCurDegrees))
     {
-      m_wrist.set(ControlMode.PercentOutput, motorOutput);
+      DataLogManager.log(getSubsystem( ) + ": move OUT OF RANGE!");
+      motorOutput = 0.0;
     }
 
+    if (m_wristValid)
+      m_wrist.set(ControlMode.PercentOutput, motorOutput);
   }
 
   public void setWristStopped( )
   {
-    DataLogManager.log(getSubsystem( ) + ": Wrist now Stopped");
+    DataLogManager.log(getSubsystem( ) + ": now STOPPED");
 
     if (m_wristValid)
       m_wrist.set(ControlMode.PercentOutput, 0.0);
@@ -335,7 +345,7 @@ public class Wrist extends SubsystemBase
 
   public void moveWristAngleInit(WristAngle angle)
   {
-    if (m_wristDebug != 0)
+    if (m_wristDebug)
     {
       m_velocity = (int) SmartDashboard.getNumber("WR_velocity", m_velocity);
       m_acceleration = (int) SmartDashboard.getNumber("WR_acceleration", m_acceleration);
@@ -374,49 +384,45 @@ public class Wrist extends SubsystemBase
         m_wristTargetDegrees = SmartDashboard.getNumber("WR_highScoreangle", m_highScoreangle);
         break;
       default :
-        DataLogManager.log(getSubsystem( ) + ": requested angle is invalid - " + angle);
+        DataLogManager.log(String.format("%s: requested angle is invalid - %.1f", getSubsystem( ), angle));
         return;
     }
 
-    if (m_calibrated)
-    {
-      // angle constraint check/soft limit for max and min angle before raising
-      if (m_wristTargetDegrees < m_wristMinangle)
+    DataLogManager.log(String.format("%s: TARGET ANGLE %.1f", getSubsystem( ), m_wristTargetDegrees));
+
+    if (WRConsts.kWristCalibrated)
+      if (WRConsts.kWristCalibrated && moveIsInRange(Math.abs(m_wristTargetDegrees - m_wristCurDegrees)))
       {
-        DataLogManager.log("Target " + String.format("%.1f", m_wristTargetDegrees) + " degrees is limited by "
-            + String.format("%.1f", m_wristMinangle) + " degrees");
-        m_wristTargetDegrees = m_wristMinangle;
-      }
+        // angle constraint check/soft limit for max and min angle before raising
+        if (!moveIsInRange(m_wristTargetDegrees))
+        {
+          DataLogManager.log(String.format("%s: Target %.1f degrees is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
+              m_wristTargetDegrees, m_wristMinAngle, m_wristMaxAngle));
+          m_wristTargetDegrees = m_wristCurDegrees;
+        }
 
-      if (m_wristTargetDegrees > m_wristMaxangle)
+        // Start the safety timer
+        m_safetyTimeout = 1.8;
+        m_safetyTimer.reset( );
+        m_safetyTimer.start( );
+
+        if (m_wristValid)
+          m_wrist.set(ControlMode.MotionMagic, wristDegreesToCounts(m_wristTargetDegrees));
+
+        DataLogManager.log(String.format("%s: moving: %.1f -> %.1f degrees | counts %d -> %d", getSubsystem( ), m_wristCurDegrees,
+            m_wristTargetDegrees, m_wristCurDegrees, m_wristTargetDegrees));
+      }
+      else
       {
-        DataLogManager.log("Target " + String.format("%.1f", m_wristTargetDegrees) + " degrees is limited by "
-            + String.format("%.1f", m_wristMaxangle) + " degrees");
-        m_wristTargetDegrees = m_wristMaxangle;
+        DataLogManager.log(getSubsystem( ) + ": not calibrated");
+        if (m_wristValid)
+          m_wrist.set(ControlMode.PercentOutput, 0.0);
       }
-
-      // Start the safety timer
-      m_safetyTimeout = 1.8;
-      m_safetyTimer.reset( );
-      m_safetyTimer.start( );
-
-      m_wrist.set(ControlMode.MotionMagic, wristDegreesToCounts(m_wristTargetDegrees));
-
-      DataLogManager.log("Wrist moving: " + String.format("%.1f", m_wristCurDegrees) + " -> "
-          + String.format("%.1f", m_wristTargetDegrees) + " degrees  |  counts " + wristDegreesToCounts(m_wristCurDegrees)
-          + " -> " + wristDegreesToCounts(m_wristTargetDegrees));
-    }
-    else
-    {
-      DataLogManager.log("Wrist is not calibrated");
-      if (m_wristValid)
-        m_wrist.set(ControlMode.PercentOutput, 0.0);
-    }
   }
 
   public void moveWristAngleExecute( )
   {
-    if (m_wristValid && m_calibrated)
+    if (m_wristValid && WRConsts.kWristCalibrated)
       m_wrist.set(ControlMode.MotionMagic, wristDegreesToCounts(m_wristTargetDegrees), DemandType.ArbitraryFeedForward,
           m_arbitraryFF * Math.sin(Units.degreesToRadians((m_wristCurDegrees))));
   }
@@ -433,8 +439,8 @@ public class Wrist extends SubsystemBase
       if (++m_withinTolerance >= 5)
       {
         isFinished = true;
-        DataLogManager.log("Wrist move finished - Time: " + String.format("%.3f", m_safetyTimer.get( )) + "  |  Cur degrees: "
-            + String.format("%.1f", m_wristCurDegrees));
+        DataLogManager.log(String.format("%s: move finished - Time: %.3f  |  Cur degrees: %.1f", getSubsystem( ),
+            m_safetyTimer.get( ), m_wristCurDegrees));
       }
     }
     else
@@ -445,7 +451,7 @@ public class Wrist extends SubsystemBase
     if (m_safetyTimer.get( ) >= m_safetyTimeout)
     {
       isFinished = true;
-      DataLogManager.log("Wrist Move Safety timer has timed out!");
+      DataLogManager.log(getSubsystem( ) + ": Move Safety timer has timed out!");
     }
 
     if (isFinished)

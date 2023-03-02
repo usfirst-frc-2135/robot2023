@@ -3,7 +3,6 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ELConsts.ElbowAngle;
 import frc.robot.subsystems.Elbow;
@@ -30,8 +29,6 @@ public class ElbowMoveToAngle extends CommandBase
   public void initialize( )
   {
     m_elbow.moveElbowAngleInit(m_angle);
-    DataLogManager.log("ELBOW TARGET ANGLE: " + m_angle);
-
   }
 
   // Called every time the scheduler runs while the command is scheduled.
