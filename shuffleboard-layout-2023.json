@@ -1880,7 +1880,7 @@
               "_showGlyph": false
             }
           },
-          "9,0": {
+          "12,0": {
             "size": [
               10,
               7
@@ -1894,6 +1894,58 @@
               "Game/Game": "A2023_Charged_Up",
               "Visuals/Robot Icon Size": 30.0,
               "Visuals/Show Outside Circles": false
+            }
+          },
+          "9,2": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ArmSetHeightLow",
+              "_title": "SmartDashboard/ArmSetHeightLow",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "9,6": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ArmSetHeightHigh",
+              "_title": "SmartDashboard/ArmSetHeightHigh",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "9,4": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ArmSetHeightMid",
+              "_title": "SmartDashboard/ArmSetHeightMid",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "9,0": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ArmSetHeightStow",
+              "_title": "SmartDashboard/ArmSetHeightStow",
+              "_glyph": 148,
+              "_showGlyph": false
             }
           }
         }
