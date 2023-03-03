@@ -26,7 +26,6 @@ public class DriveLimelightPath extends CommandBase
   private final Swerve          m_swerve;
   private final Vision          m_vision;
   private final VIGoalDirection m_goalDirection;
-  private Pose2d                m_goalPose;
 
   public DriveLimelightPath(Swerve swerve, Vision vision, VIGoalDirection goalDirection)
   {
@@ -42,17 +41,14 @@ public class DriveLimelightPath extends CommandBase
   @Override
   public void initialize( )
   {
+    Pose2d goalPose2d = calculateTarget(m_vision.getTargetID( ), m_goalDirection);
     Pose2d currentPose = m_swerve.getPose( );
-    DataLogManager.log(getName( ) + ": goalDirection " + m_goalDirection + " curPose " + currentPose);
 
-    m_goalPose = getGoalPose(m_goalDirection);
-    DataLogManager.log(getName( ) + ": goalPose " + m_goalPose);
+    PathPlannerTrajectory trajectory = PathPlanner.generatePath(new PathConstraints(3, 4),
+        new PathPoint(currentPose.getTranslation( ), currentPose.getRotation( ), currentPose.getRotation( )),
+        new PathPoint(goalPose2d.getTranslation( ), goalPose2d.getRotation( ), goalPose2d.getRotation( )));
 
-    if (m_goalPose != null)
-    {
-      PathPlannerTrajectory trajectory = PathPlanner.generatePath(new PathConstraints(3, 4),
-          new PathPoint(currentPose.getTranslation( ), currentPose.getRotation( ), currentPose.getRotation( )),
-          new PathPoint(m_goalPose.getTranslation( ), m_goalPose.getRotation( ), m_goalPose.getRotation( )));
+    m_swerve.driveWithPathFollowerInit(trajectory, true);
 
     DataLogManager.log(String.format("%s: current %s, goal %s", getName( ), currentPose, goalPose2d));
   }
@@ -61,8 +57,7 @@ public class DriveLimelightPath extends CommandBase
   @Override
   public void execute( )
   {
-    if (m_goalPose != null)
-      m_swerve.driveWithPathFollowerExecute( );
+    m_swerve.driveWithPathFollowerExecute( );
   }
 
   // Called once the command ends or is  interrupted.
@@ -70,15 +65,14 @@ public class DriveLimelightPath extends CommandBase
   public void end(boolean interrupted)
   {
     m_swerve.driveWithPathFollowerEnd( );
-    if (m_goalPose != null)
-      m_swerve.driveStop(true);
+    m_swerve.driveStop(true);
   }
 
   // Returns true when the command  sh
   @Override
   public boolean isFinished( )
   {
-    return (m_goalPose == null) || m_swerve.driveWithPathFollowerIsFinished( );
+    return m_swerve.driveWithPathFollowerIsFinished( );
   }
 
   @Override
@@ -94,11 +88,6 @@ public class DriveLimelightPath extends CommandBase
 
   public Pose2d calculateTarget(int targetId, VIConsts.VIGoalDirection goalDirection)
   {
-    int targetId = m_vision.getTargetID( );
-
-    if (!m_vision.isAprilTagValid(targetId))
-      return null;
-
     Pose2d targetPose = VIConsts.kAprilTagPoses.get(targetId);
     double goalXValue = 0;
     double goalYValue = 0;
@@ -106,7 +95,6 @@ public class DriveLimelightPath extends CommandBase
 
     goalXValue = targetPose.getX( ) + getSignFromId(targetId) * VIConsts.kAdjustPathX;
 
-    // TODO: Need to add a named constant for the left/right offset to align with cone poles
     switch (goalDirection)
     {
       default :
@@ -126,8 +114,7 @@ public class DriveLimelightPath extends CommandBase
 
     DataLogManager.log(String.format("%s: Calculate target ID %d direction %s", getName( ), targetId, strName));
 
-    return new Pose2d(new Translation2d(goalXValue, goalYValue),
-        new Rotation2d(targetPose.getRotation( ).getRadians( ) + Math.PI));
-  }
+    return new Pose2d(new Translation2d(goalXValue, goalYValue), new Rotation2d(targetPose.getRotation( ).getRadians( ) + 3.14));
 
+  }
 }
