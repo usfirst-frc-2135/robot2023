@@ -8,22 +8,13 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.ctre.phoenix.sensors.CANCoder;
-import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
-import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -35,8 +26,6 @@ import frc.robot.Constants;
 import frc.robot.Constants.EXConsts;
 import frc.robot.Constants.EXConsts.ExtensionLength;
 import frc.robot.Constants.EXConsts.ExtensionMode;
-import frc.robot.lib.math.Conversions;
-import frc.robot.lib.util.CTREConfigs;
 import frc.robot.team2135.PhoenixUtil;
 
 //
@@ -50,7 +39,6 @@ public class Extension extends SubsystemBase
 
   // Member objects
   private final WPI_TalonFX               m_extension             = new WPI_TalonFX(Constants.Ports.kCANID_Extension);  //extension
-  private final CANCoder                  m_extensionCANCoder     = new CANCoder(Constants.Ports.kCANID_EXCANCoder);
   // private final TalonFXSimCollection      m_extensionMotorSim     = new TalonFXSimCollection(m_extension);
   // private final SingleJointedArmSim       m_extensionSim          = new SingleJointedArmSim(DCMotor.getFalcon500(1),
   //     EXConsts.kExtensionGearRatio, 2.0, EXConsts.kForearmLengthMeters, 0.0, Math.PI, false);
@@ -61,8 +49,7 @@ public class Extension extends SubsystemBase
   private MechanismLigament2d             m_extensionLigament     =
       m_extensionRoot.append(new MechanismLigament2d("extension", 1, 0, 6, new Color8Bit(Color.kBlue)));
 
-  private boolean                         m_extensionValid;               // Health indicator for extension Talon 
-  private boolean                         m_extensionCCValid;             // Health indicator for extension CANCoder 
+  private boolean                         m_extensionValid;              // Health indicator for extension Talon 
   private double                          m_extensionLengthOffset = 0.0; // CANCoder length measured at reference point
 
   //Devices and simulation objs
@@ -115,24 +102,6 @@ public class Extension extends SubsystemBase
     if (m_extensionValid)
       extensionTalonInitialize(m_extension, EXConsts.kInvertMotor);
 
-    m_extensionCCValid = PhoenixUtil.getInstance( ).canCoderInitialize(m_extensionCANCoder, "extension");
-
-    if (m_extensionCCValid)
-    {
-      m_extensionCANCoder.configAllSettings(CTREConfigs.extensionCancoderConfig( ));
-      m_extensionCANCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
-      m_extensionCANCoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 255);
-
-      m_extensionLengthOffset = (Constants.isComp) ? EXConsts.kCompExtensionOffset : EXConsts.kBetaExtensionOffset;
-      m_extensionLengthOffset *= ((EXConsts.kExtensionCANCoderAbsInvert) ? -1.0 : 1.0);
-
-      double absolutePosition =
-          Conversions.inchesToFalcon(getCanCoder( ).getInches( ) - m_extensionLengthOffset, EXConsts.kExtensionGearRatio);
-
-      if (RobotBase.isReal( ))
-        m_extension.setSelectedSensorPosition(absolutePosition);
-    }
-
     initSmartDashboard( );
 
     initialize( );
@@ -146,6 +115,13 @@ public class Extension extends SubsystemBase
     if (m_extensionValid)
     {
       int curCounts = (int) m_extension.getSelectedSensorPosition(0);
+
+      if (RobotState.isDisabled( ) && (curCounts < 0))
+      {
+        curCounts = 0;
+        m_extension.setSelectedSensorPosition(curCounts, PIDINDEX, Constants.kCANTimeoutMs);
+        m_extensionTargetInches = extensionCountsToInches(curCounts);
+      }
 
       if (m_extensionDebug)
       {
@@ -225,11 +201,6 @@ public class Extension extends SubsystemBase
     m_extensionCurInches = extensionCountsToInches((int) curEXCounts);
     m_extensionTargetInches = m_extensionCurInches;
     DataLogManager.log(String.format("%s: Init Target Inches: %.1f", getSubsystem( ), m_extensionTargetInches));
-  }
-
-  public Rotation2d getCanCoder( )
-  {
-    return Rotation2d.fromDegrees(m_extensionCANCoder.getAbsolutePosition( ));
   }
 
   private int extensionInchesToCounts(double inches)
