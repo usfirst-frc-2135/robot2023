@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -59,8 +60,9 @@ public class Wrist extends SubsystemBase
   private final MechanismLigament2d       m_wristLigament       =
       m_wristRoot.append(new MechanismLigament2d("wrist", 0.5, 0, 6, new Color8Bit(Color.kPurple)));
 
-  private boolean                         m_wristValid;                // Health indicator for wrist Talon 
-  private double                          m_wristAngleOffset;          // CANCoder angle measured at reference point
+  private boolean                         m_wristValid;                 // Health indicator for wrist Talon 
+  private boolean                         m_wristCCValid;               // Health indicator for wrist CANCoder 
+  private double                          m_wristAngleOffset    = 0.0;  // CANCoder angle measured at reference point
 
   //Devices and simulation objs
   private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true,
@@ -90,7 +92,7 @@ public class Wrist extends SubsystemBase
   private double                          m_stickDeadband       = Constants.kStickDeadband;          // joystick deadband
   private WristMode                       m_wristMode           = WristMode.WRIST_INIT;              // Mode active with joysticks
 
-  private boolean                         m_wristDebug          = false;  // DEBUG flag to disable/enable extra logging calls
+  private boolean                         m_wristDebug          = true;   // DEBUG flag to disable/enable extra logging calls
 
   private double                          m_wristTargetDegrees  = 0.0;    // Target angle in degrees
   private double                          m_wristCurDegrees     = 0.0;    // Current angle in degrees
@@ -112,12 +114,21 @@ public class Wrist extends SubsystemBase
     if (m_wristValid)
       wristTalonInitialize(m_wrist, WRConsts.kInvertMotor);
 
-    m_wristAngleOffset = (Constants.isComp) ? WRConsts.kCompWristOffset : WRConsts.kBetaWristOffset;
-    m_wristCANCoder.configFactoryDefault( );
-    m_wristCANCoder.configAllSettings(CTREConfigs.wristCancoderConfig( ));
-    m_wristCANCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
-    m_wristCANCoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 255);
-    resetToAbsolute( );
+    m_wristCCValid = PhoenixUtil.getInstance( ).canCoderInitialize(m_wristCANCoder, "wrist");
+
+    if (m_wristCCValid)
+    {
+      m_wristCANCoder.configAllSettings(CTREConfigs.wristCancoderConfig( ));
+      m_wristCANCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
+      m_wristCANCoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 255);
+      m_wristAngleOffset = (Constants.isComp) ? WRConsts.kCompWristOffset : WRConsts.kBetaWristOffset;
+      m_wristAngleOffset *= ((WRConsts.kWristCANCoderAbsInvert) ? -1.0 : 1.0);
+      double absolutePosition =
+          Conversions.degreesToFalcon(getCanCoder( ).getDegrees( ) - m_wristAngleOffset, WRConsts.kWristGearRatio);
+
+      if (RobotBase.isReal( ))
+        m_wrist.setSelectedSensorPosition(absolutePosition);
+    }
 
     initSmartDashboard( );
 
@@ -181,7 +192,7 @@ public class Wrist extends SubsystemBase
     SmartDashboard.putNumber("WR_pidKi", m_pidKi);
     SmartDashboard.putNumber("WR_pidKd", m_pidKd);
 
-    SmartDashboard.putNumber("WR_stowangle", m_wristAngleStow);
+    SmartDashboard.putNumber("WR_stowAngle", m_wristAngleStow);
     SmartDashboard.putNumber("WR_scoreAngleLow", m_wristAngleLow);
     SmartDashboard.putNumber("WR_scoreAngleMid", m_wristAngleMid);
     SmartDashboard.putNumber("WR_scoreAngleHigh", m_wristAngleHigh);
@@ -192,7 +203,7 @@ public class Wrist extends SubsystemBase
     SmartDashboard.putBoolean("WR_normalMode", !m_wristDebug);
 
     // post the mechanism to the dashboard
-    SmartDashboard.putData("WristMech2d", m_wristMech);
+    SmartDashboard.putData("WristMech", m_wristMech);
   }
 
   public void initialize( )
@@ -213,13 +224,6 @@ public class Wrist extends SubsystemBase
   public Rotation2d getCanCoder( )
   {
     return Rotation2d.fromDegrees(m_wristCANCoder.getAbsolutePosition( ));
-  }
-
-  public void resetToAbsolute( )
-  {
-    double absolutePosition = ((WRConsts.kWristCANCoderAbsInvert) ? -1.0 : 1.0)
-        * Conversions.degreesToFalcon(getCanCoder( ).getDegrees( ) - m_wristAngleOffset, WRConsts.kWristGearRatio);
-    m_wrist.setSelectedSensorPosition(absolutePosition);
   }
 
   private int wristDegreesToCounts(double degrees)
@@ -363,10 +367,10 @@ public class Wrist extends SubsystemBase
       m_wrist.config_kI(SLOTINDEX, m_pidKi);
       m_wrist.config_kD(SLOTINDEX, m_pidKd);
 
-      m_wristAngleStow = SmartDashboard.getNumber("WR_stowangle", m_wristAngleStow);
-      m_wristAngleLow = SmartDashboard.getNumber("WR_lowScoreangle", m_wristAngleLow);
-      m_wristAngleMid = SmartDashboard.getNumber("WR_midScoreangle", m_wristAngleMid);
-      m_wristAngleHigh = SmartDashboard.getNumber("WR_highScoreangle", m_wristAngleHigh);
+      m_wristAngleStow = SmartDashboard.getNumber("WR_stowAngle", m_wristAngleStow);
+      m_wristAngleLow = SmartDashboard.getNumber("WR_scoreAngleLow", m_wristAngleLow);
+      m_wristAngleMid = SmartDashboard.getNumber("WR_scoreAngleMid", m_wristAngleMid);
+      m_wristAngleHigh = SmartDashboard.getNumber("WR_scoreAngleHigh", m_wristAngleHigh);
     }
 
     switch (angle) // Do not change from current level!
@@ -417,8 +421,8 @@ public class Wrist extends SubsystemBase
         if (m_wristValid)
           m_wrist.set(ControlMode.MotionMagic, wristDegreesToCounts(m_wristTargetDegrees));
 
-        DataLogManager.log(String.format("%s: moving: %.1f -> %.1f degrees | counts %d -> %d", getSubsystem( ), m_wristCurDegrees,
-            m_wristTargetDegrees, m_wristCurDegrees, m_wristTargetDegrees));
+        DataLogManager
+            .log(String.format("%s: moving: %.1f -> %.1f degrees", getSubsystem( ), m_wristCurDegrees, m_wristTargetDegrees));
       }
       else
       {

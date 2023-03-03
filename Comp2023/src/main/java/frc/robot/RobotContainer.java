@@ -155,19 +155,29 @@ public class RobotContainer
     SmartDashboard.putData("ElbowMid", new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_MID));
     SmartDashboard.putData("ElbowHigh", new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_HIGH));
 
+    // Extension subsytem tests
+    SmartDashboard.putData("ElbowStow", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_STOW));
+    SmartDashboard.putData("ElbowLow", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_LOW));
+    SmartDashboard.putData("ElbowMid", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_MID));
+    SmartDashboard.putData("ElbowHigh", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_HIGH));
+
     // Wrist subsytem tests
     SmartDashboard.putData("WristStow", new WristMoveToAngle(m_wrist, WristAngle.WRIST_STOW));
     SmartDashboard.putData("WristLow", new WristMoveToAngle(m_wrist, WristAngle.WRIST_LOW));
     SmartDashboard.putData("WristMid", new WristMoveToAngle(m_wrist, WristAngle.WRIST_MID));
     SmartDashboard.putData("WristHigh", new WristMoveToAngle(m_wrist, WristAngle.WRIST_HIGH));
 
-    // Extension subsystem tests
-
     // Gripper subsystem test
     SmartDashboard.putData("GripperStop", new GripperRun(m_gripper, GRMode.GR_STOP));
     SmartDashboard.putData("GripperAcquire", new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
     SmartDashboard.putData("GripperHold", new GripperRun(m_gripper, GRMode.GR_HOLD));
     SmartDashboard.putData("GripperExpel", new GripperRun(m_gripper, GRMode.GR_EXPEL));
+
+    // Arm group tests
+    SmartDashboard.putData("ArmSetHeightStow", new ArmSetHeightStow(m_elbow, m_extension, m_wrist));
+    SmartDashboard.putData("ArmSetHeightLow", new ArmSetHeightScoreLow(m_elbow, m_extension, m_wrist));
+    SmartDashboard.putData("ArmSetHeightMid", new ArmSetHeightScoreMid(m_elbow, m_extension, m_wrist));
+    SmartDashboard.putData("ArmSetHeightHigh", new ArmSetHeightScoreHigh(m_elbow, m_extension, m_wrist));
 
     // LED (CANdle) test
     SmartDashboard.putData("LEDSet", new LEDSet(m_led, LEDColor.LEDCOLOR_DASH));

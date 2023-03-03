@@ -26,7 +26,7 @@ public class Gripper extends SubsystemBase
   private final WPI_TalonSRX              m_gripper             = new WPI_TalonSRX(Ports.kCANID_Gripper);
 
   private boolean                         m_gripperValid;                // Health indicator for gripper Talon
-  private boolean                         m_gripperDebug        = false; // Enable/disable dashboard and logging updates
+  private boolean                         m_gripperDebug        = true; // Enable/disable dashboard and logging updates
 
   //Devices and simulation objs
   private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true,
