@@ -239,6 +239,11 @@ public class Elbow extends SubsystemBase
     return degrees > m_elbowMinAngle && degrees < m_elbowMaxAngle;
   }
 
+  public double getAngle( )
+  {
+    return m_elbowTargetDegrees;
+  }
+
   private void elbowTalonInitialize(WPI_TalonFX motor, boolean inverted)
   {
     motor.setInverted(inverted);

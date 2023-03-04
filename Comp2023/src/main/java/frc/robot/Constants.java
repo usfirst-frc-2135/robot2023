@@ -145,6 +145,7 @@ public class Constants
     public static final double  kElbowDegreesPerCount   = 360 / Falcon500.kEncoderCPR / kElbowGearRatio;
     public static final double  kForearmLengthMeters    = 1.22;   // Sim value: 48 inches
     public static final double  kForearmMassKg          = 6.0;    // Sim value: 13.2 lbs 
+    public static final double  kElbowMinDriveAngle     = 20;     // how far out arm can stick before drive is slowed down
     public static final boolean kInvertMotor            = true;   // Motor direction for positive input
 
     public static final double  kElbowAngleMin          = -3.0;   // Elbow minimum allowable degrees
@@ -492,7 +493,9 @@ public class Constants
 
     /* Swerve Profiling Values */
     public static final double                                       maxSpeed                    = 4.5; // meters per second
-    public static final double                                       maxAngularVelocity          = 10.0;
+    public static final double                                       maxSpeedArmRaised           = 2.25; // meters per second
+    public static final double                                       maxAngularVelocity          = 6.0; //orginially 10.0
+    public static final double                                       maxAngularVelocityArmRaised = 4.0; //orginially 5.0
 
     /* Neutral Modes */
     public static final NeutralMode                                  angleNeutralMode            = NeutralMode.Coast;
@@ -541,7 +544,7 @@ public class Constants
     /* Back Left Module - Module 2 */
     public static final class Mod2
     {
-      public static final double epsilonAngleOffset = 227.549;
+      public static final double epsilonAngleOffset = 137.988;
       public static final double compAngleOffset    = 97.471;
 
       public static SwerveModuleConstants SwerveModuleConstants( )

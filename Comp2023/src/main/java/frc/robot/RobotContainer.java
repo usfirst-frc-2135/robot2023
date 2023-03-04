@@ -293,7 +293,7 @@ public class RobotContainer
    */
   private void initDefaultCommands( )
   {
-    m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_driverPad));
+    m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_elbow, m_driverPad));
     m_elbow.setDefaultCommand(new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_NOCHANGE));
     m_extension.setDefaultCommand(new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_NOCHANGE));
     m_wrist.setDefaultCommand(new WristMoveToAngle(m_wrist, WristAngle.WRIST_NOCHANGE));
