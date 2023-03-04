@@ -5,13 +5,13 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.GRConsts;
 import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.Ports;
@@ -25,7 +25,8 @@ public class Gripper extends SubsystemBase
   // Member objects
   private final WPI_TalonSRX              m_gripper             = new WPI_TalonSRX(Ports.kCANID_Gripper);
 
-  private boolean                         m_gripperValid;  // Health indicator for gripper Talon 
+  private boolean                         m_gripperValid;                // Health indicator for gripper Talon
+  private boolean                         m_gripperDebug        = true; // Enable/disable dashboard and logging updates
 
   //Devices and simulation objs
   private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true,
@@ -50,8 +51,10 @@ public class Gripper extends SubsystemBase
   public void periodic( )
   {
     // This method will be called once per scheduler run
-    if (m_gripper.getStatorCurrent( ) != 0)
-      DataLogManager.log("Gripper Current: " + m_gripper.getStatorCurrent( ));
+    double currentDraw = m_gripper.getStatorCurrent( );
+
+    if (m_gripperDebug && (currentDraw >= Constants.kMinCurrent))
+      DataLogManager.log(String.format("%s: current: %.1f", getSubsystem( ), m_gripper.getStatorCurrent( )));
   }
 
   @Override
@@ -64,7 +67,7 @@ public class Gripper extends SubsystemBase
 
   public void initialize( )
   {
-    DataLogManager.log(getSubsystem( ) + ": subsystem initialized!");
+    DataLogManager.log(getSubsystem( ) + ": Subsystem initialized!");
     setGripperSpeed(GRMode.GR_STOP);
   }
 
@@ -114,7 +117,7 @@ public class Gripper extends SubsystemBase
         break;
     }
 
-    DataLogManager.log(getSubsystem( ) + ": Set As - " + strName);
+    DataLogManager.log(getSubsystem( ) + ": Mode is now - " + strName);
     m_gripper.set(output);
   }
 }

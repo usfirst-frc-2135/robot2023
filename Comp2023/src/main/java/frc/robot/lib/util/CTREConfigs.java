@@ -64,6 +64,16 @@ public final class CTREConfigs
     return config;
   }
 
+  public static CANCoderConfiguration extensionCancoderConfig( )
+  {
+    CANCoderConfiguration config = new CANCoderConfiguration( );
+    config.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
+    config.sensorDirection = Constants.EXConsts.kInvertCANCoder;
+    config.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
+    config.sensorTimeBase = SensorTimeBase.PerSecond;
+    return config;
+  }
+
   public static CANCoderConfiguration wristCancoderConfig( )
   {
     CANCoderConfiguration config = new CANCoderConfiguration( );
