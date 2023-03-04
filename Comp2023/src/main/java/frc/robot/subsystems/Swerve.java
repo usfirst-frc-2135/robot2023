@@ -78,7 +78,7 @@ public class Swerve extends SubsystemBase
   private boolean                  m_locked            = false;
 
   // Path following
-  private int                      m_pathDebug         = 0;    // Debug flag to disable extra ramsete logging calls
+  private int                      m_pathDebug         = 1;    // Debug flag to disable extra ramsete logging calls
 
   // Limelight drive
   private double                   m_turnConstant      = SWConsts.kTurnConstant;
@@ -535,7 +535,7 @@ public class Swerve extends SubsystemBase
     {
       drivevalue = 0;
     }
-    driveStop(true);
+    drive(new Translation2d(drivevalue, 0), 0.0, false, true);
     //DataLogManager.log(String.format("Robot pitch: %.1f degrees - Robot power applied to motors: %.1f m/s", pitch, drivevalue));
   }
 

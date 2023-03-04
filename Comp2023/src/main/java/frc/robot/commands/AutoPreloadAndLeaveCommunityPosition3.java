@@ -16,42 +16,38 @@ import frc.robot.subsystems.Wrist;
 /**
  *
  */
-public class AutoPreloadAndEngageChargeStation extends SequentialCommandGroup
+public class AutoPreloadAndLeaveCommunityPosition3 extends SequentialCommandGroup
 {
-  public AutoPreloadAndEngageChargeStation(Swerve swerve, Gripper gripper, Elbow elbow, Wrist wrist)
+  public AutoPreloadAndLeaveCommunityPosition3(Swerve swerve, Gripper gripper, Elbow elbow, Wrist wrist)
   {
-    setName("AutoPreloadAndLeaveCommunity");
+    setName("AutoPreloadAndLeaveCommunityPosition3");
 
     addCommands(
         // Add Commands here:
 
         // @formatter:off
-        new PrintCommand("AUTO PATH SEQUENCE: Run first path"),
-        new PrintCommand("AUTO: Move Arm for Preload"),        
+        new PrintCommand("AUTO: Score Preload"),        
         new ParallelDeadlineGroup(
-            new ArmSetHeightScoreHigh(elbow, wrist)
+            new ArmSetHeightScoreHigh(elbow, wrist),
+            new GripperRun(gripper, GRConsts.GRMode.GR_EXPEL).withTimeout(1)
         ),
-        new PrintCommand("AUTO: Gripper Score"),
+        new PrintCommand("AUTO: Stop Preload"),
         new ParallelDeadlineGroup(
-          new GripperRun(gripper, GRConsts.GRMode.GR_EXPEL).withTimeout(1)
-        ),
-        new ParallelDeadlineGroup(
-          new GripperRun(gripper, GRConsts.GRMode.GR_STOP)
-          ),
-
-        new PrintCommand("AUTO: Move Arm Down"),
-        new ParallelDeadlineGroup(
+          new GripperRun(gripper, GRConsts.GRMode.GR_STOP),
           new ArmSetHeightStow(elbow, wrist)
         ),
-        new PrintCommand("AUTO: Run to ChargeStation"),
+        new ParallelDeadlineGroup(        
+        new PrintCommand("AUTO: Drive Off Community"),
         new ParallelDeadlineGroup(
-          new AutoChargeStation(swerve)
+          new WaitUntilCommand(swerve::driveWithPathFollowerIsFinished),
+          new AutoDrivePath ( swerve, "driveOffCommunity2", false)
+        )
         ),
-
         new PrintCommand("AUTO: Hold in place"),
         new AutoStop(swerve)
         // @formatter:on
     );
+
   }
 
   @Override

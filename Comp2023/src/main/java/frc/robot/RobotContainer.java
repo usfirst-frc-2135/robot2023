@@ -25,6 +25,9 @@ import frc.robot.commands.ArmSetHeightScoreMid;
 import frc.robot.commands.ArmSetHeightStow;
 import frc.robot.commands.AutoChargeStation;
 import frc.robot.commands.AutoDrivePath;
+import frc.robot.commands.AutoPreloadAndEngageChargeStation;
+import frc.robot.commands.AutoPreloadAndLeaveCommunity;
+import frc.robot.commands.AutoPreloadAndLeaveCommunityPosition3;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.DriveBalance;
 import frc.robot.commands.DriveLimelightPath;
@@ -123,6 +126,17 @@ public class RobotContainer
     SmartDashboard.putData("AutoDrivePathRight", new AutoDrivePath(m_swerve, "right1m", true));
     SmartDashboard.putData("AutoDrivePathForward2", new AutoDrivePath(m_swerve, "forward2m", true));
     SmartDashboard.putData("AutoDrivePathBackward2", new AutoDrivePath(m_swerve, "backward2m", true));
+
+    SmartDashboard.putData("ArmSetHeightStow", new ArmSetHeightStow(m_elbow, m_wrist));
+    SmartDashboard.putData("ArmSetHeightScoreLow", new ArmSetHeightScoreLow(m_elbow, m_wrist));
+    SmartDashboard.putData("ArmSetHeightScoreMid", new ArmSetHeightScoreMid(m_elbow, m_wrist));
+    SmartDashboard.putData("ArmSetHeightScoreHigh", new ArmSetHeightScoreHigh(m_elbow, m_wrist));
+    SmartDashboard.putData("AutoPreloadAndLeaveCommunity",
+        new AutoPreloadAndLeaveCommunity(m_swerve, m_gripper, m_elbow, m_wrist));
+    SmartDashboard.putData("AutoPreloadAndEngageChargeStation",
+        new AutoPreloadAndEngageChargeStation(m_swerve, m_gripper, m_elbow, m_wrist));
+    SmartDashboard.putData("AutoPreloadAndLeaveCommunityPosition3",
+        new AutoPreloadAndLeaveCommunityPosition3(m_swerve, m_gripper, m_elbow, m_wrist));
 
     SmartDashboard.putData("LEDSet", new LEDSet(m_led, LEDColor.LEDCOLOR_DASH));
 
@@ -291,9 +305,13 @@ public class RobotContainer
     // Autonomous Chooser
     m_chooser.addOption("1 - AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveOffCommunity", true));
     m_chooser.addOption("2 - AutoDockOnChargeStation", new AutoChargeStation(m_swerve));
-    // m_chooser.addOption("3 - AutoPreloadAndLeaveCommunity", new AutoPreloadAndLeaveCommunity(m_swerve));
-    // m_chooser.addOption("4 - AutoPreloadAndEngageChargeStation", new AutoPreloadAndEngageChargeStation(m_swerve));
-    // m_chooser.addOption("5 - AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve));
+    m_chooser.addOption("3 - AutoPreloadAndLeaveCommunity",
+        new AutoPreloadAndLeaveCommunity(m_swerve, m_gripper, m_elbow, m_wrist));
+    m_chooser.addOption("4 - AutoPreloadAndEngageChargeStation",
+        new AutoPreloadAndEngageChargeStation(m_swerve, m_gripper, m_elbow, m_wrist));
+    m_chooser.addOption("5 - AutoPreloadAndEngageChargeStationPosition3",
+        new AutoPreloadAndLeaveCommunityPosition3(m_swerve, m_gripper, m_elbow, m_wrist));
+    // m_chooser.addOption("6 - AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve));
     m_chooser.setDefaultOption("0 - AutoStop", new AutoStop(m_swerve));
 
     // Configure autonomous sendable chooser
