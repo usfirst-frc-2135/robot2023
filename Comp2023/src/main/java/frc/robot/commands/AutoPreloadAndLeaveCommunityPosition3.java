@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.Constants.GRConsts;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
 import frc.robot.subsystems.Gripper;
@@ -27,24 +26,18 @@ public class AutoPreloadAndLeaveCommunityPosition3 extends SequentialCommandGrou
         // Add Commands here:
 
         // @formatter:off
-        new PrintCommand("AUTO: Score Preload"),        
+        new PrintCommand(getSubsystem() + ": AUTO: Score Preload"),        
         new ParallelDeadlineGroup(
-            new ArmSetHeightScoreHigh(elbow, extension, wrist),
-            new GripperRun(gripper, GRConsts.GRMode.GR_EXPEL).withTimeout(1)
-        ),
-        new PrintCommand("AUTO: Stop Preload"),
-        new ParallelDeadlineGroup(
-          new GripperRun(gripper, GRConsts.GRMode.GR_STOP),
-          new ArmSetHeightStow(elbow, extension, wrist)
+            new AutoPreloadHigh(elbow, extension, wrist, gripper)
         ),
         new ParallelDeadlineGroup(        
-        new PrintCommand("AUTO: Drive Off Community"),
+        new PrintCommand(getSubsystem() +": AUTO: Drive Off Community"),
         new ParallelDeadlineGroup(
           new WaitUntilCommand(swerve::driveWithPathFollowerIsFinished),
           new AutoDrivePath ( swerve, "driveOffCommunity2", false)
         )
         ),
-        new PrintCommand("AUTO: Hold in place"),
+        new PrintCommand(getSubsystem() + ": AUTO: Hold in place"),
         new AutoStop(swerve)
         // @formatter:on
     );
