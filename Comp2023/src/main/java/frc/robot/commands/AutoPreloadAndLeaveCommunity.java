@@ -19,7 +19,7 @@ import frc.robot.subsystems.Wrist;
  */
 public class AutoPreloadAndLeaveCommunity extends SequentialCommandGroup
 {
-  public AutoPreloadAndLeaveCommunity(Swerve swerve, Gripper gripper, Elbow elbow, Wrist wrist, Extension extension)
+  public AutoPreloadAndLeaveCommunity(Swerve swerve, Elbow elbow, Extension extension, Wrist wrist, Gripper gripper)
   {
     setName("AutoPreloadAndLeaveCommunity");
 

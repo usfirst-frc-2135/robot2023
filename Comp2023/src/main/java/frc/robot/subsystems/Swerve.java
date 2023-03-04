@@ -447,6 +447,7 @@ public class Swerve extends SubsystemBase
       DataLogManager.log(String.format(
           "%s: PATH time: %.3f curXYR: %.2f %.2f %.2f targXYR %.2f %.2f %.1f chasXYO: %.1f %.1f %.1f targVel: %.1f %.1f %.1f %.1f curVel: %.2f %.2f %.2f %.2f errXYR: %.2f %.2f %.2f",
           // @formatter:off
+          getSubsystem(),
           m_trajTimer.get( ),
           currentTrajX,
           currentTrajY,
@@ -583,13 +584,13 @@ public class Swerve extends SubsystemBase
     if (Math.abs(pitch) > SWConsts.kDriveBalancedAngle)
     {
       motorOutput = SWConsts.kDriveBalanceKp * pitch;
-      drive(new Translation2d(motorOutput, 0), 0, true, true);
+      drive(new Translation2d(motorOutput, 0), 0, false, true);
     }
     else
     {
       driveStop(true);
     }
-    //DataLogManager.log(String.format("Robot pitch: %.1f degrees - Robot power applied to motors: %.1f m/s", pitch, drivevalue));
+    //DataLogManager.log(String.format(getSubsystem() + ": Robot pitch: %.1f degrees - Robot power applied to motors: %.1f m/s", pitch, drivevalue));
   }
 
   //

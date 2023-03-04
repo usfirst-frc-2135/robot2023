@@ -144,13 +144,14 @@ public class RobotContainer
     SmartDashboard.putData("ArmSetHeightScoreMid", new ArmSetHeightScoreMid(m_elbow, m_extension, m_wrist));
     SmartDashboard.putData("ArmSetHeightScoreHigh", new ArmSetHeightScoreHigh(m_elbow, m_extension, m_wrist));
     SmartDashboard.putData("AutoPreloadAndLeaveCommunity",
-        new AutoPreloadAndLeaveCommunity(m_swerve, m_gripper, m_elbow, m_wrist, m_extension));
+        new AutoPreloadAndLeaveCommunity(m_swerve, m_elbow, m_extension, m_wrist, m_gripper));
     SmartDashboard.putData("AutoPreloadAndEngageChargeStation",
-        new AutoPreloadAndEngageChargeStation(m_swerve, m_gripper, m_elbow, m_wrist, m_extension));
+        new AutoPreloadAndEngageChargeStation(m_swerve, m_elbow, m_extension, m_wrist, m_gripper));
     SmartDashboard.putData("AutoPreloadAndLeaveCommunityPosition3",
-        new AutoPreloadAndLeaveCommunityPosition3(m_swerve, m_gripper, m_elbow, m_wrist, m_extension));
+        new AutoPreloadAndLeaveCommunityPosition3(m_swerve, m_elbow, m_extension, m_wrist, m_gripper));
 
     SmartDashboard.putData("LEDSet", new LEDSet(m_led, LEDColor.LEDCOLOR_DASH));
+    SmartDashboard.putData("ResetOdometryToLimelight", new ResetOdometryToLimelight(m_swerve, m_vision, 0));
 
     SmartDashboard.putData("DriveLLLeft", new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_LEFT));
     SmartDashboard.putData("DriveLLMiddle", new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_MIDDLE));
@@ -337,11 +338,11 @@ public class RobotContainer
     m_autoChooser.addOption("1 - AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveOffCommunity", true));
     m_autoChooser.addOption("2 - AutoDockOnChargeStation", new AutoChargeStation(m_swerve));
     m_autoChooser.addOption("3 - AutoPreloadAndLeaveCommunity",
-        new AutoPreloadAndLeaveCommunity(m_swerve, m_gripper, m_elbow, m_wrist, m_extension));
+        new AutoPreloadAndLeaveCommunity(m_swerve, m_elbow, m_extension, m_wrist, m_gripper));
     m_autoChooser.addOption("4 - AutoPreloadAndEngageChargeStation",
-        new AutoPreloadAndEngageChargeStation(m_swerve, m_gripper, m_elbow, m_wrist, m_extension));
+        new AutoPreloadAndEngageChargeStation(m_swerve, m_elbow, m_extension, m_wrist, m_gripper));
     m_autoChooser.addOption("5 - AutoPreloadAndEngageChargeStationPosition3",
-        new AutoPreloadAndLeaveCommunityPosition3(m_swerve, m_gripper, m_elbow, m_wrist, m_extension));
+        new AutoPreloadAndLeaveCommunityPosition3(m_swerve, m_elbow, m_extension, m_wrist, m_gripper));
     // m_chooser.addOption("6 - AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve));
     m_autoChooser.setDefaultOption("0 - AutoStop", new AutoStop(m_swerve));
 
