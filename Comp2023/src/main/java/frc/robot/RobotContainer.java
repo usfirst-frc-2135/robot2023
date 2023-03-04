@@ -41,6 +41,7 @@ import frc.robot.commands.ElbowRun;
 import frc.robot.commands.ExtensionMoveToLength;
 import frc.robot.commands.GripperRun;
 import frc.robot.commands.LEDSet;
+import frc.robot.commands.ManualMode;
 import frc.robot.commands.ResetGyro;
 import frc.robot.commands.ResetOdometryToLimelight;
 import frc.robot.commands.WristMoveToAngle;
@@ -301,8 +302,8 @@ public class RobotContainer
     operLeftBumper.onTrue(new Dummy("left bumper"));
     operRightBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
     operRightBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
-    operBack.onTrue(new ElbowRun(m_elbow, m_operatorPad)); // aka View
-    operStart.onTrue(new WristRun(m_wrist, m_operatorPad)); // aka Menu
+    operBack.onTrue(new ManualMode(m_elbow, m_extension, m_wrist, m_driverPad)); // aka View
+    operStart.onTrue(new Dummy("Start")); // aka Menu
     //
     // Operator - POV buttons
     operUp.onTrue(new Dummy("POV up"));
@@ -311,7 +312,7 @@ public class RobotContainer
     operLeft.onTrue(new Dummy("POV left"));
     //
     // Operator Left/Right Trigger
-    operLeftTrigger.onTrue(new Dummy("right trigger"));
+    operLeftTrigger.onTrue(new Dummy("left trigger"));
     operRightTrigger.onTrue(new GripperRun(m_gripper, GRMode.GR_EXPEL));
     operRightTrigger.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
   }
