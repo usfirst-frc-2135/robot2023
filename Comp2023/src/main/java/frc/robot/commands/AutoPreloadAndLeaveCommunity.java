@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.GRConsts;
 import frc.robot.subsystems.Elbow;
+import frc.robot.subsystems.Extension;
 import frc.robot.subsystems.Gripper;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Wrist;
@@ -18,7 +19,7 @@ import frc.robot.subsystems.Wrist;
  */
 public class AutoPreloadAndLeaveCommunity extends SequentialCommandGroup
 {
-  public AutoPreloadAndLeaveCommunity(Swerve swerve, Gripper gripper, Elbow elbow, Wrist wrist)
+  public AutoPreloadAndLeaveCommunity(Swerve swerve, Gripper gripper, Elbow elbow, Wrist wrist, Extension extension)
   {
     setName("AutoPreloadAndLeaveCommunity");
 
@@ -28,13 +29,13 @@ public class AutoPreloadAndLeaveCommunity extends SequentialCommandGroup
         // @formatter:off
         new PrintCommand("AUTO: Score Preload"),        
         new ParallelDeadlineGroup(
-            new ArmSetHeightScoreHigh(elbow, wrist),
+            new ArmSetHeightScoreHigh(elbow, extension, wrist),
             new GripperRun(gripper, GRConsts.GRMode.GR_EXPEL).withTimeout(1)
         ),
         new PrintCommand("AUTO: Stop Preload"),
         new ParallelDeadlineGroup(
           new GripperRun(gripper, GRConsts.GRMode.GR_STOP),
-          new ArmSetHeightStow(elbow, wrist)
+          new ArmSetHeightStow(elbow, extension, wrist)
         ),
         new ParallelDeadlineGroup(        
         new PrintCommand("AUTO: Drive Off Community"),
