@@ -121,6 +121,8 @@ public class RobotContainer
     SmartDashboard.putData("AutoStop", new AutoStop(m_swerve));
     SmartDashboard.putData("AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveOffCommunity", true));
     SmartDashboard.putData("AutoEngageChargeStation", new AutoEngageChargeStation(m_swerve));
+    SmartDashboard.putData("AutoChargeStation", new AutoChargeStation(m_swerve));
+    SmartDashboard.putData("driveOffCommunityCopy", new AutoDrivePath(m_swerve, "driveOffCommunityCopy", true));
     // SmartDashboard.putData("AutoPreloadAndLeaveCommunity", new AutoPreloadAndLeaveCommunity(m_swerve));
     // SmartDashboard.putData("AutoPreloadAndEngageChargeStation", new AutoPreloadAndEngageChargeStation(m_swerve));
     // SmartDashboard.putData("AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve));
@@ -144,6 +146,7 @@ public class RobotContainer
     SmartDashboard.putData("ArmSetHeightScoreLow", new ArmSetHeightScoreLow(m_elbow, m_extension, m_wrist));
     SmartDashboard.putData("ArmSetHeightScoreMid", new ArmSetHeightScoreMid(m_elbow, m_extension, m_wrist));
     SmartDashboard.putData("ArmSetHeightScoreHigh", new ArmSetHeightScoreHigh(m_elbow, m_extension, m_wrist));
+
     SmartDashboard.putData("AutoPreloadAndLeaveCommunity",
         new AutoPreloadAndLeaveCommunity(m_swerve, m_elbow, m_extension, m_wrist, m_gripper));
     SmartDashboard.putData("AutoPreloadAndEngageChargeStation",
