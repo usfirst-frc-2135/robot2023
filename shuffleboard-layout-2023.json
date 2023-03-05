@@ -5,11 +5,11 @@
       "autoPopulate": false,
       "autoPopulatePrefix": "",
       "widgetPane": {
-        "gridSize": 36.0,
+        "gridSize": 32.0,
         "showGrid": true,
         "hgap": 16.0,
         "vgap": 16.0,
-        "titleType": 0,
+        "titleType": 1,
         "tiles": {
           "14,0": {
             "size": [
@@ -383,11 +383,11 @@
       "autoPopulate": false,
       "autoPopulatePrefix": "",
       "widgetPane": {
-        "gridSize": 36.0,
+        "gridSize": 32.0,
         "showGrid": true,
         "hgap": 16.0,
         "vgap": 16.0,
-        "titleType": 0,
+        "titleType": 1,
         "tiles": {
           "10,6": {
             "size": [
@@ -702,12 +702,318 @@
       "autoPopulate": false,
       "autoPopulatePrefix": "",
       "widgetPane": {
-        "gridSize": 36.0,
+        "gridSize": 32.0,
         "showGrid": true,
         "hgap": 16.0,
         "vgap": 16.0,
-        "titleType": 0,
-        "tiles": {}
+        "titleType": 1,
+        "tiles": {
+          "2,2": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_acceleration",
+              "_title": "SmartDashboard/EX_acceleration",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "6,0": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/EX_calibrated",
+              "_title": "SmartDashboard/EX_calibrated",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "4,0": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_curCounts",
+              "_title": "SmartDashboard/EX_curCounts",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "4,2": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_curInches",
+              "_title": "SmartDashboard/EX_curInches",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "4,4": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_curVelocity",
+              "_title": "SmartDashboard/EX_curVelocity",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "4,6": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_maxVelocity",
+              "_title": "SmartDashboard/EX_maxVelocity",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "6,4": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/EX_normalMode",
+              "_title": "SmartDashboard/EX_normalMode",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "0,6": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_pidKd",
+              "_title": "SmartDashboard/EX_pidKd",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "0,0": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_pidKf",
+              "_title": "SmartDashboard/EX_pidKf",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "0,4": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_pidKi",
+              "_title": "SmartDashboard/EX_pidKi",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "2,4": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_sCurveStrength",
+              "_title": "SmartDashboard/EX_sCurveStrength",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "8,6": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_scoreLengthHigh",
+              "_title": "SmartDashboard/EX_scoreLengthHigh",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "8,2": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_scoreLengthLow",
+              "_title": "SmartDashboard/EX_scoreLengthLow",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "8,0": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_stowlength",
+              "_title": "SmartDashboard/EX_stowlength",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "6,2": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_targetInches",
+              "_title": "SmartDashboard/EX_targetInches",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "2,0": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_velocity",
+              "_title": "SmartDashboard/EX_velocity",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "0,2": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_pidKp",
+              "_title": "SmartDashboard/EX_pidKp",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "8,4": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_scoreLengthMid",
+              "_title": "SmartDashboard/EX_scoreLengthMid",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "13,0": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/HL_validEX",
+              "_title": "SmartDashboard/HL_validEX",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
+          },
+          "10,6": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ExtensionHigh",
+              "_title": "SmartDashboard/ExtensionHigh",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "10,2": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ExtensionLow",
+              "_title": "SmartDashboard/ExtensionLow",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "10,4": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ExtensionMid",
+              "_title": "SmartDashboard/ExtensionMid",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "10,0": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ExtensionStow",
+              "_title": "SmartDashboard/ExtensionStow",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          }
+        }
       }
     },
     {
@@ -715,11 +1021,11 @@
       "autoPopulate": false,
       "autoPopulatePrefix": "",
       "widgetPane": {
-        "gridSize": 36.0,
+        "gridSize": 32.0,
         "showGrid": true,
         "hgap": 16.0,
         "vgap": 16.0,
-        "titleType": 0,
+        "titleType": 1,
         "tiles": {
           "10,6": {
             "size": [
@@ -1047,11 +1353,11 @@
       "autoPopulate": false,
       "autoPopulatePrefix": "",
       "widgetPane": {
-        "gridSize": 36.0,
+        "gridSize": 32.0,
         "showGrid": true,
         "hgap": 16.0,
         "vgap": 16.0,
-        "titleType": 0,
+        "titleType": 1,
         "tiles": {
           "10,2": {
             "size": [
@@ -1128,11 +1434,11 @@
       "autoPopulate": false,
       "autoPopulatePrefix": "",
       "widgetPane": {
-        "gridSize": 36.0,
+        "gridSize": 32.0,
         "showGrid": true,
         "hgap": 16.0,
         "vgap": 16.0,
-        "titleType": 0,
+        "titleType": 1,
         "tiles": {
           "2,2": {
             "size": [
@@ -1412,11 +1718,11 @@
       "autoPopulate": false,
       "autoPopulatePrefix": "",
       "widgetPane": {
-        "gridSize": 36.0,
+        "gridSize": 32.0,
         "showGrid": true,
         "hgap": 16.0,
         "vgap": 16.0,
-        "titleType": 0,
+        "titleType": 1,
         "tiles": {
           "6,0": {
             "size": [
@@ -1574,7 +1880,7 @@
               "_showGlyph": false
             }
           },
-          "9,0": {
+          "12,0": {
             "size": [
               10,
               7
@@ -1587,8 +1893,59 @@
               "_showGlyph": false,
               "Game/Game": "A2023_Charged_Up",
               "Visuals/Robot Icon Size": 30.0,
-              "Visuals/Show Outside Circles": false,
-              "Colors/trajectory": "#FFFFFFFF"
+              "Visuals/Show Outside Circles": false
+            }
+          },
+          "9,2": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ArmSetHeightLow",
+              "_title": "SmartDashboard/ArmSetHeightLow",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "9,6": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ArmSetHeightHigh",
+              "_title": "SmartDashboard/ArmSetHeightHigh",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "9,4": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ArmSetHeightMid",
+              "_title": "SmartDashboard/ArmSetHeightMid",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "9,0": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ArmSetHeightStow",
+              "_title": "SmartDashboard/ArmSetHeightStow",
+              "_glyph": 148,
+              "_showGlyph": false
             }
           }
         }
@@ -1599,11 +1956,11 @@
       "autoPopulate": false,
       "autoPopulatePrefix": "",
       "widgetPane": {
-        "gridSize": 36.0,
+        "gridSize": 32.0,
         "showGrid": true,
         "hgap": 16.0,
         "vgap": 16.0,
-        "titleType": 0,
+        "titleType": 1,
         "tiles": {
           "3,0": {
             "size": [
@@ -1834,11 +2191,11 @@
       "autoPopulate": false,
       "autoPopulatePrefix": "",
       "widgetPane": {
-        "gridSize": 36.0,
+        "gridSize": 32.0,
         "showGrid": true,
         "hgap": 16.0,
         "vgap": 16.0,
-        "titleType": 0,
+        "titleType": 1,
         "tiles": {
           "12,0": {
             "size": [
@@ -1853,8 +2210,7 @@
               "_showGlyph": false,
               "Game/Game": "A2023_Charged_Up",
               "Visuals/Robot Icon Size": 50.0,
-              "Visuals/Show Outside Circles": false,
-              "Colors/trajectory": "#FFFFFFFF"
+              "Visuals/Show Outside Circles": false
             }
           }
         }
@@ -1864,7 +2220,7 @@
   "windowGeometry": {
     "x": 0.0,
     "y": 25.0,
-    "width": 1061.0,
-    "height": 508.0
+    "width": 1077.0,
+    "height": 483.0
   }
 }

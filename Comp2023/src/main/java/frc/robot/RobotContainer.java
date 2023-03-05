@@ -156,10 +156,10 @@ public class RobotContainer
     SmartDashboard.putData("ElbowHigh", new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_HIGH));
 
     // Extension subsytem tests
-    SmartDashboard.putData("ElbowStow", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_STOW));
-    SmartDashboard.putData("ElbowLow", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_LOW));
-    SmartDashboard.putData("ElbowMid", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_MID));
-    SmartDashboard.putData("ElbowHigh", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_HIGH));
+    SmartDashboard.putData("ExtensionStow", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_STOW));
+    SmartDashboard.putData("ExtensionLow", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_LOW));
+    SmartDashboard.putData("ExtensionMid", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_MID));
+    SmartDashboard.putData("ExtensionHigh", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_HIGH));
 
     // Wrist subsytem tests
     SmartDashboard.putData("WristStow", new WristMoveToAngle(m_wrist, WristAngle.WRIST_STOW));
