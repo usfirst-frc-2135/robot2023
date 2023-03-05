@@ -151,6 +151,7 @@ public class Constants
     public static final double  kElbowAngleMin          = -3.0;   // Elbow minimum allowable degrees
     public static final double  kElbowAngleMax          = 110.0;  // Elbow maximum allowable degrees
     public static final double  kElbowAngleStow         = 0.0;    // TODO: FIGURE IT OUT
+    public static final double  kElbowAngleIdle         = 0.0;    // TODO: FIGURE IT OUT
     public static final double  kElbowAngleScoreLow     = 20.0;   // From Mech Design (floor, feet art 5" high)
     public static final double  kElbowAngleScoreMid     = 91.0;   // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube)
     public static final double  kElbowAngleScoreHigh    = 103.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube)
@@ -189,6 +190,7 @@ public class Constants
     {
       ELBOW_NOCHANGE,     // No change in elbow angle--maintain current position
       ELBOW_STOW,         // Move elbow to stow angle
+      ELBOW_IDLE,         // Move elbow to idle andgle
       ELBOW_LOW,          // Move elbow to low-scoring angle
       ELBOW_MID,          // Move elbow to shelf Angle; slightly higher than mid-scoring angle so this is used for both
       ELBOW_HIGH,         // Move elbow to high-scoring angle
@@ -220,6 +222,7 @@ public class Constants
     public static final double  kExtensionLengthMin         = -3.0;   // Extension minimum allowable length
     public static final double  kExtensionLengthMax         = 110.0;  // Extension maximum allowable length
     public static final double  kExtensionLengthStow        = 0.0;    // TODO: FIGURE IT OUT
+    public static final double  kExtensionLengthIdle        = 0.0;    // TODO: FIGURE IT OUT
     public static final double  kExtensionLengthScoreLow    = 20.0;   // From Mech Design (floor, feet art 5" high)
     public static final double  kExtensionLengthScoreMid    = 91.0;   // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube)
     public static final double  kExtensionLengthScoreHigh   = 103.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube)
@@ -258,6 +261,7 @@ public class Constants
     {
       EXTENSION_NOCHANGE,     // No change in extension length--maintain current position
       EXTENSION_STOW,         // Move extension to stow length
+      EXTENSION_IDLE,         // Move extension to idle length
       EXTENSION_LOW,          // Move extension to low-scoring length
       EXTENSION_MID,          // Move extension to shelf length
       EXTENSION_HIGH,         // Move extension to high-scoring length
@@ -288,6 +292,7 @@ public class Constants
     public static final double  kWristMinAngle          = -3.0;  // Wrist maximum allowable Angle
     public static final double  kWristMaxAngle          = 110.0; // Wrist maximum allowable Angle
     public static final double  kWristAngleStow         = 0.0;   // TO-DO: FIGURE IT OUT
+    public static final double  kWristAngleIdle         = 0.0;   // TO-DO: FIGURE IT OUT
     public static final double  kWristAngleScoreLow     = 20.0;  // From Mech Design (floor, feet art 5" high)
     public static final double  kWristAngleScoreMid     = 91.0;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube)
     public static final double  kWristAngleScoreHigh    = 103.0; // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube)
@@ -326,6 +331,7 @@ public class Constants
     {
       WRIST_NOCHANGE,     // No change in Wrist Angle--maintain current position
       WRIST_STOW,         // Move wrist to stow position
+      WRIST_IDLE,         // Move wrist to stow position
       WRIST_LOW,          // Move wrist to low-scoring Angle
       WRIST_MID,          // Move wrist to shelf Angle; slightly higher than mid-scoring Angle so this is used for both
       WRIST_HIGH,         // Move wrist to high-scoring Angle

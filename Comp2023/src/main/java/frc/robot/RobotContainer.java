@@ -20,6 +20,7 @@ import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.VIConsts.VIGoalDirection;
 import frc.robot.Constants.WRConsts.WristAngle;
+import frc.robot.commands.ArmSetHeightIdle;
 import frc.robot.commands.ArmSetHeightScoreHigh;
 import frc.robot.commands.ArmSetHeightScoreLow;
 import frc.robot.commands.ArmSetHeightScoreMid;
@@ -213,7 +214,7 @@ public class RobotContainer
     // @formatter:on
 
     // Driver - A, B, X, Y
-    driverA.onTrue(new ArmSetHeightStow(m_elbow, m_extension, m_wrist));
+    driverA.onTrue(new ArmSetHeightIdle(m_elbow, m_extension, m_wrist));
     driverB.onTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_RIGHT));
     driverX.onTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_LEFT));
     driverY.onTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_MIDDLE));

@@ -81,6 +81,7 @@ public class Wrist extends SubsystemBase
   private double                          m_arbitraryFF         = WRConsts.kWristArbitraryFF;        // Arbitrary Feedfoward (elevators and arms))
 
   private double                          m_wristAngleStow      = WRConsts.kWristAngleStow;          // wrist Stow angle
+  private double                          m_wristAngleIdle      = WRConsts.kWristAngleIdle;          // wrist Idle angle  
   private double                          m_wristAngleLow       = WRConsts.kWristAngleScoreLow;      // low-peg scoring angle   
   private double                          m_wristAngleMid       = WRConsts.kWristAngleScoreMid;      // mid-peg scoring angle
   private double                          m_wristAngleHigh      = WRConsts.kWristAngleScoreHigh;     // high-peg scoring angle
@@ -181,10 +182,11 @@ public class Wrist extends SubsystemBase
     SmartDashboard.putNumber("WR_pidKi", m_pidKi);
     SmartDashboard.putNumber("WR_pidKd", m_pidKd);
 
-    SmartDashboard.putNumber("WR_stowangle", m_wristAngleStow);
-    SmartDashboard.putNumber("WR_scoreAngleLow", m_wristAngleLow);
-    SmartDashboard.putNumber("WR_scoreAngleMid", m_wristAngleMid);
-    SmartDashboard.putNumber("WR_scoreAngleHigh", m_wristAngleHigh);
+    SmartDashboard.putNumber("WR_stowAngle", m_wristAngleStow);
+    SmartDashboard.putNumber("WR_idleAngle", m_wristAngleIdle);
+    SmartDashboard.putNumber("WR_lowAngle", m_wristAngleLow);
+    SmartDashboard.putNumber("WR_midAngle", m_wristAngleMid);
+    SmartDashboard.putNumber("WR_highAngle", m_wristAngleHigh);
 
     SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
     SmartDashboard.putNumber("WR_targetDegrees", m_wristTargetDegrees);
@@ -363,10 +365,11 @@ public class Wrist extends SubsystemBase
       m_wrist.config_kI(SLOTINDEX, m_pidKi);
       m_wrist.config_kD(SLOTINDEX, m_pidKd);
 
-      m_wristAngleStow = SmartDashboard.getNumber("WR_stowangle", m_wristAngleStow);
-      m_wristAngleLow = SmartDashboard.getNumber("WR_lowScoreangle", m_wristAngleLow);
-      m_wristAngleMid = SmartDashboard.getNumber("WR_midScoreangle", m_wristAngleMid);
-      m_wristAngleHigh = SmartDashboard.getNumber("WR_highScoreangle", m_wristAngleHigh);
+      m_wristAngleStow = SmartDashboard.getNumber("WR_stowAngle", m_wristAngleStow);
+      m_wristAngleStow = SmartDashboard.getNumber("WR_idleAngle", m_wristAngleIdle);
+      m_wristAngleLow = SmartDashboard.getNumber("WR_lowAngle", m_wristAngleLow);
+      m_wristAngleMid = SmartDashboard.getNumber("WR_midAngle", m_wristAngleMid);
+      m_wristAngleHigh = SmartDashboard.getNumber("WR_highAngle", m_wristAngleHigh);
     }
 
     switch (angle) // Do not change from current level!
@@ -378,6 +381,9 @@ public class Wrist extends SubsystemBase
         break;
       case WRIST_STOW :
         m_wristTargetDegrees = m_wristAngleStow;
+        break;
+      case WRIST_IDLE :
+        m_wristTargetDegrees = m_wristAngleIdle;
         break;
       case WRIST_LOW :
         m_wristTargetDegrees = m_wristAngleLow;
