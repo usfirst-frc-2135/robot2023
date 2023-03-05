@@ -30,12 +30,10 @@ public class AutoPreloadAndLeaveCommunityPosition3 extends SequentialCommandGrou
         new ParallelDeadlineGroup(
             new AutoPreloadHigh(elbow, extension, wrist, gripper)
         ),
-        new ParallelDeadlineGroup(        
         new PrintCommand(getSubsystem() +": AUTO: Drive Off Community"),
         new ParallelDeadlineGroup(
           new WaitUntilCommand(swerve::driveWithPathFollowerIsFinished),
-          new AutoDrivePath ( swerve, "driveOffCommunity2", false)
-        )
+          new AutoDrivePath ( swerve, "driveOffCommunity2", true)
         ),
         new PrintCommand(getSubsystem() + ": AUTO: Hold in place"),
         new AutoStop(swerve)
