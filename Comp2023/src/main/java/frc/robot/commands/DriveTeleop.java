@@ -43,7 +43,9 @@ public class DriveTeleop extends CommandBase
   // Called when the command is initially scheduled.
   @Override
   public void initialize( )
-  {}
+  {
+    m_swerve.setAutoMode(false);
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
