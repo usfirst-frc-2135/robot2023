@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.StickyFaults;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.ctre.phoenix.sensors.PigeonIMU_Faults;
 
@@ -124,6 +125,77 @@ public class PhoenixUtil
 
     DataLogManager.log(classString + ": " + baseStr + "faults - " + ((faults.hasAnyFault( )) ? faults.toString( ) : "none"));
     DataLogManager.log(classString + ": " + baseStr + "sticky - " + ((sticky.hasAnyFault( )) ? sticky.toString( ) : "none"));
+  }
+
+  // CANCoder handlers
+
+  public ErrorCode checkCANCoderError(CANCoder canCoder, String message)
+  {
+    ErrorCode errorCode = canCoder.getLastError( );
+
+    if (errorCode != ErrorCode.OK)
+      DataLogManager
+          .log(classString + ": CANCoder ID " + canCoder.getDeviceID( ) + " error " + errorCode + " Message: " + message);
+
+    return errorCode;
+  }
+
+  public boolean canCoderInitialize(CANCoder canCoder, String ccName)
+  {
+    ErrorCode error = ErrorCode.OK;
+    int deviceID = 0;
+    int fwVersion = 0;
+    String baseStr = ccName + " ";
+    boolean canCoderValid = false;
+    boolean initialized = false;
+
+    // Display Talon firmware versions
+    deviceID = canCoder.getDeviceID( );
+    error = checkCANCoderError(canCoder, baseStr + "getDeviceID error");
+
+    Timer.delay(0.250);
+
+    if (error == ErrorCode.OK)
+    {
+      // This can take multiple attempts before ready
+      for (int i = 0; i < m_retries; i++)
+      {
+        fwVersion = canCoder.getFirmwareVersion( );
+        error = checkCANCoderError(canCoder, baseStr + "getFirmwareVersion error");
+
+        if (error == ErrorCode.OK)
+        {
+          if (fwVersion >= Falcon500.kTalonReqVersion)
+          {
+            canCoderValid = true;
+            break;
+          }
+          else
+            DataLogManager
+                .log(classString + ": CANCoder ID " + deviceID + " " + baseStr + "Incorrect FW version - " + (fwVersion / 256.0));
+        }
+
+        Timer.delay(0.100);
+      }
+    }
+
+    if (canCoderValid)
+    {
+      baseStr += "ver " + (fwVersion / 256.0) + " ";
+      error = canCoder.configFactoryDefault( );
+      if (error != ErrorCode.OK)
+        DataLogManager.log(classString + ": CANCoder ID " + deviceID + " error " + error + " " + baseStr
+            + " Message: configFactoryDefault error");
+      else
+        initialized = true;
+    }
+
+    if (canCoderValid && initialized)
+      DataLogManager.log(classString + ": CANCoder ID " + deviceID + " error " + error + " " + baseStr + "is INITIALIZED!");
+    else
+      DataLogManager.log(classString + ": CANCoder ID " + deviceID + " error " + error + " " + baseStr + "is UNRESPONSIVE!");
+
+    return canCoderValid && initialized;
   }
 
   // Pigeon IMU handlers

@@ -8,8 +8,10 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.ELConsts.ElbowAngle;
+import frc.robot.Constants.EXConsts.ExtensionLength;
 import frc.robot.Constants.WRConsts.WristAngle;
 import frc.robot.subsystems.Elbow;
+import frc.robot.subsystems.Extension;
 import frc.robot.subsystems.Wrist;
 
 /**
@@ -17,7 +19,7 @@ import frc.robot.subsystems.Wrist;
  */
 public class ArmSetHeightStow extends SequentialCommandGroup
 {
-  public ArmSetHeightStow(Elbow elbow, Wrist wrist)
+  public ArmSetHeightStow(Elbow elbow, Extension extension, Wrist wrist)
   {
     setName("ArmSetHeightStow");
 
@@ -30,7 +32,11 @@ public class ArmSetHeightStow extends SequentialCommandGroup
           new WaitUntilCommand(wrist::moveWristAngleIsFinished),
           new WristMoveToAngle(wrist, WristAngle.WRIST_STOW)
         ),
-        //TODO: RETRACT EXTENSION
+        new PrintCommand(getName() + ": Moving Extension"),
+        new ParallelDeadlineGroup(
+          new WaitUntilCommand(extension::moveExtensionLengthIsFinished),
+          new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_STOW)
+        ),
         new PrintCommand(getName() + ": Moving Elbow"),
         new ParallelDeadlineGroup(
           new WaitUntilCommand(elbow::moveElbowAngleIsFinished),

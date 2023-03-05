@@ -206,6 +206,79 @@ public class Constants
     public static final double kElbowArbitraryFF      = 0.070;  // Elbow motor output for arm at 90 degrees
   }
 
+  public static final class EXConsts
+  {
+    // Global settings
+
+    public static final double  kExtensionGearRatio         = 9.63;    // Gear reduction for extension
+    public static final double  kDrumDiameterInches         = 1.375;  // Drum diameter in inches
+    public static final double  kDrumCircumInches           = kDrumDiameterInches * Math.PI;            // Drum diameter in inches
+    public static final double  kRolloutRatio               = kDrumCircumInches / kExtensionGearRatio;  // inches per shaft rotation
+    public static final double  kInchesPerCount             = kRolloutRatio / Falcon500.kEncoderCPR;
+    public static final double  kExtensionInchesPerCount    = 360 / Falcon500.kEncoderCPR / kExtensionGearRatio;
+    // public static final double  kForearmLengthMeters        = 1.22;   // Sim value: 48 inches (no sim for extension)
+    // public static final double  kForearmMassKg              = 6.0;    // Sim value: 13.2 lbs 
+    public static final boolean kInvertMotor                = true;   // Motor direction for positive input
+
+    public static final double  kExtensionLengthMin         = -0.5;   // Extension minimum allowable length
+    public static final double  kExtensionLengthMax         = 22.0;   // Extension maximum allowable length
+    public static final double  kExtensionLengthStow        = 0.0;    // TODO: FIGURE IT OUT
+    public static final double  kExtensionLengthScoreLow    = 8.0;    // From Mech Design (floor, feet art 5" high)
+    public static final double  kExtensionLengthScoreMid    = 3.0;    // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube)
+    public static final double  kExtensionLengthScoreHigh   = 22.0;   // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube)
+    public static final double  kExtensionLengthSubstation  = 0.0;    // From Mech Design (3'1-38" above floor)
+
+    // Current limit settings - extension
+    public static final double  kSupplyCurrentLimit         = 15.0;  // Supply current limit (after trigger)
+    public static final double  kSupplyTriggerCurrent       = 15.0;  // Supply trigger current that will cause limiting
+    public static final double  kSupplyTriggerTime          = 0.001; // Supply time duration of trigger that will causing limiting
+    public static final double  kStatorCurrentLimit         = 15.0;  // Stator current limit (after trigger)
+    public static final double  kStatorTriggerCurrent       = 15.0;  // Stator trigger current that will cause limiting
+    public static final double  kStatorTriggerTime          = 0.001; // Stator time duration of trigger that will causing limiting
+
+    // CANCoder extension absolute offset
+    public static final boolean kInvertCANCoder             = false;  // CANCoder direction for positive angle in relative mode
+    public static final boolean kExtensionCANCoderAbsInvert = true;   // CANCoder direction for positive angle in absolute mode
+    public static final boolean kExtensionCalibrated        = false;  // Indicates whether the extension has been calibrated by CANCoder
+    public static final double  kCompExtensionOffset        = 0.000;  // CANCoder offset for comp bot
+    public static final double  kBetaExtensionOffset        = 0.0;    // CANCoder offset for beta bot
+
+    // Manual config parameters
+
+    public enum ExtensionMode
+    {
+      EXTENSION_INIT,         // Initialize extension
+      EXTENSION_OUT,         // Extension moving out
+      EXTENSION_STOPPED,      // Extension stop and hold position
+      EXTENSION_IN            // Extension moving in
+    }
+
+    public static final double kExtensionSpeedMaxManual = 0.3;    // Motor percent output during manual operation
+
+    // Motion Magic config parameters
+
+    public enum ExtensionLength
+    {
+      EXTENSION_NOCHANGE,     // No change in extension length--maintain current position
+      EXTENSION_STOW,         // Move extension to stow length
+      EXTENSION_LOW,          // Move extension to low-scoring length
+      EXTENSION_MID,          // Move extension to shelf length
+      EXTENSION_HIGH,         // Move extension to high-scoring length
+      EXTENSION_SHELF,        // Move extension to high-scoring length
+    }
+
+    public static final int    kExtensionMMVelocity       = 16646;  // Extension motion magic velocity
+    public static final int    kExtensionMMAcceleration   = 16646;  // Extension motion magic acceleration
+    public static final int    kExtensionMMSCurveStrength = 0;      // Extension motion magic S curve smoothing strength
+    public static final double kExtensionPidKf            = 0.0461; // Extension PID force constant
+    public static final double kExtensionPidKp            = 0.0246; // Extension PID proportional constant
+    public static final double kExtensionPidKi            = 0.0;    // Extension PID integral constant
+    public static final double kExtensionPidKd            = 0.0;    // Extension PID derivative constant
+    public static final int    kExtensionAllowedError     = 0;      // Extension PID allowable closed loop error in counts
+    public static final double kExtensionToleranceInches  = 1.0;    // Extension PID tolerance in inches
+    public static final double kExtensionArbitraryFF      = 0.000;  // Extension motor output for extension when fully retracted
+  }
+
   public static final class WRConsts
   {
     // Global settings
