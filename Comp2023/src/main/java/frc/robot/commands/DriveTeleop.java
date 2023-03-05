@@ -150,11 +150,11 @@ public class DriveTeleop extends CommandBase
       double scaled_y = tAxes.getY( ) - (deadband_vector.getY( )) / (1 - deadband_vector.getY( ));
       if (elbow.getAngle( ) > ELConsts.kElbowMinDriveAngle)
       {
-        swerveTranslation = new Translation2d(scaled_x, scaled_y).times(Constants.SwerveConstants.maxSpeed);
+        swerveTranslation = new Translation2d(scaled_x, scaled_y).times(Constants.SwerveConstants.maxSpeedArmRaised);
       }
       else
       {
-        swerveTranslation = new Translation2d(scaled_x, scaled_y).times(Constants.SwerveConstants.maxSpeedArmRaised);
+        swerveTranslation = new Translation2d(scaled_x, scaled_y).times(Constants.SwerveConstants.maxSpeed);
       }
 
       double rotAxis = driverPad.getRightX( );
