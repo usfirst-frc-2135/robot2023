@@ -10,10 +10,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
-import frc.robot.Constants.ELConsts;
+import frc.robot.Constants.SWConsts;
 import frc.robot.Constants.SwerveConstants;
-import frc.robot.Constants.ELConsts.ElbowAngle;
-import frc.robot.Constants.ELConsts.ElbowMode;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Swerve;
 
@@ -115,8 +113,6 @@ public class DriveTeleop extends CommandBase
 
     Translation2d tAxes = new Translation2d(forwardAxis, strafeAxis);
 
-    double maxAngularVel = Constants.SwerveConstants.maxAngularVelocity;
-
     if (Math.abs(tAxes.getNorm( )) < Constants.kStickDeadband)
     {
       swerveTranslation = new Translation2d( );
@@ -150,33 +146,27 @@ public class DriveTeleop extends CommandBase
 
       double scaled_x = tAxes.getX( ) - (deadband_vector.getX( )) / (1 - deadband_vector.getX( ));
       double scaled_y = tAxes.getY( ) - (deadband_vector.getY( )) / (1 - deadband_vector.getY( ));
-      if (elbow.getAngle( ) > ELConsts.kElbowMinDriveAngle)
-      {
-        swerveTranslation = new Translation2d(scaled_x, scaled_y).times(Constants.SwerveConstants.maxSpeedArmRaised);
-      }
-      else
-      {
-        swerveTranslation = new Translation2d(scaled_x, scaled_y).times(Constants.SwerveConstants.maxSpeed);
-      }
+      double maxSpeed =
+          (elbow.getAngle( ) > SWConsts.kElbowDriveSlowAngle) ? SwerveConstants.maxSpeedSlowMode : SwerveConstants.maxSpeed;
 
-      double rotAxis = driverPad.getRightX( );
-      rotAxis = Constants.SwerveConstants.invertRAxis ? rotAxis : -rotAxis;
-
-      if (Math.abs(rotAxis) < Constants.kStickDeadband)
-      {
-        rot = 0.0;
-      }
-      else
-      {
-        if (elbow.getAngle( ) > ELConsts.kElbowMinDriveAngle)
-        {
-          maxAngularVel = Constants.SwerveConstants.maxAngularVelocityArmRaised;
-        }
-
-        rot = maxAngularVel * (rotAxis - (Math.signum(rotAxis) * Constants.kStickDeadband)) / (1 - Constants.kStickDeadband);
-      }
-
-      swerve.drive(swerveTranslation, rot, fieldRelative, true);
+      swerveTranslation = new Translation2d(scaled_x, scaled_y).times(maxSpeed);
     }
+
+    double rotAxis = driverPad.getRightX( );
+    rotAxis = Constants.SwerveConstants.invertRAxis ? rotAxis : -rotAxis;
+
+    if (Math.abs(rotAxis) < Constants.kStickDeadband)
+    {
+      rot = 0.0;
+    }
+    else
+    {
+      double maxAngVel = (elbow.getAngle( ) > SWConsts.kElbowDriveSlowAngle) ? SwerveConstants.maxAngularVelocitySlowMode
+          : SwerveConstants.maxAngularVelocity;
+
+      rot = maxAngVel * (rotAxis - (Math.signum(rotAxis) * Constants.kStickDeadband)) / (1 - Constants.kStickDeadband);
+    }
+
+    swerve.drive(swerveTranslation, rot, fieldRelative, true);
   }
 }

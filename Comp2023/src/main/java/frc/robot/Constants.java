@@ -116,25 +116,27 @@ public class Constants
   public static final class SWConsts
   {
     // Constants for balance
-    public static final double kDriveBalancedAngle = 5.0;    // Pitch values less than this stop driving
-    public static final double kDriveBalanceKp     = -0.04;  // Amount of power to apply per degree
+    public static final double kDriveBalancedAngle  = 5.0;    // Pitch values less than this stop driving
+    public static final double kDriveBalanceKp      = -0.04;  // Amount of power to apply per degree
 
     // Limelight PID driving controls
-    public static final double kTurnConstant       = 0.0;
-    public static final double kTurnPidKp          = 0.005;
-    public static final double kTurnPidKi          = 0.0;
-    public static final double kTurnPidKd          = 0.0;
-    public static final double kTurnMax            = 0.4;
-    public static final double kThrottlePidKp      = 0.011;
-    public static final double kThrottlePidKi      = 0.0;
-    public static final double kThrottlePidKd      = 0.0;
-    public static final double kThrottleMax        = 0.2;
-    public static final double kThrottleShape      = 10.0;
+    public static final double kTurnConstant        = 0.0;
+    public static final double kTurnPidKp           = 0.005;
+    public static final double kTurnPidKi           = 0.0;
+    public static final double kTurnPidKd           = 0.0;
+    public static final double kTurnMax             = 0.4;
+    public static final double kThrottlePidKp       = 0.011;
+    public static final double kThrottlePidKi       = 0.0;
+    public static final double kThrottlePidKd       = 0.0;
+    public static final double kThrottleMax         = 0.2;
+    public static final double kThrottleShape       = 10.0;
 
-    public static final double kTargetAngle        = 0.0;      // Optimal shooting angle
-    public static final double kSetPointDistance   = 60.0;     // Optimal shooting distance
-    public static final double kAngleThreshold     = 3.5;      // Degrees tolerance around optimal
-    public static final double kDistThreshold      = 6.0;      // Inches tolerance around optimal
+    public static final double kTargetAngle         = 0.0;      // Optimal shooting angle
+    public static final double kSetPointDistance    = 60.0;     // Optimal shooting distance
+    public static final double kAngleThreshold      = 3.5;      // Degrees tolerance around optimal
+    public static final double kDistThreshold       = 6.0;      // Inches tolerance around optimal
+
+    public static final double kElbowDriveSlowAngle = 20.0;     // When arm is out beyond this - drive is slowed down
   }
 
   public static final class ELConsts
@@ -145,7 +147,6 @@ public class Constants
     public static final double  kElbowDegreesPerCount   = 360 / Falcon500.kEncoderCPR / kElbowGearRatio;
     public static final double  kForearmLengthMeters    = 1.22;   // Sim value: 48 inches
     public static final double  kForearmMassKg          = 6.0;    // Sim value: 13.2 lbs 
-    public static final double  kElbowMinDriveAngle     = 20;     // how far out arm can stick before drive is slowed down
     public static final boolean kInvertMotor            = true;   // Motor direction for positive input
 
     public static final double  kElbowAngleMin          = -3.0;   // Elbow minimum allowable degrees
@@ -499,9 +500,9 @@ public class Constants
 
     /* Swerve Profiling Values */
     public static final double                                       maxSpeed                    = 4.5; // meters per second
-    public static final double                                       maxSpeedArmRaised           = 2.25; // meters per second
+    public static final double                                       maxSpeedSlowMode            = 2.25; // meters per second
     public static final double                                       maxAngularVelocity          = 6.0; //orginially 10.0
-    public static final double                                       maxAngularVelocityArmRaised = 4.0; //orginially 5.0
+    public static final double                                       maxAngularVelocitySlowMode  = 4.0; //orginially 5.0
 
     /* Neutral Modes */
     public static final NeutralMode                                  angleNeutralMode            = NeutralMode.Coast;
