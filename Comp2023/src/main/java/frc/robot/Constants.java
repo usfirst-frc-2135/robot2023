@@ -116,8 +116,8 @@ public class Constants
   public static final class SWConsts
   {
     // Constants for balance
-    public static final double kDriveBalancedAngle = 5.0;    // Pitch values less than this stop driving
-    public static final double kDriveBalanceKp     = -0.04;  // Amount of power to apply per degree
+    public static final double kDriveBalancedAngle  = 5.0;    // Pitch values less than this stop driving
+    public static final double kDriveBalanceKp      = -0.045;  // Amount of power to apply per degree
 
     // Limelight PID driving controls
     public static final double kTurnConstant       = 0.0;
@@ -546,7 +546,7 @@ public class Constants
     /* Back Left Module - Module 2 */
     public static final class Mod2
     {
-      public static final double epsilonAngleOffset = 227.549;
+      public static final double epsilonAngleOffset = 137.99;
       public static final double compAngleOffset    = 97.471;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
