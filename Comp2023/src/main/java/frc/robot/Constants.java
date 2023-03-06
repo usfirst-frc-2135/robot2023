@@ -505,8 +505,8 @@ public class Constants
 
     /* Swerve Profiling Values */
     public static final double                                       maxSpeed                    = 4.5; // meters per second
-    public static final double                                       maxSpeedSlowMode            = 2.25; // meters per second
     public static final double                                       maxAngularVelocity          = 6.0; //orginially 10.0
+    public static final double                                       maxSpeedSlowMode            = 2.25; // meters per second
     public static final double                                       maxAngularVelocitySlowMode  = 4.0; //orginially 5.0
 
     /* Neutral Modes */

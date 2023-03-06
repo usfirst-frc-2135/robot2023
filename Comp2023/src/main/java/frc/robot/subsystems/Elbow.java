@@ -249,7 +249,7 @@ public class Elbow extends SubsystemBase
 
   public double getAngle( )
   {
-    return m_elbowTargetDegrees;
+    return m_elbowCurDegrees;
   }
 
   private void elbowTalonInitialize(WPI_TalonFX motor, boolean inverted)
