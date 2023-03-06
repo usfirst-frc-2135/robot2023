@@ -266,7 +266,7 @@ public class RobotContainer
     // Operator - A, B, X, Y
     operA.toggleOnTrue(new ArmSetHeightScoreLow(m_elbow, m_extension, m_wrist));
     operB.toggleOnTrue(new ArmSetHeightScoreMid(m_elbow, m_extension, m_wrist));
-    operX.onTrue(new ArmSetHeightStow(m_elbow, m_extension, m_wrist));
+    operX.onTrue(new ArmSetHeightIdle(m_elbow, m_extension, m_wrist));
     operY.onTrue(new ArmSetHeightScoreHigh(m_elbow, m_extension, m_wrist));
     //
     // Operator - Bumpers, start, back
