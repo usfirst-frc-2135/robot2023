@@ -71,6 +71,7 @@ public class Extension extends SubsystemBase
   private double                          m_arbitraryFF           = EXConsts.kExtensionArbitraryFF;       // Arbitrary Feedfoward (elevators and arms)
 
   private double                          m_extensionLengthStow   = EXConsts.kExtensionLengthStow;         // extension Stow length
+  private double                          m_extensionLengthIdle   = EXConsts.kExtensionLengthIdle;         // extension Stow length
   private double                          m_extensionLengthLow    = EXConsts.kExtensionLengthScoreLow;     // low-peg scoring length   
   private double                          m_extensionLengthMid    = EXConsts.kExtensionLengthScoreMid;     // mid-peg scoring length
   private double                          m_extensionLengthHigh   = EXConsts.kExtensionLengthScoreHigh;    // high-peg scoring length
@@ -174,10 +175,11 @@ public class Extension extends SubsystemBase
     SmartDashboard.putNumber("EX_pidKi", m_pidKi);
     SmartDashboard.putNumber("EX_pidKd", m_pidKd);
 
-    SmartDashboard.putNumber("EX_stowlength", m_extensionLengthStow);
-    SmartDashboard.putNumber("EX_scoreLengthLow", m_extensionLengthLow);
-    SmartDashboard.putNumber("EX_scoreLengthMid", m_extensionLengthMid);
-    SmartDashboard.putNumber("EX_scoreLengthHigh", m_extensionLengthHigh);
+    SmartDashboard.putNumber("EX_stowLength", m_extensionLengthStow);
+    SmartDashboard.putNumber("EX_idleLength", m_extensionLengthIdle);
+    SmartDashboard.putNumber("EX_lowLength", m_extensionLengthLow);
+    SmartDashboard.putNumber("EX_midLength", m_extensionLengthMid);
+    SmartDashboard.putNumber("EX_highLength", m_extensionLengthHigh);
 
     SmartDashboard.putNumber("EX_curInches", m_extensionCurInches);
     SmartDashboard.putNumber("EX_targetInches", m_extensionTargetInches);
@@ -344,10 +346,11 @@ public class Extension extends SubsystemBase
       m_extension.config_kI(SLOTINDEX, m_pidKi);
       m_extension.config_kD(SLOTINDEX, m_pidKd);
 
-      m_extensionLengthStow = SmartDashboard.getNumber("EX_stowlength", m_extensionLengthStow);
-      m_extensionLengthLow = SmartDashboard.getNumber("EX_stowlength", m_extensionLengthLow);
-      m_extensionLengthMid = SmartDashboard.getNumber("EX_stowlength", m_extensionLengthMid);
-      m_extensionLengthHigh = SmartDashboard.getNumber("EX_stowlength", m_extensionLengthHigh);
+      m_extensionLengthStow = SmartDashboard.getNumber("EX_stowLength", m_extensionLengthStow);
+      m_extensionLengthIdle = SmartDashboard.getNumber("EX_idleLength", m_extensionLengthIdle);
+      m_extensionLengthLow = SmartDashboard.getNumber("EX_lowLength", m_extensionLengthLow);
+      m_extensionLengthMid = SmartDashboard.getNumber("EX_midLength", m_extensionLengthMid);
+      m_extensionLengthHigh = SmartDashboard.getNumber("EX_highLength", m_extensionLengthHigh);
     }
 
     switch (length)
@@ -359,6 +362,9 @@ public class Extension extends SubsystemBase
         break;
       case EXTENSION_STOW :
         m_extensionTargetInches = m_extensionLengthStow;
+        break;
+      case EXTENSION_IDLE :
+        m_extensionTargetInches = m_extensionLengthIdle;
         break;
       case EXTENSION_LOW :
         m_extensionTargetInches = m_extensionLengthLow;

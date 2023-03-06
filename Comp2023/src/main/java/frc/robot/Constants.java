@@ -81,11 +81,10 @@ public class Constants
     public static final int    kCANID_Elbow      = 15;
     public static final int    kCANID_ELCANCoder = 16;
 
-    public static final int    kCANID_Wrist      = 17;
-    public static final int    kCANID_WRCANCoder = 18;
+    public static final int    kCANID_Extension  = 17;
 
-    public static final int    kCANID_Extension  = 19;
-    public static final int    kCANID_EXCANCoder = 20;
+    public static final int    kCANID_Wrist      = 19;
+    public static final int    kCANID_WRCANCoder = 20;
 
     public static final int    kCANID_Gripper    = 21;
 
@@ -120,21 +119,23 @@ public class Constants
     public static final double kDriveBalanceKp      = -0.045;  // Amount of power to apply per degree
 
     // Limelight PID driving controls
-    public static final double kTurnConstant       = 0.0;
-    public static final double kTurnPidKp          = 0.005;
-    public static final double kTurnPidKi          = 0.0;
-    public static final double kTurnPidKd          = 0.0;
-    public static final double kTurnMax            = 0.4;
-    public static final double kThrottlePidKp      = 0.011;
-    public static final double kThrottlePidKi      = 0.0;
-    public static final double kThrottlePidKd      = 0.0;
-    public static final double kThrottleMax        = 0.2;
-    public static final double kThrottleShape      = 10.0;
+    public static final double kTurnConstant        = 0.0;
+    public static final double kTurnPidKp           = 0.005;
+    public static final double kTurnPidKi           = 0.0;
+    public static final double kTurnPidKd           = 0.0;
+    public static final double kTurnMax             = 0.4;
+    public static final double kThrottlePidKp       = 0.011;
+    public static final double kThrottlePidKi       = 0.0;
+    public static final double kThrottlePidKd       = 0.0;
+    public static final double kThrottleMax         = 0.2;
+    public static final double kThrottleShape       = 10.0;
 
-    public static final double kTargetAngle        = 0.0;      // Optimal shooting angle
-    public static final double kSetPointDistance   = 60.0;     // Optimal shooting distance
-    public static final double kAngleThreshold     = 3.5;      // Degrees tolerance around optimal
-    public static final double kDistThreshold      = 6.0;      // Inches tolerance around optimal
+    public static final double kTargetAngle         = 0.0;      // Optimal shooting angle
+    public static final double kSetPointDistance    = 60.0;     // Optimal shooting distance
+    public static final double kAngleThreshold      = 3.5;      // Degrees tolerance around optimal
+    public static final double kDistThreshold       = 6.0;      // Inches tolerance around optimal
+
+    public static final double kElbowDriveSlowAngle = 20.0;     // When arm is out beyond this - drive is slowed down
   }
 
   public static final class ELConsts
@@ -150,6 +151,7 @@ public class Constants
     public static final double  kElbowAngleMin          = -3.0;   // Elbow minimum allowable degrees
     public static final double  kElbowAngleMax          = 110.0;  // Elbow maximum allowable degrees
     public static final double  kElbowAngleStow         = 0.0;    // TODO: FIGURE IT OUT
+    public static final double  kElbowAngleIdle         = 0.0;    // TODO: FIGURE IT OUT
     public static final double  kElbowAngleScoreLow     = 20.0;   // From Mech Design (floor, feet art 5" high)
     public static final double  kElbowAngleScoreMid     = 91.0;   // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube)
     public static final double  kElbowAngleScoreHigh    = 103.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube)
@@ -188,6 +190,7 @@ public class Constants
     {
       ELBOW_NOCHANGE,     // No change in elbow angle--maintain current position
       ELBOW_STOW,         // Move elbow to stow angle
+      ELBOW_IDLE,         // Move elbow to idle andgle
       ELBOW_LOW,          // Move elbow to low-scoring angle
       ELBOW_MID,          // Move elbow to shelf Angle; slightly higher than mid-scoring angle so this is used for both
       ELBOW_HIGH,         // Move elbow to high-scoring angle
@@ -223,6 +226,7 @@ public class Constants
     public static final double  kExtensionLengthMin         = -0.5;   // Extension minimum allowable length
     public static final double  kExtensionLengthMax         = 22.0;   // Extension maximum allowable length
     public static final double  kExtensionLengthStow        = 0.0;    // TODO: FIGURE IT OUT
+    public static final double  kExtensionLengthIdle        = 0.0;    // TODO: FIGURE IT OUT
     public static final double  kExtensionLengthScoreLow    = 8.0;    // From Mech Design (floor, feet art 5" high)
     public static final double  kExtensionLengthScoreMid    = 3.0;    // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube)
     public static final double  kExtensionLengthScoreHigh   = 22.0;   // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube)
@@ -261,6 +265,7 @@ public class Constants
     {
       EXTENSION_NOCHANGE,     // No change in extension length--maintain current position
       EXTENSION_STOW,         // Move extension to stow length
+      EXTENSION_IDLE,         // Move extension to idle length
       EXTENSION_LOW,          // Move extension to low-scoring length
       EXTENSION_MID,          // Move extension to shelf length
       EXTENSION_HIGH,         // Move extension to high-scoring length
@@ -292,6 +297,7 @@ public class Constants
     public static final double  kWristMinAngle          = -3.0;  // Wrist maximum allowable Angle
     public static final double  kWristMaxAngle          = 110.0; // Wrist maximum allowable Angle
     public static final double  kWristAngleStow         = 0.0;   // TO-DO: FIGURE IT OUT
+    public static final double  kWristAngleIdle         = 0.0;   // TO-DO: FIGURE IT OUT
     public static final double  kWristAngleScoreLow     = 20.0;  // From Mech Design (floor, feet art 5" high)
     public static final double  kWristAngleScoreMid     = 91.0;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube)
     public static final double  kWristAngleScoreHigh    = 103.0; // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube)
@@ -330,6 +336,7 @@ public class Constants
     {
       WRIST_NOCHANGE,     // No change in Wrist Angle--maintain current position
       WRIST_STOW,         // Move wrist to stow position
+      WRIST_IDLE,         // Move wrist to stow position
       WRIST_LOW,          // Move wrist to low-scoring Angle
       WRIST_MID,          // Move wrist to shelf Angle; slightly higher than mid-scoring Angle so this is used for both
       WRIST_HIGH,         // Move wrist to high-scoring Angle
@@ -497,7 +504,9 @@ public class Constants
 
     /* Swerve Profiling Values */
     public static final double                                       maxSpeed                    = 4.5; // meters per second
-    public static final double                                       maxAngularVelocity          = 10.0;
+    public static final double                                       maxAngularVelocity          = 6.0; //orginially 10.0
+    public static final double                                       maxSpeedSlowMode            = 2.25; // meters per second
+    public static final double                                       maxAngularVelocitySlowMode  = 4.0; //orginially 5.0
 
     /* Neutral Modes */
     public static final NeutralMode                                  angleNeutralMode            = NeutralMode.Coast;
@@ -546,7 +555,7 @@ public class Constants
     /* Back Left Module - Module 2 */
     public static final class Mod2
     {
-      public static final double epsilonAngleOffset = 137.99;
+      public static final double epsilonAngleOffset = 137.988;
       public static final double compAngleOffset    = 97.471;
 
       public static SwerveModuleConstants SwerveModuleConstants( )

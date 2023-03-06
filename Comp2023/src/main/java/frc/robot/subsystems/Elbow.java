@@ -84,6 +84,7 @@ public class Elbow extends SubsystemBase
   private double                          m_arbitraryFF         = ELConsts.kElbowArbitraryFF;       // Arbitrary Feedfoward (elevators and arms)
 
   private double                          m_elbowAngleStow      = ELConsts.kElbowAngleStow;         // elbow Stow angle
+  private double                          m_elbowAngleIdle      = ELConsts.kElbowAngleIdle;         // elbow Idle angle
   private double                          m_elbowAngleLow       = ELConsts.kElbowAngleScoreLow;     // low-peg scoring angle   
   private double                          m_elbowAngleMid       = ELConsts.kElbowAngleScoreMid;     // mid-peg scoring angle
   private double                          m_elbowAngleHigh      = ELConsts.kElbowAngleScoreHigh;    // high-peg scoring angle
@@ -197,6 +198,7 @@ public class Elbow extends SubsystemBase
     SmartDashboard.putNumber("EL_pidKd", m_pidKd);
 
     SmartDashboard.putNumber("EL_stowAngle", m_elbowAngleStow);
+    SmartDashboard.putNumber("EL_idleAngle", m_elbowAngleIdle);
     SmartDashboard.putNumber("EL_scoreAngleLow", m_elbowAngleLow);
     SmartDashboard.putNumber("EL_scoreAngleMid", m_elbowAngleMid);
     SmartDashboard.putNumber("EL_scoreAngleHigh", m_elbowAngleHigh);
@@ -243,6 +245,11 @@ public class Elbow extends SubsystemBase
   public boolean moveIsInRange(double degrees)
   {
     return degrees > m_elbowMinAngle && degrees < m_elbowMaxAngle;
+  }
+
+  public double getAngle( )
+  {
+    return m_elbowCurDegrees;
   }
 
   private void elbowTalonInitialize(WPI_TalonFX motor, boolean inverted)
@@ -372,6 +379,7 @@ public class Elbow extends SubsystemBase
       m_elbow.config_kD(SLOTINDEX, m_pidKd);
 
       m_elbowAngleStow = SmartDashboard.getNumber("EL_stowAngle", m_elbowAngleStow);
+      m_elbowAngleIdle = SmartDashboard.getNumber("EL_idleAngle", m_elbowAngleIdle);
       m_elbowAngleLow = SmartDashboard.getNumber("EL_scoreAngleLow", m_elbowAngleLow);
       m_elbowAngleMid = SmartDashboard.getNumber("EL_scoreAngleMid", m_elbowAngleMid);
       m_elbowAngleHigh = SmartDashboard.getNumber("EL_scoreAngleHigh", m_elbowAngleHigh);
@@ -386,6 +394,9 @@ public class Elbow extends SubsystemBase
         break;
       case ELBOW_STOW :
         m_elbowTargetDegrees = m_elbowAngleStow;
+        break;
+      case ELBOW_IDLE :
+        m_elbowTargetDegrees = m_elbowAngleIdle;
         break;
       case ELBOW_LOW :
         m_elbowTargetDegrees = m_elbowAngleLow;
