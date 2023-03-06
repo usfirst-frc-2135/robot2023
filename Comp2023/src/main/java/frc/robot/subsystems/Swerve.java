@@ -80,9 +80,6 @@ public class Swerve extends SubsystemBase
   // Path following
   private int                      m_pathDebug         = 0;    // Debug flag to disable extra ramsete logging calls
 
-  // Auto Mode
-  private boolean                  m_autoMode          = false;
-
   // Limelight drive
   private double                   m_turnConstant      = SWConsts.kTurnConstant;
   private double                   m_turnPidKp         = SWConsts.kTurnPidKp;
@@ -226,16 +223,6 @@ public class Swerve extends SubsystemBase
     SmartDashboard.putNumber("SW: snap", m_periodicIO.snap_target);
 
     m_field.setRobotPose(getPose( ));
-  }
-
-  public void setAutoMode(boolean autoMode)
-  {
-    m_autoMode = autoMode;
-  }
-
-  public boolean getAutoMode( )
-  {
-    return m_autoMode;
   }
 
   public void updateSwerveOdometry( )

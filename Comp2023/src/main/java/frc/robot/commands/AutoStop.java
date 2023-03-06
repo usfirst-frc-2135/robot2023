@@ -25,7 +25,7 @@ public class AutoStop extends CommandBase
   @Override
   public void initialize( )
   {
-    m_swerve.setAutoMode(true);
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.

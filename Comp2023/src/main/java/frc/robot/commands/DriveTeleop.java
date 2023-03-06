@@ -42,7 +42,7 @@ public class DriveTeleop extends CommandBase
   @Override
   public void initialize( )
   {
-    m_swerve.setAutoMode(false);
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
