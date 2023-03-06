@@ -6,38 +6,40 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
 import frc.robot.subsystems.Gripper;
+import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Wrist;
 
 /**
  *
  */
-public class PreloadHigh extends SequentialCommandGroup
+public class AutoPreloadAndLeaveCommunityPosition3 extends SequentialCommandGroup
 {
-  public PreloadHigh(Gripper gripper, Wrist wrist, Extension extension, Elbow elbow)
+  public AutoPreloadAndLeaveCommunityPosition3(Swerve swerve, Elbow elbow, Extension extension, Wrist wrist, Gripper gripper)
   {
-    setName("PreloadHigh");
+    setName("AutoPreloadAndLeaveCommunityPosition3");
 
     addCommands(
         // Add Commands here:
 
         // @formatter:off
-        new PrintCommand(getName() + ": MOVE ARM"),
+        new PrintCommand(getName() + ": AUTO: Score Preload"),        
         new ParallelDeadlineGroup(
-          new ArmSetHeightScoreHigh(elbow, extension, wrist)
-          )
-        //TODO: ADD COMMAND TO SCORE GAME PIECE - EXPEL WITH GRIPPER (?)
-        /* 
-        new PrintCommand(getName() + ": AUTO: Run second path"),
+            new AutoPreloadHigh(elbow, extension, wrist, gripper)
+        ),
+        new PrintCommand(getName() +": AUTO: Drive Off Community"),
         new ParallelDeadlineGroup(
           new WaitUntilCommand(swerve::driveWithPathFollowerIsFinished),
-          new AutoDrivePath ( swerve, "driveFromGamePiece", false)
+          new AutoDrivePath ( swerve, "driveOffCommunity2", true)
         ),
-        */
+        new PrintCommand(getName() + ": AUTO: Hold in place"),
+        new AutoStop(swerve)
         // @formatter:on
     );
+
   }
 
   @Override

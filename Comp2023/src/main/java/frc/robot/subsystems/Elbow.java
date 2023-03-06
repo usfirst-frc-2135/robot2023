@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -60,8 +61,9 @@ public class Elbow extends SubsystemBase
   private MechanismLigament2d             m_elbowLigament       =
       m_elbowRoot.append(new MechanismLigament2d("elbow", 1, 0, 6, new Color8Bit(Color.kBlue)));
 
-  private boolean                         m_elbowValid;                // Health indicator for elbow Talon 
-  private double                          m_elbowAngleOffset;          // CANCoder angle measured at reference point
+  private boolean                         m_elbowValid;                 // Health indicator for elbow Talon 
+  private boolean                         m_elbowCCValid;               // Health indicator for elbow CANCoder 
+  private double                          m_elbowAngleOffset    = 0.0;  // CANCoder angle measured at reference point
 
   //Devices and simulation objs
   private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true,
@@ -114,12 +116,23 @@ public class Elbow extends SubsystemBase
     if (m_elbowValid)
       elbowTalonInitialize(m_elbow, ELConsts.kInvertMotor);
 
-    m_elbowAngleOffset = (Constants.isComp) ? ELConsts.kCompElbowOffset : ELConsts.kBetaElbowOffset;
-    m_elbowCANCoder.configFactoryDefault( );
-    m_elbowCANCoder.configAllSettings(CTREConfigs.elbowCancoderConfig( ));
-    m_elbowCANCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
-    m_elbowCANCoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 255);
-    resetToAbsolute( );
+    m_elbowCCValid = PhoenixUtil.getInstance( ).canCoderInitialize(m_elbowCANCoder, "elbow");
+
+    if (m_elbowCCValid)
+    {
+      m_elbowCANCoder.configAllSettings(CTREConfigs.elbowCancoderConfig( ));
+      m_elbowCANCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
+      m_elbowCANCoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 255);
+
+      m_elbowAngleOffset = (Constants.isComp) ? ELConsts.kCompElbowOffset : ELConsts.kBetaElbowOffset;
+      m_elbowAngleOffset *= ((ELConsts.kElbowCANCoderAbsInvert) ? -1.0 : 1.0);
+
+      double absolutePosition =
+          Conversions.degreesToFalcon(getCanCoder( ).getDegrees( ) - m_elbowAngleOffset, ELConsts.kElbowGearRatio);
+
+      if (RobotBase.isReal( ))
+        m_elbow.setSelectedSensorPosition(absolutePosition);
+    }
 
     initSmartDashboard( );
 
@@ -186,9 +199,9 @@ public class Elbow extends SubsystemBase
 
     SmartDashboard.putNumber("EL_stowAngle", m_elbowAngleStow);
     SmartDashboard.putNumber("EL_idleAngle", m_elbowAngleIdle);
-    SmartDashboard.putNumber("EL_lowAngle", m_elbowAngleLow);
-    SmartDashboard.putNumber("EL_midAngle", m_elbowAngleMid);
-    SmartDashboard.putNumber("EL_highAngle", m_elbowAngleHigh);
+    SmartDashboard.putNumber("EL_scoreAngleLow", m_elbowAngleLow);
+    SmartDashboard.putNumber("EL_scoreAngleMid", m_elbowAngleMid);
+    SmartDashboard.putNumber("EL_scoreAngleHigh", m_elbowAngleHigh);
 
     SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
     SmartDashboard.putNumber("EL_targetDegrees", m_elbowTargetDegrees);
@@ -217,13 +230,6 @@ public class Elbow extends SubsystemBase
   public Rotation2d getCanCoder( )
   {
     return Rotation2d.fromDegrees(m_elbowCANCoder.getAbsolutePosition( ));
-  }
-
-  public void resetToAbsolute( )
-  {
-    double absolutePosition = ((ELConsts.kElbowCANCoderAbsInvert) ? -1.0 : 1.0)
-        * Conversions.degreesToFalcon(getCanCoder( ).getDegrees( ) - m_elbowAngleOffset, ELConsts.kElbowGearRatio);
-    m_elbow.setSelectedSensorPosition(absolutePosition);
   }
 
   private int elbowDegreesToCounts(double degrees)
@@ -374,9 +380,9 @@ public class Elbow extends SubsystemBase
 
       m_elbowAngleStow = SmartDashboard.getNumber("EL_stowAngle", m_elbowAngleStow);
       m_elbowAngleIdle = SmartDashboard.getNumber("EL_idleAngle", m_elbowAngleIdle);
-      m_elbowAngleLow = SmartDashboard.getNumber("EL_LowAngle", m_elbowAngleLow);
-      m_elbowAngleMid = SmartDashboard.getNumber("EL_MidAngle", m_elbowAngleMid);
-      m_elbowAngleHigh = SmartDashboard.getNumber("EL_HighAngle", m_elbowAngleHigh);
+      m_elbowAngleLow = SmartDashboard.getNumber("EL_scoreAngleLow", m_elbowAngleLow);
+      m_elbowAngleMid = SmartDashboard.getNumber("EL_scoreAngleMid", m_elbowAngleMid);
+      m_elbowAngleHigh = SmartDashboard.getNumber("EL_scoreAngleHigh", m_elbowAngleHigh);
     }
 
     switch (angle)
@@ -430,8 +436,8 @@ public class Elbow extends SubsystemBase
         if (m_elbowValid)
           m_elbow.set(ControlMode.MotionMagic, elbowDegreesToCounts(m_elbowTargetDegrees));
 
-        DataLogManager.log(String.format("%s: moving: %.1f -> %.1f degrees | counts %d -> %d", getSubsystem( ), m_elbowCurDegrees,
-            m_elbowTargetDegrees, m_elbowCurDegrees, m_elbowTargetDegrees));
+        DataLogManager
+            .log(String.format("%s: moving: %.1f -> %.1f degrees", getSubsystem( ), m_elbowCurDegrees, m_elbowTargetDegrees));
       }
       else
       {
