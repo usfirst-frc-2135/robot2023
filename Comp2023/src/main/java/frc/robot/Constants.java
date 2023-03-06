@@ -81,11 +81,10 @@ public class Constants
     public static final int    kCANID_Elbow      = 15;
     public static final int    kCANID_ELCANCoder = 16;
 
-    public static final int    kCANID_Wrist      = 17;
-    public static final int    kCANID_WRCANCoder = 18;
+    public static final int    kCANID_Extension  = 17;
 
-    public static final int    kCANID_Extension  = 19;
-    public static final int    kCANID_EXCANCoder = 20;
+    public static final int    kCANID_Wrist      = 19;
+    public static final int    kCANID_WRCANCoder = 20;
 
     public static final int    kCANID_Gripper    = 21;
 
