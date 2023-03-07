@@ -304,7 +304,8 @@ public class RobotContainer
     operLeftBumper.onTrue(new Dummy("left bumper"));
     operRightBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
     operRightBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
-    operBack.onTrue(new ManualMode(m_elbow, m_extension, m_wrist, m_driverPad)); // aka View
+    operBack.toggleOnTrue(new ManualMode(m_elbow, m_extension, m_wrist, m_operatorPad)); // aka View
+
     operStart.onTrue(new Dummy("Start")); // aka Menu
     //
     // Operator - POV buttons
