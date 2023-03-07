@@ -13,6 +13,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -63,7 +64,6 @@ public class Elbow extends SubsystemBase
 
   private boolean                         m_elbowValid;                 // Health indicator for elbow Talon 
   private boolean                         m_elbowCCValid;               // Health indicator for elbow CANCoder 
-  private double                          m_elbowAngleOffset    = 0.0;  // CANCoder angle measured at reference point
 
   //Devices and simulation objs
   private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true,
@@ -84,6 +84,7 @@ public class Elbow extends SubsystemBase
   private double                          m_arbitraryFF         = ELConsts.kElbowArbitraryFF;       // Arbitrary Feedfoward (elevators and arms)
 
   private double                          m_elbowAngleStow      = ELConsts.kElbowAngleStow;         // elbow Stow angle
+  private double                          m_elbowAngleIdle      = ELConsts.kElbowAngleIdle;         // elbow Idle angle
   private double                          m_elbowAngleLow       = ELConsts.kElbowAngleScoreLow;     // low-peg scoring angle   
   private double                          m_elbowAngleMid       = ELConsts.kElbowAngleScoreMid;     // mid-peg scoring angle
   private double                          m_elbowAngleHigh      = ELConsts.kElbowAngleScoreHigh;    // high-peg scoring angle
@@ -123,15 +124,20 @@ public class Elbow extends SubsystemBase
       m_elbowCANCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
       m_elbowCANCoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 255);
 
-      m_elbowAngleOffset = (Constants.isComp) ? ELConsts.kCompElbowOffset : ELConsts.kBetaElbowOffset;
-      m_elbowAngleOffset *= ((ELConsts.kElbowCANCoderAbsInvert) ? -1.0 : 1.0);
-
-      double absolutePosition =
-          Conversions.degreesToFalcon(getCanCoder( ).getDegrees( ) - m_elbowAngleOffset, ELConsts.kElbowGearRatio);
+      double m_elbowCurDegrees = getCanCoder( ).getDegrees( );
+      DataLogManager.log(getSubsystem( ) + ": Initial degrees " + m_elbowCurDegrees);
+      double absolutePosition = Conversions.degreesToFalcon(m_elbowCurDegrees, ELConsts.kElbowGearRatio);
 
       if (RobotBase.isReal( ))
         m_elbow.setSelectedSensorPosition(absolutePosition);
     }
+
+    m_elbow.configReverseSoftLimitThreshold(Conversions.degreesToFalcon(m_elbowMinAngle, ELConsts.kElbowGearRatio),
+        Constants.kCANTimeoutMs);
+    m_elbow.configReverseSoftLimitEnable(true, Constants.kCANTimeoutMs);
+    m_elbow.configForwardSoftLimitThreshold(Conversions.degreesToFalcon(m_elbowMaxAngle, ELConsts.kElbowGearRatio),
+        Constants.kCANTimeoutMs);
+    m_elbow.configForwardSoftLimitEnable(true, Constants.kCANTimeoutMs);
 
     initSmartDashboard( );
 
@@ -159,7 +165,11 @@ public class Elbow extends SubsystemBase
 
       m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
       SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
+      SmartDashboard.putNumber("EK_targetDegrees", m_elbowTargetDegrees);
       m_elbowLigament.setAngle(m_elbowCurDegrees);
+
+      double currentDraw = m_elbow.getStatorCurrent( );
+      SmartDashboard.putNumber("EL_currentDraw", currentDraw);
     }
   }
 
@@ -197,6 +207,7 @@ public class Elbow extends SubsystemBase
     SmartDashboard.putNumber("EL_pidKd", m_pidKd);
 
     SmartDashboard.putNumber("EL_stowAngle", m_elbowAngleStow);
+    SmartDashboard.putNumber("EL_idleAngle", m_elbowAngleIdle);
     SmartDashboard.putNumber("EL_scoreAngleLow", m_elbowAngleLow);
     SmartDashboard.putNumber("EL_scoreAngleMid", m_elbowAngleMid);
     SmartDashboard.putNumber("EL_scoreAngleHigh", m_elbowAngleHigh);
@@ -242,7 +253,12 @@ public class Elbow extends SubsystemBase
 
   public boolean moveIsInRange(double degrees)
   {
-    return degrees > m_elbowMinAngle && degrees < m_elbowMaxAngle;
+    return (degrees > m_elbowMinAngle) && (degrees < m_elbowMaxAngle);
+  }
+
+  public double getAngle( )
+  {
+    return m_elbowCurDegrees;
   }
 
   private void elbowTalonInitialize(WPI_TalonFX motor, boolean inverted)
@@ -294,51 +310,34 @@ public class Elbow extends SubsystemBase
 
   public void moveElbowWithJoystick(XboxController joystick)
   {
-    double yElbowValue = 0.0;
-    double motorOutput = 0.0;
-    double manualSpeedMax = ELConsts.kElbowSpeedMaxManual;
+    double yValue = -joystick.getLeftY( );
+    ElbowMode newMode;
 
-    yElbowValue = -joystick.getLeftY( );
-    if (yElbowValue > -m_stickDeadband && yElbowValue < m_stickDeadband)
-    {
-      if (m_elbowMode != ElbowMode.ELBOW_STOPPED)
-        DataLogManager.log(getSubsystem( ) + ": move Stopped");
-      m_elbowMode = ElbowMode.ELBOW_STOPPED;
-    }
+    yValue = MathUtil.applyDeadband(yValue, m_stickDeadband);
+
+    if (yValue == 0.0)
+      newMode = ElbowMode.ELBOW_STOPPED;
+    else if (yValue < 0.0)
+      newMode = ElbowMode.ELBOW_DOWN;
     else
+      newMode = ElbowMode.ELBOW_UP;
+
+    if (newMode != m_elbowMode)
     {
-      // If joystick is above a value, elbow will move up
-      if (yElbowValue > m_stickDeadband)
-      {
-        if (m_elbowMode != ElbowMode.ELBOW_UP)
-          DataLogManager.log(getSubsystem( ) + ": move Up");
-        m_elbowMode = ElbowMode.ELBOW_UP;
-
-        yElbowValue -= m_stickDeadband;
-        yElbowValue *= (1.0 / (1.0 - m_stickDeadband));
-        motorOutput = manualSpeedMax * (yElbowValue * Math.abs(yElbowValue));
-      }
-      // If joystick is below a value, elbow will move down
-      else if (yElbowValue < -m_stickDeadband)
-      {
-        if (m_elbowMode != ElbowMode.ELBOW_DOWN)
-          DataLogManager.log(getSubsystem( ) + ": move Down");
-        m_elbowMode = ElbowMode.ELBOW_DOWN;
-
-        yElbowValue += m_stickDeadband;
-        yElbowValue *= (1.0 / (1.0 - m_stickDeadband));
-        motorOutput = manualSpeedMax * (yElbowValue * Math.abs(yElbowValue));
-      }
+      m_elbowMode = newMode;
+      DataLogManager.log(getSubsystem( ) + ": move " + m_elbowMode);
     }
 
-    if (!moveIsInRange(m_elbowCurDegrees))
+    if (((m_elbowCurDegrees < m_elbowMinAngle) && yValue < 0.0) || ((m_elbowCurDegrees > m_elbowMaxAngle) && yValue > 0.0))
     {
       DataLogManager.log(getSubsystem( ) + ": move OUT OF RANGE!");
-      motorOutput = 0.0;
+      yValue = 0.0;
     }
 
+    m_elbowTargetDegrees = m_elbowCurDegrees;
+
     if (m_elbowValid)
-      m_elbow.set(ControlMode.PercentOutput, motorOutput);
+      m_elbow.set(ControlMode.PercentOutput, yValue * ELConsts.kElbowSpeedMaxManual);
   }
 
   public void setElbowStopped( )
@@ -372,6 +371,7 @@ public class Elbow extends SubsystemBase
       m_elbow.config_kD(SLOTINDEX, m_pidKd);
 
       m_elbowAngleStow = SmartDashboard.getNumber("EL_stowAngle", m_elbowAngleStow);
+      m_elbowAngleIdle = SmartDashboard.getNumber("EL_idleAngle", m_elbowAngleIdle);
       m_elbowAngleLow = SmartDashboard.getNumber("EL_scoreAngleLow", m_elbowAngleLow);
       m_elbowAngleMid = SmartDashboard.getNumber("EL_scoreAngleMid", m_elbowAngleMid);
       m_elbowAngleHigh = SmartDashboard.getNumber("EL_scoreAngleHigh", m_elbowAngleHigh);
@@ -386,6 +386,9 @@ public class Elbow extends SubsystemBase
         break;
       case ELBOW_STOW :
         m_elbowTargetDegrees = m_elbowAngleStow;
+        break;
+      case ELBOW_IDLE :
+        m_elbowTargetDegrees = m_elbowAngleIdle;
         break;
       case ELBOW_LOW :
         m_elbowTargetDegrees = m_elbowAngleLow;
@@ -406,34 +409,33 @@ public class Elbow extends SubsystemBase
 
     DataLogManager.log(String.format("%s: TARGET ANGLE %.1f", getSubsystem( ), m_elbowTargetDegrees));
 
-    if (ELConsts.kElbowCalibrated)
-      if (ELConsts.kElbowCalibrated && moveIsInRange(Math.abs(m_elbowTargetDegrees - m_elbowCurDegrees)))
+    if (ELConsts.kElbowCalibrated && moveIsInRange(Math.abs(m_elbowTargetDegrees - m_elbowCurDegrees)))
+    {
+      // angle constraint check/soft limit for max and min angle before raising
+      if (!moveIsInRange(m_elbowTargetDegrees))
       {
-        // angle constraint check/soft limit for max and min angle before raising
-        if (!moveIsInRange(m_elbowTargetDegrees))
-        {
-          DataLogManager.log(String.format("%s: Target %.1f degrees is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
-              m_elbowTargetDegrees, m_elbowMinAngle, m_elbowMaxAngle));
-          m_elbowTargetDegrees = m_elbowCurDegrees;
-        }
-
-        // Start the safety timer
-        m_safetyTimeout = 1.8;
-        m_safetyTimer.reset( );
-        m_safetyTimer.start( );
-
-        if (m_elbowValid)
-          m_elbow.set(ControlMode.MotionMagic, elbowDegreesToCounts(m_elbowTargetDegrees));
-
-        DataLogManager
-            .log(String.format("%s: moving: %.1f -> %.1f degrees", getSubsystem( ), m_elbowCurDegrees, m_elbowTargetDegrees));
+        DataLogManager.log(String.format("%s: Target %.1f degrees is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
+            m_elbowTargetDegrees, m_elbowMinAngle, m_elbowMaxAngle));
+        m_elbowTargetDegrees = m_elbowCurDegrees;
       }
-      else
-      {
-        DataLogManager.log(getSubsystem( ) + ": not calibrated");
-        if (m_elbowValid)
-          m_elbow.set(ControlMode.PercentOutput, 0.0);
-      }
+
+      // Start the safety timer
+      m_safetyTimeout = 1.8;
+      m_safetyTimer.reset( );
+      m_safetyTimer.start( );
+
+      if (m_elbowValid)
+        m_elbow.set(ControlMode.MotionMagic, elbowDegreesToCounts(m_elbowTargetDegrees));
+
+      DataLogManager
+          .log(String.format("%s: moving: %.1f -> %.1f degrees", getSubsystem( ), m_elbowCurDegrees, m_elbowTargetDegrees));
+    }
+    else
+    {
+      DataLogManager.log(getSubsystem( ) + ": not calibrated");
+      if (m_elbowValid)
+        m_elbow.set(ControlMode.PercentOutput, 0.0);
+    }
   }
 
   public void moveElbowAngleExecute( )

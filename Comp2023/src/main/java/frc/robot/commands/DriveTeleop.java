@@ -10,7 +10,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
+import frc.robot.Constants.SWConsts;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Swerve;
 
 /**
@@ -19,16 +21,18 @@ import frc.robot.subsystems.Swerve;
 public class DriveTeleop extends CommandBase
 {
   private final Swerve          m_swerve;
+  private final Elbow           m_elbow;
   private final XboxController  m_driverPad;
 
   private final SlewRateLimiter m_xSpeedLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter m_ySpeedLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter m_rotLimiter    = new SlewRateLimiter(3);
 
-  public DriveTeleop(Swerve swerve, XboxController driverPad)
+  public DriveTeleop(Swerve swerve, Elbow elbow, XboxController driverPad)
   {
     m_swerve = swerve;
     m_driverPad = driverPad;
+    m_elbow = elbow;
 
     setName("DriveTeleop");
     addRequirements(m_swerve);
@@ -37,13 +41,15 @@ public class DriveTeleop extends CommandBase
   // Called when the command is initially scheduled.
   @Override
   public void initialize( )
-  {}
+  {
+
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute( )
   {
-    driveWithGamepad(m_swerve, m_driverPad, true);
+    driveWithGamepad(m_swerve, m_driverPad, m_elbow, true);
   }
 
   // Called once the command ends or is interrupted.
@@ -94,7 +100,7 @@ public class DriveTeleop extends CommandBase
     swerve.drive(swerveTranslation, rot, fieldRelative, true);
   }
 
-  public void driveWithGamepad(Swerve swerve, XboxController driverPad, boolean fieldRelative)
+  public void driveWithGamepad(Swerve swerve, XboxController driverPad, Elbow elbow, boolean fieldRelative)
   {
     Translation2d swerveTranslation = new Translation2d( );
     double rot = 0.0;
@@ -140,7 +146,10 @@ public class DriveTeleop extends CommandBase
 
       double scaled_x = tAxes.getX( ) - (deadband_vector.getX( )) / (1 - deadband_vector.getX( ));
       double scaled_y = tAxes.getY( ) - (deadband_vector.getY( )) / (1 - deadband_vector.getY( ));
-      swerveTranslation = new Translation2d(scaled_x, scaled_y).times(Constants.SwerveConstants.maxSpeed);
+      double maxSpeed =
+          (elbow.getAngle( ) > SWConsts.kElbowDriveSlowAngle) ? SwerveConstants.maxSpeedSlowMode : SwerveConstants.maxSpeed;
+
+      swerveTranslation = new Translation2d(scaled_x, scaled_y).times(maxSpeed);
     }
 
     double rotAxis = driverPad.getRightX( );
@@ -152,8 +161,10 @@ public class DriveTeleop extends CommandBase
     }
     else
     {
-      rot = Constants.SwerveConstants.maxAngularVelocity * (rotAxis - (Math.signum(rotAxis) * Constants.kStickDeadband))
-          / (1 - Constants.kStickDeadband);
+      double maxAngVel = (elbow.getAngle( ) > SWConsts.kElbowDriveSlowAngle) ? SwerveConstants.maxAngularVelocitySlowMode
+          : SwerveConstants.maxAngularVelocity;
+
+      rot = maxAngVel * (rotAxis - (Math.signum(rotAxis) * Constants.kStickDeadband)) / (1 - Constants.kStickDeadband);
     }
 
     swerve.drive(swerveTranslation, rot, fieldRelative, true);

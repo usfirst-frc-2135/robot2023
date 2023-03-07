@@ -57,18 +57,9 @@ public final class CTREConfigs
   public static CANCoderConfiguration elbowCancoderConfig( )
   {
     CANCoderConfiguration config = new CANCoderConfiguration( );
-    config.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
+    config.magnetOffsetDegrees = Constants.ELConsts.kCompElbowOffset;
+    config.absoluteSensorRange = AbsoluteSensorRange.Signed_PlusMinus180;
     config.sensorDirection = Constants.ELConsts.kInvertCANCoder;
-    config.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
-    config.sensorTimeBase = SensorTimeBase.PerSecond;
-    return config;
-  }
-
-  public static CANCoderConfiguration extensionCancoderConfig( )
-  {
-    CANCoderConfiguration config = new CANCoderConfiguration( );
-    config.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
-    config.sensorDirection = Constants.EXConsts.kInvertCANCoder;
     config.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
     config.sensorTimeBase = SensorTimeBase.PerSecond;
     return config;
@@ -77,7 +68,8 @@ public final class CTREConfigs
   public static CANCoderConfiguration wristCancoderConfig( )
   {
     CANCoderConfiguration config = new CANCoderConfiguration( );
-    config.absoluteSensorRange = AbsoluteSensorRange.Unsigned_0_to_360;
+    config.absoluteSensorRange = AbsoluteSensorRange.Signed_PlusMinus180;
+    config.magnetOffsetDegrees = Constants.WRConsts.kCompWristOffset;
     config.sensorDirection = Constants.WRConsts.kInvertCANCoder;
     config.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
     config.sensorTimeBase = SensorTimeBase.PerSecond;

@@ -20,6 +20,7 @@ import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.VIConsts.VIGoalDirection;
 import frc.robot.Constants.WRConsts.WristAngle;
+import frc.robot.commands.ArmSetHeightIdle;
 import frc.robot.commands.ArmSetHeightScoreHigh;
 import frc.robot.commands.ArmSetHeightScoreLow;
 import frc.robot.commands.ArmSetHeightScoreMid;
@@ -37,7 +38,6 @@ import frc.robot.commands.DriveSnap;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.ElbowMoveToAngle;
-import frc.robot.commands.ElbowRun;
 import frc.robot.commands.ExtensionMoveToLength;
 import frc.robot.commands.GripperRun;
 import frc.robot.commands.LEDSet;
@@ -45,7 +45,6 @@ import frc.robot.commands.ManualMode;
 import frc.robot.commands.ResetGyro;
 import frc.robot.commands.ResetOdometryToLimelight;
 import frc.robot.commands.WristMoveToAngle;
-import frc.robot.commands.WristRun;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
 import frc.robot.subsystems.Gripper;
@@ -246,7 +245,7 @@ public class RobotContainer
     // @formatter:on
 
     // Driver - A, B, X, Y
-    driverA.onTrue(new ArmSetHeightStow(m_elbow, m_extension, m_wrist));
+    driverA.onTrue(new ArmSetHeightIdle(m_elbow, m_extension, m_wrist));
     driverB.onTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_RIGHT));
     driverX.onTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_LEFT));
     driverY.onTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_MIDDLE));
@@ -298,14 +297,15 @@ public class RobotContainer
     // Operator - A, B, X, Y
     operA.toggleOnTrue(new ArmSetHeightScoreLow(m_elbow, m_extension, m_wrist));
     operB.toggleOnTrue(new ArmSetHeightScoreMid(m_elbow, m_extension, m_wrist));
-    operX.onTrue(new ArmSetHeightStow(m_elbow, m_extension, m_wrist));
+    operX.onTrue(new ArmSetHeightIdle(m_elbow, m_extension, m_wrist));
     operY.onTrue(new ArmSetHeightScoreHigh(m_elbow, m_extension, m_wrist));
     //
     // Operator - Bumpers, start, back
     operLeftBumper.onTrue(new Dummy("left bumper"));
     operRightBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
     operRightBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
-    operBack.onTrue(new ManualMode(m_elbow, m_extension, m_wrist, m_driverPad)); // aka View
+    operBack.toggleOnTrue(new ManualMode(m_elbow, m_extension, m_wrist, m_operatorPad)); // aka View
+
     operStart.onTrue(new Dummy("Start")); // aka Menu
     //
     // Operator - POV buttons
@@ -326,7 +326,7 @@ public class RobotContainer
    */
   private void initDefaultCommands( )
   {
-    m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_driverPad));
+    m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_elbow, m_driverPad));
     m_elbow.setDefaultCommand(new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_NOCHANGE));
     m_extension.setDefaultCommand(new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_NOCHANGE));
     m_wrist.setDefaultCommand(new WristMoveToAngle(m_wrist, WristAngle.WRIST_NOCHANGE));
