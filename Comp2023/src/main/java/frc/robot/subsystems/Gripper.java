@@ -52,9 +52,7 @@ public class Gripper extends SubsystemBase
   {
     // This method will be called once per scheduler run
     double currentDraw = m_gripper.getStatorCurrent( );
-
-    if (m_gripperDebug && (currentDraw >= Constants.kMinCurrent))
-      DataLogManager.log(String.format("%s: current: %.1f", getSubsystem( ), m_gripper.getStatorCurrent( )));
+    SmartDashboard.putNumber("GR_currentDraw", currentDraw);
   }
 
   @Override

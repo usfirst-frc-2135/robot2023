@@ -158,6 +158,9 @@ public class Wrist extends SubsystemBase
       SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
       m_wristLigament.setAngle(m_wristCurDegrees);
     }
+
+    double currentDraw = m_wrist.getStatorCurrent( );
+    SmartDashboard.putNumber("WR_currentDraw", currentDraw);
   }
 
   @Override
@@ -408,34 +411,33 @@ public class Wrist extends SubsystemBase
 
     DataLogManager.log(String.format("%s: TARGET ANGLE %.1f", getSubsystem( ), m_wristTargetDegrees));
 
-    if (WRConsts.kWristCalibrated)
-      if (WRConsts.kWristCalibrated && moveIsInRange(Math.abs(m_wristTargetDegrees - m_wristCurDegrees)))
+    if (WRConsts.kWristCalibrated && moveIsInRange(Math.abs(m_wristTargetDegrees - m_wristCurDegrees)))
+    {
+      // angle constraint check/soft limit for max and min angle before raising
+      if (!moveIsInRange(m_wristTargetDegrees))
       {
-        // angle constraint check/soft limit for max and min angle before raising
-        if (!moveIsInRange(m_wristTargetDegrees))
-        {
-          DataLogManager.log(String.format("%s: Target %.1f degrees is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
-              m_wristTargetDegrees, m_wristMinAngle, m_wristMaxAngle));
-          m_wristTargetDegrees = m_wristCurDegrees;
-        }
-
-        // Start the safety timer
-        m_safetyTimeout = 1.8;
-        m_safetyTimer.reset( );
-        m_safetyTimer.start( );
-
-        if (m_wristValid)
-          m_wrist.set(ControlMode.MotionMagic, wristDegreesToCounts(m_wristTargetDegrees));
-
-        DataLogManager
-            .log(String.format("%s: moving: %.1f -> %.1f degrees", getSubsystem( ), m_wristCurDegrees, m_wristTargetDegrees));
+        DataLogManager.log(String.format("%s: Target %.1f degrees is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
+            m_wristTargetDegrees, m_wristMinAngle, m_wristMaxAngle));
+        m_wristTargetDegrees = m_wristCurDegrees;
       }
-      else
-      {
-        DataLogManager.log(getSubsystem( ) + ": not calibrated");
-        if (m_wristValid)
-          m_wrist.set(ControlMode.PercentOutput, 0.0);
-      }
+
+      // Start the safety timer
+      m_safetyTimeout = 1.8;
+      m_safetyTimer.reset( );
+      m_safetyTimer.start( );
+
+      if (m_wristValid)
+        m_wrist.set(ControlMode.MotionMagic, wristDegreesToCounts(m_wristTargetDegrees));
+
+      DataLogManager
+          .log(String.format("%s: moving: %.1f -> %.1f degrees", getSubsystem( ), m_wristCurDegrees, m_wristTargetDegrees));
+    }
+    else
+    {
+      DataLogManager.log(getSubsystem( ) + ": not calibrated");
+      if (m_wristValid)
+        m_wrist.set(ControlMode.PercentOutput, 0.0);
+    }
   }
 
   public void moveWristAngleExecute( )

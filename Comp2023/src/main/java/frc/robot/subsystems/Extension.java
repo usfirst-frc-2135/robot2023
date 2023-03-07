@@ -137,6 +137,9 @@ public class Extension extends SubsystemBase
       m_extensionCurInches = extensionCountsToInches(curCounts);
       SmartDashboard.putNumber("EX_curInches", m_extensionCurInches);
       m_extensionLigament.setLength(m_extensionCurInches);
+
+      double currentDraw = m_extension.getStatorCurrent( );
+      SmartDashboard.putNumber("EX_currentDraw", currentDraw);
     }
   }
 
@@ -385,34 +388,33 @@ public class Extension extends SubsystemBase
 
     DataLogManager.log(String.format("%s: TARGET DEGREES %.1f", getSubsystem( ), m_extensionTargetInches));
 
-    if (EXConsts.kExtensionCalibrated)
-      if (EXConsts.kExtensionCalibrated && moveIsInRange(Math.abs(m_extensionTargetInches - m_extensionCurInches)))
+    if (EXConsts.kExtensionCalibrated && moveIsInRange(Math.abs(m_extensionTargetInches - m_extensionCurInches)))
+    {
+      // length constraint check/soft limit for max and min length before raising
+      if (!moveIsInRange(m_extensionTargetInches))
       {
-        // length constraint check/soft limit for max and min length before raising
-        if (!moveIsInRange(m_extensionTargetInches))
-        {
-          DataLogManager.log(String.format("%s: Target %.1f inches is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
-              m_extensionTargetInches, m_extensionMinLength, m_extensionMaxLength));
-          m_extensionTargetInches = m_extensionCurInches;
-        }
-
-        // Start the safety timer
-        m_safetyTimeout = 1.8;
-        m_safetyTimer.reset( );
-        m_safetyTimer.start( );
-
-        if (m_extensionValid)
-          m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches));
-
-        DataLogManager.log(String.format("%s: moving: %.1f -> %.1f inches | counts %d -> %d", getSubsystem( ),
-            m_extensionCurInches, m_extensionTargetInches, m_extensionCurInches, m_extensionTargetInches));
+        DataLogManager.log(String.format("%s: Target %.1f inches is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
+            m_extensionTargetInches, m_extensionMinLength, m_extensionMaxLength));
+        m_extensionTargetInches = m_extensionCurInches;
       }
-      else
-      {
-        DataLogManager.log(getSubsystem( ) + ": not calibrated");
-        if (m_extensionValid)
-          m_extension.set(ControlMode.PercentOutput, 0.0);
-      }
+
+      // Start the safety timer
+      m_safetyTimeout = 1.8;
+      m_safetyTimer.reset( );
+      m_safetyTimer.start( );
+
+      if (m_extensionValid)
+        m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches));
+
+      DataLogManager.log(String.format("%s: moving: %.1f -> %.1f inches | counts %d -> %d", getSubsystem( ), m_extensionCurInches,
+          m_extensionTargetInches, m_extensionCurInches, m_extensionTargetInches));
+    }
+    else
+    {
+      DataLogManager.log(getSubsystem( ) + ": not calibrated");
+      if (m_extensionValid)
+        m_extension.set(ControlMode.PercentOutput, 0.0);
+    }
   }
 
   public void moveExtensionLengthExecute( )
