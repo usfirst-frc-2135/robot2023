@@ -150,9 +150,9 @@ public class Constants
 
     public static final double  kElbowAngleMin        = -3.0;   // Elbow minimum allowable degrees
     public static final double  kElbowAngleMax        = 115.0;  // Elbow maximum allowable degrees
-    public static final double  kElbowAngleStow       = 0.0;    // TODO: FIGURE IT OUT EMPIRICALLY
-    public static final double  kElbowAngleIdle       = 3.0;    // TODO: FIGURE IT OUT EMPIRICALLY
-    public static final double  kElbowAngleScoreLow   = 20.0;   // From Mech Design (floor, feet art 5" high)
+    public static final double  kElbowAngleStow       = 2.0;    // TODO: FIGURE IT OUT EMPIRICALLY
+    public static final double  kElbowAngleIdle       = 20.0;   // TODO: FIGURE IT OUT EMPIRICALLY
+    public static final double  kElbowAngleScoreLow   = 30.0;   // From Mech Design (floor, feet art 5" high)
     public static final double  kElbowAngleScoreMid   = 91.0;   // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube)
     public static final double  kElbowAngleScoreHigh  = 103.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube)
     public static final double  kElbowAngleSubstation = 103.0;  // From Mech Design (3'1-38" above floor)
@@ -167,7 +167,7 @@ public class Constants
 
     // CANCoder elbow absolute offset
     public static final boolean kInvertCANCoder       = true;   // CANCoder direction for positive angle in relative mode
-    public static final boolean kElbowCalibrated      = false;   // Indicates whether the elbow has been calibrated by CANCoder
+    public static final boolean kElbowCalibrated      = true;   // Indicates whether the elbow has been calibrated by CANCoder
     public static final double  kCompElbowOffset      = 132.363; // CANCoder offset angle for comp bot
     public static final double  kBetaElbowOffset      = 0.000; // (TODO: Beta requires an offset) CANCoder offset angle for beta bot
 
@@ -295,8 +295,8 @@ public class Constants
     public static final double  kWristMinAngle        = -2.0;  // Wrist minimum allowable Angle
     public static final double  kWristMaxAngle        = 115.0; // Wrist maximum allowable Angle
     public static final double  kWristAngleStow       = 0.0;   // TO-DO: FIGURE IT OUT
-    public static final double  kWristAngleIdle       = 3.0;   // TO-DO: FIGURE IT OUT
-    public static final double  kWristAngleScoreLow   = 20.0;  // From Mech Design (floor, feet art 5" high)
+    public static final double  kWristAngleIdle       = 5.0;   // TO-DO: FIGURE IT OUT
+    public static final double  kWristAngleScoreLow   = 30.0;  // From Mech Design (floor, feet art 5" high)
     public static final double  kWristAngleScoreMid   = 91.0;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube)
     public static final double  kWristAngleScoreHigh  = 103.0; // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube)
     public static final double  kWristAngleSubstation = 103.0; // From Mech Design (3'1-38" above floor)
