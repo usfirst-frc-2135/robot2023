@@ -13,6 +13,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderStatusFrame;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -62,7 +63,6 @@ public class Wrist extends SubsystemBase
 
   private boolean                         m_wristValid;                 // Health indicator for wrist Talon 
   private boolean                         m_wristCCValid;               // Health indicator for wrist CANCoder 
-  private double                          m_wristAngleOffset    = 0.0;  // CANCoder angle measured at reference point
 
   //Devices and simulation objs
   private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true,
@@ -122,14 +122,21 @@ public class Wrist extends SubsystemBase
       m_wristCANCoder.configAllSettings(CTREConfigs.wristCancoderConfig( ));
       m_wristCANCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
       m_wristCANCoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 255);
-      m_wristAngleOffset = (Constants.isComp) ? WRConsts.kCompWristOffset : WRConsts.kBetaWristOffset;
-      m_wristAngleOffset *= ((WRConsts.kWristCANCoderAbsInvert) ? -1.0 : 1.0);
-      double absolutePosition =
-          Conversions.degreesToFalcon(getCanCoder( ).getDegrees( ) - m_wristAngleOffset, WRConsts.kWristGearRatio);
+
+      double m_wristCurDegrees = getCanCoder( ).getDegrees( );
+      DataLogManager.log(getSubsystem( ) + ": Initial degrees " + m_wristCurDegrees);
+      double absolutePosition = Conversions.degreesToFalcon(m_wristCurDegrees, WRConsts.kWristGearRatio);
 
       if (RobotBase.isReal( ))
         m_wrist.setSelectedSensorPosition(absolutePosition);
     }
+
+    m_wrist.configReverseSoftLimitThreshold(Conversions.degreesToFalcon(m_wristMinAngle, WRConsts.kWristGearRatio),
+        Constants.kCANTimeoutMs);
+    m_wrist.configReverseSoftLimitEnable(true, Constants.kCANTimeoutMs);
+    m_wrist.configForwardSoftLimitThreshold(Conversions.degreesToFalcon(m_wristMaxAngle, WRConsts.kWristGearRatio),
+        Constants.kCANTimeoutMs);
+    m_wrist.configForwardSoftLimitEnable(true, Constants.kCANTimeoutMs);
 
     initSmartDashboard( );
 
@@ -156,11 +163,11 @@ public class Wrist extends SubsystemBase
 
       m_wristCurDegrees = wristCountsToDegrees(curCounts);
       SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
+      SmartDashboard.putNumber("WR_targetDegrees", m_wristTargetDegrees);
       m_wristLigament.setAngle(m_wristCurDegrees);
+      double currentDraw = m_wrist.getStatorCurrent( );
+      SmartDashboard.putNumber("WR_currentDraw", currentDraw);
     }
-
-    double currentDraw = m_wrist.getStatorCurrent( );
-    SmartDashboard.putNumber("WR_currentDraw", currentDraw);
   }
 
   @Override
@@ -243,7 +250,12 @@ public class Wrist extends SubsystemBase
 
   public boolean moveIsInRange(double degrees)
   {
-    return degrees > m_wristMinAngle && degrees < m_wristMaxAngle;
+    return (degrees > m_wristMinAngle) && (degrees < m_wristMaxAngle);
+  }
+
+  public double getAngle( )
+  {
+    return m_wristCurDegrees;
   }
 
   private void wristTalonInitialize(WPI_TalonFX motor, boolean inverted)
@@ -295,51 +307,35 @@ public class Wrist extends SubsystemBase
 
   public void moveWristWithJoystick(XboxController joystick)
   {
-    double yWristValue = 0.0;
-    double motorOutput = 0.0;
-    double manualSpeedMax = WRConsts.kWristSpeedMaxManual;
+    double yValue = -joystick.getRightY( );
+    WristMode newMode;
 
-    yWristValue = -joystick.getRightY( );
-    if (yWristValue > -m_stickDeadband && yWristValue < m_stickDeadband)
-    {
-      if (m_wristMode != WristMode.WRIST_STOPPED)
-        DataLogManager.log(getSubsystem( ) + ": move Stopped");
-      m_wristMode = WristMode.WRIST_STOPPED;
-    }
+    yValue = MathUtil.applyDeadband(yValue, m_stickDeadband);
+
+    if (yValue == 0.0)
+      newMode = WristMode.WRIST_STOPPED;
+    else if (yValue < 0.0)
+      newMode = WristMode.WRIST_UP;
     else
+      newMode = WristMode.WRIST_DOWN;
+
+    if (newMode != m_wristMode)
     {
-      // If joystick is above a value, wrist will move up
-      if (yWristValue > m_stickDeadband)
-      {
-        if (m_wristMode != WristMode.WRIST_UP)
-          DataLogManager.log(getSubsystem( ) + ": move Up");
-        m_wristMode = WristMode.WRIST_UP;
-
-        yWristValue -= m_stickDeadband;
-        yWristValue *= (1.0 / (1.0 - m_stickDeadband));
-        motorOutput = manualSpeedMax * (yWristValue * Math.abs(yWristValue));
-      }
-      // If joystick is below a value, wrist will move down
-      else if (yWristValue < -m_stickDeadband)
-      {
-        if (m_wristMode != WristMode.WRIST_DOWN)
-          DataLogManager.log(getSubsystem( ) + " : move Down");
-        m_wristMode = WristMode.WRIST_DOWN;
-
-        yWristValue += m_stickDeadband;
-        yWristValue *= (1.0 / (1.0 - m_stickDeadband));
-        motorOutput = manualSpeedMax * (yWristValue * Math.abs(yWristValue));
-      }
+      m_wristMode = newMode;
+      DataLogManager.log(getSubsystem( ) + ": move " + m_wristMode);
     }
 
-    if (!moveIsInRange(m_wristCurDegrees))
+    // DataLogManager.log(String.format("debug: %.1f  %.1f %.2f", m_wristCurDegrees, m_wristMinAngle, yValue));
+    if (((m_wristCurDegrees < m_wristMinAngle) && yValue < 0.0) || ((m_wristCurDegrees > m_wristMaxAngle) && yValue > 0.0))
     {
       DataLogManager.log(getSubsystem( ) + ": move OUT OF RANGE!");
-      motorOutput = 0.0;
+      yValue = 0.0;
     }
 
+    m_wristTargetDegrees = m_wristCurDegrees;
+
     if (m_wristValid)
-      m_wrist.set(ControlMode.PercentOutput, motorOutput);
+      m_wrist.set(ControlMode.PercentOutput, yValue * WRConsts.kWristSpeedMaxManual);
   }
 
   public void setWristStopped( )

@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotState;
@@ -136,6 +137,7 @@ public class Extension extends SubsystemBase
 
       m_extensionCurInches = extensionCountsToInches(curCounts);
       SmartDashboard.putNumber("EX_curInches", m_extensionCurInches);
+      SmartDashboard.putNumber("EX_targetInches", m_extensionTargetInches);
       m_extensionLigament.setLength(m_extensionCurInches);
 
       double currentDraw = m_extension.getStatorCurrent( );
@@ -220,7 +222,7 @@ public class Extension extends SubsystemBase
 
   public boolean moveIsInRange(double inches)
   {
-    return inches > m_extensionMinLength && inches < m_extensionMaxLength;
+    return (inches > m_extensionMinLength) && (inches < m_extensionMaxLength);
   }
 
   private void extensionTalonInitialize(WPI_TalonFX motor, boolean inverted)
@@ -272,48 +274,35 @@ public class Extension extends SubsystemBase
 
   public void moveExtensionWithJoystick(XboxController joystick)
   {
-    double xExtensionValue = 0.0;
+    double yValue = joystick.getRightX( );
     double motorOutput = 0.0;
-    double manualSpeedMax = EXConsts.kExtensionSpeedMaxManual;
+    ExtensionMode newMode;
 
-    xExtensionValue = -joystick.getRightX( );
-    if (xExtensionValue > -m_stickDeadband && xExtensionValue < m_stickDeadband)
-    {
-      if (m_extensionMode != ExtensionMode.EXTENSION_STOPPED)
-        DataLogManager.log(getSubsystem( ) + ": move Stopped");
-      m_extensionMode = ExtensionMode.EXTENSION_STOPPED;
-    }
+    yValue = MathUtil.applyDeadband(yValue, m_stickDeadband);
+
+    if (yValue == 0.0)
+      newMode = ExtensionMode.EXTENSION_STOPPED;
+    else if (yValue < 0.0)
+      newMode = ExtensionMode.EXTENSION_IN;
     else
+      newMode = ExtensionMode.EXTENSION_OUT;
+
+    if (newMode != m_extensionMode)
     {
-      // If joystick is above a value, extension will move up
-      if (xExtensionValue > m_stickDeadband)
-      {
-        if (m_extensionMode != ExtensionMode.EXTENSION_IN)
-          DataLogManager.log(getSubsystem( ) + ": move Out");
-        m_extensionMode = ExtensionMode.EXTENSION_IN;
-
-        xExtensionValue -= m_stickDeadband;
-        xExtensionValue *= (1.0 / (1.0 - m_stickDeadband));
-        motorOutput = manualSpeedMax * (xExtensionValue * Math.abs(xExtensionValue));
-      }
-      // If joystick is below a value, extension will move down
-      else if (xExtensionValue < -m_stickDeadband)
-      {
-        if (m_extensionMode != ExtensionMode.EXTENSION_OUT)
-          DataLogManager.log(getSubsystem( ) + ": move In");
-        m_extensionMode = ExtensionMode.EXTENSION_OUT;
-
-        xExtensionValue += m_stickDeadband;
-        xExtensionValue *= (1.0 / (1.0 - m_stickDeadband));
-        motorOutput = manualSpeedMax * (xExtensionValue * Math.abs(xExtensionValue));
-      }
+      m_extensionMode = newMode;
+      DataLogManager.log(getSubsystem( ) + ": move " + m_extensionMode);
     }
 
-    if (!moveIsInRange(m_extensionCurInches))
+    if (((m_extensionCurInches < m_extensionMinLength) && motorOutput < 0.0)
+        || ((m_extensionCurInches > m_extensionMaxLength) && motorOutput > 0.0))
     {
       DataLogManager.log(getSubsystem( ) + ": move OUT OF RANGE!");
       motorOutput = 0.0;
     }
+    else
+      motorOutput = yValue * EXConsts.kExtensionSpeedMaxManual;
+
+    m_extensionTargetInches = m_extensionCurInches;
 
     if (m_extensionValid)
       m_extension.set(ControlMode.PercentOutput, motorOutput);
