@@ -81,11 +81,10 @@ public class Constants
     public static final int    kCANID_Elbow      = 15;
     public static final int    kCANID_ELCANCoder = 16;
 
-    public static final int    kCANID_Wrist      = 17;
-    public static final int    kCANID_WRCANCoder = 18;
+    public static final int    kCANID_Extension  = 17;
 
-    public static final int    kCANID_Extension  = 19;
-    public static final int    kCANID_EXCANCoder = 20;
+    public static final int    kCANID_Wrist      = 19;
+    public static final int    kCANID_WRCANCoder = 20;
 
     public static final int    kCANID_Gripper    = 21;
 
@@ -116,59 +115,61 @@ public class Constants
   public static final class SWConsts
   {
     // Constants for balance
-    public static final double kDriveBalancedAngle = 5.0;    // Pitch values less than this stop driving
-    public static final double kDriveBalanceKp     = -0.04;  // Amount of power to apply per degree
+    public static final double kDriveBalancedAngle  = 5.0;    // Pitch values less than this stop driving
+    public static final double kDriveBalanceKp      = -0.045;  // Amount of power to apply per degree
 
     // Limelight PID driving controls
-    public static final double kTurnConstant       = 0.0;
-    public static final double kTurnPidKp          = 0.005;
-    public static final double kTurnPidKi          = 0.0;
-    public static final double kTurnPidKd          = 0.0;
-    public static final double kTurnMax            = 0.4;
-    public static final double kThrottlePidKp      = 0.011;
-    public static final double kThrottlePidKi      = 0.0;
-    public static final double kThrottlePidKd      = 0.0;
-    public static final double kThrottleMax        = 0.2;
-    public static final double kThrottleShape      = 10.0;
+    public static final double kTurnConstant        = 0.0;
+    public static final double kTurnPidKp           = 0.005;
+    public static final double kTurnPidKi           = 0.0;
+    public static final double kTurnPidKd           = 0.0;
+    public static final double kTurnMax             = 0.4;
+    public static final double kThrottlePidKp       = 0.011;
+    public static final double kThrottlePidKi       = 0.0;
+    public static final double kThrottlePidKd       = 0.0;
+    public static final double kThrottleMax         = 0.2;
+    public static final double kThrottleShape       = 10.0;
 
-    public static final double kTargetAngle        = 0.0;      // Optimal shooting angle
-    public static final double kSetPointDistance   = 60.0;     // Optimal shooting distance
-    public static final double kAngleThreshold     = 3.5;      // Degrees tolerance around optimal
-    public static final double kDistThreshold      = 6.0;      // Inches tolerance around optimal
+    public static final double kTargetAngle         = 0.0;      // Optimal shooting angle
+    public static final double kSetPointDistance    = 60.0;     // Optimal shooting distance
+    public static final double kAngleThreshold      = 3.5;      // Degrees tolerance around optimal
+    public static final double kDistThreshold       = 6.0;      // Inches tolerance around optimal
+
+    public static final double kElbowDriveSlowAngle = 20.0;     // When arm is out beyond this angle - drive is slowed down
   }
 
   public static final class ELConsts
   {
     // Global settings
 
-    public static final double  kElbowGearRatio         = 300;    // Gear reduction for elbow
-    public static final double  kElbowDegreesPerCount   = 360 / Falcon500.kEncoderCPR / kElbowGearRatio;
-    public static final double  kForearmLengthMeters    = 1.22;   // Sim value: 48 inches
-    public static final double  kForearmMassKg          = 6.0;    // Sim value: 13.2 lbs 
-    public static final boolean kInvertMotor            = true;   // Motor direction for positive input
+    public static final double  kElbowGearRatio       = 300;    // Gear reduction for elbow
+    public static final double  kElbowDegreesPerCount = 360 / Falcon500.kEncoderCPR / kElbowGearRatio;
+    public static final double  kForearmLengthMeters  = 1.22;   // Sim value: 48 inches
+    public static final double  kForearmMassKg        = 6.0;    // Sim value: 13.2 lbs 
+    public static final boolean kInvertMotor          = true;   // Motor direction for positive input
 
-    public static final double  kElbowAngleMin          = -3.0;   // Elbow minimum allowable degrees
-    public static final double  kElbowAngleMax          = 110.0;  // Elbow maximum allowable degrees
-    public static final double  kElbowAngleStow         = 0.0;    // TODO: FIGURE IT OUT
-    public static final double  kElbowAngleScoreLow     = 20.0;   // From Mech Design (floor, feet art 5" high)
-    public static final double  kElbowAngleScoreMid     = 91.0;   // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube)
-    public static final double  kElbowAngleScoreHigh    = 103.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube)
-    public static final double  kElbowAngleSubstation   = 103.0;  // From Mech Design (3'1-38" above floor)
+    public static final double  kElbowAngleMin        = -3.0;   // Elbow minimum allowable degrees
+    public static final double  kElbowAngleMax        = 115.0;  // Elbow maximum allowable degrees
+    public static final double  kElbowAngleStow       = 2.0;    // TODO: FIGURE IT OUT EMPIRICALLY
+    public static final double  kElbowAngleIdle       = 20.0;   // TODO: FIGURE IT OUT EMPIRICALLY
+    public static final double  kElbowAngleScoreLow   = 30.0;   // From Mech Design (floor, feet art 5" high)
+    public static final double  kElbowAngleScoreMid   = 91.0;   // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube)
+    public static final double  kElbowAngleScoreHigh  = 103.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube)
+    public static final double  kElbowAngleSubstation = 103.0;  // From Mech Design (3'1-38" above floor)
 
     // Current limit settings - elbow
-    public static final double  kSupplyCurrentLimit     = 25.0;  // Supply current limit (after trigger)
-    public static final double  kSupplyTriggerCurrent   = 25.0;  // Supply trigger current that will cause limiting
-    public static final double  kSupplyTriggerTime      = 0.001; // Supply time duration of trigger that will causing limiting
-    public static final double  kStatorCurrentLimit     = 25.0;  // Stator current limit (after trigger)
-    public static final double  kStatorTriggerCurrent   = 25.0;  // Stator trigger current that will cause limiting
-    public static final double  kStatorTriggerTime      = 0.001; // Stator time duration of trigger that will causing limiting
+    public static final double  kSupplyCurrentLimit   = 25.0;  // Supply current limit (after trigger)
+    public static final double  kSupplyTriggerCurrent = 25.0;  // Supply trigger current that will cause limiting
+    public static final double  kSupplyTriggerTime    = 0.001; // Supply time duration of trigger that will causing limiting
+    public static final double  kStatorCurrentLimit   = 25.0;  // Stator current limit (after trigger)
+    public static final double  kStatorTriggerCurrent = 25.0;  // Stator trigger current that will cause limiting
+    public static final double  kStatorTriggerTime    = 0.001; // Stator time duration of trigger that will causing limiting
 
     // CANCoder elbow absolute offset
-    public static final boolean kInvertCANCoder         = false;  // CANCoder direction for positive angle in relative mode
-    public static final boolean kElbowCANCoderAbsInvert = true;   // CANCoder direction for positive angle in absolute mode
-    public static final boolean kElbowCalibrated        = false;  // Indicates whether the elbow has been calibrated by CANCoder
-    public static final double  kCompElbowOffset        = 0.000;  // CANCoder offset angle for comp bot
-    public static final double  kBetaElbowOffset        = 251.279 - 5.0; // (TODO: Beta requires an offset) CANCoder offset angle for beta bot
+    public static final boolean kInvertCANCoder       = true;   // CANCoder direction for positive angle in relative mode
+    public static final boolean kElbowCalibrated      = true;   // Indicates whether the elbow has been calibrated by CANCoder
+    public static final double  kCompElbowOffset      = 132.363; // CANCoder offset angle for comp bot
+    public static final double  kBetaElbowOffset      = 0.000; // (TODO: Beta requires an offset) CANCoder offset angle for beta bot
 
     // Manual config parameters
 
@@ -188,6 +189,7 @@ public class Constants
     {
       ELBOW_NOCHANGE,     // No change in elbow angle--maintain current position
       ELBOW_STOW,         // Move elbow to stow angle
+      ELBOW_IDLE,         // Move elbow to idle andgle
       ELBOW_LOW,          // Move elbow to low-scoring angle
       ELBOW_MID,          // Move elbow to shelf Angle; slightly higher than mid-scoring angle so this is used for both
       ELBOW_HIGH,         // Move elbow to high-scoring angle
@@ -210,38 +212,38 @@ public class Constants
   {
     // Global settings
 
-    public static final double  kExtensionGearRatio         = 9.63;    // Gear reduction for extension
-    public static final double  kDrumDiameterInches         = 1.375;  // Drum diameter in inches
-    public static final double  kDrumCircumInches           = kDrumDiameterInches * Math.PI;            // Drum diameter in inches
-    public static final double  kRolloutRatio               = kDrumCircumInches / kExtensionGearRatio;  // inches per shaft rotation
-    public static final double  kInchesPerCount             = kRolloutRatio / Falcon500.kEncoderCPR;
-    public static final double  kExtensionInchesPerCount    = 360 / Falcon500.kEncoderCPR / kExtensionGearRatio;
+    public static final double  kExtensionGearRatio        = 9.64;   // Gear reduction for extension
+    public static final double  kDrumDiameterInches        = 1.375;  // Drum diameter in inches
+    public static final double  kDrumCircumInches          = kDrumDiameterInches * Math.PI;            // Drum diameter in inches
+    public static final double  kRolloutRatio              = kDrumCircumInches / kExtensionGearRatio;  // inches per shaft rotation
+    public static final double  kInchesPerCount            = kRolloutRatio / Falcon500.kEncoderCPR;
+    public static final double  kExtensionInchesPerCount   = 360 / Falcon500.kEncoderCPR / kExtensionGearRatio;
     // public static final double  kForearmLengthMeters        = 1.22;   // Sim value: 48 inches (no sim for extension)
     // public static final double  kForearmMassKg              = 6.0;    // Sim value: 13.2 lbs 
-    public static final boolean kInvertMotor                = true;   // Motor direction for positive input
+    public static final boolean kInvertMotor               = false;  // Motor direction for positive input
 
-    public static final double  kExtensionLengthMin         = -0.5;   // Extension minimum allowable length
-    public static final double  kExtensionLengthMax         = 22.0;   // Extension maximum allowable length
-    public static final double  kExtensionLengthStow        = 0.0;    // TODO: FIGURE IT OUT
-    public static final double  kExtensionLengthScoreLow    = 8.0;    // From Mech Design (floor, feet art 5" high)
-    public static final double  kExtensionLengthScoreMid    = 3.0;    // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube)
-    public static final double  kExtensionLengthScoreHigh   = 22.0;   // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube)
-    public static final double  kExtensionLengthSubstation  = 0.0;    // From Mech Design (3'1-38" above floor)
+    public static final double  kExtensionLengthMin        = -0.5;   // Extension minimum allowable length
+    public static final double  kExtensionLengthMax        = 20.0;   // Extension maximum allowable length
+    public static final double  kExtensionLengthStow       = 0.0;    // TODO: FIGURE IT OUT EMPIRICALLY
+    public static final double  kExtensionLengthIdle       = 0.0;    // TODO: FIGURE IT OUT EMPIRICALLY
+    public static final double  kExtensionLengthScoreLow   = 8.0;    // From Mech Design (floor, feet art 5" high)
+    public static final double  kExtensionLengthScoreMid   = 3.0;    // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube)
+    public static final double  kExtensionLengthScoreHigh  = 18.0;   // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube)
+    public static final double  kExtensionLengthSubstation = 0.0;    // From Mech Design (3'1-38" above floor)
 
     // Current limit settings - extension
-    public static final double  kSupplyCurrentLimit         = 15.0;  // Supply current limit (after trigger)
-    public static final double  kSupplyTriggerCurrent       = 15.0;  // Supply trigger current that will cause limiting
-    public static final double  kSupplyTriggerTime          = 0.001; // Supply time duration of trigger that will causing limiting
-    public static final double  kStatorCurrentLimit         = 15.0;  // Stator current limit (after trigger)
-    public static final double  kStatorTriggerCurrent       = 15.0;  // Stator trigger current that will cause limiting
-    public static final double  kStatorTriggerTime          = 0.001; // Stator time duration of trigger that will causing limiting
+    public static final double  kSupplyCurrentLimit        = 15.0;  // Supply current limit (after trigger)
+    public static final double  kSupplyTriggerCurrent      = 15.0;  // Supply trigger current that will cause limiting
+    public static final double  kSupplyTriggerTime         = 0.001; // Supply time duration of trigger that will causing limiting
+    public static final double  kStatorCurrentLimit        = 15.0;  // Stator current limit (after trigger)
+    public static final double  kStatorTriggerCurrent      = 15.0;  // Stator trigger current that will cause limiting
+    public static final double  kStatorTriggerTime         = 0.001; // Stator time duration of trigger that will causing limiting
 
     // CANCoder extension absolute offset
-    public static final boolean kInvertCANCoder             = false;  // CANCoder direction for positive angle in relative mode
-    public static final boolean kExtensionCANCoderAbsInvert = true;   // CANCoder direction for positive angle in absolute mode
-    public static final boolean kExtensionCalibrated        = false;  // Indicates whether the extension has been calibrated by CANCoder
-    public static final double  kCompExtensionOffset        = 0.000;  // CANCoder offset for comp bot
-    public static final double  kBetaExtensionOffset        = 0.0;    // CANCoder offset for beta bot
+    public static final boolean kInvertCANCoder            = false;  // CANCoder direction for positive angle in relative mode
+    public static final boolean kExtensionCalibrated       = false;  // Indicates whether the extension has been calibrated by CANCoder
+    public static final double  kCompExtensionOffset       = 0.000;  // CANCoder offset for comp bot
+    public static final double  kBetaExtensionOffset       = 0.000;  // CANCoder offset for beta bot
 
     // Manual config parameters
 
@@ -261,21 +263,22 @@ public class Constants
     {
       EXTENSION_NOCHANGE,     // No change in extension length--maintain current position
       EXTENSION_STOW,         // Move extension to stow length
+      EXTENSION_IDLE,         // Move extension to idle length
       EXTENSION_LOW,          // Move extension to low-scoring length
       EXTENSION_MID,          // Move extension to shelf length
       EXTENSION_HIGH,         // Move extension to high-scoring length
       EXTENSION_SHELF,        // Move extension to high-scoring length
     }
 
-    public static final int    kExtensionMMVelocity       = 16646;  // Extension motion magic velocity
-    public static final int    kExtensionMMAcceleration   = 16646;  // Extension motion magic acceleration
+    public static final int    kExtensionMMVelocity       = 16646 / 2;  // Extension motion magic velocity
+    public static final int    kExtensionMMAcceleration   = 16646 / 2;  // Extension motion magic acceleration
     public static final int    kExtensionMMSCurveStrength = 0;      // Extension motion magic S curve smoothing strength
     public static final double kExtensionPidKf            = 0.0461; // Extension PID force constant
     public static final double kExtensionPidKp            = 0.0246; // Extension PID proportional constant
     public static final double kExtensionPidKi            = 0.0;    // Extension PID integral constant
     public static final double kExtensionPidKd            = 0.0;    // Extension PID derivative constant
     public static final int    kExtensionAllowedError     = 0;      // Extension PID allowable closed loop error in counts
-    public static final double kExtensionToleranceInches  = 1.0;    // Extension PID tolerance in inches
+    public static final double kExtensionToleranceInches  = 0.5;    // Extension PID tolerance in inches
     public static final double kExtensionArbitraryFF      = 0.000;  // Extension motor output for extension when fully retracted
   }
 
@@ -283,34 +286,34 @@ public class Constants
   {
     // Global settings
 
-    public static final double  kWristGearRatio         = 305;   // Gear reduction for wrist
-    public static final double  kWristDegreesPerCount   = 360 / Falcon500.kEncoderCPR / kWristGearRatio;
-    public static final double  kGripperLengthMeters    = 0.3;   // Sim value: 11.8 in
-    public static final double  kGripperMassKg          = 3.0;   // Sim value: 6.6 lbs
-    public static final boolean kInvertMotor            = true;  // Motor direction for positive input
+    public static final double  kWristGearRatio       = 375;   // Gear reduction for wrist
+    public static final double  kWristDegreesPerCount = 360 / Falcon500.kEncoderCPR / kWristGearRatio;
+    public static final double  kGripperLengthMeters  = 0.3;   // Sim value: 11.8 in
+    public static final double  kGripperMassKg        = 3.0;   // Sim value: 6.6 lbs
+    public static final boolean kInvertMotor          = false; // Motor direction for positive input
 
-    public static final double  kWristMinAngle          = -3.0;  // Wrist maximum allowable Angle
-    public static final double  kWristMaxAngle          = 110.0; // Wrist maximum allowable Angle
-    public static final double  kWristAngleStow         = 0.0;   // TO-DO: FIGURE IT OUT
-    public static final double  kWristAngleScoreLow     = 20.0;  // From Mech Design (floor, feet art 5" high)
-    public static final double  kWristAngleScoreMid     = 91.0;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube)
-    public static final double  kWristAngleScoreHigh    = 103.0; // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube)
-    public static final double  kWristAngleSubstation   = 103.0; // From Mech Design (3'1-38" above floor)
+    public static final double  kWristMinAngle        = -2.0;  // Wrist minimum allowable Angle
+    public static final double  kWristMaxAngle        = 115.0; // Wrist maximum allowable Angle
+    public static final double  kWristAngleStow       = 0.0;   // TO-DO: FIGURE IT OUT
+    public static final double  kWristAngleIdle       = 5.0;   // TO-DO: FIGURE IT OUT
+    public static final double  kWristAngleScoreLow   = 30.0;  // From Mech Design (floor, feet art 5" high)
+    public static final double  kWristAngleScoreMid   = 91.0;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube)
+    public static final double  kWristAngleScoreHigh  = 103.0; // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube)
+    public static final double  kWristAngleSubstation = 103.0; // From Mech Design (3'1-38" above floor)
 
     // Current limit settings - wrist
-    public static final double  kSupplyCurrentLimit     = 25.0;  // Supply current limit (after trigger)
-    public static final double  kSupplyTriggerCurrent   = 25.0;  // Supply trigger current that will cause limiting
-    public static final double  kSupplyTriggerTime      = 0.001; // Supply time duration of trigger that will causing limiting
-    public static final double  kStatorCurrentLimit     = 25.0;  // Stator current limit (after trigger)
-    public static final double  kStatorTriggerCurrent   = 25.0;  // Stator trigger current that will cause limiting
-    public static final double  kStatorTriggerTime      = 0.001; // Stator time duration of trigger that will causing limiting
+    public static final double  kSupplyCurrentLimit   = 15.0;  // Supply current limit (after trigger)
+    public static final double  kSupplyTriggerCurrent = 15.0;  // Supply trigger current that will cause limiting
+    public static final double  kSupplyTriggerTime    = 0.001; // Supply time duration of trigger that will causing limiting
+    public static final double  kStatorCurrentLimit   = 10.0;  // Stator current limit (after trigger)
+    public static final double  kStatorTriggerCurrent = 10.0;  // Stator trigger current that will cause limiting
+    public static final double  kStatorTriggerTime    = 0.001; // Stator time duration of trigger that will causing limiting
 
     // CANCoder wrist absolute offset
-    public static final boolean kInvertCANCoder         = false;  // CANCoder direction for positive angle in relative mode
-    public static final boolean kWristCANCoderAbsInvert = false;  // CANCoder direction for positive angle in absolute mode
-    public static final boolean kWristCalibrated        = false;  // Indicates whether the wrist has been calibrated by CANCoder
-    public static final double  kCompWristOffset        = 0.000;  // CANCoder offset angle for comp bot
-    public static final double  kBetaWristOffset        = 0.000;  // CANCoder offset angle for beta bot
+    public static final boolean kInvertCANCoder       = true;  // CANCoder direction for positive angle in relative mode
+    public static final boolean kWristCalibrated      = true;  // Indicates whether the wrist has been calibrated by CANCoder
+    public static final double  kCompWristOffset      = -48.4;  // CANCoder offset angle for comp bot
+    public static final double  kBetaWristOffset      = 0.000;  // CANCoder offset angle for beta bot
 
     // Manual config parameters
 
@@ -330,14 +333,15 @@ public class Constants
     {
       WRIST_NOCHANGE,     // No change in Wrist Angle--maintain current position
       WRIST_STOW,         // Move wrist to stow position
+      WRIST_IDLE,         // Move wrist to stow position
       WRIST_LOW,          // Move wrist to low-scoring Angle
       WRIST_MID,          // Move wrist to shelf Angle; slightly higher than mid-scoring Angle so this is used for both
       WRIST_HIGH,         // Move wrist to high-scoring Angle
       WRIST_SHELF         // Move wrist to substation loading shelf angle
     }
 
-    public static final int    kWristMMVelocity       = 16466 * 3 / 4;  // (TODO: Slowed until new wrist) Wrist motion magic velocity
-    public static final int    kWristMMAcceleration   = 16466 * 3 / 4;  // (TODO: Slowed until new wrist) Wrist motion magic acceleration
+    public static final int    kWristMMVelocity       = 16466;  // Wrist motion magic velocity
+    public static final int    kWristMMAcceleration   = 16466;  // Wrist motion magic acceleration
     public static final int    kWristMMSCurveStrength = 0;      // Wrist motion magic S curve smoothing strength
     public static final double kWristPidKf            = 0.0466; // Wrist PID force constant
     public static final double kWristPidKp            = 0.069;  // Wrist PID proportional constant
@@ -497,7 +501,9 @@ public class Constants
 
     /* Swerve Profiling Values */
     public static final double                                       maxSpeed                    = 4.5; // meters per second
-    public static final double                                       maxAngularVelocity          = 10.0;
+    public static final double                                       maxAngularVelocity          = 6.0; //orginially 10.0
+    public static final double                                       maxSpeedSlowMode            = 2.25; // meters per second
+    public static final double                                       maxAngularVelocitySlowMode  = 4.0; //orginially 5.0
 
     /* Neutral Modes */
     public static final NeutralMode                                  angleNeutralMode            = NeutralMode.Coast;
@@ -521,7 +527,7 @@ public class Constants
     public static final class Mod0
     {
       public static final double epsilonAngleOffset = 325.723;
-      public static final double compAngleOffset    = 16.172;
+      public static final double compAngleOffset    = 15.732;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -534,7 +540,7 @@ public class Constants
     public static final class Mod1
     {
       public static final double epsilonAngleOffset = 142.91;
-      public static final double compAngleOffset    = 239.502;
+      public static final double compAngleOffset    = 239.766;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -546,8 +552,8 @@ public class Constants
     /* Back Left Module - Module 2 */
     public static final class Mod2
     {
-      public static final double epsilonAngleOffset = 227.549;
-      public static final double compAngleOffset    = 97.471;
+      public static final double epsilonAngleOffset = 137.988;
+      public static final double compAngleOffset    = 98.174;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -560,7 +566,7 @@ public class Constants
     public static final class Mod3
     {
       public static final double epsilonAngleOffset = 44.736;
-      public static final double compAngleOffset    = 92.549;
+      public static final double compAngleOffset    = 93.076;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {

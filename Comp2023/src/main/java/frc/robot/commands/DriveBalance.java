@@ -1,23 +1,23 @@
-
-// ROBOTBUILDER TYPE: Command.
-
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Swerve;
 
 /**
  *
  */
-public class AutoStop extends CommandBase
+public class DriveBalance extends CommandBase
 {
-  private final Swerve m_swerve;
+  private Swerve m_swerve;
+  private Timer  m_timer = new Timer( );
 
-  public AutoStop(Swerve swerve)
+  public DriveBalance(Swerve swerve)
   {
     m_swerve = swerve;
 
-    setName("AutoStop");
     addRequirements(m_swerve);
   }
 
@@ -25,26 +25,29 @@ public class AutoStop extends CommandBase
   @Override
   public void initialize( )
   {
-
+    DataLogManager.log("Running Drive Balance!");
+    m_timer.restart( );
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute( )
   {
-    m_swerve.driveStop(true);
+    m_swerve.driveBalanceExecute( );
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted)
-  {}
+  {
+    m_timer.stop( );
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished( )
   {
-    return false;
+    return (m_timer.hasElapsed(15) || RobotState.isDisabled( ));
   }
 
   @Override
