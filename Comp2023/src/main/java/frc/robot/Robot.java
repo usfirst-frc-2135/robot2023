@@ -114,6 +114,7 @@ public class Robot extends TimedRobot
     m_robotContainer.m_power.initialize( );
     m_robotContainer.m_swerve.initialize( );
     m_robotContainer.m_elbow.initialize( );
+    m_robotContainer.m_extension.initialize( );
     m_robotContainer.m_wrist.initialize( );
     m_robotContainer.m_gripper.initialize( );
   }

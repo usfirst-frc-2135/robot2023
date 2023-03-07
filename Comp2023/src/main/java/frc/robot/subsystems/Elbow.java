@@ -161,6 +161,9 @@ public class Elbow extends SubsystemBase
       m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
       SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
       m_elbowLigament.setAngle(m_elbowCurDegrees);
+
+      double currentDraw = m_elbow.getStatorCurrent( );
+      SmartDashboard.putNumber("EL_currentDraw", currentDraw);
     }
   }
 
@@ -417,34 +420,33 @@ public class Elbow extends SubsystemBase
 
     DataLogManager.log(String.format("%s: TARGET ANGLE %.1f", getSubsystem( ), m_elbowTargetDegrees));
 
-    if (ELConsts.kElbowCalibrated)
-      if (ELConsts.kElbowCalibrated && moveIsInRange(Math.abs(m_elbowTargetDegrees - m_elbowCurDegrees)))
+    if (ELConsts.kElbowCalibrated && moveIsInRange(Math.abs(m_elbowTargetDegrees - m_elbowCurDegrees)))
+    {
+      // angle constraint check/soft limit for max and min angle before raising
+      if (!moveIsInRange(m_elbowTargetDegrees))
       {
-        // angle constraint check/soft limit for max and min angle before raising
-        if (!moveIsInRange(m_elbowTargetDegrees))
-        {
-          DataLogManager.log(String.format("%s: Target %.1f degrees is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
-              m_elbowTargetDegrees, m_elbowMinAngle, m_elbowMaxAngle));
-          m_elbowTargetDegrees = m_elbowCurDegrees;
-        }
-
-        // Start the safety timer
-        m_safetyTimeout = 1.8;
-        m_safetyTimer.reset( );
-        m_safetyTimer.start( );
-
-        if (m_elbowValid)
-          m_elbow.set(ControlMode.MotionMagic, elbowDegreesToCounts(m_elbowTargetDegrees));
-
-        DataLogManager
-            .log(String.format("%s: moving: %.1f -> %.1f degrees", getSubsystem( ), m_elbowCurDegrees, m_elbowTargetDegrees));
+        DataLogManager.log(String.format("%s: Target %.1f degrees is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
+            m_elbowTargetDegrees, m_elbowMinAngle, m_elbowMaxAngle));
+        m_elbowTargetDegrees = m_elbowCurDegrees;
       }
-      else
-      {
-        DataLogManager.log(getSubsystem( ) + ": not calibrated");
-        if (m_elbowValid)
-          m_elbow.set(ControlMode.PercentOutput, 0.0);
-      }
+
+      // Start the safety timer
+      m_safetyTimeout = 1.8;
+      m_safetyTimer.reset( );
+      m_safetyTimer.start( );
+
+      if (m_elbowValid)
+        m_elbow.set(ControlMode.MotionMagic, elbowDegreesToCounts(m_elbowTargetDegrees));
+
+      DataLogManager
+          .log(String.format("%s: moving: %.1f -> %.1f degrees", getSubsystem( ), m_elbowCurDegrees, m_elbowTargetDegrees));
+    }
+    else
+    {
+      DataLogManager.log(getSubsystem( ) + ": not calibrated");
+      if (m_elbowValid)
+        m_elbow.set(ControlMode.PercentOutput, 0.0);
+    }
   }
 
   public void moveElbowAngleExecute( )

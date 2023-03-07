@@ -169,7 +169,7 @@ public class Constants
     public static final boolean kInvertCANCoder         = false;  // CANCoder direction for positive angle in relative mode
     public static final boolean kElbowCANCoderAbsInvert = true;   // CANCoder direction for positive angle in absolute mode
     public static final boolean kElbowCalibrated        = false;  // Indicates whether the elbow has been calibrated by CANCoder
-    public static final double  kCompElbowOffset        = 0.000;  // CANCoder offset angle for comp bot
+    public static final double  kCompElbowOffset        = 228.428;  // CANCoder offset angle for comp bot
     public static final double  kBetaElbowOffset        = 251.279 - 5.0; // (TODO: Beta requires an offset) CANCoder offset angle for beta bot
 
     // Manual config parameters
@@ -213,7 +213,7 @@ public class Constants
   {
     // Global settings
 
-    public static final double  kExtensionGearRatio         = 9.63;    // Gear reduction for extension
+    public static final double  kExtensionGearRatio         = 9.64;    // Gear reduction for extension
     public static final double  kDrumDiameterInches         = 1.375;  // Drum diameter in inches
     public static final double  kDrumCircumInches           = kDrumDiameterInches * Math.PI;            // Drum diameter in inches
     public static final double  kRolloutRatio               = kDrumCircumInches / kExtensionGearRatio;  // inches per shaft rotation
@@ -288,11 +288,11 @@ public class Constants
   {
     // Global settings
 
-    public static final double  kWristGearRatio         = 305;   // Gear reduction for wrist
+    public static final double  kWristGearRatio         = 375;   // Gear reduction for wrist
     public static final double  kWristDegreesPerCount   = 360 / Falcon500.kEncoderCPR / kWristGearRatio;
     public static final double  kGripperLengthMeters    = 0.3;   // Sim value: 11.8 in
     public static final double  kGripperMassKg          = 3.0;   // Sim value: 6.6 lbs
-    public static final boolean kInvertMotor            = true;  // Motor direction for positive input
+    public static final boolean kInvertMotor            = false;  // Motor direction for positive input
 
     public static final double  kWristMinAngle          = -3.0;  // Wrist maximum allowable Angle
     public static final double  kWristMaxAngle          = 110.0; // Wrist maximum allowable Angle
@@ -314,8 +314,8 @@ public class Constants
     // CANCoder wrist absolute offset
     public static final boolean kInvertCANCoder         = false;  // CANCoder direction for positive angle in relative mode
     public static final boolean kWristCANCoderAbsInvert = false;  // CANCoder direction for positive angle in absolute mode
-    public static final boolean kWristCalibrated        = false;  // Indicates whether the wrist has been calibrated by CANCoder
-    public static final double  kCompWristOffset        = 0.000;  // CANCoder offset angle for comp bot
+    public static final boolean kWristCalibrated        = true;  // Indicates whether the wrist has been calibrated by CANCoder
+    public static final double  kCompWristOffset        = 46.143;  // CANCoder offset angle for comp bot
     public static final double  kBetaWristOffset        = 0.000;  // CANCoder offset angle for beta bot
 
     // Manual config parameters
@@ -530,7 +530,7 @@ public class Constants
     public static final class Mod0
     {
       public static final double epsilonAngleOffset = 325.723;
-      public static final double compAngleOffset    = 16.172;
+      public static final double compAngleOffset    = 15.732;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -543,7 +543,7 @@ public class Constants
     public static final class Mod1
     {
       public static final double epsilonAngleOffset = 142.91;
-      public static final double compAngleOffset    = 239.502;
+      public static final double compAngleOffset    = 239.766;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -556,7 +556,7 @@ public class Constants
     public static final class Mod2
     {
       public static final double epsilonAngleOffset = 137.988;
-      public static final double compAngleOffset    = 97.471;
+      public static final double compAngleOffset    = 98.174;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -569,7 +569,7 @@ public class Constants
     public static final class Mod3
     {
       public static final double epsilonAngleOffset = 44.736;
-      public static final double compAngleOffset    = 92.549;
+      public static final double compAngleOffset    = 93.076;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
