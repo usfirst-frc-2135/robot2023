@@ -18,7 +18,7 @@ import frc.robot.Constants.Falcon500;
 public class PhoenixUtil
 {
   private static PhoenixUtil  instance    = null;
-  private static final int    m_retries   = 4;    // Number of version check attempts
+  private static final int    m_retries   = 3;    // Number of version check attempts
   private static final String classString = "PhoenixUtil";
 
   PhoenixUtil( )
@@ -69,14 +69,11 @@ public class PhoenixUtil
 
         if (error == ErrorCode.OK)
         {
-          if (fwVersion >= Falcon500.kTalonReqVersion)
-          {
-            talonValid = true;
-            break;
-          }
-          else
+          talonValid = true;
+          if (fwVersion < Falcon500.kTalonReqVersion)
             DataLogManager
                 .log(classString + ": Talon ID " + deviceID + " " + baseStr + "Incorrect FW version - " + (fwVersion / 256.0));
+          break;
         }
 
         Timer.delay(0.100);
