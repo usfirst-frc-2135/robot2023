@@ -388,24 +388,7 @@ public class Swerve extends SubsystemBase
 
   public void resetOdometryToLimelight( )
   {
-    Pose2d llPose = new Pose2d( );
-    if (RobotContainer.getInstance( ).m_vision.getTargetID( ) > 0 && RobotContainer.getInstance( ).m_vision.getTargetID( ) < 9)
-    {
-      MedianFilter xFilter = new MedianFilter(10);
-      MedianFilter yFilter = new MedianFilter(10);
-      MedianFilter rotFilter = new MedianFilter(10);
-
-      double xValue = xFilter.calculate(RobotContainer.getInstance( ).m_vision.getLimelightRawPose( ).getX( ));
-      double yValue = yFilter.calculate(RobotContainer.getInstance( ).m_vision.getLimelightRawPose( ).getY( ));
-      double rot =
-          rotFilter.calculate(RobotContainer.getInstance( ).m_vision.getLimelightRawPose( ).getRotation( ).getRadians( ));
-
-      llPose = new Pose2d(new Translation2d(xValue, yValue), new Rotation2d(rot));
-
-      xFilter.reset( );
-      yFilter.reset( );
-      rotFilter.reset( );
-    }
+    Pose2d llPose = RobotContainer.getInstance( ).m_vision.getLimelightRawPose( );
 
     if (llPose != null)
     {

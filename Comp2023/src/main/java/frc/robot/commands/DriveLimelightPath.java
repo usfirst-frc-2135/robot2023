@@ -98,9 +98,10 @@ public class DriveLimelightPath extends CommandBase
   {
     int targetId = m_vision.getTargetID( );
 
-    // if (!m_vision.isAprilTagValid(targetId))
-    if (targetId < 0)
+    if ((!m_vision.isAprilTagValid(targetId)) || (targetId < 0))
+    {
       return null;
+    }
 
     Pose2d targetPose = VIConsts.kAprilTagPoses.get(targetId);
     double goalXValue = 0;
