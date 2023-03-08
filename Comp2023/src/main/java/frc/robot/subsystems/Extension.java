@@ -229,6 +229,9 @@ public class Extension extends SubsystemBase
   {
     motor.setInverted(inverted);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setInverted");
+    motor.setSensorPhase(true);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "setSensorPhase");
+    DataLogManager.log("extensionTalonInitialize");
     motor.setNeutralMode(NeutralMode.Brake);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
     motor.setSafetyEnabled(false);

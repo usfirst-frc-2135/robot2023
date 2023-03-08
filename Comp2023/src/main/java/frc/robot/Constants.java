@@ -220,7 +220,7 @@ public class Constants
     public static final double  kExtensionInchesPerCount   = 360 / Falcon500.kEncoderCPR / kExtensionGearRatio;
     // public static final double  kForearmLengthMeters        = 1.22;   // Sim value: 48 inches (no sim for extension)
     // public static final double  kForearmMassKg              = 6.0;    // Sim value: 13.2 lbs 
-    public static final boolean kInvertMotor               = false;  // Motor direction for positive input
+    public static final boolean kInvertMotor               = true;  // Motor direction for positive input
 
     public static final double  kExtensionLengthMin        = -0.5;   // Extension minimum allowable length
     public static final double  kExtensionLengthMax        = 20.0;   // Extension maximum allowable length
