@@ -13,6 +13,7 @@ import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -32,6 +33,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SWConsts;
 import frc.robot.Constants.SwerveConstants;
+import frc.robot.commands.ResetOdometryToLimelight;
 import frc.robot.RobotContainer;
 import frc.robot.team1678.frc2022.drivers.Pigeon;
 import frc.robot.team1678.frc2022.drivers.SwerveModule;
@@ -384,6 +386,36 @@ public class Swerve extends SubsystemBase
     return sanityCheck;
   }
 
+  public void resetOdometryToLimelight( )
+  {
+    Pose2d llPose = new Pose2d( );
+    if (RobotContainer.getInstance( ).m_vision.getTargetID( ) > 0 && RobotContainer.getInstance( ).m_vision.getTargetID( ) < 9)
+    {
+      MedianFilter xFilter = new MedianFilter(10);
+      MedianFilter yFilter = new MedianFilter(10);
+      MedianFilter rotFilter = new MedianFilter(10);
+
+      double xValue = xFilter.calculate(RobotContainer.getInstance( ).m_vision.getLimelightRawPose( ).getX( ));
+      double yValue = yFilter.calculate(RobotContainer.getInstance( ).m_vision.getLimelightRawPose( ).getY( ));
+      double rot =
+          rotFilter.calculate(RobotContainer.getInstance( ).m_vision.getLimelightRawPose( ).getRotation( ).getRadians( ));
+
+      llPose = new Pose2d(new Translation2d(xValue, yValue), new Rotation2d(rot));
+
+      xFilter.reset( );
+      yFilter.reset( );
+      rotFilter.reset( );
+    }
+
+    if (llPose != null)
+    {
+      //m_swerve.resetOdometry(new Pose2d(new Translation2d(llPose.getX( ) + 2, llPose.getY( )), llPose.getRotation( )));
+
+      resetLimelightOdometry(llPose);
+      DataLogManager.log(getSubsystem( ) + " | POSE: " + llPose);
+    }
+  }
+
   ///////////////////////////////////////////////////////////////////////////////
   //
   // Autonomous mode - Holonomic path follower
@@ -518,7 +550,7 @@ public class Swerve extends SubsystemBase
       return true;
     }
 
-    return (m_trajTimer.hasElapsed(m_trajectory.getTotalTimeSeconds( ) + 0.25));
+    return (m_trajTimer.hasElapsed(m_trajectory.getTotalTimeSeconds( ) + 0.55));
   }
 
   public void driveWithPathFollowerEnd( )
@@ -661,7 +693,15 @@ public class Swerve extends SubsystemBase
   public void resetOdometry(Pose2d pose)
   {
     m_poseEstimator.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
-    zeroGyro(pose.getRotation( ).getDegrees( ));
+
+    DataLogManager.log(" || Updated Rotation : " + pose.getRotation( ).getDegrees( ));
+  }
+
+  public void resetLimelightOdometry(Pose2d pose)
+  {
+    m_poseEstimator.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
+    //zeroGyro(pose.getRotation( ).getDegrees( ));
+
   }
 
   public void resetAnglesToAbsolute( )

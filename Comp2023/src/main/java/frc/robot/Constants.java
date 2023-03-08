@@ -427,6 +427,8 @@ public class Constants
     public static final double       kRobotCenterToFront = Units.inchesToMeters((28.0 + 6.0) / 2); // Depth from limelight to front robot edge
     public static final double       kAdjustPathX        = kATagDepthInGrid + kRobotCenterToFront;
     public static final double       kAdjustPathY        = Units.inchesToMeters(18.25 / 2 + 18.5 / 2);
+    public static final double       kAdjustSubPathX     = kRobotCenterToFront + Units.inchesToMeters(20);
+    public static final double       kAdjustSubPathY     = Units.inchesToMeters(50.5 / 2);
 
     public static final List<Pose2d> kAprilTagPoses      = Collections.unmodifiableList(List.of( //
         new Pose2d(new Translation2d(0.0, 0.0), new Rotation2d(0)),        // AprilTag ID: 0 (invalid)
