@@ -78,7 +78,7 @@ public class Swerve extends SubsystemBase
   private boolean                  m_locked            = false;
 
   // Path following
-  private int                      m_pathDebug         = 0;    // Debug flag to disable extra ramsete logging calls
+  private int                      m_pathDebug         = 1;    // Debug flag to disable extra ramsete logging calls
 
   // Limelight drive
   private double                   m_turnConstant      = SWConsts.kTurnConstant;
@@ -447,6 +447,7 @@ public class Swerve extends SubsystemBase
       DataLogManager.log(String.format(
           "%s: PATH time: %.3f curXYR: %.2f %.2f %.2f targXYR %.2f %.2f %.1f chasXYO: %.1f %.1f %.1f targVel: %.1f %.1f %.1f %.1f curVel: %.2f %.2f %.2f %.2f errXYR: %.2f %.2f %.2f",
           // @formatter:off
+          getSubsystem(),
           m_trajTimer.get( ),
           currentTrajX,
           currentTrajY,
@@ -583,14 +584,13 @@ public class Swerve extends SubsystemBase
     if (Math.abs(pitch) > SWConsts.kDriveBalancedAngle)
     {
       motorOutput = SWConsts.kDriveBalanceKp * pitch;
-      drive(new Translation2d(motorOutput, 0), 0, true, true);
+      drive(new Translation2d(motorOutput, 0), 0, false, true);
     }
     else
     {
       driveStop(true);
     }
-
-    // DataLogManager.log(String.format("%s: pitch: %.1f degrees - output power: %.1f m/s", getSubsystem( ), pitch, motorOutput));
+    //DataLogManager.log(String.format(getSubsystem() + ": Robot pitch: %.1f degrees - Robot power applied to motors: %.1f m/s", pitch, drivevalue));
   }
 
   //

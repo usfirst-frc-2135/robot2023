@@ -58,7 +58,7 @@ public class Robot extends TimedRobot
       Constants.isComp = false;
       robotName = "PRACTICE (B)";
     }
-    DataLogManager.log("robotInit: Detected the %s robot! " + robotName);
+    DataLogManager.log(String.format("robotInit: Detected the %s robot! ", robotName));
 
     // Instantiate CTRE configurations
     ctreConfigs = new CTREConfigs( );
@@ -114,6 +114,7 @@ public class Robot extends TimedRobot
     m_robotContainer.m_power.initialize( );
     m_robotContainer.m_swerve.initialize( );
     m_robotContainer.m_elbow.initialize( );
+    m_robotContainer.m_extension.initialize( );
     m_robotContainer.m_wrist.initialize( );
     m_robotContainer.m_gripper.initialize( );
   }

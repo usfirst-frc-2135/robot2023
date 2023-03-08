@@ -6,15 +6,18 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.subsystems.Elbow;
+import frc.robot.subsystems.Extension;
+import frc.robot.subsystems.Gripper;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Wrist;
 
 /**
  *
  */
 public class AutoPreloadAndEngageChargeStation extends SequentialCommandGroup
 {
-  public AutoPreloadAndEngageChargeStation(Swerve swerve)
+  public AutoPreloadAndEngageChargeStation(Swerve swerve, Elbow elbow, Extension extension, Wrist wrist, Gripper gripper)
   {
     setName("AutoPreloadAndEngageChargeStation");
 
@@ -22,17 +25,13 @@ public class AutoPreloadAndEngageChargeStation extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
-        new PrintCommand(getName() + ": AUTO PATH SEQUENCE: Run first path"),
-        /* TODO: DRIVE BACKWARD + PRELOAD PATHS / COMMANDS
+        new PrintCommand(getName() + ": AUTO: Preload"),        
         new ParallelDeadlineGroup(
-          new WaitUntilCommand(swerve::driveWithPathFollowerIsFinished),
-          new AutoDrivePath (swerve, "driveOffCommunity", true)
+            new AutoPreloadHigh(elbow, extension, wrist, gripper)
         ),
-        */
-        new PrintCommand(getName() + ": AUTO: Run second path"),
+        new PrintCommand(getName() + ": AUTO: Run to ChargeStation"),
         new ParallelDeadlineGroup(
-          new WaitUntilCommand(swerve::driveWithPathFollowerIsFinished),
-          new AutoDrivePath ( swerve, "driveOffCommunity", false)
+          new AutoChargeStation(swerve)
         ),
 
         new PrintCommand(getName() + ": AUTO: Hold in place"),
