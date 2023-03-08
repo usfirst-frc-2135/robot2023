@@ -693,15 +693,12 @@ public class Swerve extends SubsystemBase
   public void resetOdometry(Pose2d pose)
   {
     m_poseEstimator.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
-
-    DataLogManager.log(" || Updated Rotation : " + pose.getRotation( ).getDegrees( ));
+    zeroGyro(pose.getRotation( ).getDegrees( ));
   }
 
   public void resetLimelightOdometry(Pose2d pose)
   {
     m_poseEstimator.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
-    //zeroGyro(pose.getRotation( ).getDegrees( ));
-
   }
 
   public void resetAnglesToAbsolute( )
