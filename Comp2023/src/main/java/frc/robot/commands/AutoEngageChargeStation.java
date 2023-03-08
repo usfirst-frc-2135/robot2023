@@ -25,7 +25,7 @@ public class AutoEngageChargeStation extends SequentialCommandGroup
         new PrintCommand(getName() + ": AUTO PATH SEQUENCE: go to ChargeStation"),
         new ParallelDeadlineGroup(
           new WaitUntilCommand(swerve::driveWithPathFollowerIsFinished),
-          new AutoDrivePath (swerve, "drivetochargestation", true)
+          new AutoDrivePath (swerve, "driveToChargeStation", true)
         ),
 
         new PrintCommand(getName() + ": AUTO: Balance on ChargeStation"),

@@ -38,6 +38,7 @@ import frc.robot.commands.DriveSnap;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.ElbowMoveToAngle;
+import frc.robot.commands.ExtensionCalibrate;
 import frc.robot.commands.ExtensionMoveToLength;
 import frc.robot.commands.GripperRun;
 import frc.robot.commands.LEDSet;
@@ -65,23 +66,26 @@ public class RobotContainer
   private static RobotContainer    m_instance;
 
   // Joysticks
-  private final XboxController     m_driverPad   = new XboxController(Constants.kDriverPadPort);
-  private final XboxController     m_operatorPad = new XboxController(Constants.kOperatorPadPort);
+  private final XboxController     m_driverPad          = new XboxController(Constants.kDriverPadPort);
+  private final XboxController     m_operatorPad        = new XboxController(Constants.kOperatorPadPort);
 
   // The robot's shared subsystems
-  public final LED                 m_led         = new LED( );
-  public final Vision              m_vision      = new Vision( );
+  public final LED                 m_led                = new LED( );
+  public final Vision              m_vision             = new Vision( );
 
   // These subsystems can use LED or vision and must be created afterward
-  public final Elbow               m_elbow       = new Elbow( );
-  public final Extension           m_extension   = new Extension( );
-  public final Wrist               m_wrist       = new Wrist( );
-  public final Gripper             m_gripper     = new Gripper( );
-  public final Power               m_power       = new Power( );
-  public final Swerve              m_swerve      = new Swerve( );
+  public final Elbow               m_elbow              = new Elbow( );
+  public final Extension           m_extension          = new Extension( );
+  public final Wrist               m_wrist              = new Wrist( );
+  public final Gripper             m_gripper            = new Gripper( );
+  public final Power               m_power              = new Power( );
+  public final Swerve              m_swerve             = new Swerve( );
+
+  // Commands
+  public Command                   m_extensionCalibrate = new ExtensionCalibrate(m_extension);
 
   // A chooser for autonomous commands
-  private SendableChooser<Command> m_autoChooser = new SendableChooser<>( );
+  private SendableChooser<Command> m_autoChooser        = new SendableChooser<>( );
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -132,14 +136,14 @@ public class RobotContainer
     // SmartDashboard.putData("DriveSlowMode", new DriveSlowMode(m_swerve, false));
 
     // Path follower tests
-    SmartDashboard.putData("AutoDrivePathForward", new AutoDrivePath(m_swerve, "forward1m", true));
-    SmartDashboard.putData("AutoDrivePathBackward", new AutoDrivePath(m_swerve, "backward1m", true));
-    SmartDashboard.putData("AutoDrivePathForwardLeft", new AutoDrivePath(m_swerve, "forwardLeft", true));
-    SmartDashboard.putData("AutoDrivePathBackwardRight", new AutoDrivePath(m_swerve, "backwardRight", true));
-    SmartDashboard.putData("AutoDrivePathLeft", new AutoDrivePath(m_swerve, "left1m", true));
-    SmartDashboard.putData("AutoDrivePathRight", new AutoDrivePath(m_swerve, "right1m", true));
-    SmartDashboard.putData("AutoDrivePathForward2", new AutoDrivePath(m_swerve, "forward2m", true));
-    SmartDashboard.putData("AutoDrivePathBackward2", new AutoDrivePath(m_swerve, "backward2m", true));
+    // SmartDashboard.putData("AutoDrivePathForward", new AutoDrivePath(m_swerve, "testForward1m", true));
+    // SmartDashboard.putData("AutoDrivePathBackward", new AutoDrivePath(m_swerve, "testBackward1m", true));
+    // SmartDashboard.putData("AutoDrivePathForwardLeft", new AutoDrivePath(m_swerve, "testForwardLeft", true));
+    // SmartDashboard.putData("AutoDrivePathBackwardRight", new AutoDrivePath(m_swerve, "testBackwardRight", true));
+    // SmartDashboard.putData("AutoDrivePathLeft", new AutoDrivePath(m_swerve, "testLeft1m", true));
+    // SmartDashboard.putData("AutoDrivePathRight", new AutoDrivePath(m_swerve, "testRight1m", true));
+    // SmartDashboard.putData("AutoDrivePathForward2", new AutoDrivePath(m_swerve, "testForward2m", true));
+    // SmartDashboard.putData("AutoDrivePathBackward2", new AutoDrivePath(m_swerve, "testBackward2m", true));
 
     SmartDashboard.putData("ArmSetHeightStow", new ArmSetHeightStow(m_elbow, m_extension, m_wrist));
     SmartDashboard.putData("ArmSetHeightScoreLow", new ArmSetHeightScoreLow(m_elbow, m_extension, m_wrist));

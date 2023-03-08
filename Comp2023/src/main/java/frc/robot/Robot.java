@@ -172,6 +172,8 @@ public class Robot extends TimedRobot
     {
       m_autonomousCommand.cancel( );
     }
+
+    CommandScheduler.getInstance( ).schedule(m_robotContainer.m_extensionCalibrate);
   }
 
   /**
