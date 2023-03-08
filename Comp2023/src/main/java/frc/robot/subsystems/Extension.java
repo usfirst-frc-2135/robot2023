@@ -120,6 +120,7 @@ public class Extension extends SubsystemBase
 
       if (RobotState.isDisabled( ) && (curCounts < 0))
       {
+        m_extension.setNeutralMode(NeutralMode.Coast);
         curCounts = 0;
         m_extension.setSelectedSensorPosition(curCounts, PIDINDEX, Constants.kCANTimeoutMs);
         m_extensionTargetInches = extensionCountsToInches(curCounts);
@@ -229,6 +230,9 @@ public class Extension extends SubsystemBase
   {
     motor.setInverted(inverted);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setInverted");
+    motor.setSensorPhase(true);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "setSensorPhase");
+    DataLogManager.log("extensionTalonInitialize");
     motor.setNeutralMode(NeutralMode.Brake);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
     motor.setSafetyEnabled(false);
@@ -275,7 +279,6 @@ public class Extension extends SubsystemBase
   public void moveExtensionWithJoystick(XboxController joystick)
   {
     double yValue = joystick.getRightX( );
-    double motorOutput = 0.0;
     ExtensionMode newMode;
 
     yValue = MathUtil.applyDeadband(yValue, m_stickDeadband);
@@ -293,19 +296,17 @@ public class Extension extends SubsystemBase
       DataLogManager.log(getSubsystem( ) + ": move " + m_extensionMode);
     }
 
-    if (((m_extensionCurInches < m_extensionMinLength) && motorOutput < 0.0)
-        || ((m_extensionCurInches > m_extensionMaxLength) && motorOutput > 0.0))
+    if (((m_extensionCurInches < m_extensionMinLength) && yValue < 0.0)
+        || ((m_extensionCurInches > m_extensionMaxLength) && yValue > 0.0))
     {
       DataLogManager.log(getSubsystem( ) + ": move OUT OF RANGE!");
-      motorOutput = 0.0;
+      yValue = 0.0;
     }
-    else
-      motorOutput = yValue * EXConsts.kExtensionSpeedMaxManual;
 
     m_extensionTargetInches = m_extensionCurInches;
 
     if (m_extensionValid)
-      m_extension.set(ControlMode.PercentOutput, motorOutput);
+      m_extension.set(ControlMode.PercentOutput, yValue * EXConsts.kExtensionSpeedMaxManual - 0.043);
   }
 
   public void setExtensionStopped( )
