@@ -13,7 +13,6 @@ import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -33,7 +32,6 @@ import frc.robot.Constants;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SWConsts;
 import frc.robot.Constants.SwerveConstants;
-import frc.robot.commands.ResetOdometryToLimelight;
 import frc.robot.RobotContainer;
 import frc.robot.team1678.frc2022.drivers.Pigeon;
 import frc.robot.team1678.frc2022.drivers.SwerveModule;
@@ -386,19 +384,6 @@ public class Swerve extends SubsystemBase
     return sanityCheck;
   }
 
-  public void resetOdometryToLimelight( )
-  {
-    Pose2d llPose = RobotContainer.getInstance( ).m_vision.getLimelightRawPose( );
-
-    if (llPose != null)
-    {
-      //m_swerve.resetOdometry(new Pose2d(new Translation2d(llPose.getX( ) + 2, llPose.getY( )), llPose.getRotation( )));
-
-      resetLimelightOdometry(llPose);
-      DataLogManager.log(getSubsystem( ) + " | POSE: " + llPose);
-    }
-  }
-
   ///////////////////////////////////////////////////////////////////////////////
   //
   // Autonomous mode - Holonomic path follower
@@ -533,7 +518,7 @@ public class Swerve extends SubsystemBase
       return true;
     }
 
-    return (m_trajTimer.hasElapsed(m_trajectory.getTotalTimeSeconds( ) + 0.55));
+    return (m_trajTimer.hasElapsed(m_trajectory.getTotalTimeSeconds( ) + 0.25));
   }
 
   public void driveWithPathFollowerEnd( )
@@ -677,11 +662,6 @@ public class Swerve extends SubsystemBase
   {
     m_poseEstimator.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
     zeroGyro(pose.getRotation( ).getDegrees( ));
-  }
-
-  public void resetLimelightOdometry(Pose2d pose)
-  {
-    m_poseEstimator.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
   }
 
   public void resetAnglesToAbsolute( )
