@@ -87,6 +87,7 @@ public class Extension extends SubsystemBase
   private double                          m_extensionTargetInches = 0.0;    // Target length in inches
   private double                          m_extensionCurInches    = 0.0;    // Current length in inches
   private int                             m_withinTolerance       = 0;      // Counter for consecutive readings within tolerance
+  private boolean                         m_calibrated            = false;  // Indicates whether the extension has been calibrated
 
   private Timer                           m_safetyTimer           = new Timer( ); // Safety timer for use in extension
   private double                          m_safetyTimeout;                // Seconds that the timer ran before stopping
@@ -315,6 +316,25 @@ public class Extension extends SubsystemBase
 
     if (m_extensionValid)
       m_extension.set(ControlMode.PercentOutput, 0.0);
+  }
+
+  public void moveToCalibrate( )
+  {
+    double motorCalibrateSpeed = EXConsts.kSpeedCalibrate;
+
+    if (m_extensionValid)
+      m_extension.set(ControlMode.PercentOutput, motorCalibrateSpeed);
+  }
+
+  public void calibrate( )
+  {
+    if (m_extensionValid)
+      m_extension.setSelectedSensorPosition(0.0);
+
+    m_extensionTargetInches = 0;
+    m_extensionCurInches = 0;
+    m_calibrated = true;
+    SmartDashboard.putBoolean("EX_calibrated", m_calibrated);
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
