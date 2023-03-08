@@ -216,11 +216,11 @@ public class Constants
     public static final double  kDrumDiameterInches        = 1.375;  // Drum diameter in inches
     public static final double  kDrumCircumInches          = kDrumDiameterInches * Math.PI;            // Drum diameter in inches
     public static final double  kRolloutRatio              = kDrumCircumInches / kExtensionGearRatio;  // inches per shaft rotation
-    public static final double  kInchesPerCount            = kRolloutRatio / Falcon500.kEncoderCPR;
-    public static final double  kExtensionInchesPerCount   = 360 / Falcon500.kEncoderCPR / kExtensionGearRatio;
+    public static final double  kExtensionInchesPerCount   = kRolloutRatio / Falcon500.kEncoderCPR;
     // public static final double  kForearmLengthMeters        = 1.22;   // Sim value: 48 inches (no sim for extension)
     // public static final double  kForearmMassKg              = 6.0;    // Sim value: 13.2 lbs 
-    public static final boolean kInvertMotor               = false;  // Motor direction for positive input
+    public static final boolean kInvertMotor               = true;  // Motor direction for positive input
+    public static final double  kSpeedCalibrate            = -0.043;   // Motor percent output during calibration
 
     public static final double  kExtensionLengthMin        = -0.5;   // Extension minimum allowable length
     public static final double  kExtensionLengthMax        = 20.0;   // Extension maximum allowable length
