@@ -111,7 +111,14 @@ public class DriveLimelightPath extends CommandBase
     double goalYValue = 0;
     String strName;
 
-    goalXValue = targetPose.getX( ) + getSignFromId(targetId) * (VIConsts.kAdjustPathX);
+    if (targetId == 4 || targetId == 5)
+    {
+      goalXValue = targetPose.getY( ) + getSignFromId(targetId) * (VIConsts.kAdjustSubPathX);
+    }
+    else
+    {
+      goalXValue = targetPose.getX( ) + getSignFromId(targetId) * (VIConsts.kAdjustPathX);
+    }
 
     switch (goalDirection)
     {

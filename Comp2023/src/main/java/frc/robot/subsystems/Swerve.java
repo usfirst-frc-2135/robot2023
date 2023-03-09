@@ -240,8 +240,14 @@ public class Swerve extends SubsystemBase
         //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
         m_poseEstimator.addVisionMeasurement(botLLPose, Timer.getFPGATimestamp( ) - (latency / 1000));
       }
+
       Pose2d rawPose = RobotContainer.getInstance( ).m_vision.getLimelightRawPose( );
 
+      if (rawPose != null && !m_isTeleported)
+      {
+        resetLimelightOdometry(rawPose);
+        m_isTeleported = true;
+      }
     }
 
     // Pose2d estimate = getPose();
@@ -553,6 +559,10 @@ public class Swerve extends SubsystemBase
     m_trajTimer.stop( );
   }
 
+  public void setIsTeleported(boolean isTeleported)
+  {
+    m_isTeleported = isTeleported;
+  }
   //// 1678 Swerve //////////////////////////////////////////////////////////////
 
   public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop)
