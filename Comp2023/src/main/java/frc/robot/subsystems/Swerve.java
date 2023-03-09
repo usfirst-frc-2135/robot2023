@@ -24,6 +24,7 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -67,6 +68,7 @@ public class Swerve extends SubsystemBase
   private HolonomicDriveController m_holonomicController;
   private PathPlannerTrajectory    m_trajectory;
   private Timer                    m_trajTimer         = new Timer( );
+  private boolean                  m_isTeleported      = true;
 
   // Module variables
   private PeriodicIO               m_periodicIO        = new PeriodicIO( );
@@ -233,10 +235,18 @@ public class Swerve extends SubsystemBase
       Pose2d botLLPose = RobotContainer.getInstance( ).m_vision.getLimelightValidPose(getPose( ));
       double latency = RobotContainer.getInstance( ).m_vision.getTargetLatency( );
 
-      if ((botLLPose != null))
+      if (botLLPose != null && DriverStation.isTeleopEnabled( ))
       {
         //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
         m_poseEstimator.addVisionMeasurement(botLLPose, Timer.getFPGATimestamp( ) - (latency / 1000));
+      }
+
+      Pose2d rawPose = RobotContainer.getInstance( ).m_vision.getLimelightRawPose( );
+
+      if (rawPose != null && !m_isTeleported)
+      {
+        resetLimelightOdometry(rawPose);
+        m_isTeleported = true;
       }
     }
 
@@ -411,6 +421,29 @@ public class Swerve extends SubsystemBase
     m_trajTimer.start( );
   }
 
+  public void driveWithPathFollowerLimelightInit(PathPlannerTrajectory trajectory, boolean useInitialPose)
+  {
+    m_holonomicController = new HolonomicDriveController(xController, yController, thetaController);
+
+    m_trajectory = trajectory;
+
+    m_field.getObject("trajectory").setTrajectory(m_trajectory);
+
+    List<Trajectory.State> trajStates = new ArrayList<Trajectory.State>( );
+    trajStates = m_trajectory.getStates( );
+    DataLogManager.log(String.format("%s: PATH states: %d duration: %.3f secs", getSubsystem( ), trajStates.size( ),
+        m_trajectory.getTotalTimeSeconds( )));
+
+    // This initializes the odometry (where we are)
+    if (useInitialPose)
+    {
+      resetLimelightOdometry(m_trajectory.getInitialHolonomicPose( ));
+    }
+
+    m_trajTimer.reset( );
+    m_trajTimer.start( );
+  }
+
   public void driveWithPathFollowerExecute( )
   {
     Trajectory.State trajState = m_trajectory.sample(m_trajTimer.get( ));
@@ -518,7 +551,7 @@ public class Swerve extends SubsystemBase
       return true;
     }
 
-    return (m_trajTimer.hasElapsed(m_trajectory.getTotalTimeSeconds( ) + 0.25));
+    return (m_trajTimer.hasElapsed(m_trajectory.getTotalTimeSeconds( ) + 0.55));
   }
 
   public void driveWithPathFollowerEnd( )
@@ -526,6 +559,10 @@ public class Swerve extends SubsystemBase
     m_trajTimer.stop( );
   }
 
+  public void setIsTeleported(boolean isTeleported)
+  {
+    m_isTeleported = isTeleported;
+  }
   //// 1678 Swerve //////////////////////////////////////////////////////////////
 
   public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop)
@@ -662,6 +699,21 @@ public class Swerve extends SubsystemBase
   {
     m_poseEstimator.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
     zeroGyro(pose.getRotation( ).getDegrees( ));
+  }
+
+  public void resetLimelightOdometry(Pose2d pose)
+  {
+    m_poseEstimator.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
+  }
+
+  public void resetOdometryToLimelight( )
+  {
+    Pose2d llPose = RobotContainer.getInstance( ).m_vision.getLimelightRawPose( );
+
+    if (llPose != null)
+    {
+      resetLimelightOdometry(llPose);
+    }
   }
 
   public void resetAnglesToAbsolute( )
