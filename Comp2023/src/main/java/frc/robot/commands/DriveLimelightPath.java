@@ -43,17 +43,17 @@ public class DriveLimelightPath extends CommandBase
   public void initialize( )
   {
     Pose2d currentPose = m_swerve.getPose( );
+    DataLogManager.log(getName( ) + ": goalDirection " + m_goalDirection + " curPose " + currentPose);
 
     m_goalPose = getGoalPose(m_goalDirection);
-
-    DataLogManager.log(getName( ) + ": goalDirection " + m_goalDirection + " curPose " + currentPose);
+    DataLogManager.log(getName( ) + ": goalPose " + m_goalPose);
 
     if (m_goalPose != null)
     {
       PathPlannerTrajectory trajectory = PathPlanner.generatePath(new PathConstraints(1.7, 2),
           new PathPoint(currentPose.getTranslation( ), currentPose.getRotation( ), currentPose.getRotation( )),
           new PathPoint(m_goalPose.getTranslation( ), m_goalPose.getRotation( ), m_goalPose.getRotation( )));
-      m_swerve.driveWithPathFollowerInit(trajectory, true);
+      m_swerve.driveWithPathFollowerLimelightInit(trajectory, true);
 
     }
   }
@@ -73,7 +73,10 @@ public class DriveLimelightPath extends CommandBase
   public void end(boolean interrupted)
   {
     m_swerve.driveWithPathFollowerEnd( );
-    m_swerve.driveStop(true);
+    if (m_goalPose == null)
+    {
+      m_swerve.driveStop(true);
+    }
   }
 
   // Returns true when the command  sh
@@ -137,7 +140,8 @@ public class DriveLimelightPath extends CommandBase
 
     DataLogManager.log(String.format("%s: Calculate target ID %d direction %s", getName( ), targetId, strName));
 
-    return new Pose2d(new Translation2d(goalXValue, goalYValue), new Rotation2d(targetPose.getRotation( ).getRadians( ) + 3.14));
+    return new Pose2d(new Translation2d(goalXValue, goalYValue),
+        new Rotation2d(targetPose.getRotation( ).getRadians( ) + Math.PI));
 
   }
 }

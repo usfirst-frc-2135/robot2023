@@ -426,8 +426,8 @@ public class Constants
     public static final double       kATagDepthInGrid    = Units.inchesToMeters(14.25); // Depth from front of grid to AprilTag - 1'2-1/4"
     public static final double       kRobotCenterToFront = Units.inchesToMeters((28.0 + 6.0) / 2); // Depth from limelight to front robot edge
     public static final double       kAdjustPathX        = kATagDepthInGrid + kRobotCenterToFront;
-    public static final double       kAdjustPathY        = Units.inchesToMeters(18.25 / 2 + 18.5 / 2) + 0.06; // Addition of 6cm to adjust for error    public static final double       kAdjustSubPathX     = kRobotCenterToFront + Units.inchesToMeters(20);
-    public static final double       kAdjustSubPathX     = kRobotCenterToFront + Units.inchesToMeters(20);
+    public static final double       kAdjustPathY        = Units.inchesToMeters(18.25 / 2 + 18.5 / 2) + 0.06; // Addition of 6cm to adjust for empirical error 
+    public static final double       kAdjustSubPathX     = kRobotCenterToFront + Units.inchesToMeters(30);
     public static final double       kAdjustSubPathY     = Units.inchesToMeters(50.5 / 2);
 
     public static final List<Pose2d> kAprilTagPoses      = Collections.unmodifiableList(List.of( //
