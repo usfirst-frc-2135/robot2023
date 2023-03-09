@@ -10,16 +10,16 @@ import frc.robot.subsystems.Extension;
 /**
  *
  */
-public class Calibrate extends CommandBase
+public class ExtensionCalibrate extends CommandBase
 {
   private Timer     m_calibrateTimer = new Timer( );
   private Extension m_extension;
 
-  public Calibrate(Extension extension)
+  public ExtensionCalibrate(Extension extension)
   {
     m_extension = extension;
 
-    setName("Calibrate");
+    setName("ExtensionCalibrate");
     addRequirements(m_extension);
   }
 

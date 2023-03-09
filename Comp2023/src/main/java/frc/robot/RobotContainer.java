@@ -38,13 +38,17 @@ import frc.robot.commands.DriveSnap;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.ElbowMoveToAngle;
+import frc.robot.commands.ElbowRun;
+import frc.robot.commands.ExtensionCalibrate;
 import frc.robot.commands.ExtensionMoveToLength;
+import frc.robot.commands.ExtensionRun;
 import frc.robot.commands.GripperRun;
 import frc.robot.commands.LEDSet;
 import frc.robot.commands.ManualMode;
 import frc.robot.commands.ResetGyro;
 import frc.robot.commands.ResetOdometryToLimelight;
 import frc.robot.commands.WristMoveToAngle;
+import frc.robot.commands.WristRun;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
 import frc.robot.subsystems.Gripper;
@@ -65,23 +69,26 @@ public class RobotContainer
   private static RobotContainer    m_instance;
 
   // Joysticks
-  private final XboxController     m_driverPad   = new XboxController(Constants.kDriverPadPort);
-  private final XboxController     m_operatorPad = new XboxController(Constants.kOperatorPadPort);
+  private final XboxController     m_driverPad          = new XboxController(Constants.kDriverPadPort);
+  private final XboxController     m_operatorPad        = new XboxController(Constants.kOperatorPadPort);
 
   // The robot's shared subsystems
-  public final LED                 m_led         = new LED( );
-  public final Vision              m_vision      = new Vision( );
+  public final LED                 m_led                = new LED( );
+  public final Vision              m_vision             = new Vision( );
 
   // These subsystems can use LED or vision and must be created afterward
-  public final Elbow               m_elbow       = new Elbow( );
-  public final Extension           m_extension   = new Extension( );
-  public final Wrist               m_wrist       = new Wrist( );
-  public final Gripper             m_gripper     = new Gripper( );
-  public final Power               m_power       = new Power( );
-  public final Swerve              m_swerve      = new Swerve( );
+  public final Elbow               m_elbow              = new Elbow( );
+  public final Extension           m_extension          = new Extension( );
+  public final Wrist               m_wrist              = new Wrist( );
+  public final Gripper             m_gripper            = new Gripper( );
+  public final Power               m_power              = new Power( );
+  public final Swerve              m_swerve             = new Swerve( );
 
   // A chooser for autonomous commands
-  private SendableChooser<Command> m_autoChooser = new SendableChooser<>( );
+  private SendableChooser<Command> m_autoChooser        = new SendableChooser<>( );
+
+  // Command Scheduler
+  public Command                   m_extensionCalibrate = new ExtensionCalibrate(m_extension);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -316,9 +323,12 @@ public class RobotContainer
   private void initDefaultCommands( )
   {
     m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_elbow, m_driverPad));
-    m_elbow.setDefaultCommand(new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_NOCHANGE));
-    m_extension.setDefaultCommand(new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_NOCHANGE));
-    m_wrist.setDefaultCommand(new WristMoveToAngle(m_wrist, WristAngle.WRIST_NOCHANGE));
+    // m_elbow.setDefaultCommand(new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_NOCHANGE));
+    // m_extension.setDefaultCommand(new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_NOCHANGE));
+    // m_wrist.setDefaultCommand(new WristMoveToAngle(m_wrist, WristAngle.WRIST_NOCHANGE));
+    m_elbow.setDefaultCommand(new ElbowRun(m_elbow, m_operatorPad));
+    m_extension.setDefaultCommand(new ExtensionRun(m_extension, m_operatorPad));
+    m_wrist.setDefaultCommand(new WristRun(m_wrist, m_operatorPad));
   }
 
   /****************************************************************************
