@@ -26,6 +26,7 @@ public class DriveLimelightPath extends CommandBase
   private final Swerve          m_swerve;
   private final Vision          m_vision;
   private final VIGoalDirection m_goalDirection;
+  private Pose2d                m_goalPose;
 
   public DriveLimelightPath(Swerve swerve, Vision vision, VIGoalDirection goalDirection)
   {
@@ -41,23 +42,30 @@ public class DriveLimelightPath extends CommandBase
   @Override
   public void initialize( )
   {
-    Pose2d goalPose2d = calculateTarget(m_vision.getTargetID( ), m_goalDirection);
     Pose2d currentPose = m_swerve.getPose( );
 
-    PathPlannerTrajectory trajectory = PathPlanner.generatePath(new PathConstraints(3, 4),
-        new PathPoint(currentPose.getTranslation( ), currentPose.getRotation( ), currentPose.getRotation( )),
-        new PathPoint(goalPose2d.getTranslation( ), goalPose2d.getRotation( ), goalPose2d.getRotation( )));
+    m_goalPose = getGoalPose(m_goalDirection);
 
-    m_swerve.driveWithPathFollowerInit(trajectory, true);
+    DataLogManager.log(getName( ) + ": goalDirection " + m_goalDirection + " curPose " + currentPose);
 
-    DataLogManager.log(String.format("%s: current %s, goal %s", getName( ), currentPose, goalPose2d));
+    if (m_goalPose != null)
+    {
+      PathPlannerTrajectory trajectory = PathPlanner.generatePath(new PathConstraints(1.7, 2),
+          new PathPoint(currentPose.getTranslation( ), currentPose.getRotation( ), currentPose.getRotation( )),
+          new PathPoint(m_goalPose.getTranslation( ), m_goalPose.getRotation( ), m_goalPose.getRotation( )));
+      m_swerve.driveWithPathFollowerInit(trajectory, true);
+
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute( )
   {
-    m_swerve.driveWithPathFollowerExecute( );
+    if (m_goalPose != null)
+    {
+      m_swerve.driveWithPathFollowerExecute( );
+    }
   }
 
   // Called once the command ends or is  interrupted.
@@ -72,7 +80,7 @@ public class DriveLimelightPath extends CommandBase
   @Override
   public boolean isFinished( )
   {
-    return m_swerve.driveWithPathFollowerIsFinished( );
+    return (m_goalPose == null) || (m_swerve.driveWithPathFollowerIsFinished( ));
   }
 
   @Override
@@ -86,21 +94,32 @@ public class DriveLimelightPath extends CommandBase
     return (targetId <= 4) ? -1 : 1;
   }
 
-  public Pose2d calculateTarget(int targetId, VIConsts.VIGoalDirection goalDirection)
+  public Pose2d getGoalPose(VIConsts.VIGoalDirection goalDirection)
   {
+    int targetId = m_vision.getTargetID( );
+
+    if ((!m_vision.isAprilTagValid(targetId)) || (targetId < 0))
+    {
+      return null;
+    }
+
     Pose2d targetPose = VIConsts.kAprilTagPoses.get(targetId);
     double goalXValue = 0;
     double goalYValue = 0;
     String strName;
 
-    goalXValue = targetPose.getX( ) + getSignFromId(targetId) * VIConsts.kAdjustPathX;
+    goalXValue = targetPose.getX( ) + getSignFromId(targetId) * (VIConsts.kAdjustPathX);
 
     switch (goalDirection)
     {
       default :
       case DIRECTION_LEFT :
         strName = "LEFT";
-        goalYValue = targetPose.getY( ) + getSignFromId(targetId) * VIConsts.kAdjustPathY;
+        goalYValue = targetPose.getY( ) + getSignFromId(targetId) * (VIConsts.kAdjustPathY);
+        if (targetId == 4 || targetId == 5)
+        {
+          goalYValue = targetPose.getY( ) - getSignFromId(targetId) * (VIConsts.kAdjustSubPathY);
+        }
         break;
       case DIRECTION_MIDDLE :
         strName = "MIDDLE";
@@ -108,7 +127,11 @@ public class DriveLimelightPath extends CommandBase
         break;
       case DIRECTION_RIGHT :
         strName = "RIGHT";
-        goalYValue = targetPose.getY( ) - getSignFromId(targetId) * VIConsts.kAdjustPathY;
+        goalYValue = targetPose.getY( ) - getSignFromId(targetId) * (VIConsts.kAdjustPathY);
+        if (targetId == 4 || targetId == 5)
+        {
+          goalYValue = targetPose.getY( ) + getSignFromId(targetId) * VIConsts.kAdjustSubPathY;
+        }
         break;
     }
 

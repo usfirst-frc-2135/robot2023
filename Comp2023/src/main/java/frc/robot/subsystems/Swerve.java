@@ -518,7 +518,7 @@ public class Swerve extends SubsystemBase
       return true;
     }
 
-    return (m_trajTimer.hasElapsed(m_trajectory.getTotalTimeSeconds( ) + 0.25));
+    return (m_trajTimer.hasElapsed(m_trajectory.getTotalTimeSeconds( ) + 0.55));
   }
 
   public void driveWithPathFollowerEnd( )
@@ -662,6 +662,21 @@ public class Swerve extends SubsystemBase
   {
     m_poseEstimator.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
     zeroGyro(pose.getRotation( ).getDegrees( ));
+  }
+
+  public void resetLimelightOdometry(Pose2d pose)
+  {
+    m_poseEstimator.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
+  }
+
+  public void resetOdometryToLimelight( )
+  {
+    Pose2d llPose = RobotContainer.getInstance( ).m_vision.getLimelightRawPose( );
+
+    if (llPose != null)
+    {
+      resetLimelightOdometry(llPose);
+    }
   }
 
   public void resetAnglesToAbsolute( )
