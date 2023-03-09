@@ -39,7 +39,7 @@ public class AutoPreloadHigh extends SequentialCommandGroup
 
         new PrintCommand(getName() + ": AUTO: Move Arm Down"),
         new ParallelDeadlineGroup(
-          new ArmSetHeightStow(elbow, extension, wrist)
+          new ArmSetHeightIdle(elbow, extension, wrist)
         )
         // @formatter:on
     );
