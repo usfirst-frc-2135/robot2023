@@ -235,7 +235,7 @@ public class Swerve extends SubsystemBase
       Pose2d botLLPose = RobotContainer.getInstance( ).m_vision.getLimelightValidPose(getPose( ));
       double latency = RobotContainer.getInstance( ).m_vision.getTargetLatency( );
 
-      if (botLLPose != null && !DriverStation.isAutonomous( ))
+      if (botLLPose != null && DriverStation.isTeleopEnabled( ))
       {
         //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
         m_poseEstimator.addVisionMeasurement(botLLPose, Timer.getFPGATimestamp( ) - (latency / 1000));
