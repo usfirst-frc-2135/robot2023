@@ -480,4 +480,11 @@ public class Elbow extends SubsystemBase
 
     return isFinished;
   }
+
+  public boolean isElbowBelowDesired( )
+  {
+    int curCounts = (int) m_elbow.getSelectedSensorPosition(0);
+    m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
+    return m_elbowCurDegrees < m_elbowTargetDegrees;
+  }
 }
