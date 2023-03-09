@@ -356,7 +356,7 @@ public class Constants
   {
     // Global settings
 
-    public static final boolean kInvertMotor          = true;  // Motor direction for positive input
+    public static final boolean kInvertMotor          = false;  // Motor direction for positive input
 
     // Input current limit settings - gripper
     public static final double  kSupplyCurrentLimit   = 30.0;  // Default supply current limit (after trigger)

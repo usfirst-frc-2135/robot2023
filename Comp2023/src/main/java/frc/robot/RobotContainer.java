@@ -38,14 +38,17 @@ import frc.robot.commands.DriveSnap;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.ElbowMoveToAngle;
+import frc.robot.commands.ElbowRun;
 import frc.robot.commands.ExtensionCalibrate;
 import frc.robot.commands.ExtensionMoveToLength;
+import frc.robot.commands.ExtensionRun;
 import frc.robot.commands.GripperRun;
 import frc.robot.commands.LEDSet;
 import frc.robot.commands.ManualMode;
 import frc.robot.commands.ResetGyro;
 import frc.robot.commands.ResetOdometryToLimelight;
 import frc.robot.commands.WristMoveToAngle;
+import frc.robot.commands.WristRun;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
 import frc.robot.subsystems.Gripper;
@@ -81,11 +84,11 @@ public class RobotContainer
   public final Power               m_power              = new Power( );
   public final Swerve              m_swerve             = new Swerve( );
 
-  // Commands
-  public Command                   m_extensionCalibrate = new ExtensionCalibrate(m_extension);
-
   // A chooser for autonomous commands
   private SendableChooser<Command> m_autoChooser        = new SendableChooser<>( );
+
+  // Command Scheduler
+  public Command                   m_extensionCalibrate = new ExtensionCalibrate(m_extension);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -122,10 +125,9 @@ public class RobotContainer
 
     // Autonomous buttons  for main routines- chooser order
     SmartDashboard.putData("AutoStop", new AutoStop(m_swerve));
-    SmartDashboard.putData("AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveOffCommunity", true));
+    SmartDashboard.putData("AutoDriveOutOfCommunity", new AutoDrivePath(m_swerve, "driveOutOfCommunity", true));
     SmartDashboard.putData("AutoEngageChargeStation", new AutoEngageChargeStation(m_swerve));
     SmartDashboard.putData("AutoChargeStation", new AutoChargeStation(m_swerve));
-    SmartDashboard.putData("driveOffCommunityCopy", new AutoDrivePath(m_swerve, "driveOffCommunityCopy", true));
     // SmartDashboard.putData("AutoPreloadAndLeaveCommunity", new AutoPreloadAndLeaveCommunity(m_swerve));
     // SmartDashboard.putData("AutoPreloadAndEngageChargeStation", new AutoPreloadAndEngageChargeStation(m_swerve));
     // SmartDashboard.putData("AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve));
@@ -134,16 +136,6 @@ public class RobotContainer
     SmartDashboard.putData("AutoDriveBalance", new AutoDriveBalance(m_swerve));
 
     // SmartDashboard.putData("DriveSlowMode", new DriveSlowMode(m_swerve, false));
-
-    // Path follower tests
-    // SmartDashboard.putData("AutoDrivePathForward", new AutoDrivePath(m_swerve, "testForward1m", true));
-    // SmartDashboard.putData("AutoDrivePathBackward", new AutoDrivePath(m_swerve, "testBackward1m", true));
-    // SmartDashboard.putData("AutoDrivePathForwardLeft", new AutoDrivePath(m_swerve, "testForwardLeft", true));
-    // SmartDashboard.putData("AutoDrivePathBackwardRight", new AutoDrivePath(m_swerve, "testBackwardRight", true));
-    // SmartDashboard.putData("AutoDrivePathLeft", new AutoDrivePath(m_swerve, "testLeft1m", true));
-    // SmartDashboard.putData("AutoDrivePathRight", new AutoDrivePath(m_swerve, "testRight1m", true));
-    // SmartDashboard.putData("AutoDrivePathForward2", new AutoDrivePath(m_swerve, "testForward2m", true));
-    // SmartDashboard.putData("AutoDrivePathBackward2", new AutoDrivePath(m_swerve, "testBackward2m", true));
 
     SmartDashboard.putData("ArmSetHeightStow", new ArmSetHeightStow(m_elbow, m_extension, m_wrist));
     SmartDashboard.putData("ArmSetHeightScoreLow", new ArmSetHeightScoreLow(m_elbow, m_extension, m_wrist));
@@ -331,9 +323,12 @@ public class RobotContainer
   private void initDefaultCommands( )
   {
     m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_elbow, m_driverPad));
-    m_elbow.setDefaultCommand(new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_NOCHANGE));
-    m_extension.setDefaultCommand(new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_NOCHANGE));
-    m_wrist.setDefaultCommand(new WristMoveToAngle(m_wrist, WristAngle.WRIST_NOCHANGE));
+    // m_elbow.setDefaultCommand(new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_NOCHANGE));
+    // m_extension.setDefaultCommand(new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_NOCHANGE));
+    // m_wrist.setDefaultCommand(new WristMoveToAngle(m_wrist, WristAngle.WRIST_NOCHANGE));
+    m_elbow.setDefaultCommand(new ElbowRun(m_elbow, m_operatorPad));
+    m_extension.setDefaultCommand(new ExtensionRun(m_extension, m_operatorPad));
+    m_wrist.setDefaultCommand(new WristRun(m_wrist, m_operatorPad));
   }
 
   /****************************************************************************
@@ -343,7 +338,7 @@ public class RobotContainer
   private void initAutonomousChooser( )
   {
     // Autonomous Chooser
-    m_autoChooser.addOption("1 - AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveOffCommunity", true));
+    m_autoChooser.addOption("1 - AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveOutOfCommunity", true));
     m_autoChooser.addOption("2 - AutoDockOnChargeStation", new AutoChargeStation(m_swerve));
     m_autoChooser.addOption("3 - AutoPreloadAndLeaveCommunity",
         new AutoPreloadAndLeaveCommunity(m_swerve, m_elbow, m_extension, m_wrist, m_gripper));

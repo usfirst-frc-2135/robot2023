@@ -33,7 +33,7 @@ public class AutoPreloadAndLeaveCommunity extends SequentialCommandGroup
         new PrintCommand(getName() + ": AUTO: Drive Off Community"),
         new ParallelDeadlineGroup(
           new WaitUntilCommand(swerve::driveWithPathFollowerIsFinished),
-          new AutoDrivePath (swerve, "driveOffCommunity", true)
+          new AutoDrivePath (swerve, "driveOutOfCommunity", true)
         ),
         new PrintCommand(getName() + ": AUTO: Hold in place"),
         new AutoStop(swerve)
