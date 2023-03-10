@@ -279,7 +279,7 @@ public class Constants
     public static final double kExtensionPidKd            = 0.0;    // Extension PID derivative constant
     public static final int    kExtensionAllowedError     = 0;      // Extension PID allowable closed loop error in counts
     public static final double kExtensionToleranceInches  = 0.5;    // Extension PID tolerance in inches
-    public static final double kExtensionArbitraryFF      = 0.000;  // Extension motor output for extension when fully retracted
+    public static final double kExtensionArbitraryFF      = -0.032; // Extension motor output for extension when fully retracted
   }
 
   public static final class WRConsts
