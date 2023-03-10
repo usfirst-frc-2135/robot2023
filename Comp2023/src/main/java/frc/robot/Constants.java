@@ -152,7 +152,7 @@ public class Constants
     public static final double  kElbowAngleMax        = 115.0;  // Elbow maximum allowable degrees
     public static final double  kElbowAngleStow       = 2.0;    // TODO: FIGURE IT OUT EMPIRICALLY
     public static final double  kElbowAngleIdle       = 20.0;   // TODO: FIGURE IT OUT EMPIRICALLY
-    public static final double  kElbowAngleScoreLow   = 30.0;   // From Mech Design (floor, feet art 5" high)
+    public static final double  kElbowAngleScoreLow   = 35.0;   // From Mech Design (floor, feet art 5" high)
     public static final double  kElbowAngleScoreMid   = 91.0;   // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube)
     public static final double  kElbowAngleScoreHigh  = 103.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube)
     public static final double  kElbowAngleSubstation = 103.0;  // From Mech Design (3'1-38" above floor)
@@ -225,8 +225,8 @@ public class Constants
     public static final double  kExtensionLengthMin        = -0.5;   // Extension minimum allowable length
     public static final double  kExtensionLengthMax        = 20.0;   // Extension maximum allowable length
     public static final double  kExtensionLengthStow       = 0.0;    // TODO: FIGURE IT OUT EMPIRICALLY
-    public static final double  kExtensionLengthIdle       = 0.0;    // TODO: FIGURE IT OUT EMPIRICALLY
-    public static final double  kExtensionLengthScoreLow   = 8.0;    // From Mech Design (floor, feet art 5" high)
+    public static final double  kExtensionLengthIdle       = 8.0;    // TODO: FIGURE IT OUT EMPIRICALLY
+    public static final double  kExtensionLengthScoreLow   = 10.0;    // From Mech Design (floor, feet art 5" high)
     public static final double  kExtensionLengthScoreMid   = 3.0;    // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube)
     public static final double  kExtensionLengthScoreHigh  = 18.0;   // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube)
     public static final double  kExtensionLengthSubstation = 0.0;    // From Mech Design (3'1-38" above floor)
@@ -241,7 +241,7 @@ public class Constants
 
     // CANCoder extension absolute offset
     public static final boolean kInvertCANCoder            = false;  // CANCoder direction for positive angle in relative mode
-    public static final boolean kExtensionCalibrated       = false;  // Indicates whether the extension has been calibrated by CANCoder
+    public static final boolean kExtensionCalibrated       = true;  // Indicates whether the extension has been calibrated by CANCoder
     public static final double  kCompExtensionOffset       = 0.000;  // CANCoder offset for comp bot
     public static final double  kBetaExtensionOffset       = 0.000;  // CANCoder offset for beta bot
 
@@ -270,8 +270,8 @@ public class Constants
       EXTENSION_SHELF,        // Move extension to high-scoring length
     }
 
-    public static final int    kExtensionMMVelocity       = 16646 / 2;  // Extension motion magic velocity
-    public static final int    kExtensionMMAcceleration   = 16646 / 2;  // Extension motion magic acceleration
+    public static final int    kExtensionMMVelocity       = 16646 * 3 / 4;  // Extension motion magic velocity
+    public static final int    kExtensionMMAcceleration   = 16646 * 3 / 4;  // Extension motion magic acceleration
     public static final int    kExtensionMMSCurveStrength = 0;      // Extension motion magic S curve smoothing strength
     public static final double kExtensionPidKf            = 0.0461; // Extension PID force constant
     public static final double kExtensionPidKp            = 0.0246; // Extension PID proportional constant

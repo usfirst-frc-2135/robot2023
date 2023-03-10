@@ -87,7 +87,7 @@ public class Extension extends SubsystemBase
   private double                          m_extensionTargetInches = 0.0;    // Target length in inches
   private double                          m_extensionCurInches    = 0.0;    // Current length in inches
   private int                             m_withinTolerance       = 0;      // Counter for consecutive readings within tolerance
-  private boolean                         m_calibrated            = false;  // Indicates whether the extension has been calibrated
+  private boolean                         m_calibrated            = EXConsts.kExtensionCalibrated;  // Indicates whether the extension has been calibrated
 
   private Timer                           m_safetyTimer           = new Timer( ); // Safety timer for use in extension
   private double                          m_safetyTimeout;                // Seconds that the timer ran before stopping
@@ -398,9 +398,9 @@ public class Extension extends SubsystemBase
         return;
     }
 
-    DataLogManager.log(String.format("%s: TARGET DEGREES %.1f", getSubsystem( ), m_extensionTargetInches));
+    DataLogManager.log(String.format("%s: TARGET INCHES %.1f", getSubsystem( ), m_extensionTargetInches));
 
-    if (EXConsts.kExtensionCalibrated && moveIsInRange(Math.abs(m_extensionTargetInches - m_extensionCurInches)))
+    if (EXConsts.kExtensionCalibrated)
     {
       // length constraint check/soft limit for max and min length before raising
       if (!moveIsInRange(m_extensionTargetInches))
@@ -416,10 +416,12 @@ public class Extension extends SubsystemBase
       m_safetyTimer.start( );
 
       if (m_extensionValid)
-        m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches));
+        //m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches));
+        m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches),
+            DemandType.ArbitraryFeedForward, m_arbitraryFF);
 
-      DataLogManager.log(String.format("%s: moving: %.1f -> %.1f inches | counts %d -> %d", getSubsystem( ), m_extensionCurInches,
-          m_extensionTargetInches, m_extensionCurInches, m_extensionTargetInches));
+      DataLogManager.log(String.format("%s: moving: %.1f -> %.1f inches | counts %.1f -> %.1f", getSubsystem( ),
+          m_extensionCurInches, m_extensionTargetInches, m_extensionCurInches, m_extensionTargetInches));
     }
     else
     {
@@ -431,9 +433,9 @@ public class Extension extends SubsystemBase
 
   public void moveExtensionLengthExecute( )
   {
-    if (m_extensionValid && EXConsts.kExtensionCalibrated)
-      m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches), DemandType.ArbitraryFeedForward,
-          m_arbitraryFF * Math.sin(Units.degreesToRadians((m_extensionCurInches))));
+    // if (m_extensionValid && EXConsts.kExtensionCalibrated)
+    //   m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches), DemandType.ArbitraryFeedForward,
+    //       m_arbitraryFF);
   }
 
   public boolean moveExtensionLengthIsFinished( )

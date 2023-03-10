@@ -3,33 +3,30 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Extension;
+import frc.robot.subsystems.Wrist;
 
 /**
  *
  */
-public class ExtensionCalibrate extends CommandBase
+public class SetWRAngleZero extends CommandBase
 {
-  private Timer     m_calibrateTimer = new Timer( );
-  private Extension m_extension;
+  private final Wrist m_wrist;
 
-  public ExtensionCalibrate(Extension extension)
+  public SetWRAngleZero(Wrist wrist)
   {
-    m_extension = extension;
+    m_wrist = wrist;
 
-    setName("ExtensionCalibrate");
-    addRequirements(m_extension);
+    setName("SetWRAngleZero");
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize( )
   {
-    m_calibrateTimer.reset( );
-    m_extension.moveToCalibrate( );
-    m_calibrateTimer.start( );
+    DataLogManager.log(getName( ) + ": key pressed - " + m_wrist);
+    m_wrist.setWristAngleToZero( );
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -40,21 +37,18 @@ public class ExtensionCalibrate extends CommandBase
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted)
-  {
-    m_calibrateTimer.stop( );
-    m_extension.calibrate( );
-  }
+  {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished( )
   {
-    return m_calibrateTimer.hasElapsed(1.5);
+    return true;
   }
 
   @Override
   public boolean runsWhenDisabled( )
   {
-    return false;
+    return true;
   }
 }

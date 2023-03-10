@@ -47,6 +47,7 @@ import frc.robot.commands.LEDSet;
 import frc.robot.commands.ManualMode;
 import frc.robot.commands.ResetGyro;
 import frc.robot.commands.ResetOdometryToLimelight;
+import frc.robot.commands.SetWRAngleZero;
 import frc.robot.commands.WristMoveToAngle;
 import frc.robot.commands.WristRun;
 import frc.robot.subsystems.Elbow;
@@ -184,6 +185,7 @@ public class RobotContainer
     SmartDashboard.putData("WristLow", new WristMoveToAngle(m_wrist, WristAngle.WRIST_LOW));
     SmartDashboard.putData("WristMid", new WristMoveToAngle(m_wrist, WristAngle.WRIST_MID));
     SmartDashboard.putData("WristHigh", new WristMoveToAngle(m_wrist, WristAngle.WRIST_HIGH));
+    SmartDashboard.putData("WristSetAngleToZero", new SetWRAngleZero(m_wrist));
 
     // Gripper subsystem test
     SmartDashboard.putData("GripperStop", new GripperRun(m_gripper, GRMode.GR_STOP));
@@ -323,12 +325,12 @@ public class RobotContainer
   private void initDefaultCommands( )
   {
     m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_elbow, m_driverPad));
-    // m_elbow.setDefaultCommand(new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_NOCHANGE));
-    // m_extension.setDefaultCommand(new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_NOCHANGE));
-    // m_wrist.setDefaultCommand(new WristMoveToAngle(m_wrist, WristAngle.WRIST_NOCHANGE));
-    m_elbow.setDefaultCommand(new ElbowRun(m_elbow, m_operatorPad));
+    m_elbow.setDefaultCommand(new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_NOCHANGE));
+    //m_extension.setDefaultCommand(new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_NOCHANGE));
+    m_wrist.setDefaultCommand(new WristMoveToAngle(m_wrist, WristAngle.WRIST_NOCHANGE));
+    // m_elbow.setDefaultCommand(new ElbowRun(m_elbow, m_operatorPad));
     m_extension.setDefaultCommand(new ExtensionRun(m_extension, m_operatorPad));
-    m_wrist.setDefaultCommand(new WristRun(m_wrist, m_operatorPad));
+    // m_wrist.setDefaultCommand(new WristRun(m_wrist, m_operatorPad));
   }
 
   /****************************************************************************
