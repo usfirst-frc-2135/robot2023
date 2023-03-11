@@ -481,10 +481,24 @@ public class Elbow extends SubsystemBase
     return isFinished;
   }
 
-  public boolean isElbowBelowDesired( )
+  public boolean isElbowBelowIdle( )
   {
     int curCounts = (int) m_elbow.getSelectedSensorPosition(0);
     m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
-    return m_elbowCurDegrees < m_elbowTargetDegrees;
+    return m_elbowCurDegrees < m_elbowAngleIdle;
+  }
+
+  public boolean isElbowBelowLow( )
+  {
+    int curCounts = (int) m_elbow.getSelectedSensorPosition(0);
+    m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
+    return m_elbowCurDegrees < m_elbowAngleLow;
+  }
+
+  public boolean isElbowBelowMid( )
+  {
+    int curCounts = (int) m_elbow.getSelectedSensorPosition(0);
+    m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
+    return m_elbowCurDegrees < m_elbowAngleMid;
   }
 }

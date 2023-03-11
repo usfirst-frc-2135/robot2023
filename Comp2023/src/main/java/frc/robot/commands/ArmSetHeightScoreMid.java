@@ -58,7 +58,7 @@ public class ArmSetHeightScoreMid extends SequentialCommandGroup
             new ElbowMoveToAngle(elbow, ElbowAngle.ELBOW_MID)
           )
           ),
-          elbow::isElbowBelowDesired
+          elbow::isElbowBelowMid
         ),
         new PrintCommand(getName() + ": Extend Extension"),
         new ParallelDeadlineGroup(

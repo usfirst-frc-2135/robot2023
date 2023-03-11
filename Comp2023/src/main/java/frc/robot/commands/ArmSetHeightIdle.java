@@ -58,7 +58,7 @@ public class ArmSetHeightIdle extends SequentialCommandGroup
             new ElbowMoveToAngle(elbow, ElbowAngle.ELBOW_IDLE)
           )
           ),
-          elbow::isElbowBelowDesired
+          elbow::isElbowBelowIdle
         ),
         new PrintCommand(getName() + ": Extend Extension"),
         new ParallelDeadlineGroup(

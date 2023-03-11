@@ -119,7 +119,7 @@ public class Extension extends SubsystemBase
     {
       int curCounts = (int) m_extension.getSelectedSensorPosition(0);
 
-      if (RobotState.isDisabled( ) && (curCounts < 0))
+      if (curCounts < 0)
       {
         m_extension.setNeutralMode(NeutralMode.Coast);
         curCounts = 0;
@@ -274,6 +274,8 @@ public class Extension extends SubsystemBase
     motor.selectProfileSlot(SLOTINDEX, PIDINDEX);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "selectProfileSlot");
 
+    motor.configNeutralDeadband(0.01, Constants.kLongCANTimeoutMs);
+
     motor.set(ControlMode.PercentOutput, 0.0);
   }
 
@@ -307,7 +309,7 @@ public class Extension extends SubsystemBase
     m_extensionTargetInches = m_extensionCurInches;
 
     if (m_extensionValid)
-      m_extension.set(ControlMode.PercentOutput, yValue * EXConsts.kExtensionSpeedMaxManual - 0.043);
+      m_extension.set(ControlMode.PercentOutput, yValue * EXConsts.kExtensionSpeedMaxManual + EXConsts.kExtensionArbitraryFF);
   }
 
   public void setExtensionStopped( )

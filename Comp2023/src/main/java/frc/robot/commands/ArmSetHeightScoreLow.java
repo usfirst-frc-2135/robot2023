@@ -54,7 +54,7 @@ public class ArmSetHeightScoreLow extends SequentialCommandGroup
               new WaitUntilCommand(elbow::moveElbowAngleIsFinished),
               new ElbowMoveToAngle(elbow, ElbowAngle.ELBOW_LOW))
           ),
-          elbow::isElbowBelowDesired
+          elbow::isElbowBelowLow
         ),
 
         new PrintCommand(getName() + ": Extend Extension"),

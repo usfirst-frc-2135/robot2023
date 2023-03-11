@@ -33,8 +33,8 @@ public class AutoDrivePath extends CommandBase
 
     // Get our trajectory
     m_trajectory = PathPlanner.loadPath(pathName, new PathConstraints(4, 3));
-    //DataLogManager.log(String.format("%s: '%s' has %2d states Total time - %.3f secs", getName( ), pathName,
-    //    m_trajectory.getStates( ).size( ), m_trajectory.getTotalTimeSeconds( )));
+    DataLogManager.log(String.format("%s: '%s' has %2d states Total time - %.3f secs", getName( ), pathName,
+        m_trajectory.getStates( ).size( ), m_trajectory.getTotalTimeSeconds( )));
   }
 
   // Called when the command is initially scheduled.
