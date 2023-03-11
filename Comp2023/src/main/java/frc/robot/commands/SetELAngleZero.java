@@ -5,27 +5,27 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.Elbow;
 
 /**
  *
  */
-public class SetWRAngleZero extends CommandBase
+public class SetELAngleZero extends CommandBase
 {
-  private final Wrist m_wrist;
+  private final Elbow m_elbow;
 
-  public SetWRAngleZero(Wrist wrist)
+  public SetELAngleZero(Elbow elbow)
   {
-    m_wrist = wrist;
+    m_elbow = elbow;
 
-    setName("SetWRAngleZero");
+    setName("SetELAngleZero");
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize( )
   {
-    m_wrist.setWristAngleToZero( );
+    m_elbow.setElbowAngleToZero( );
   }
 
   // Called every time the scheduler runs while the command is scheduled.

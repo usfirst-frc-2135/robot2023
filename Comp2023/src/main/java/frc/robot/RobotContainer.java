@@ -47,6 +47,7 @@ import frc.robot.commands.LEDSet;
 import frc.robot.commands.ManualMode;
 import frc.robot.commands.ResetGyro;
 import frc.robot.commands.ResetOdometryToLimelight;
+import frc.robot.commands.SetELAngleZero;
 import frc.robot.commands.SetWRAngleZero;
 import frc.robot.commands.WristMoveToAngle;
 import frc.robot.commands.WristRun;
@@ -173,6 +174,7 @@ public class RobotContainer
     SmartDashboard.putData("ElbowLow", new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_LOW));
     SmartDashboard.putData("ElbowMid", new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_MID));
     SmartDashboard.putData("ElbowHigh", new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_HIGH));
+    SmartDashboard.putData("ElbowSetAngleToZero", new SetELAngleZero(m_elbow));
 
     // Extension subsytem tests
     SmartDashboard.putData("ExtensionStow", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_STOW));
