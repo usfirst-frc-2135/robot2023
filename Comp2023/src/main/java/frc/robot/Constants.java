@@ -225,7 +225,7 @@ public class Constants
     public static final double  kExtensionLengthMin        = -0.5;   // Extension minimum allowable length
     public static final double  kExtensionLengthMax        = 20.0;   // Extension maximum allowable length
     public static final double  kExtensionLengthStow       = 0.0;    // TODO: FIGURE IT OUT EMPIRICALLY
-    public static final double  kExtensionLengthIdle       = 8.0;    // TODO: FIGURE IT OUT EMPIRICALLY
+    public static final double  kExtensionLengthIdle       = 0.0;    // TODO: FIGURE IT OUT EMPIRICALLY
     public static final double  kExtensionLengthScoreLow   = 10.0;    // From Mech Design (floor, feet art 5" high)
     public static final double  kExtensionLengthScoreMid   = 3.0;    // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube)
     public static final double  kExtensionLengthScoreHigh  = 18.0;   // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube)
@@ -296,17 +296,17 @@ public class Constants
     public static final double  kWristMaxAngle        = 115.0; // Wrist maximum allowable Angle
     public static final double  kWristAngleStow       = 0.0;   // TO-DO: FIGURE IT OUT
     public static final double  kWristAngleIdle       = 5.0;   // TO-DO: FIGURE IT OUT
-    public static final double  kWristAngleScoreLow   = 30.0;  // From Mech Design (floor, feet art 5" high)
-    public static final double  kWristAngleScoreMid   = 91.0;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube)
-    public static final double  kWristAngleScoreHigh  = 103.0; // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube)
+    public static final double  kWristAngleScoreLow   = 33.0;  // From Mech Design (floor, feet art 5" high)
+    public static final double  kWristAngleScoreMid   = 87.0;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube)
+    public static final double  kWristAngleScoreHigh  = 100.0; // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube)
     public static final double  kWristAngleSubstation = 103.0; // From Mech Design (3'1-38" above floor)
 
     // Current limit settings - wrist
-    public static final double  kSupplyCurrentLimit   = 15.0;  // Supply current limit (after trigger)
-    public static final double  kSupplyTriggerCurrent = 15.0;  // Supply trigger current that will cause limiting
+    public static final double  kSupplyCurrentLimit   = 5.0;  // Supply current limit (after trigger)
+    public static final double  kSupplyTriggerCurrent = 5.0;  // Supply trigger current that will cause limiting
     public static final double  kSupplyTriggerTime    = 0.001; // Supply time duration of trigger that will causing limiting
-    public static final double  kStatorCurrentLimit   = 10.0;  // Stator current limit (after trigger)
-    public static final double  kStatorTriggerCurrent = 10.0;  // Stator trigger current that will cause limiting
+    public static final double  kStatorCurrentLimit   = 5.0;  // Stator current limit (after trigger)
+    public static final double  kStatorTriggerCurrent = 5.0;  // Stator trigger current that will cause limiting
     public static final double  kStatorTriggerTime    = 0.001; // Stator time duration of trigger that will causing limiting
 
     // CANCoder wrist absolute offset
