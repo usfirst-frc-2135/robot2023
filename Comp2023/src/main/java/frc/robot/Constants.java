@@ -135,7 +135,7 @@ public class Constants
     public static final double kAngleThreshold      = 3.5;      // Degrees tolerance around optimal
     public static final double kDistThreshold       = 6.0;      // Inches tolerance around optimal
 
-    public static final double kElbowDriveSlowAngle = 20.0;     // When arm is out beyond this angle - drive is slowed down
+    public static final double kElbowDriveSlowAngle = 34.0;     // When arm is out beyond this angle - drive is slowed down
   }
 
   public static final class ELConsts
@@ -158,11 +158,11 @@ public class Constants
     public static final double  kElbowAngleSubstation = 103.0;  // From Mech Design (3'1-38" above floor)
 
     // Current limit settings - elbow
-    public static final double  kSupplyCurrentLimit   = 25.0;  // Supply current limit (after trigger)
-    public static final double  kSupplyTriggerCurrent = 25.0;  // Supply trigger current that will cause limiting
+    public static final double  kSupplyCurrentLimit   = 35.0;  // Supply current limit (after trigger)
+    public static final double  kSupplyTriggerCurrent = 35.0;  // Supply trigger current that will cause limiting
     public static final double  kSupplyTriggerTime    = 0.001; // Supply time duration of trigger that will causing limiting
-    public static final double  kStatorCurrentLimit   = 25.0;  // Stator current limit (after trigger)
-    public static final double  kStatorTriggerCurrent = 25.0;  // Stator trigger current that will cause limiting
+    public static final double  kStatorCurrentLimit   = 35.0;  // Stator current limit (after trigger)
+    public static final double  kStatorTriggerCurrent = 35.0;  // Stator trigger current that will cause limiting
     public static final double  kStatorTriggerTime    = 0.001; // Stator time duration of trigger that will causing limiting
 
     // CANCoder elbow absolute offset
@@ -302,11 +302,11 @@ public class Constants
     public static final double  kWristAngleSubstation = 103.0; // From Mech Design (3'1-38" above floor)
 
     // Current limit settings - wrist
-    public static final double  kSupplyCurrentLimit   = 5.0;  // Supply current limit (after trigger)
-    public static final double  kSupplyTriggerCurrent = 5.0;  // Supply trigger current that will cause limiting
+    public static final double  kSupplyCurrentLimit   = 8.0;  // Supply current limit (after trigger)
+    public static final double  kSupplyTriggerCurrent = 8.0;  // Supply trigger current that will cause limiting
     public static final double  kSupplyTriggerTime    = 0.001; // Supply time duration of trigger that will causing limiting
-    public static final double  kStatorCurrentLimit   = 5.0;  // Stator current limit (after trigger)
-    public static final double  kStatorTriggerCurrent = 5.0;  // Stator trigger current that will cause limiting
+    public static final double  kStatorCurrentLimit   = 8.0;  // Stator current limit (after trigger)
+    public static final double  kStatorTriggerCurrent = 8.0;  // Stator trigger current that will cause limiting
     public static final double  kStatorTriggerTime    = 0.001; // Stator time duration of trigger that will causing limiting
 
     // CANCoder wrist absolute offset
@@ -344,7 +344,7 @@ public class Constants
     public static final int    kWristMMAcceleration   = 16466;  // Wrist motion magic acceleration
     public static final int    kWristMMSCurveStrength = 0;      // Wrist motion magic S curve smoothing strength
     public static final double kWristPidKf            = 0.0466; // Wrist PID force constant
-    public static final double kWristPidKp            = 0.069;  // Wrist PID proportional constant
+    public static final double kWristPidKp            = 0.0246;  // Wrist PID proportional constant
     public static final double kWristPidKi            = 0.0;    // Wrist PID integral constant
     public static final double kWristPidKd            = 0.0;    // Wrist PID derivative constant
     public static final int    kWristAllowedError     = 0;      // Wrist PID allowable closed loop error in counts
