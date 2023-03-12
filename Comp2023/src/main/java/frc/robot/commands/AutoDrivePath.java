@@ -32,7 +32,7 @@ public class AutoDrivePath extends CommandBase
     addRequirements(m_swerve);
 
     // Get our trajectory
-    m_trajectory = PathPlanner.loadPath(pathName, new PathConstraints(4, 3));
+    m_trajectory = PathPlanner.loadPath(pathName, new PathConstraints(4, 4.5));
     DataLogManager.log(String.format("%s: '%s' has %2d states Total time - %.3f secs", getName( ), pathName,
         m_trajectory.getStates( ).size( ), m_trajectory.getTotalTimeSeconds( )));
   }
