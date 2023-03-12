@@ -6,6 +6,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
 import frc.robot.subsystems.Gripper;
@@ -27,8 +28,11 @@ public class AutoPreloadAndEngageChargeStation extends SequentialCommandGroup
         // @formatter:off
         new PrintCommand(getName() + ": AUTO: Preload"),        
         new ParallelDeadlineGroup(
-            new AutoPreloadHigh(elbow, extension, wrist, gripper)
+          new ExtensionCalibrate(extension), 
+          new GripperRun(gripper, GRMode.GR_EXPEL)
         ),
+
+        new GripperRun(gripper, GRMode.GR_STOP),
         new PrintCommand(getName() + ": AUTO: Run to ChargeStation"),
         new ParallelDeadlineGroup(
           new AutoChargeStation(swerve)

@@ -29,7 +29,7 @@ public class AutoEngageChargeStation extends SequentialCommandGroup
         ),
 
         new PrintCommand(getName() + ": AUTO: Balance on ChargeStation"),
-        new AutoDriveBalance(swerve)
+        new AutoDriveBalance(swerve).withTimeout(6.0)
         
         // @formatter:on
     );

@@ -348,6 +348,11 @@ public class Elbow extends SubsystemBase
       m_elbow.set(ControlMode.PercentOutput, 0.0);
   }
 
+  public void setElbowAngleToZero( )
+  {
+    m_elbow.setSelectedSensorPosition(elbowDegreesToCounts(0));
+  }
+
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
   public void moveElbowAngleInit(ElbowAngle angle)
