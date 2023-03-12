@@ -49,7 +49,7 @@ public class ExtensionCalibrate extends CommandBase
   @Override
   public boolean isFinished( )
   {
-    return m_calibrateTimer.hasElapsed(1.5);
+    return m_calibrateTimer.hasElapsed(1.0);
   }
 
   @Override
