@@ -125,10 +125,9 @@ public class RobotContainer
 
     // Autonomous buttons  for main routines- chooser order
     SmartDashboard.putData("AutoStop", new AutoStop(m_swerve));
-    SmartDashboard.putData("AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveOffCommunity", true));
+    SmartDashboard.putData("AutoDriveOutOfCommunity", new AutoDrivePath(m_swerve, "driveOutOfCommunity", true));
     SmartDashboard.putData("AutoEngageChargeStation", new AutoEngageChargeStation(m_swerve));
     SmartDashboard.putData("AutoChargeStation", new AutoChargeStation(m_swerve));
-    SmartDashboard.putData("driveOffCommunityCopy", new AutoDrivePath(m_swerve, "driveOffCommunityCopy", true));
     // SmartDashboard.putData("AutoPreloadAndLeaveCommunity", new AutoPreloadAndLeaveCommunity(m_swerve));
     // SmartDashboard.putData("AutoPreloadAndEngageChargeStation", new AutoPreloadAndEngageChargeStation(m_swerve));
     // SmartDashboard.putData("AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve));
@@ -137,16 +136,6 @@ public class RobotContainer
     SmartDashboard.putData("AutoDriveBalance", new AutoDriveBalance(m_swerve));
 
     // SmartDashboard.putData("DriveSlowMode", new DriveSlowMode(m_swerve, false));
-
-    // Path follower tests
-    // SmartDashboard.putData("AutoDrivePathForward", new AutoDrivePath(m_swerve, "testForward1m", true));
-    // SmartDashboard.putData("AutoDrivePathBackward", new AutoDrivePath(m_swerve, "testBackward1m", true));
-    // SmartDashboard.putData("AutoDrivePathForwardLeft", new AutoDrivePath(m_swerve, "testForwardLeft", true));
-    // SmartDashboard.putData("AutoDrivePathBackwardRight", new AutoDrivePath(m_swerve, "testBackwardRight", true));
-    // SmartDashboard.putData("AutoDrivePathLeft", new AutoDrivePath(m_swerve, "testLeft1m", true));
-    // SmartDashboard.putData("AutoDrivePathRight", new AutoDrivePath(m_swerve, "testRight1m", true));
-    // SmartDashboard.putData("AutoDrivePathForward2", new AutoDrivePath(m_swerve, "testForward2m", true));
-    // SmartDashboard.putData("AutoDrivePathBackward2", new AutoDrivePath(m_swerve, "testBackward2m", true));
 
     SmartDashboard.putData("ArmSetHeightStow", new ArmSetHeightStow(m_elbow, m_extension, m_wrist));
     SmartDashboard.putData("ArmSetHeightScoreLow", new ArmSetHeightScoreLow(m_elbow, m_extension, m_wrist));
@@ -253,9 +242,9 @@ public class RobotContainer
 
     // Driver - A, B, X, Y
     driverA.onTrue(new ArmSetHeightIdle(m_elbow, m_extension, m_wrist));
-    driverB.onTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_RIGHT));
-    driverX.onTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_LEFT));
-    driverY.onTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_MIDDLE));
+    driverB.whileTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_RIGHT));
+    driverX.whileTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_LEFT));
+    driverY.whileTrue(new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_MIDDLE));
     //
     // Driver - Bumpers, start, back
     driverLeftBumper.onTrue(new Dummy("left bumper"));
@@ -349,7 +338,7 @@ public class RobotContainer
   private void initAutonomousChooser( )
   {
     // Autonomous Chooser
-    m_autoChooser.addOption("1 - AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveOffCommunity", true));
+    m_autoChooser.addOption("1 - AutoDriveOffCommunity", new AutoDrivePath(m_swerve, "driveOutOfCommunity", true));
     m_autoChooser.addOption("2 - AutoDockOnChargeStation", new AutoChargeStation(m_swerve));
     m_autoChooser.addOption("3 - AutoPreloadAndLeaveCommunity",
         new AutoPreloadAndLeaveCommunity(m_swerve, m_elbow, m_extension, m_wrist, m_gripper));

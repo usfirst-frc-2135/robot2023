@@ -279,7 +279,7 @@ public class Constants
     public static final double kExtensionPidKd            = 0.0;    // Extension PID derivative constant
     public static final int    kExtensionAllowedError     = 0;      // Extension PID allowable closed loop error in counts
     public static final double kExtensionToleranceInches  = 0.5;    // Extension PID tolerance in inches
-    public static final double kExtensionArbitraryFF      = 0.000;  // Extension motor output for extension when fully retracted
+    public static final double kExtensionArbitraryFF      = -0.032; // Extension motor output for extension when fully retracted
   }
 
   public static final class WRConsts
@@ -426,7 +426,9 @@ public class Constants
     public static final double       kATagDepthInGrid    = Units.inchesToMeters(14.25); // Depth from front of grid to AprilTag - 1'2-1/4"
     public static final double       kRobotCenterToFront = Units.inchesToMeters((28.0 + 6.0) / 2); // Depth from limelight to front robot edge
     public static final double       kAdjustPathX        = kATagDepthInGrid + kRobotCenterToFront;
-    public static final double       kAdjustPathY        = Units.inchesToMeters(18.25 / 2 + 18.5 / 2);
+    public static final double       kAdjustPathY        = Units.inchesToMeters(18.25 / 2 + 18.5 / 2) + 0.06; // Addition of 6cm to adjust for empirical error 
+    public static final double       kAdjustSubPathX     = kRobotCenterToFront + Units.inchesToMeters(30); //Robot stop 30 inches from the substation loading zone
+    public static final double       kAdjustSubPathY     = Units.inchesToMeters(50.5 / 2);
 
     public static final List<Pose2d> kAprilTagPoses      = Collections.unmodifiableList(List.of( //
         new Pose2d(new Translation2d(0.0, 0.0), new Rotation2d(0)),        // AprilTag ID: 0 (invalid)

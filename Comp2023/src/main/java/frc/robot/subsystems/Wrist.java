@@ -369,7 +369,7 @@ public class Wrist extends SubsystemBase
       m_wrist.config_kD(SLOTINDEX, m_pidKd);
 
       m_wristAngleStow = SmartDashboard.getNumber("WR_stowAngle", m_wristAngleStow);
-      m_wristAngleStow = SmartDashboard.getNumber("WR_idleAngle", m_wristAngleIdle);
+      m_wristAngleIdle = SmartDashboard.getNumber("WR_idleAngle", m_wristAngleIdle);
       m_wristAngleLow = SmartDashboard.getNumber("WR_scoreAngleLow", m_wristAngleLow);
       m_wristAngleMid = SmartDashboard.getNumber("WR_scoreAngleMid", m_wristAngleMid);
       m_wristAngleHigh = SmartDashboard.getNumber("WR_scoreAngleHigh", m_wristAngleHigh);

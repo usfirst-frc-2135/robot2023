@@ -3,6 +3,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -27,20 +28,42 @@ public class ArmSetHeightIdle extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
-        new PrintCommand(getName() + ": Moving Wrist"),
+        new PrintCommand(getName()+": Retract Extension"),
         new ParallelDeadlineGroup(
-          new WaitUntilCommand(wrist::moveWristAngleIsFinished),
-          new WristMoveToAngle(wrist, WristAngle.WRIST_IDLE)
+          new WaitUntilCommand(extension::moveExtensionLengthIsFinished),
+          new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_STOW)
         ),
-        new PrintCommand(getName() + ": Moving Extension"),
+        new ConditionalCommand(
+          new SequentialCommandGroup(
+            new PrintCommand(getName() + ": Move Elbow"),
+            new ParallelDeadlineGroup(
+              new WaitUntilCommand(elbow::moveElbowAngleIsFinished),
+              new ElbowMoveToAngle(elbow, ElbowAngle.ELBOW_IDLE)
+            ), 
+            new PrintCommand(getName() + ": Move Wrist"),
+            new ParallelDeadlineGroup(
+               new WaitUntilCommand(wrist::moveWristAngleIsFinished),
+               new WristMoveToAngle(wrist, WristAngle.WRIST_IDLE)
+            )
+          ),
+          new SequentialCommandGroup(
+            new PrintCommand(getName() + ": Move Wrist"),
+            new ParallelDeadlineGroup(
+              new WaitUntilCommand(wrist::moveWristAngleIsFinished),
+              new WristMoveToAngle(wrist, WristAngle.WRIST_IDLE)
+           ),
+           new PrintCommand(getName() + ": Move Elbow"),
+           new ParallelDeadlineGroup(
+            new WaitUntilCommand(elbow::moveElbowAngleIsFinished),
+            new ElbowMoveToAngle(elbow, ElbowAngle.ELBOW_IDLE)
+          )
+          ),
+          elbow::isElbowBelowIdle
+        ),
+        new PrintCommand(getName() + ": Extend Extension"),
         new ParallelDeadlineGroup(
           new WaitUntilCommand(extension::moveExtensionLengthIsFinished),
           new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_IDLE)
-        ),
-        new PrintCommand(getName() + ": Moving Elbow"),
-        new ParallelDeadlineGroup(
-          new WaitUntilCommand(elbow::moveElbowAngleIsFinished),
-          new ElbowMoveToAngle(elbow, ElbowAngle.ELBOW_IDLE)
         )
 
         // @formatter:on
