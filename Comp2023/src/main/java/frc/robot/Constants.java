@@ -168,7 +168,7 @@ public class Constants
     // CANCoder elbow absolute offset
     public static final boolean kInvertCANCoder       = true;   // CANCoder direction for positive angle in relative mode
     public static final boolean kElbowCalibrated      = true;   // Indicates whether the elbow has been calibrated by CANCoder
-    public static final double  kCompElbowOffset      = 132.363; // CANCoder offset angle for comp bot
+    public static final double  kCompElbowOffset      = -50.010; // CANCoder offset angle for comp bot
     public static final double  kBetaElbowOffset      = 0.000; // (TODO: Beta requires an offset) CANCoder offset angle for beta bot
 
     // Manual config parameters
@@ -373,7 +373,7 @@ public class Constants
 
     public static final double kGripperSpeedAcquire = 1.0;  // Acquire game piece from loading station or floor
     public static final double kGripperSpeedHold    = 0.1;  // Hold game piece while traversing the field (must be < 2V equiv)
-    public static final double kGripperSpeedExpel   = -0.3; // Score game piece on cone node or cube shelf
+    public static final double kGripperSpeedExpel   = -0.25; // Score game piece on cone node or cube shelf
   }
 
   public static final class LEDConsts
