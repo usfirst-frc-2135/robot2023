@@ -83,13 +83,13 @@ public class Elbow extends SubsystemBase
   private double                          m_toleranceDegrees    = ELConsts.kElbowToleranceDegrees;  // PID tolerance in inches
   private double                          m_arbitraryFF         = ELConsts.kElbowArbitraryFF;       // Arbitrary Feedfoward (elevators and arms)
 
+  private double                          m_elbowAngleMin       = ELConsts.kElbowAngleMin;          // minimum elbow allowable angle
   private double                          m_elbowAngleStow      = ELConsts.kElbowAngleStow;         // elbow Stow angle
   private double                          m_elbowAngleIdle      = ELConsts.kElbowAngleIdle;         // elbow Idle angle
   private double                          m_elbowAngleLow       = ELConsts.kElbowAngleScoreLow;     // low-peg scoring angle   
   private double                          m_elbowAngleMid       = ELConsts.kElbowAngleScoreMid;     // mid-peg scoring angle
   private double                          m_elbowAngleHigh      = ELConsts.kElbowAngleScoreHigh;    // high-peg scoring angle
-  private double                          m_elbowMinAngle       = ELConsts.kElbowAngleMin;          // minimum elbow allowable angle
-  private double                          m_elbowMaxAngle       = ELConsts.kElbowAngleMax;          // maximum elbow allowable angle
+  private double                          m_elbowAngleMax       = ELConsts.kElbowAngleMax;          // maximum elbow allowable angle
 
   private double                          m_stickDeadband       = Constants.kStickDeadband;         // joystick deadband
   private ElbowMode                       m_elbowMode           = ElbowMode.ELBOW_INIT;             // Mode active with joysticks
@@ -132,10 +132,10 @@ public class Elbow extends SubsystemBase
         m_elbow.setSelectedSensorPosition(absolutePosition);
     }
 
-    m_elbow.configReverseSoftLimitThreshold(Conversions.degreesToFalcon(m_elbowMinAngle, ELConsts.kElbowGearRatio),
+    m_elbow.configReverseSoftLimitThreshold(Conversions.degreesToFalcon(m_elbowAngleMin, ELConsts.kElbowGearRatio),
         Constants.kCANTimeoutMs);
     m_elbow.configReverseSoftLimitEnable(true, Constants.kCANTimeoutMs);
-    m_elbow.configForwardSoftLimitThreshold(Conversions.degreesToFalcon(m_elbowMaxAngle, ELConsts.kElbowGearRatio),
+    m_elbow.configForwardSoftLimitThreshold(Conversions.degreesToFalcon(m_elbowAngleMax, ELConsts.kElbowGearRatio),
         Constants.kCANTimeoutMs);
     m_elbow.configForwardSoftLimitEnable(true, Constants.kCANTimeoutMs);
 
@@ -253,7 +253,7 @@ public class Elbow extends SubsystemBase
 
   public boolean moveIsInRange(double degrees)
   {
-    return (degrees > m_elbowMinAngle) && (degrees < m_elbowMaxAngle);
+    return (degrees > m_elbowAngleMin) && (degrees < m_elbowAngleMax);
   }
 
   public double getAngle( )
@@ -310,34 +310,40 @@ public class Elbow extends SubsystemBase
 
   public void moveElbowWithJoystick(XboxController joystick)
   {
-    double yValue = -joystick.getLeftY( );
-    ElbowMode newMode;
+    double axisValue = -joystick.getLeftY( );
+    boolean outOfRange = false;
+    ElbowMode newMode = ElbowMode.ELBOW_STOPPED;
 
-    yValue = MathUtil.applyDeadband(yValue, m_stickDeadband);
+    axisValue = MathUtil.applyDeadband(axisValue, m_stickDeadband);
 
-    if (yValue == 0.0)
-      newMode = ElbowMode.ELBOW_STOPPED;
-    else if (yValue < 0.0)
-      newMode = ElbowMode.ELBOW_DOWN;
-    else
-      newMode = ElbowMode.ELBOW_UP;
+    if (axisValue < 0.0)
+    {
+      if (m_elbowCurDegrees > m_elbowAngleMin)
+        newMode = ElbowMode.ELBOW_DOWN;
+      else
+        outOfRange = true;
+    }
+    else if (axisValue > 0.0)
+    {
+      if (m_elbowCurDegrees < m_elbowAngleMax)
+        newMode = ElbowMode.ELBOW_UP;
+      else
+        outOfRange = true;
+    }
+
+    if (outOfRange)
+      axisValue = 0.0;
 
     if (newMode != m_elbowMode)
     {
       m_elbowMode = newMode;
-      DataLogManager.log(getSubsystem( ) + ": move " + m_elbowMode);
-    }
-
-    if (((m_elbowCurDegrees < m_elbowMinAngle) && yValue < 0.0) || ((m_elbowCurDegrees > m_elbowMaxAngle) && yValue > 0.0))
-    {
-      DataLogManager.log(getSubsystem( ) + ": move OUT OF RANGE!");
-      yValue = 0.0;
+      DataLogManager.log(getSubsystem( ) + ": move " + m_elbowMode + ((outOfRange) ? " - OUT OF RANGE" : ""));
     }
 
     m_elbowTargetDegrees = m_elbowCurDegrees;
 
     if (m_elbowValid)
-      m_elbow.set(ControlMode.PercentOutput, yValue * ELConsts.kElbowSpeedMaxManual);
+      m_elbow.set(ControlMode.PercentOutput, axisValue * ELConsts.kElbowSpeedMaxManual);
   }
 
   public void setElbowStopped( )
@@ -420,7 +426,7 @@ public class Elbow extends SubsystemBase
       if (!moveIsInRange(m_elbowTargetDegrees))
       {
         DataLogManager.log(String.format("%s: Target %.1f degrees is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
-            m_elbowTargetDegrees, m_elbowMinAngle, m_elbowMaxAngle));
+            m_elbowTargetDegrees, m_elbowAngleMin, m_elbowAngleMax));
         m_elbowTargetDegrees = m_elbowCurDegrees;
       }
 

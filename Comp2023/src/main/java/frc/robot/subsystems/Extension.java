@@ -69,13 +69,13 @@ public class Extension extends SubsystemBase
   private double                          m_toleranceInches       = EXConsts.kExtensionToleranceInches;  // PID tolerance in inches
   private double                          m_arbitraryFF           = EXConsts.kExtensionArbitraryFF;       // Arbitrary Feedfoward (elevators and arms)
 
+  private double                          m_extensionLengthMin    = EXConsts.kExtensionLengthMin;          // minimum extension allowable length
   private double                          m_extensionLengthStow   = EXConsts.kExtensionLengthStow;         // extension Stow length
   private double                          m_extensionLengthIdle   = EXConsts.kExtensionLengthIdle;         // extension Stow length
   private double                          m_extensionLengthLow    = EXConsts.kExtensionLengthScoreLow;     // low-peg scoring length   
   private double                          m_extensionLengthMid    = EXConsts.kExtensionLengthScoreMid;     // mid-peg scoring length
   private double                          m_extensionLengthHigh   = EXConsts.kExtensionLengthScoreHigh;    // high-peg scoring length
-  private double                          m_extensionMinLength    = EXConsts.kExtensionLengthMin;          // minimum extension allowable length
-  private double                          m_extensionMaxLength    = EXConsts.kExtensionLengthMax;          // maximum extension allowable length
+  private double                          m_extensionLengthMax    = EXConsts.kExtensionLengthMax;          // maximum extension allowable length
 
   private double                          m_stickDeadband         = Constants.kStickDeadband;         // joystick deadband
   private ExtensionMode                   m_extensionMode         = ExtensionMode.EXTENSION_INIT;             // Mode active with joysticks
@@ -222,7 +222,7 @@ public class Extension extends SubsystemBase
 
   public boolean moveIsInRange(double inches)
   {
-    return (inches > m_extensionMinLength) && (inches < m_extensionMaxLength);
+    return (inches > m_extensionLengthMin) && (inches < m_extensionLengthMax);
   }
 
   private void extensionTalonInitialize(WPI_TalonFX motor, boolean inverted)
@@ -279,35 +279,40 @@ public class Extension extends SubsystemBase
 
   public void moveExtensionWithJoystick(XboxController joystick)
   {
-    double yValue = joystick.getRightX( );
-    ExtensionMode newMode;
+    double axisValue = joystick.getRightX( );
+    boolean outOfRange = false;
+    ExtensionMode newMode = ExtensionMode.EXTENSION_STOPPED;
 
-    yValue = MathUtil.applyDeadband(yValue, m_stickDeadband);
+    axisValue = MathUtil.applyDeadband(axisValue, m_stickDeadband);
 
-    if (yValue == 0.0)
-      newMode = ExtensionMode.EXTENSION_STOPPED;
-    else if (yValue < 0.0)
-      newMode = ExtensionMode.EXTENSION_IN;
-    else
-      newMode = ExtensionMode.EXTENSION_OUT;
+    if (axisValue < 0.0)
+    {
+      if (m_extensionCurInches > m_extensionLengthMin)
+        newMode = ExtensionMode.EXTENSION_IN;
+      else
+        outOfRange = true;
+    }
+    else if (axisValue > 0.0)
+    {
+      if (m_extensionCurInches < m_extensionLengthMax)
+        newMode = ExtensionMode.EXTENSION_OUT;
+      else
+        outOfRange = true;
+    }
+
+    if (outOfRange)
+      axisValue = 0.0;
 
     if (newMode != m_extensionMode)
     {
       m_extensionMode = newMode;
-      DataLogManager.log(getSubsystem( ) + ": move " + m_extensionMode);
-    }
-
-    if (((m_extensionCurInches < m_extensionMinLength) && yValue < 0.0)
-        || ((m_extensionCurInches > m_extensionMaxLength) && yValue > 0.0))
-    {
-      DataLogManager.log(getSubsystem( ) + ": move OUT OF RANGE!");
-      yValue = 0.0;
+      DataLogManager.log(getSubsystem( ) + ": move " + m_extensionMode + ((outOfRange) ? " - OUT OF RANGE" : ""));
     }
 
     m_extensionTargetInches = m_extensionCurInches;
 
     if (m_extensionValid)
-      m_extension.set(ControlMode.PercentOutput, yValue * EXConsts.kExtensionSpeedMaxManual + EXConsts.kExtensionArbitraryFF);
+      m_extension.set(ControlMode.PercentOutput, axisValue * EXConsts.kExtensionSpeedMaxManual + EXConsts.kExtensionArbitraryFF);
   }
 
   public void setExtensionStopped( )
@@ -404,7 +409,7 @@ public class Extension extends SubsystemBase
       if (!moveIsInRange(m_extensionTargetInches))
       {
         DataLogManager.log(String.format("%s: Target %.1f inches is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
-            m_extensionTargetInches, m_extensionMinLength, m_extensionMaxLength));
+            m_extensionTargetInches, m_extensionLengthMin, m_extensionLengthMax));
         m_extensionTargetInches = m_extensionCurInches;
       }
 
