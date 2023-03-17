@@ -54,12 +54,12 @@ public class Elbow extends SubsystemBase
   private final CANCoder                  m_elbowCANCoder       = new CANCoder(Constants.Ports.kCANID_ELCANCoder);
   private final TalonFXSimCollection      m_elbowMotorSim       = new TalonFXSimCollection(m_elbow);
   private final SingleJointedArmSim       m_elbowSim            = new SingleJointedArmSim(DCMotor.getFalcon500(1),
-      ELConsts.kElbowGearRatio, 2.0, ELConsts.kForearmLengthMeters, 0.0, Math.PI, false);
+      ELConsts.kElbowGearRatio, 2.0, ELConsts.kForearmLengthMeters, -Math.PI, Math.PI, false);
 
   // Mechanism2d
   private final Mechanism2d               m_elbowMech           = new Mechanism2d(3, 3);
   private final MechanismRoot2d           m_elbowRoot           = m_elbowMech.getRoot("elbow", 1.5, 2);
-  private MechanismLigament2d             m_elbowLigament       =
+  private final MechanismLigament2d       m_elbowLigament       =
       m_elbowRoot.append(new MechanismLigament2d("elbow", 1, 0, 6, new Color8Bit(Color.kBlue)));
 
   private boolean                         m_elbowValid;                 // Health indicator for elbow Talon 
@@ -165,7 +165,7 @@ public class Elbow extends SubsystemBase
 
       m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
       SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
-      SmartDashboard.putNumber("EK_targetDegrees", m_elbowTargetDegrees);
+      SmartDashboard.putNumber("EL_targetDegrees", m_elbowTargetDegrees);
       m_elbowLigament.setAngle(m_elbowCurDegrees);
 
       double currentDraw = m_elbow.getStatorCurrent( );

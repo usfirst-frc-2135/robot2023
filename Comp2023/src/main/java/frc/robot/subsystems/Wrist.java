@@ -54,8 +54,9 @@ public class Wrist extends SubsystemBase
   private final CANCoder                  m_wristCANCoder       = new CANCoder(Constants.Ports.kCANID_WRCANCoder);
   private final TalonFXSimCollection      m_wristMotorSim       = new TalonFXSimCollection(m_wrist);
   private final SingleJointedArmSim       m_wristSim            = new SingleJointedArmSim(DCMotor.getFalcon500(1),
-      WRConsts.kWristGearRatio, 2.0, WRConsts.kGripperLengthMeters, 0, Math.PI, false);
+      WRConsts.kWristGearRatio, 2.0, WRConsts.kGripperLengthMeters, -Math.PI, Math.PI, false);
 
+  // Mechanism2d
   private final Mechanism2d               m_wristMech           = new Mechanism2d(3, 3);
   private final MechanismRoot2d           m_wristRoot           = m_wristMech.getRoot("wrist", 1.5, 2);
   private final MechanismLigament2d       m_wristLigament       =
@@ -87,8 +88,8 @@ public class Wrist extends SubsystemBase
   private double                          m_wristAngleLow       = WRConsts.kWristAngleScoreLow;      // low-peg scoring angle   
   private double                          m_wristAngleMid       = WRConsts.kWristAngleScoreMid;      // mid-peg scoring angle
   private double                          m_wristAngleHigh      = WRConsts.kWristAngleScoreHigh;     // high-peg scoring angle
-  private double                          m_wristMinAngle       = WRConsts.kWristMinAngle;           // minimum wrist allowable angle
-  private double                          m_wristMaxAngle       = WRConsts.kWristMaxAngle;           // maximum wrist allowable angle
+  private double                          m_wristMinAngle       = WRConsts.kWristAngleMin;           // minimum wrist allowable angle
+  private double                          m_wristMaxAngle       = WRConsts.kWristAngleMax;           // maximum wrist allowable angle
 
   private double                          m_stickDeadband       = Constants.kStickDeadband;          // joystick deadband
   private WristMode                       m_wristMode           = WristMode.WRIST_INIT;              // Mode active with joysticks
