@@ -346,6 +346,12 @@ public class Wrist extends SubsystemBase
       m_wrist.set(ControlMode.PercentOutput, 0.0);
   }
 
+  //m_wrsit::methodYouWantToDO
+  public void setWristAngleToZero( )
+  {
+    m_wrist.setSelectedSensorPosition(wristDegreesToCounts(0));
+  }
+
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
   public void moveWristAngleInit(WristAngle angle)
