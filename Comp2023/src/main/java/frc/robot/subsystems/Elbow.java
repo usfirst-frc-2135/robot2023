@@ -121,10 +121,12 @@ public class Elbow extends SubsystemBase
     if (m_elbowCCValid)
     {
       m_elbowCANCoder.configAllSettings(CTREConfigs.elbowCancoderConfig( ));
+      double m_elbowCurDegrees = getCanCoder( ).getDegrees( );
+
+      // Slow status frame updates AFTER getting the absolute position
       m_elbowCANCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
       m_elbowCANCoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 255);
 
-      double m_elbowCurDegrees = getCanCoder( ).getDegrees( );
       DataLogManager.log(getSubsystem( ) + ": Initial degrees " + m_elbowCurDegrees);
       double absolutePosition = Conversions.degreesToFalcon(m_elbowCurDegrees, ELConsts.kElbowGearRatio);
 

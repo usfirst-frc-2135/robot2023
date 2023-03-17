@@ -121,10 +121,12 @@ public class Wrist extends SubsystemBase
     if (m_wristCCValid)
     {
       m_wristCANCoder.configAllSettings(CTREConfigs.wristCancoderConfig( ));
+      double m_wristCurDegrees = getCanCoder( ).getDegrees( );
+
+      // Slow status frame updates AFTER getting the absolute position
       m_wristCANCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
       m_wristCANCoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 255);
 
-      double m_wristCurDegrees = getCanCoder( ).getDegrees( );
       DataLogManager.log(getSubsystem( ) + ": Initial degrees " + m_wristCurDegrees);
       double absolutePosition = Conversions.degreesToFalcon(m_wristCurDegrees, WRConsts.kWristGearRatio);
 
