@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.crypto.Data;
+
 import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.math.MathUtil;
@@ -415,6 +417,8 @@ public class Swerve extends SubsystemBase
     if (useInitialPose)
     {
       resetOdometry(m_trajectory.getInitialHolonomicPose( ));
+      resetOdometry(m_trajectory.getInitialHolonomicPose( ));
+      DataLogManager.log("GYRO : " + m_pigeon.getYaw( ));
     }
 
     m_trajTimer.reset( );
@@ -697,6 +701,8 @@ public class Swerve extends SubsystemBase
 
   public void resetOdometry(Pose2d pose)
   {
+    DataLogManager.log("GYRO: " + m_pigeon.getYaw( ));
+    DataLogManager.log("GYRO Before : " + m_poseEstimator.getEstimatedPosition( ));
     m_poseEstimator.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
     zeroGyro(pose.getRotation( ).getDegrees( ));
   }
