@@ -94,7 +94,7 @@ public class Wrist extends SubsystemBase
   private double                          m_stickDeadband       = Constants.kStickDeadband;          // joystick deadband
   private WristMode                       m_wristMode           = WristMode.WRIST_INIT;              // Mode active with joysticks
 
-  private boolean                         m_wristDebug          = true;   // DEBUG flag to disable/enable extra logging calls
+  private boolean                         m_wristDebug          = false;  // DEBUG flag to disable/enable extra logging calls
 
   private double                          m_wristTargetDegrees  = 0.0;    // Target angle in degrees
   private double                          m_wristCurDegrees     = 0.0;    // Current angle in degrees

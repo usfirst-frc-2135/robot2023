@@ -51,6 +51,8 @@ public class Vision extends SubsystemBase
 
   private double                m_distLL;                // calculated distance in inches for the current y value
 
+  private boolean               m_visionDebug   = false; // DEBUG flag to disable/enable extra logging calls
+
   /**
    *
    */
@@ -118,14 +120,17 @@ public class Vision extends SubsystemBase
 
     getLimelightRawPose( );
 
-    SmartDashboard.putNumber("VI_horizAngle", m_targetHorizAngle);
-    SmartDashboard.putNumber("VI_vertAngle", m_targetVertAngle);
-    SmartDashboard.putNumber("VI_area", m_targetArea);
-    SmartDashboard.putNumber("VI_skew", m_targetSkew);
+    if (m_visionDebug)
+    {
+      SmartDashboard.putNumber("VI_horizAngle", m_targetHorizAngle);
+      SmartDashboard.putNumber("VI_vertAngle", m_targetVertAngle);
+      SmartDashboard.putNumber("VI_area", m_targetArea);
+      SmartDashboard.putNumber("VI_skew", m_targetSkew);
+      SmartDashboard.putNumber("VI_distLL", m_distLL);
+    }
+
     SmartDashboard.putBoolean("VI_valid", m_targetValid);
     SmartDashboard.putNumber("VI_targetLatency", m_targetLatency);
-
-    SmartDashboard.putNumber("VI_distLL", m_distLL);
   }
 
   @Override

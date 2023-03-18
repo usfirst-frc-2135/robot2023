@@ -80,7 +80,7 @@ public class Extension extends SubsystemBase
   private double                          m_stickDeadband         = Constants.kStickDeadband;         // joystick deadband
   private ExtensionMode                   m_extensionMode         = ExtensionMode.EXTENSION_INIT;             // Mode active with joysticks
 
-  private boolean                         m_extensionDebug        = true;   // DEBUG flag to disable/enable extra logging calls
+  private boolean                         m_extensionDebug        = false;  // DEBUG flag to disable/enable extra logging calls
 
   private double                          m_extensionTargetInches = 0.0;    // Target length in inches
   private double                          m_extensionCurInches    = 0.0;    // Current length in inches

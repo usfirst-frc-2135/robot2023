@@ -94,7 +94,7 @@ public class Elbow extends SubsystemBase
   private double                          m_stickDeadband       = Constants.kStickDeadband;         // joystick deadband
   private ElbowMode                       m_elbowMode           = ElbowMode.ELBOW_INIT;             // Mode active with joysticks
 
-  private boolean                         m_elbowDebug          = true;   // DEBUG flag to disable/enable extra logging calls
+  private boolean                         m_elbowDebug          = false;  // DEBUG flag to disable/enable extra logging calls
 
   private double                          m_elbowTargetDegrees  = 0.0;    // Target angle in degrees
   private double                          m_elbowCurDegrees     = 0.0;    // Current angle in degrees
