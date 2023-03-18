@@ -25,6 +25,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.EXConsts;
 import frc.robot.Constants.EXConsts.ExtensionLength;
 import frc.robot.Constants.EXConsts.ExtensionMode;
+import frc.robot.RobotContainer;
 import frc.robot.team2135.PhoenixUtil;
 
 //
@@ -225,6 +226,11 @@ public class Extension extends SubsystemBase
   public boolean moveIsInRange(double inches)
   {
     return (inches > m_extensionLengthMin) && (inches < m_extensionLengthMax);
+  }
+
+  public double getInches( )
+  {
+    return m_extensionCurInches;
   }
 
   private void extensionTalonInitialize(WPI_TalonFX motor, boolean inverted)
@@ -439,6 +445,8 @@ public class Extension extends SubsystemBase
 
   public void moveExtensionLengthExecute( )
   {
+    double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
+    double wristDegrees = RobotContainer.getInstance( ).m_wrist.getAngle( );
     // if (m_extensionValid && EXConsts.kExtensionCalibrated)
     //   m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches), DemandType.ArbitraryFeedForward,
     //       m_arbitraryFF);

@@ -5,17 +5,18 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Wrist;
 
 /**
  *
  */
 public class WristMoveNinety extends CommandBase
 {
-  private final String m_string;
+  private final Wrist m_wrist;
 
-  public WristMoveNinety(String string)
+  public WristMoveNinety(Wrist wrist)
   {
-    m_string = string;
+    m_wrist = wrist;
 
     setName("WristMoveNinety");
   }
@@ -24,7 +25,7 @@ public class WristMoveNinety extends CommandBase
   @Override
   public void initialize( )
   {
-    DataLogManager.log(getName( ) + ": key pressed - " + m_string);
+    DataLogManager.log(getName( ) + ": key pressed - " + m_wrist);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

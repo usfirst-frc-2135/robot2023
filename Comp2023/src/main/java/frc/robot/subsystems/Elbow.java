@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.ELConsts;
 import frc.robot.Constants.ELConsts.ElbowAngle;
 import frc.robot.Constants.ELConsts.ElbowMode;
@@ -363,6 +364,11 @@ public class Elbow extends SubsystemBase
     m_elbow.setSelectedSensorPosition(elbowDegreesToCounts(0));
   }
 
+  public double getElbowCurrentDegrees( )
+  {
+    return m_elbowCurDegrees;
+  }
+
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
   public void moveElbowAngleInit(ElbowAngle angle)
@@ -456,6 +462,8 @@ public class Elbow extends SubsystemBase
 
   public void moveElbowAngleExecute( )
   {
+    double extensionDegrees = RobotContainer.getInstance( ).m_extension.getInches( );
+    double wristDegrees = RobotContainer.getInstance( ).m_wrist.getAngle( );
     if (m_elbowValid && ELConsts.kElbowCalibrated)
       m_elbow.set(ControlMode.MotionMagic, elbowDegreesToCounts(m_elbowTargetDegrees), DemandType.ArbitraryFeedForward,
           m_arbitraryFF * Math.sin(Units.degreesToRadians((m_elbowCurDegrees))));

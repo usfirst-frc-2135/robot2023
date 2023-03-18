@@ -36,6 +36,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.WRConsts;
 import frc.robot.Constants.WRConsts.WristAngle;
 import frc.robot.Constants.WRConsts.WristMode;
+import frc.robot.RobotContainer;
 import frc.robot.lib.math.Conversions;
 import frc.robot.lib.util.CTREConfigs;
 import frc.robot.team2135.PhoenixUtil;
@@ -455,6 +456,7 @@ public class Wrist extends SubsystemBase
 
   public void moveWristAngleExecute( )
   {
+    double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
     if (m_wristValid && WRConsts.kWristCalibrated)
       m_wrist.set(ControlMode.MotionMagic, wristDegreesToCounts(m_wristTargetDegrees), DemandType.ArbitraryFeedForward,
           m_arbitraryFF * Math.sin(Units.degreesToRadians((m_wristCurDegrees))));

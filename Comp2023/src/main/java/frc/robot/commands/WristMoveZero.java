@@ -26,6 +26,7 @@ public class WristMoveZero extends CommandBase
   public void initialize( )
   {
     DataLogManager.log(getName( ) + ": key pressed - " + m_wrist);
+    //m_wrist.setSelectedSensorPosition(wristDegreesToCounts(90));
   }
 
   // Called every time the scheduler runs while the command is scheduled.
