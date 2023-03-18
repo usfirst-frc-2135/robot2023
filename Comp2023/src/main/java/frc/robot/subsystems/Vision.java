@@ -12,6 +12,8 @@ import edu.wpi.first.networktables.DoubleArraySubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VIConsts;
@@ -138,7 +140,7 @@ public class Vision extends SubsystemBase
   {
     DataLogManager.log(getSubsystem( ) + ": Subsystem initialized!");
 
-    //setLEDMode(VIConsts.LED_OFF);
+    setLEDMode(VIConsts.LED_OFF);
     //setCameraDisplay(VIConsts.PIP_SECONDARY);
 
     syncStateFromDashboard( );
@@ -241,6 +243,34 @@ public class Vision extends SubsystemBase
 
     // TODO: This should probably be the magnitude of the hypotenuse of the transform (linear distance)
     return (((Math.abs(deltaTransform.getX( )) < 1.0) && ((Math.abs(deltaTransform.getY( )) < 1.0))));
+  }
+
+  public boolean isAprilTagValid(int aprilTagID)
+  {
+    if (DriverStation.getAlliance( ) == Alliance.Blue)
+      switch (aprilTagID)
+      {
+        case 4 :
+        case 6 :
+        case 7 :
+        case 8 :
+          return true;
+        default :
+          return false;
+      }
+    else if (DriverStation.getAlliance( ) == Alliance.Red)
+      switch (aprilTagID)
+      {
+        case 1 :
+        case 2 :
+        case 3 :
+        case 5 :
+          return true;
+        default :
+          return false;
+      }
+    else
+      return false;
   }
 
   public void setLEDMode(int mode)

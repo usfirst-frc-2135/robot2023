@@ -3,6 +3,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -27,17 +28,39 @@ public class ArmSetHeightScoreMid extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
-        new PrintCommand(getName() + ": Moving Elbow"),
+        new PrintCommand(getName()+": Retract Extension"),
         new ParallelDeadlineGroup(
-          new WaitUntilCommand(elbow::moveElbowAngleIsFinished),
-          new ElbowMoveToAngle(elbow, ElbowAngle.ELBOW_MID)
+          new WaitUntilCommand(extension::moveExtensionLengthIsFinished),
+          new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_STOW)
         ),
-        new PrintCommand(getName() + ": Moving Wrist"),
-        new ParallelDeadlineGroup(
-          new WaitUntilCommand(wrist::moveWristAngleIsFinished),
-          new WristMoveToAngle(wrist, WristAngle.WRIST_MID)
+        new ConditionalCommand(
+          new SequentialCommandGroup(
+            new PrintCommand(getName() + ": Move Elbow"),
+            new ParallelDeadlineGroup(
+              new WaitUntilCommand(elbow::moveElbowAngleIsFinished),
+              new ElbowMoveToAngle(elbow, ElbowAngle.ELBOW_MID)
+            ), 
+            new PrintCommand(getName() + ": Move Wrist"),
+            new ParallelDeadlineGroup(
+               new WaitUntilCommand(wrist::moveWristAngleIsFinished),
+               new WristMoveToAngle(wrist, WristAngle.WRIST_MID)
+            )
+          ),
+          new SequentialCommandGroup(
+            new PrintCommand(getName() + ": Move Wrist"),
+            new ParallelDeadlineGroup(
+              new WaitUntilCommand(wrist::moveWristAngleIsFinished),
+              new WristMoveToAngle(wrist, WristAngle.WRIST_MID)
+           ),
+           new PrintCommand(getName() + ": Move Elbow"),
+           new ParallelDeadlineGroup(
+            new WaitUntilCommand(elbow::moveElbowAngleIsFinished),
+            new ElbowMoveToAngle(elbow, ElbowAngle.ELBOW_MID)
+          )
+          ),
+          elbow::isElbowBelowMid
         ),
-        new PrintCommand(getName() + ": Moving Extension"),
+        new PrintCommand(getName() + ": Extend Extension"),
         new ParallelDeadlineGroup(
           new WaitUntilCommand(extension::moveExtensionLengthIsFinished),
           new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_MID)

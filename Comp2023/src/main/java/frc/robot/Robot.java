@@ -166,11 +166,14 @@ public class Robot extends TimedRobot
     DataLogManager.log("teleopInit: Match " + matchTypeToString(DriverStation.getMatchType( )) + DriverStation.getMatchNumber( )
         + ", " + allianceToString(DriverStation.getAlliance( )) + " Alliance");
 
+    m_robotContainer.m_swerve.setIsTeleported(false);
     // This makes sure that the autonomous stops running when teleop starts running. 
     if (m_autonomousCommand != null)
     {
       m_autonomousCommand.cancel( );
     }
+
+    CommandScheduler.getInstance( ).schedule(m_robotContainer.m_extensionCalibrate);
   }
 
   /**

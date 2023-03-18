@@ -348,6 +348,11 @@ public class Elbow extends SubsystemBase
       m_elbow.set(ControlMode.PercentOutput, 0.0);
   }
 
+  public void setElbowAngleToZero( )
+  {
+    m_elbow.setSelectedSensorPosition(elbowDegreesToCounts(0));
+  }
+
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
   public void moveElbowAngleInit(ElbowAngle angle)
@@ -479,5 +484,26 @@ public class Elbow extends SubsystemBase
     }
 
     return isFinished;
+  }
+
+  public boolean isElbowBelowIdle( )
+  {
+    int curCounts = (int) m_elbow.getSelectedSensorPosition(0);
+    m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
+    return m_elbowCurDegrees < m_elbowAngleIdle;
+  }
+
+  public boolean isElbowBelowLow( )
+  {
+    int curCounts = (int) m_elbow.getSelectedSensorPosition(0);
+    m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
+    return m_elbowCurDegrees < m_elbowAngleLow;
+  }
+
+  public boolean isElbowBelowMid( )
+  {
+    int curCounts = (int) m_elbow.getSelectedSensorPosition(0);
+    m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
+    return m_elbowCurDegrees < m_elbowAngleMid;
   }
 }

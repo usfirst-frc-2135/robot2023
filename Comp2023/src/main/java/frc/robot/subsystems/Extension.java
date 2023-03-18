@@ -87,6 +87,7 @@ public class Extension extends SubsystemBase
   private double                          m_extensionTargetInches = 0.0;    // Target length in inches
   private double                          m_extensionCurInches    = 0.0;    // Current length in inches
   private int                             m_withinTolerance       = 0;      // Counter for consecutive readings within tolerance
+  private boolean                         m_calibrated            = EXConsts.kExtensionCalibrated;  // Indicates whether the extension has been calibrated
 
   private Timer                           m_safetyTimer           = new Timer( ); // Safety timer for use in extension
   private double                          m_safetyTimeout;                // Seconds that the timer ran before stopping
@@ -118,8 +119,9 @@ public class Extension extends SubsystemBase
     {
       int curCounts = (int) m_extension.getSelectedSensorPosition(0);
 
-      if (RobotState.isDisabled( ) && (curCounts < 0))
+      if (curCounts < 0)
       {
+        m_extension.setNeutralMode(NeutralMode.Coast);
         curCounts = 0;
         m_extension.setSelectedSensorPosition(curCounts, PIDINDEX, Constants.kCANTimeoutMs);
         m_extensionTargetInches = extensionCountsToInches(curCounts);
@@ -229,6 +231,9 @@ public class Extension extends SubsystemBase
   {
     motor.setInverted(inverted);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setInverted");
+    motor.setSensorPhase(true);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "setSensorPhase");
+    DataLogManager.log("extensionTalonInitialize");
     motor.setNeutralMode(NeutralMode.Brake);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
     motor.setSafetyEnabled(false);
@@ -269,13 +274,14 @@ public class Extension extends SubsystemBase
     motor.selectProfileSlot(SLOTINDEX, PIDINDEX);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "selectProfileSlot");
 
+    motor.configNeutralDeadband(0.01, Constants.kLongCANTimeoutMs);
+
     motor.set(ControlMode.PercentOutput, 0.0);
   }
 
   public void moveExtensionWithJoystick(XboxController joystick)
   {
     double yValue = joystick.getRightX( );
-    double motorOutput = 0.0;
     ExtensionMode newMode;
 
     yValue = MathUtil.applyDeadband(yValue, m_stickDeadband);
@@ -293,19 +299,17 @@ public class Extension extends SubsystemBase
       DataLogManager.log(getSubsystem( ) + ": move " + m_extensionMode);
     }
 
-    if (((m_extensionCurInches < m_extensionMinLength) && motorOutput < 0.0)
-        || ((m_extensionCurInches > m_extensionMaxLength) && motorOutput > 0.0))
+    if (((m_extensionCurInches < m_extensionMinLength) && yValue < 0.0)
+        || ((m_extensionCurInches > m_extensionMaxLength) && yValue > 0.0))
     {
       DataLogManager.log(getSubsystem( ) + ": move OUT OF RANGE!");
-      motorOutput = 0.0;
+      yValue = 0.0;
     }
-    else
-      motorOutput = yValue * EXConsts.kExtensionSpeedMaxManual;
 
     m_extensionTargetInches = m_extensionCurInches;
 
     if (m_extensionValid)
-      m_extension.set(ControlMode.PercentOutput, motorOutput);
+      m_extension.set(ControlMode.PercentOutput, yValue * EXConsts.kExtensionSpeedMaxManual + EXConsts.kExtensionArbitraryFF);
   }
 
   public void setExtensionStopped( )
@@ -314,6 +318,25 @@ public class Extension extends SubsystemBase
 
     if (m_extensionValid)
       m_extension.set(ControlMode.PercentOutput, 0.0);
+  }
+
+  public void moveToCalibrate( )
+  {
+    double motorCalibrateSpeed = EXConsts.kSpeedCalibrate;
+
+    if (m_extensionValid)
+      m_extension.set(ControlMode.PercentOutput, motorCalibrateSpeed);
+  }
+
+  public void calibrate( )
+  {
+    if (m_extensionValid)
+      m_extension.setSelectedSensorPosition(0.0);
+
+    m_extensionTargetInches = 0;
+    m_extensionCurInches = 0;
+    m_calibrated = true;
+    SmartDashboard.putBoolean("EX_calibrated", m_calibrated);
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
@@ -375,9 +398,9 @@ public class Extension extends SubsystemBase
         return;
     }
 
-    DataLogManager.log(String.format("%s: TARGET DEGREES %.1f", getSubsystem( ), m_extensionTargetInches));
+    DataLogManager.log(String.format("%s: TARGET INCHES %.1f", getSubsystem( ), m_extensionTargetInches));
 
-    if (EXConsts.kExtensionCalibrated && moveIsInRange(Math.abs(m_extensionTargetInches - m_extensionCurInches)))
+    if (EXConsts.kExtensionCalibrated)
     {
       // length constraint check/soft limit for max and min length before raising
       if (!moveIsInRange(m_extensionTargetInches))
@@ -393,10 +416,12 @@ public class Extension extends SubsystemBase
       m_safetyTimer.start( );
 
       if (m_extensionValid)
-        m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches));
+        //m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches));
+        m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches),
+            DemandType.ArbitraryFeedForward, m_arbitraryFF);
 
-      DataLogManager.log(String.format("%s: moving: %.1f -> %.1f inches | counts %d -> %d", getSubsystem( ), m_extensionCurInches,
-          m_extensionTargetInches, m_extensionCurInches, m_extensionTargetInches));
+      DataLogManager.log(String.format("%s: moving: %.1f -> %.1f inches | counts %.1f -> %.1f", getSubsystem( ),
+          m_extensionCurInches, m_extensionTargetInches, m_extensionCurInches, m_extensionTargetInches));
     }
     else
     {
@@ -408,9 +433,9 @@ public class Extension extends SubsystemBase
 
   public void moveExtensionLengthExecute( )
   {
-    if (m_extensionValid && EXConsts.kExtensionCalibrated)
-      m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches), DemandType.ArbitraryFeedForward,
-          m_arbitraryFF * Math.sin(Units.degreesToRadians((m_extensionCurInches))));
+    // if (m_extensionValid && EXConsts.kExtensionCalibrated)
+    //   m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches), DemandType.ArbitraryFeedForward,
+    //       m_arbitraryFF);
   }
 
   public boolean moveExtensionLengthIsFinished( )
