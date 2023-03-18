@@ -89,6 +89,7 @@ public class Elbow extends SubsystemBase
   private double                          m_elbowAngleLow       = ELConsts.kElbowAngleScoreLow;     // low-peg scoring angle   
   private double                          m_elbowAngleMid       = ELConsts.kElbowAngleScoreMid;     // mid-peg scoring angle
   private double                          m_elbowAngleHigh      = ELConsts.kElbowAngleScoreHigh;    // high-peg scoring angle
+  private double                          m_elbowAngleShelf     = ELConsts.kElbowAngleSubstation;   // substation loading shelf
   private double                          m_elbowAngleMax       = ELConsts.kElbowAngleMax;          // maximum elbow allowable angle
 
   private double                          m_stickDeadband       = Constants.kStickDeadband;         // joystick deadband
@@ -208,11 +209,12 @@ public class Elbow extends SubsystemBase
     SmartDashboard.putNumber("EL_pidKi", m_pidKi);
     SmartDashboard.putNumber("EL_pidKd", m_pidKd);
 
-    SmartDashboard.putNumber("EL_stowAngle", m_elbowAngleStow);
-    SmartDashboard.putNumber("EL_idleAngle", m_elbowAngleIdle);
-    SmartDashboard.putNumber("EL_scoreAngleLow", m_elbowAngleLow);
-    SmartDashboard.putNumber("EL_scoreAngleMid", m_elbowAngleMid);
-    SmartDashboard.putNumber("EL_scoreAngleHigh", m_elbowAngleHigh);
+    SmartDashboard.putNumber("EL_angleStow", m_elbowAngleStow);
+    SmartDashboard.putNumber("EL_angleIdle", m_elbowAngleIdle);
+    SmartDashboard.putNumber("EL_angleLow", m_elbowAngleLow);
+    SmartDashboard.putNumber("EL_angleMid", m_elbowAngleMid);
+    SmartDashboard.putNumber("EL_angleHigh", m_elbowAngleHigh);
+    SmartDashboard.putNumber("EL_angleShelf", m_elbowAngleShelf);
 
     SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
     SmartDashboard.putNumber("EL_targetDegrees", m_elbowTargetDegrees);
@@ -383,11 +385,12 @@ public class Elbow extends SubsystemBase
       m_elbow.config_kI(SLOTINDEX, m_pidKi);
       m_elbow.config_kD(SLOTINDEX, m_pidKd);
 
-      m_elbowAngleStow = SmartDashboard.getNumber("EL_stowAngle", m_elbowAngleStow);
-      m_elbowAngleIdle = SmartDashboard.getNumber("EL_idleAngle", m_elbowAngleIdle);
-      m_elbowAngleLow = SmartDashboard.getNumber("EL_scoreAngleLow", m_elbowAngleLow);
-      m_elbowAngleMid = SmartDashboard.getNumber("EL_scoreAngleMid", m_elbowAngleMid);
-      m_elbowAngleHigh = SmartDashboard.getNumber("EL_scoreAngleHigh", m_elbowAngleHigh);
+      m_elbowAngleStow = SmartDashboard.getNumber("EL_angleStow", m_elbowAngleStow);
+      m_elbowAngleIdle = SmartDashboard.getNumber("EL_angleIdle", m_elbowAngleIdle);
+      m_elbowAngleLow = SmartDashboard.getNumber("EL_angleLow", m_elbowAngleLow);
+      m_elbowAngleMid = SmartDashboard.getNumber("EL_angleMid", m_elbowAngleMid);
+      m_elbowAngleHigh = SmartDashboard.getNumber("EL_angleHigh", m_elbowAngleHigh);
+      m_elbowAngleShelf = SmartDashboard.getNumber("EL_angleShelf", m_elbowAngleShelf);
     }
 
     switch (angle)
@@ -413,7 +416,7 @@ public class Elbow extends SubsystemBase
         m_elbowTargetDegrees = m_elbowAngleHigh;
         break;
       case ELBOW_SHELF :
-        m_elbowTargetDegrees = m_elbowAngleHigh;
+        m_elbowTargetDegrees = m_elbowAngleShelf;
         break;
       default :
         DataLogManager.log(String.format("%s: requested angle is invalid - %.1f", getSubsystem( ), angle));

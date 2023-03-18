@@ -89,6 +89,7 @@ public class Wrist extends SubsystemBase
   private double                          m_wristAngleLow       = WRConsts.kWristAngleScoreLow;      // low-peg scoring angle   
   private double                          m_wristAngleMid       = WRConsts.kWristAngleScoreMid;      // mid-peg scoring angle
   private double                          m_wristAngleHigh      = WRConsts.kWristAngleScoreHigh;     // high-peg scoring angle
+  private double                          m_wristAngleShelf     = WRConsts.kWristAngleSubstation;    // substation loading shelf
   private double                          m_wristAngleMax       = WRConsts.kWristAngleMax;           // maximum wrist allowable angle
 
   private double                          m_stickDeadband       = Constants.kStickDeadband;          // joystick deadband
@@ -206,11 +207,12 @@ public class Wrist extends SubsystemBase
     SmartDashboard.putNumber("WR_pidKi", m_pidKi);
     SmartDashboard.putNumber("WR_pidKd", m_pidKd);
 
-    SmartDashboard.putNumber("WR_stowAngle", m_wristAngleStow);
-    SmartDashboard.putNumber("WR_idleAngle", m_wristAngleIdle);
-    SmartDashboard.putNumber("WR_scoreAngleLow", m_wristAngleLow);
-    SmartDashboard.putNumber("WR_scoreAngleMid", m_wristAngleMid);
-    SmartDashboard.putNumber("WR_scoreAngleHigh", m_wristAngleHigh);
+    SmartDashboard.putNumber("WR_angleStow", m_wristAngleStow);
+    SmartDashboard.putNumber("WR_angleIdle", m_wristAngleIdle);
+    SmartDashboard.putNumber("WR_angleLow", m_wristAngleLow);
+    SmartDashboard.putNumber("WR_angleMid", m_wristAngleMid);
+    SmartDashboard.putNumber("WR_angleHigh", m_wristAngleHigh);
+    SmartDashboard.putNumber("WR_angleShelf", m_wristAngleShelf);
 
     SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
     SmartDashboard.putNumber("WR_targetDegrees", m_wristTargetDegrees);
@@ -382,11 +384,12 @@ public class Wrist extends SubsystemBase
       m_wrist.config_kI(SLOTINDEX, m_pidKi);
       m_wrist.config_kD(SLOTINDEX, m_pidKd);
 
-      m_wristAngleStow = SmartDashboard.getNumber("WR_stowAngle", m_wristAngleStow);
-      m_wristAngleIdle = SmartDashboard.getNumber("WR_idleAngle", m_wristAngleIdle);
-      m_wristAngleLow = SmartDashboard.getNumber("WR_scoreAngleLow", m_wristAngleLow);
-      m_wristAngleMid = SmartDashboard.getNumber("WR_scoreAngleMid", m_wristAngleMid);
-      m_wristAngleHigh = SmartDashboard.getNumber("WR_scoreAngleHigh", m_wristAngleHigh);
+      m_wristAngleStow = SmartDashboard.getNumber("WR_angleStow", m_wristAngleStow);
+      m_wristAngleIdle = SmartDashboard.getNumber("WR_angleIdle", m_wristAngleIdle);
+      m_wristAngleLow = SmartDashboard.getNumber("WR_angleLow", m_wristAngleLow);
+      m_wristAngleMid = SmartDashboard.getNumber("WR_angleMid", m_wristAngleMid);
+      m_wristAngleHigh = SmartDashboard.getNumber("WR_angleHigh", m_wristAngleHigh);
+      m_wristAngleShelf = SmartDashboard.getNumber("WR_angleShelf", m_wristAngleShelf);
     }
 
     switch (angle) // Do not change from current level!
@@ -412,7 +415,7 @@ public class Wrist extends SubsystemBase
         m_wristTargetDegrees = m_wristAngleHigh;
         break;
       case WRIST_SHELF :
-        m_wristTargetDegrees = m_wristAngleHigh;
+        m_wristTargetDegrees = m_wristAngleShelf;
         break;
       default :
         DataLogManager.log(String.format("%s: requested angle is invalid - %.1f", getSubsystem( ), angle));

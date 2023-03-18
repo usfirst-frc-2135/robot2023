@@ -66,7 +66,7 @@ public class Extension extends SubsystemBase
   private double                          m_pidKi                 = EXConsts.kExtensionPidKi;             // PID integral
   private double                          m_pidKd                 = EXConsts.kExtensionPidKd;             // PID derivative
   private int                             m_extensionAllowedError = EXConsts.kExtensionAllowedError;      // PID allowable closed loop error
-  private double                          m_toleranceInches       = EXConsts.kExtensionToleranceInches;  // PID tolerance in inches
+  private double                          m_toleranceInches       = EXConsts.kExtensionToleranceInches;   // PID tolerance in inches
   private double                          m_arbitraryFF           = EXConsts.kExtensionArbitraryFF;       // Arbitrary Feedfoward (elevators and arms)
 
   private double                          m_extensionLengthMin    = EXConsts.kExtensionLengthMin;          // minimum extension allowable length
@@ -75,10 +75,11 @@ public class Extension extends SubsystemBase
   private double                          m_extensionLengthLow    = EXConsts.kExtensionLengthScoreLow;     // low-peg scoring length   
   private double                          m_extensionLengthMid    = EXConsts.kExtensionLengthScoreMid;     // mid-peg scoring length
   private double                          m_extensionLengthHigh   = EXConsts.kExtensionLengthScoreHigh;    // high-peg scoring length
+  private double                          m_extensionLengthShelf  = EXConsts.kExtensionLengthSubstation;   // substation loading shelf
   private double                          m_extensionLengthMax    = EXConsts.kExtensionLengthMax;          // maximum extension allowable length
 
-  private double                          m_stickDeadband         = Constants.kStickDeadband;         // joystick deadband
-  private ExtensionMode                   m_extensionMode         = ExtensionMode.EXTENSION_INIT;             // Mode active with joysticks
+  private double                          m_stickDeadband         = Constants.kStickDeadband;              // joystick deadband
+  private ExtensionMode                   m_extensionMode         = ExtensionMode.EXTENSION_INIT;          // Mode active with joysticks
 
   private boolean                         m_extensionDebug        = false;  // DEBUG flag to disable/enable extra logging calls
 
@@ -180,11 +181,12 @@ public class Extension extends SubsystemBase
     SmartDashboard.putNumber("EX_pidKi", m_pidKi);
     SmartDashboard.putNumber("EX_pidKd", m_pidKd);
 
-    SmartDashboard.putNumber("EX_stowLength", m_extensionLengthStow);
-    SmartDashboard.putNumber("EX_idleLength", m_extensionLengthIdle);
-    SmartDashboard.putNumber("EX_lowLength", m_extensionLengthLow);
-    SmartDashboard.putNumber("EX_midLength", m_extensionLengthMid);
-    SmartDashboard.putNumber("EX_highLength", m_extensionLengthHigh);
+    SmartDashboard.putNumber("EX_lengthStow", m_extensionLengthStow);
+    SmartDashboard.putNumber("EX_lengthIdle", m_extensionLengthIdle);
+    SmartDashboard.putNumber("EX_lengthLow", m_extensionLengthLow);
+    SmartDashboard.putNumber("EX_lengthMid", m_extensionLengthMid);
+    SmartDashboard.putNumber("EX_lengthHigh", m_extensionLengthHigh);
+    SmartDashboard.putNumber("EX_lengthShelf", m_extensionLengthShelf);
 
     SmartDashboard.putNumber("EX_curInches", m_extensionCurInches);
     SmartDashboard.putNumber("EX_targetInches", m_extensionTargetInches);
@@ -364,11 +366,12 @@ public class Extension extends SubsystemBase
       m_extension.config_kI(SLOTINDEX, m_pidKi);
       m_extension.config_kD(SLOTINDEX, m_pidKd);
 
-      m_extensionLengthStow = SmartDashboard.getNumber("EX_stowLength", m_extensionLengthStow);
-      m_extensionLengthIdle = SmartDashboard.getNumber("EX_idleLength", m_extensionLengthIdle);
-      m_extensionLengthLow = SmartDashboard.getNumber("EX_lowLength", m_extensionLengthLow);
-      m_extensionLengthMid = SmartDashboard.getNumber("EX_midLength", m_extensionLengthMid);
-      m_extensionLengthHigh = SmartDashboard.getNumber("EX_highLength", m_extensionLengthHigh);
+      m_extensionLengthStow = SmartDashboard.getNumber("EX_lengthStow", m_extensionLengthStow);
+      m_extensionLengthIdle = SmartDashboard.getNumber("EX_lengthIdle", m_extensionLengthIdle);
+      m_extensionLengthLow = SmartDashboard.getNumber("EX_lengthLow", m_extensionLengthLow);
+      m_extensionLengthMid = SmartDashboard.getNumber("EX_lengthMid", m_extensionLengthMid);
+      m_extensionLengthHigh = SmartDashboard.getNumber("EX_lengthHigh", m_extensionLengthHigh);
+      m_extensionLengthShelf = SmartDashboard.getNumber("EX_lengthShelf", m_extensionLengthShelf);
     }
 
     switch (length)
@@ -394,7 +397,7 @@ public class Extension extends SubsystemBase
         m_extensionTargetInches = m_extensionLengthHigh;
         break;
       case EXTENSION_SHELF :
-        m_extensionTargetInches = m_extensionLengthHigh;
+        m_extensionTargetInches = m_extensionLengthShelf;
         break;
       default :
         DataLogManager.log(String.format("%s: requested length is invalid - %.1f", getSubsystem( ), length));
