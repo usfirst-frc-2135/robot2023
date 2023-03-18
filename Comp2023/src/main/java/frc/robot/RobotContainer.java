@@ -135,7 +135,7 @@ public class RobotContainer
 
     m_driveOutOfCommunityShort = PathPlanner.loadPath("driveOutOfCommunityShort", AutoConstants.defaultPathConfig);
     m_driveOutOfCommunityLong = PathPlanner.loadPath("driveOutOfCommunityLong", AutoConstants.defaultPathConfig);
-    m_driveOntoChargeStation = PathPlanner.loadPath("driveOntoChargeStation", AutoConstants.defaultPathConfig);
+    m_driveOntoChargeStation = PathPlanner.loadPath("driveOntoChargeStation", AutoConstants.chargePathConfig);
     // m_driveToGamePiece = PathPlanner.loadPath("driveToGamePiece", AutoConstants.defaultPathConfig);
     // m_driveFromGamePiece = PathPlanner.loadPath("driveFromGamePiece", AutoConstants.defaultPathConfig);
 
