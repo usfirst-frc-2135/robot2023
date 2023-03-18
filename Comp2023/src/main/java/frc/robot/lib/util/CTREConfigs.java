@@ -6,7 +6,10 @@ import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.SensorTimeBase;
+
 import frc.robot.Constants;
+import frc.robot.Constants.ELConsts;
+import frc.robot.Constants.WRConsts;
 
 public final class CTREConfigs
 {
@@ -57,7 +60,7 @@ public final class CTREConfigs
   public static CANCoderConfiguration elbowCancoderConfig( )
   {
     CANCoderConfiguration config = new CANCoderConfiguration( );
-    config.magnetOffsetDegrees = Constants.ELConsts.kCompElbowOffset;
+    config.magnetOffsetDegrees = (Constants.isComp) ? ELConsts.kCompElbowOffset : ELConsts.kBetaElbowOffset;
     config.absoluteSensorRange = AbsoluteSensorRange.Signed_PlusMinus180;
     config.sensorDirection = Constants.ELConsts.kInvertCANCoder;
     config.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
@@ -69,7 +72,7 @@ public final class CTREConfigs
   {
     CANCoderConfiguration config = new CANCoderConfiguration( );
     config.absoluteSensorRange = AbsoluteSensorRange.Signed_PlusMinus180;
-    config.magnetOffsetDegrees = Constants.WRConsts.kCompWristOffset;
+    config.magnetOffsetDegrees = (Constants.isComp) ? WRConsts.kCompWristOffset : WRConsts.kBetaWristOffset;
     config.sensorDirection = Constants.WRConsts.kInvertCANCoder;
     config.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
     config.sensorTimeBase = SensorTimeBase.PerSecond;

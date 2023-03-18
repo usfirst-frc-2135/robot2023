@@ -3,6 +3,8 @@
 
 package frc.robot.commands;
 
+import com.pathplanner.lib.PathPlannerTrajectory;
+
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -14,7 +16,7 @@ import frc.robot.subsystems.Swerve;
  */
 public class AutoEngageChargeStation extends SequentialCommandGroup
 {
-  public AutoEngageChargeStation(Swerve swerve)
+  public AutoEngageChargeStation(Swerve swerve, String pathName, PathPlannerTrajectory trajectory)
   {
     setName("AutoEngageChargeStation");
 
@@ -25,7 +27,7 @@ public class AutoEngageChargeStation extends SequentialCommandGroup
         new PrintCommand(getName() + ": AUTO PATH SEQUENCE: go to ChargeStation"),
         new ParallelDeadlineGroup(
           new WaitUntilCommand(swerve::driveWithPathFollowerIsFinished),
-          new AutoDrivePath (swerve, "driveOntoChargeStation", true)
+          new AutoDrivePath (swerve, pathName, trajectory, true)
         ),
 
         new PrintCommand(getName() + ": AUTO: Balance on ChargeStation"),
