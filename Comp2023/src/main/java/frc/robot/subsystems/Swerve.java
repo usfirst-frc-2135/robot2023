@@ -6,8 +6,6 @@ package frc.robot.subsystems;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.crypto.Data;
-
 import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.math.MathUtil;
@@ -75,14 +73,15 @@ public class Swerve extends SubsystemBase
   // Module variables
   private PeriodicIO               m_periodicIO        = new PeriodicIO( );
   private boolean                  m_isSnapping;
-  private double                   m_limelightVisionAlignGoal;
+  // private double                   m_limelightVisionAlignGoal;
   private double                   pitch;
 
   // Lock Swerve wheels
   private boolean                  m_locked            = false;
 
   // Path following
-  private int                      m_pathDebug         = 1;    // Debug flag to disable extra ramsete logging calls
+  private int                      m_pathDebug         = 1;     // Debug flag to disable extra ramsete logging calls
+  private boolean                  m_swerveDebug       = false; // Debug flag to disable extra ramsete logging calls
 
   // Limelight drive
   private double                   m_turnConstant      = SWConsts.kTurnConstant;
@@ -178,7 +177,7 @@ public class Swerve extends SubsystemBase
     public double swerve_heading;
     public double robot_pitch;
     public double robot_roll;
-    public double vision_align_target_angle;
+    // public double vision_align_target_angle;
 
     // outputs
     public double snap_target;
@@ -196,24 +195,27 @@ public class Swerve extends SubsystemBase
     m_periodicIO.robot_pitch = m_pigeon.getUnadjustedPitch( ).getDegrees( );
     m_periodicIO.robot_roll = m_pigeon.getRoll( ).getDegrees( );
 
-    m_periodicIO.vision_align_target_angle = Math.toDegrees(m_limelightVisionAlignGoal);
+    // m_periodicIO.vision_align_target_angle = Math.toDegrees(m_limelightVisionAlignGoal);
     m_periodicIO.snap_target = Math.toDegrees(m_snapPIDController.getGoal( ).position);
   }
 
   private void updateSmartDashboard( )
   {
-    SmartDashboard.putNumber("SWMod: 0 - Speed", m_swerveMods[0].getState( ).speedMetersPerSecond);
-    SmartDashboard.putNumber("SWMod: 0 - Angle", m_swerveMods[0].getState( ).angle.getDegrees( ));
-    SmartDashboard.putNumber("SWMod: 0 - Dist", m_swerveMods[0].getPosition( ).distanceMeters);
-    SmartDashboard.putNumber("SWMod: 1 - Speed", m_swerveMods[1].getState( ).speedMetersPerSecond);
-    SmartDashboard.putNumber("SWMod: 1 - Angle", m_swerveMods[1].getState( ).angle.getDegrees( ));
-    SmartDashboard.putNumber("SWMod: 1 - Dist", m_swerveMods[1].getPosition( ).distanceMeters);
-    SmartDashboard.putNumber("SWMod: 2 - Speed", m_swerveMods[2].getState( ).speedMetersPerSecond);
-    SmartDashboard.putNumber("SWMod: 2 - Angle", m_swerveMods[2].getState( ).angle.getDegrees( ));
-    SmartDashboard.putNumber("SWMod: 2 - Dist", m_swerveMods[2].getPosition( ).distanceMeters);
-    SmartDashboard.putNumber("SWMod: 3 - Speed", m_swerveMods[3].getState( ).speedMetersPerSecond);
-    SmartDashboard.putNumber("SWMod: 3 - Angle", m_swerveMods[3].getState( ).angle.getDegrees( ));
-    SmartDashboard.putNumber("SWMod: 3 - Dist", m_swerveMods[3].getPosition( ).distanceMeters);
+    if (m_swerveDebug)
+    {
+      SmartDashboard.putNumber("SWMod: 0 - Speed", m_swerveMods[0].getState( ).speedMetersPerSecond);
+      SmartDashboard.putNumber("SWMod: 0 - Angle", m_swerveMods[0].getState( ).angle.getDegrees( ));
+      SmartDashboard.putNumber("SWMod: 0 - Dist", m_swerveMods[0].getPosition( ).distanceMeters);
+      SmartDashboard.putNumber("SWMod: 1 - Speed", m_swerveMods[1].getState( ).speedMetersPerSecond);
+      SmartDashboard.putNumber("SWMod: 1 - Angle", m_swerveMods[1].getState( ).angle.getDegrees( ));
+      SmartDashboard.putNumber("SWMod: 1 - Dist", m_swerveMods[1].getPosition( ).distanceMeters);
+      SmartDashboard.putNumber("SWMod: 2 - Speed", m_swerveMods[2].getState( ).speedMetersPerSecond);
+      SmartDashboard.putNumber("SWMod: 2 - Angle", m_swerveMods[2].getState( ).angle.getDegrees( ));
+      SmartDashboard.putNumber("SWMod: 2 - Dist", m_swerveMods[2].getPosition( ).distanceMeters);
+      SmartDashboard.putNumber("SWMod: 3 - Speed", m_swerveMods[3].getState( ).speedMetersPerSecond);
+      SmartDashboard.putNumber("SWMod: 3 - Angle", m_swerveMods[3].getState( ).angle.getDegrees( ));
+      SmartDashboard.putNumber("SWMod: 3 - Dist", m_swerveMods[3].getPosition( ).distanceMeters);
+    }
 
     SmartDashboard.putNumber("SW: pose_x", m_periodicIO.odometry_pose_x);
     SmartDashboard.putNumber("SW: pose_y", m_periodicIO.odometry_pose_y);
@@ -223,7 +225,7 @@ public class Swerve extends SubsystemBase
     SmartDashboard.putNumber("SW: pitch", m_periodicIO.robot_pitch);
     SmartDashboard.putNumber("SW: roll", m_periodicIO.robot_roll);
 
-    SmartDashboard.putNumber("SW: vision", m_periodicIO.vision_align_target_angle);
+    // SmartDashboard.putNumber("SW: vision", m_periodicIO.vision_align_target_angle);
     SmartDashboard.putNumber("SW: snap", m_periodicIO.snap_target);
 
     m_field.setRobotPose(getPose( ));
