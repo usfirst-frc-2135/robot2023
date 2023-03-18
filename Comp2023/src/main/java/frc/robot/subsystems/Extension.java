@@ -11,9 +11,7 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -68,26 +66,27 @@ public class Extension extends SubsystemBase
   private double                          m_pidKi                 = EXConsts.kExtensionPidKi;             // PID integral
   private double                          m_pidKd                 = EXConsts.kExtensionPidKd;             // PID derivative
   private int                             m_extensionAllowedError = EXConsts.kExtensionAllowedError;      // PID allowable closed loop error
-  private double                          m_toleranceInches       = EXConsts.kExtensionToleranceInches;  // PID tolerance in inches
+  private double                          m_toleranceInches       = EXConsts.kExtensionToleranceInches;   // PID tolerance in inches
   private double                          m_arbitraryFF           = EXConsts.kExtensionArbitraryFF;       // Arbitrary Feedfoward (elevators and arms)
 
+  private double                          m_extensionLengthMin    = EXConsts.kExtensionLengthMin;          // minimum extension allowable length
   private double                          m_extensionLengthStow   = EXConsts.kExtensionLengthStow;         // extension Stow length
   private double                          m_extensionLengthIdle   = EXConsts.kExtensionLengthIdle;         // extension Stow length
   private double                          m_extensionLengthLow    = EXConsts.kExtensionLengthScoreLow;     // low-peg scoring length   
   private double                          m_extensionLengthMid    = EXConsts.kExtensionLengthScoreMid;     // mid-peg scoring length
   private double                          m_extensionLengthHigh   = EXConsts.kExtensionLengthScoreHigh;    // high-peg scoring length
-  private double                          m_extensionMinLength    = EXConsts.kExtensionLengthMin;          // minimum extension allowable length
-  private double                          m_extensionMaxLength    = EXConsts.kExtensionLengthMax;          // maximum extension allowable length
+  private double                          m_extensionLengthShelf  = EXConsts.kExtensionLengthSubstation;   // substation loading shelf
+  private double                          m_extensionLengthMax    = EXConsts.kExtensionLengthMax;          // maximum extension allowable length
 
-  private double                          m_stickDeadband         = Constants.kStickDeadband;         // joystick deadband
-  private ExtensionMode                   m_extensionMode         = ExtensionMode.EXTENSION_INIT;             // Mode active with joysticks
+  private double                          m_stickDeadband         = Constants.kStickDeadband;              // joystick deadband
+  private ExtensionMode                   m_extensionMode         = ExtensionMode.EXTENSION_INIT;          // Mode active with joysticks
 
-  private boolean                         m_extensionDebug        = true;   // DEBUG flag to disable/enable extra logging calls
+  private boolean                         m_extensionDebug        = false;  // DEBUG flag to disable/enable extra logging calls
 
   private double                          m_extensionTargetInches = 0.0;    // Target length in inches
   private double                          m_extensionCurInches    = 0.0;    // Current length in inches
   private int                             m_withinTolerance       = 0;      // Counter for consecutive readings within tolerance
-  private boolean                         m_calibrated            = false;  // Indicates whether the extension has been calibrated
+  private boolean                         m_calibrated            = EXConsts.kExtensionCalibrated;  // Indicates whether the extension has been calibrated
 
   private Timer                           m_safetyTimer           = new Timer( ); // Safety timer for use in extension
   private double                          m_safetyTimeout;                // Seconds that the timer ran before stopping
@@ -182,11 +181,12 @@ public class Extension extends SubsystemBase
     SmartDashboard.putNumber("EX_pidKi", m_pidKi);
     SmartDashboard.putNumber("EX_pidKd", m_pidKd);
 
-    SmartDashboard.putNumber("EX_stowLength", m_extensionLengthStow);
-    SmartDashboard.putNumber("EX_idleLength", m_extensionLengthIdle);
-    SmartDashboard.putNumber("EX_lowLength", m_extensionLengthLow);
-    SmartDashboard.putNumber("EX_midLength", m_extensionLengthMid);
-    SmartDashboard.putNumber("EX_highLength", m_extensionLengthHigh);
+    SmartDashboard.putNumber("EX_lengthStow", m_extensionLengthStow);
+    SmartDashboard.putNumber("EX_lengthIdle", m_extensionLengthIdle);
+    SmartDashboard.putNumber("EX_lengthLow", m_extensionLengthLow);
+    SmartDashboard.putNumber("EX_lengthMid", m_extensionLengthMid);
+    SmartDashboard.putNumber("EX_lengthHigh", m_extensionLengthHigh);
+    SmartDashboard.putNumber("EX_lengthShelf", m_extensionLengthShelf);
 
     SmartDashboard.putNumber("EX_curInches", m_extensionCurInches);
     SmartDashboard.putNumber("EX_targetInches", m_extensionTargetInches);
@@ -224,7 +224,7 @@ public class Extension extends SubsystemBase
 
   public boolean moveIsInRange(double inches)
   {
-    return (inches > m_extensionMinLength) && (inches < m_extensionMaxLength);
+    return (inches > m_extensionLengthMin) && (inches < m_extensionLengthMax);
   }
 
   private void extensionTalonInitialize(WPI_TalonFX motor, boolean inverted)
@@ -281,35 +281,40 @@ public class Extension extends SubsystemBase
 
   public void moveExtensionWithJoystick(XboxController joystick)
   {
-    double yValue = joystick.getRightX( );
-    ExtensionMode newMode;
+    double axisValue = joystick.getRightX( );
+    boolean outOfRange = false;
+    ExtensionMode newMode = ExtensionMode.EXTENSION_STOPPED;
 
-    yValue = MathUtil.applyDeadband(yValue, m_stickDeadband);
+    axisValue = MathUtil.applyDeadband(axisValue, m_stickDeadband);
 
-    if (yValue == 0.0)
-      newMode = ExtensionMode.EXTENSION_STOPPED;
-    else if (yValue < 0.0)
-      newMode = ExtensionMode.EXTENSION_IN;
-    else
-      newMode = ExtensionMode.EXTENSION_OUT;
+    if (axisValue < 0.0)
+    {
+      if (m_extensionCurInches > m_extensionLengthMin)
+        newMode = ExtensionMode.EXTENSION_IN;
+      else
+        outOfRange = true;
+    }
+    else if (axisValue > 0.0)
+    {
+      if (m_extensionCurInches < m_extensionLengthMax)
+        newMode = ExtensionMode.EXTENSION_OUT;
+      else
+        outOfRange = true;
+    }
+
+    if (outOfRange)
+      axisValue = 0.0;
 
     if (newMode != m_extensionMode)
     {
       m_extensionMode = newMode;
-      DataLogManager.log(getSubsystem( ) + ": move " + m_extensionMode);
-    }
-
-    if (((m_extensionCurInches < m_extensionMinLength) && yValue < 0.0)
-        || ((m_extensionCurInches > m_extensionMaxLength) && yValue > 0.0))
-    {
-      DataLogManager.log(getSubsystem( ) + ": move OUT OF RANGE!");
-      yValue = 0.0;
+      DataLogManager.log(getSubsystem( ) + ": move " + m_extensionMode + ((outOfRange) ? " - OUT OF RANGE" : ""));
     }
 
     m_extensionTargetInches = m_extensionCurInches;
 
     if (m_extensionValid)
-      m_extension.set(ControlMode.PercentOutput, yValue * EXConsts.kExtensionSpeedMaxManual + EXConsts.kExtensionArbitraryFF);
+      m_extension.set(ControlMode.PercentOutput, axisValue * EXConsts.kExtensionSpeedMaxManual + EXConsts.kExtensionArbitraryFF);
   }
 
   public void setExtensionStopped( )
@@ -361,11 +366,12 @@ public class Extension extends SubsystemBase
       m_extension.config_kI(SLOTINDEX, m_pidKi);
       m_extension.config_kD(SLOTINDEX, m_pidKd);
 
-      m_extensionLengthStow = SmartDashboard.getNumber("EX_stowLength", m_extensionLengthStow);
-      m_extensionLengthIdle = SmartDashboard.getNumber("EX_idleLength", m_extensionLengthIdle);
-      m_extensionLengthLow = SmartDashboard.getNumber("EX_lowLength", m_extensionLengthLow);
-      m_extensionLengthMid = SmartDashboard.getNumber("EX_midLength", m_extensionLengthMid);
-      m_extensionLengthHigh = SmartDashboard.getNumber("EX_highLength", m_extensionLengthHigh);
+      m_extensionLengthStow = SmartDashboard.getNumber("EX_lengthStow", m_extensionLengthStow);
+      m_extensionLengthIdle = SmartDashboard.getNumber("EX_lengthIdle", m_extensionLengthIdle);
+      m_extensionLengthLow = SmartDashboard.getNumber("EX_lengthLow", m_extensionLengthLow);
+      m_extensionLengthMid = SmartDashboard.getNumber("EX_lengthMid", m_extensionLengthMid);
+      m_extensionLengthHigh = SmartDashboard.getNumber("EX_lengthHigh", m_extensionLengthHigh);
+      m_extensionLengthShelf = SmartDashboard.getNumber("EX_lengthShelf", m_extensionLengthShelf);
     }
 
     switch (length)
@@ -391,22 +397,22 @@ public class Extension extends SubsystemBase
         m_extensionTargetInches = m_extensionLengthHigh;
         break;
       case EXTENSION_SHELF :
-        m_extensionTargetInches = m_extensionLengthHigh;
+        m_extensionTargetInches = m_extensionLengthShelf;
         break;
       default :
         DataLogManager.log(String.format("%s: requested length is invalid - %.1f", getSubsystem( ), length));
         return;
     }
 
-    DataLogManager.log(String.format("%s: TARGET DEGREES %.1f", getSubsystem( ), m_extensionTargetInches));
+    DataLogManager.log(String.format("%s: TARGET INCHES %.1f", getSubsystem( ), m_extensionTargetInches));
 
-    if (EXConsts.kExtensionCalibrated && moveIsInRange(Math.abs(m_extensionTargetInches - m_extensionCurInches)))
+    if (EXConsts.kExtensionCalibrated)
     {
       // length constraint check/soft limit for max and min length before raising
       if (!moveIsInRange(m_extensionTargetInches))
       {
         DataLogManager.log(String.format("%s: Target %.1f inches is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
-            m_extensionTargetInches, m_extensionMinLength, m_extensionMaxLength));
+            m_extensionTargetInches, m_extensionLengthMin, m_extensionLengthMax));
         m_extensionTargetInches = m_extensionCurInches;
       }
 
@@ -416,10 +422,12 @@ public class Extension extends SubsystemBase
       m_safetyTimer.start( );
 
       if (m_extensionValid)
-        m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches));
+        //m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches));
+        m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches),
+            DemandType.ArbitraryFeedForward, m_arbitraryFF);
 
-      DataLogManager.log(String.format("%s: moving: %.1f -> %.1f inches | counts %d -> %d", getSubsystem( ), m_extensionCurInches,
-          m_extensionTargetInches, m_extensionCurInches, m_extensionTargetInches));
+      DataLogManager.log(String.format("%s: moving: %.1f -> %.1f inches | counts %.1f -> %.1f", getSubsystem( ),
+          m_extensionCurInches, m_extensionTargetInches, m_extensionCurInches, m_extensionTargetInches));
     }
     else
     {
@@ -431,9 +439,9 @@ public class Extension extends SubsystemBase
 
   public void moveExtensionLengthExecute( )
   {
-    if (m_extensionValid && EXConsts.kExtensionCalibrated)
-      m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches), DemandType.ArbitraryFeedForward,
-          m_arbitraryFF * Math.sin(Units.degreesToRadians((m_extensionCurInches))));
+    // if (m_extensionValid && EXConsts.kExtensionCalibrated)
+    //   m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches), DemandType.ArbitraryFeedForward,
+    //       m_arbitraryFF);
   }
 
   public boolean moveExtensionLengthIsFinished( )

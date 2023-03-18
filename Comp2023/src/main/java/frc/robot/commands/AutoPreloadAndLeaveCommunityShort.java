@@ -3,10 +3,13 @@
 
 package frc.robot.commands;
 
+import com.pathplanner.lib.PathPlannerTrajectory;
+
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
 import frc.robot.subsystems.Gripper;
@@ -16,11 +19,12 @@ import frc.robot.subsystems.Wrist;
 /**
  *
  */
-public class AutoPreloadAndLeaveCommunity extends SequentialCommandGroup
+public class AutoPreloadAndLeaveCommunityShort extends SequentialCommandGroup
 {
-  public AutoPreloadAndLeaveCommunity(Swerve swerve, Elbow elbow, Extension extension, Wrist wrist, Gripper gripper)
+  public AutoPreloadAndLeaveCommunityShort(Swerve swerve, Elbow elbow, Extension extension, Wrist wrist, Gripper gripper,
+      String pathName, PathPlannerTrajectory trajectory)
   {
-    setName("AutoPreloadAndLeaveCommunity");
+    setName("AutoPreloadAndLeaveCommunityShort");
 
     addCommands(
         // Add Commands here:
@@ -28,12 +32,15 @@ public class AutoPreloadAndLeaveCommunity extends SequentialCommandGroup
         // @formatter:off
         new PrintCommand(getName() + ": AUTO: Score Preload"),        
         new ParallelDeadlineGroup(
-            new AutoPreloadHigh(elbow, extension, wrist, gripper)
+          new ExtensionCalibrate(extension), 
+          new GripperRun(gripper, GRMode.GR_EXPEL)
         ),
+        new GripperRun(gripper, GRMode.GR_STOP),
+
         new PrintCommand(getName() + ": AUTO: Drive Off Community"),
         new ParallelDeadlineGroup(
           new WaitUntilCommand(swerve::driveWithPathFollowerIsFinished),
-          new AutoDrivePath (swerve, "driveOutOfCommunity", true)
+          new AutoDrivePath (swerve, pathName, trajectory, true)
         ),
         new PrintCommand(getName() + ": AUTO: Hold in place"),
         new AutoStop(swerve)

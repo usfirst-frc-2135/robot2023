@@ -3,8 +3,6 @@
 
 package frc.robot.commands;
 
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -17,22 +15,21 @@ import frc.robot.subsystems.Swerve;
 public class AutoDrivePath extends CommandBase
 {
   private final Swerve          m_swerve;
+  private String                m_pathName;
+  private PathPlannerTrajectory m_trajectory;
   private final boolean         m_useInitialPose;
 
-  private PathPlannerTrajectory m_trajectory;
-  private String                m_pathName;
-
-  public AutoDrivePath(Swerve swerve, String pathName, boolean useInitialPose)
+  public AutoDrivePath(Swerve swerve, String pathName, PathPlannerTrajectory trajectory, boolean useInitialPose)
   {
     m_swerve = swerve;
-    m_useInitialPose = useInitialPose;
     m_pathName = pathName;
+    m_trajectory = trajectory;
+    m_useInitialPose = useInitialPose;
 
     setName("AutoDrivePath");
     addRequirements(m_swerve);
 
     // Get our trajectory
-    m_trajectory = PathPlanner.loadPath(pathName, new PathConstraints(4, 3));
     DataLogManager.log(String.format("%s: '%s' has %2d states Total time - %.3f secs", getName( ), pathName,
         m_trajectory.getStates( ).size( ), m_trajectory.getTotalTimeSeconds( )));
   }

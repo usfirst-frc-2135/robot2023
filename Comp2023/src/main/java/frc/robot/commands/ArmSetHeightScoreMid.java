@@ -60,7 +60,6 @@ public class ArmSetHeightScoreMid extends SequentialCommandGroup
           new WaitUntilCommand(extension::moveExtensionLengthIsFinished),
           new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_MID)
         )
-        //TODO: EXTEND ARM
         // @formatter:on
     );
   }
