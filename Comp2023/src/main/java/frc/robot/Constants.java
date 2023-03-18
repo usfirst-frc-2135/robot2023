@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.pathplanner.lib.PathConstraints;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -597,11 +598,14 @@ public class Constants
 
   public static final class AutoConstants
   {
+    public static final double                       kMaxSpeedMetersPerSecond                    = 2.2;
+    public static final double                       kMaxAccelerationMetersPerSecondSquared      = 2.3;
+
     public static final double                       kSlowSpeedMetersPerSecond                   = 1.7;
     public static final double                       kSlowAccelerationMetersPerSecondSquared     = 2.0;
 
-    public static final double                       kMaxSpeedMetersPerSecond                    = 2.2;
-    public static final double                       kMaxAccelerationMetersPerSecondSquared      = 2.3;
+    public static final double                       kChargeSpeedMetersPerSecond                 = 4.0;
+    public static final double                       kChargeAccelerationMetersPerSecondSquared   = 6.0;
 
     public static final double                       kSlowMaxAngularSpeedRadiansPerSecond        = 0.8 * Math.PI;
     public static final double                       kSlowMaxAngularSpeedRadiansPerSecondSquared =
@@ -641,6 +645,16 @@ public class Constants
     public static final TrajectoryConfig slowSpeedConfig    =
         new TrajectoryConfig(kSlowSpeedMetersPerSecond, kSlowAccelerationMetersPerSecondSquared)
             .setKinematics(Constants.SwerveConstants.swerveKinematics).setStartVelocity(0).setEndVelocity(0);
+
+    // Path following constraints
+    public static final PathConstraints  defaultPathConfig  =
+        new PathConstraints(kMaxSpeedMetersPerSecond, kMaxAccelerationMetersPerSecondSquared);
+
+    public static final PathConstraints  slowPathConfig     =
+        new PathConstraints(kSlowSpeedMetersPerSecond, kSlowAccelerationMetersPerSecondSquared);
+
+    public static final PathConstraints  chargePathConfig   =
+        new PathConstraints(kChargeSpeedMetersPerSecond, kChargeAccelerationMetersPerSecondSquared);
   }
 
   //// 1678 Constants ///////////////////////////////////////////////////////////

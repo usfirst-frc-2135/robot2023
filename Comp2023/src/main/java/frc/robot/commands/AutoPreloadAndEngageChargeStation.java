@@ -3,6 +3,8 @@
 
 package frc.robot.commands;
 
+import com.pathplanner.lib.PathPlannerTrajectory;
+
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -18,7 +20,8 @@ import frc.robot.subsystems.Wrist;
  */
 public class AutoPreloadAndEngageChargeStation extends SequentialCommandGroup
 {
-  public AutoPreloadAndEngageChargeStation(Swerve swerve, Elbow elbow, Extension extension, Wrist wrist, Gripper gripper)
+  public AutoPreloadAndEngageChargeStation(Swerve swerve, Elbow elbow, Extension extension, Wrist wrist, Gripper gripper,
+      String pathName, PathPlannerTrajectory trajectory)
   {
     setName("AutoPreloadAndEngageChargeStation");
 
@@ -35,7 +38,7 @@ public class AutoPreloadAndEngageChargeStation extends SequentialCommandGroup
         new GripperRun(gripper, GRMode.GR_STOP),
         new PrintCommand(getName() + ": AUTO: Run to ChargeStation"),
         new ParallelDeadlineGroup(
-          new AutoChargeStation(swerve)
+          new AutoEngageChargeStation(swerve, pathName, trajectory)
         ),
 
         new PrintCommand(getName() + ": AUTO: Hold in place"),
