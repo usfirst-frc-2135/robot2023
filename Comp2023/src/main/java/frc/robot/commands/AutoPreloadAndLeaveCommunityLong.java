@@ -3,6 +3,8 @@
 
 package frc.robot.commands;
 
+import com.pathplanner.lib.PathPlannerTrajectory;
+
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -17,11 +19,12 @@ import frc.robot.subsystems.Wrist;
 /**
  *
  */
-public class AutoPreloadAndLeaveCommunity extends SequentialCommandGroup
+public class AutoPreloadAndLeaveCommunityLong extends SequentialCommandGroup
 {
-  public AutoPreloadAndLeaveCommunity(Swerve swerve, Elbow elbow, Extension extension, Wrist wrist, Gripper gripper)
+  public AutoPreloadAndLeaveCommunityLong(Swerve swerve, Elbow elbow, Extension extension, Wrist wrist, Gripper gripper,
+      String pathName, PathPlannerTrajectory trajectory)
   {
-    setName("AutoPreloadAndLeaveCommunity");
+    setName("AutoPreloadAndLeaveCommunityLong");
 
     addCommands(
         // Add Commands here:
@@ -33,11 +36,11 @@ public class AutoPreloadAndLeaveCommunity extends SequentialCommandGroup
           new GripperRun(gripper, GRMode.GR_EXPEL)
         ),
         new GripperRun(gripper, GRMode.GR_STOP),
-
-        new PrintCommand(getName() + ": AUTO: Drive Off Community"),
+        
+        new PrintCommand(getName() +": AUTO: Drive Off Community"),
         new ParallelDeadlineGroup(
           new WaitUntilCommand(swerve::driveWithPathFollowerIsFinished),
-          new AutoDrivePath (swerve, "driveOutOfCommunity", true)
+          new AutoDrivePath ( swerve, pathName, trajectory, true)
         ),
         new PrintCommand(getName() + ": AUTO: Hold in place"),
         new AutoStop(swerve)
