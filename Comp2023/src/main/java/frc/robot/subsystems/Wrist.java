@@ -372,7 +372,7 @@ public class Wrist extends SubsystemBase
     double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
     double wristDegrees = RobotContainer.getInstance( ).m_wrist.getAngle( );
 
-    return WRConsts.kWristArbitraryFF * Math.abs(Math.cos(Math.toRadians(elbowDegrees - wristDegrees)));
+    return WRConsts.kWristArbitraryFF * Math.cos(Math.toRadians(elbowDegrees - wristDegrees));
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////

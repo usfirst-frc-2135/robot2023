@@ -368,17 +368,12 @@ public class Elbow extends SubsystemBase
     m_elbow.setSelectedSensorPosition(elbowDegreesToCounts(0));
   }
 
-  public double getElbowCurrentDegrees( )
-  {
-    return m_elbowCurDegrees;
-  }
-
   private double calculateTotalFF( )
   {
     double extensionLength = RobotContainer.getInstance( ).m_extension.getInches( );
 
-    return Math.abs(Math.sin(Math.toRadians(m_elbowCurDegrees)))
-        * (ELConsts.kElbowArbitraryFF + ELConsts.kEXCArbitraryFF * ((extensionLength) / EXConsts.kExtensionLengthMax));
+    return Math.sin(Math.toRadians(m_elbowCurDegrees))
+        * (ELConsts.kElbowArbitraryFF + ELConsts.kElbowExtArbFF * ((extensionLength) / EXConsts.kExtensionLengthMax));
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////

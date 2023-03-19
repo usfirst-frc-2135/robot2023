@@ -357,7 +357,7 @@ public class Extension extends SubsystemBase
   {
     double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
 
-    return EXConsts.kExtensionArbitraryFF * Math.abs(Math.cos(Math.toRadians(elbowDegrees)));
+    return EXConsts.kExtensionArbitraryFF * Math.cos(Math.toRadians(elbowDegrees));
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////

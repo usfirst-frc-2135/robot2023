@@ -207,7 +207,7 @@ public class Constants
     public static final int    kElbowAllowedError     = 0;      // Elbow PID allowable closed loop error in counts
     public static final double kElbowToleranceDegrees = 1.0;    // Elbow PID tolerance in degrees (1 deg is 1" at 48" extension)
     public static final double kElbowArbitraryFF      = 0.070;  // Elbow motor output for arm at 90 degrees
-    public static final double kEXCArbitraryFF        = 0.060;  // Elbow motor output for arm at 90 degrees
+    public static final double kElbowExtArbFF         = 0.003;  // Elbow motor output for arm at 90 degrees with full extension
   }
 
   public static final class EXConsts
