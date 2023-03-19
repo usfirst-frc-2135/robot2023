@@ -82,7 +82,6 @@ public class Wrist extends SubsystemBase
   private double                          m_pidKd               = WRConsts.kWristPidKd;              // PID derivative
   private int                             m_wristAllowedError   = WRConsts.kWristAllowedError;       // PID allowable closed loop error
   private double                          m_toleranceDegrees    = WRConsts.kWristToleranceDegrees;   // PID tolerance in Degrees
-  private double                          m_arbitraryFF         = WRConsts.kWristArbitraryFF;        // Arbitrary Feedfoward (elevators and arms))
 
   private double                          m_wristAngleMin       = WRConsts.kWristAngleMin;           // minimum wrist allowable angle
   private double                          m_wristAngleStow      = WRConsts.kWristAngleStow;          // wrist Stow angle
@@ -101,6 +100,7 @@ public class Wrist extends SubsystemBase
   private double                          m_wristTargetDegrees  = 0.0;    // Target angle in degrees
   private double                          m_wristCurDegrees     = 0.0;    // Current angle in degrees
   private int                             m_withinTolerance     = 0;      // Counter for consecutive readings within tolerance
+  private double                          m_wristTotalFF;
 
   private Timer                           m_safetyTimer         = new Timer( ); // Safety timer for use in wrist
   private double                          m_safetyTimeout;                // Seconds that the timer ran before stopping
@@ -170,6 +170,10 @@ public class Wrist extends SubsystemBase
       SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
       SmartDashboard.putNumber("WR_targetDegrees", m_wristTargetDegrees);
       m_wristLigament.setAngle(m_wristCurDegrees);
+
+      m_wristTotalFF = calculateTotalFF( );
+      SmartDashboard.putNumber("WR_totalFF", m_wristTotalFF);
+
       double currentDraw = m_wrist.getStatorCurrent( );
       SmartDashboard.putNumber("WR_currentDraw", currentDraw);
     }
@@ -346,7 +350,7 @@ public class Wrist extends SubsystemBase
     m_wristTargetDegrees = m_wristCurDegrees;
 
     if (m_wristValid)
-      m_wrist.set(ControlMode.PercentOutput, axisValue * WRConsts.kWristSpeedMaxManual);
+      m_wrist.set(ControlMode.PercentOutput, axisValue * WRConsts.kWristSpeedMaxManual + m_wristTotalFF);
   }
 
   public void setWristStopped( )
@@ -363,13 +367,12 @@ public class Wrist extends SubsystemBase
     m_wrist.setSelectedSensorPosition(wristDegreesToCounts(0));
   }
 
-  private double calculateArbFF( )
+  private double calculateTotalFF( )
   {
     double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
     double wristDegrees = RobotContainer.getInstance( ).m_wrist.getAngle( );
-    double arbFF = WRConsts.kWristArbitraryFF * Math.abs(Math.cos(Math.toRadians(elbowDegrees - wristDegrees)));
-    SmartDashboard.putNumber("WR_arbFF", arbFF);
-    return arbFF;
+
+    return WRConsts.kWristArbitraryFF * Math.abs(Math.cos(Math.toRadians(elbowDegrees - wristDegrees)));
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
@@ -449,8 +452,9 @@ public class Wrist extends SubsystemBase
       m_safetyTimer.reset( );
       m_safetyTimer.start( );
 
-      if (m_wristValid)
-        m_wrist.set(ControlMode.MotionMagic, wristDegreesToCounts(m_wristTargetDegrees));
+      if (m_wristValid && WRConsts.kWristCalibrated)
+        m_wrist.set(ControlMode.MotionMagic, wristDegreesToCounts(m_wristTargetDegrees), DemandType.ArbitraryFeedForward,
+            m_wristTotalFF);
 
       DataLogManager
           .log(String.format("%s: moving: %.1f -> %.1f degrees", getSubsystem( ), m_wristCurDegrees, m_wristTargetDegrees));
@@ -467,7 +471,7 @@ public class Wrist extends SubsystemBase
   {
     if (m_wristValid && WRConsts.kWristCalibrated)
       m_wrist.set(ControlMode.MotionMagic, wristDegreesToCounts(m_wristTargetDegrees), DemandType.ArbitraryFeedForward,
-          calculateArbFF( ));
+          m_wristTotalFF);
   }
 
   public boolean moveWristAngleIsFinished( )

@@ -86,6 +86,7 @@ public class Extension extends SubsystemBase
   private double                          m_extensionTargetInches = 0.0;    // Target length in inches
   private double                          m_extensionCurInches    = 0.0;    // Current length in inches
   private int                             m_withinTolerance       = 0;      // Counter for consecutive readings within tolerance
+  private double                          m_extensionTotalFF;
   private boolean                         m_calibrated            = EXConsts.kExtensionCalibrated;  // Indicates whether the extension has been calibrated
 
   private Timer                           m_safetyTimer           = new Timer( ); // Safety timer for use in extension
@@ -140,6 +141,9 @@ public class Extension extends SubsystemBase
       SmartDashboard.putNumber("EX_curInches", m_extensionCurInches);
       SmartDashboard.putNumber("EX_targetInches", m_extensionTargetInches);
       m_extensionLigament.setLength(m_extensionCurInches);
+
+      m_extensionTotalFF = calculateTotalFF( );
+      SmartDashboard.putNumber("EX_totalFF", m_extensionTotalFF);
 
       double currentDraw = m_extension.getStatorCurrent( );
       SmartDashboard.putNumber("EX_currentDraw", currentDraw);
@@ -349,12 +353,11 @@ public class Extension extends SubsystemBase
     SmartDashboard.putBoolean("EX_calibrated", m_calibrated);
   }
 
-  private double calculateArbFF( )
+  private double calculateTotalFF( )
   {
     double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
-    double arbFF = EXConsts.kExtensionArbitraryFF * Math.abs(Math.cos(Math.toRadians(elbowDegrees)));
-    SmartDashboard.putNumber("EX_arbFF", arbFF);
-    return arbFF;
+
+    return EXConsts.kExtensionArbitraryFF * Math.abs(Math.cos(Math.toRadians(elbowDegrees)));
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
@@ -434,10 +437,9 @@ public class Extension extends SubsystemBase
       m_safetyTimer.reset( );
       m_safetyTimer.start( );
 
-      if (m_extensionValid)
-        //m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches));
+      if (m_extensionValid && EXConsts.kExtensionCalibrated)
         m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches),
-            DemandType.ArbitraryFeedForward, EXConsts.kExtensionArbitraryFF);
+            DemandType.ArbitraryFeedForward, m_extensionTotalFF);
 
       DataLogManager.log(String.format("%s: moving: %.1f -> %.1f inches | counts %.1f -> %.1f", getSubsystem( ),
           m_extensionCurInches, m_extensionTargetInches, m_extensionCurInches, m_extensionTargetInches));
@@ -454,7 +456,7 @@ public class Extension extends SubsystemBase
   {
     if (m_extensionValid && EXConsts.kExtensionCalibrated)
       m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches), DemandType.ArbitraryFeedForward,
-          calculateArbFF( ));
+          m_extensionTotalFF);
   }
 
   public boolean moveExtensionLengthIsFinished( )

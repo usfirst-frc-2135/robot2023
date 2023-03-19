@@ -83,7 +83,6 @@ public class Elbow extends SubsystemBase
   private double                          m_pidKd               = ELConsts.kElbowPidKd;             // PID derivative
   private int                             m_elbowAllowedError   = ELConsts.kElbowAllowedError;      // PID allowable closed loop error
   private double                          m_toleranceDegrees    = ELConsts.kElbowToleranceDegrees;  // PID tolerance in inches
-  private double                          m_arbitraryFF         = ELConsts.kElbowArbitraryFF;       // Arbitrary Feedfoward (elevators and arms)
 
   private double                          m_elbowAngleMin       = ELConsts.kElbowAngleMin;          // minimum elbow allowable angle
   private double                          m_elbowAngleStow      = ELConsts.kElbowAngleStow;         // elbow Stow angle
@@ -102,6 +101,7 @@ public class Elbow extends SubsystemBase
   private double                          m_elbowTargetDegrees  = 0.0;    // Target angle in degrees
   private double                          m_elbowCurDegrees     = 0.0;    // Current angle in degrees
   private int                             m_withinTolerance     = 0;      // Counter for consecutive readings within tolerance
+  private double                          m_elbowTotalFF;
 
   private Timer                           m_safetyTimer         = new Timer( ); // Safety timer for use in elbow
   private double                          m_safetyTimeout;                // Seconds that the timer ran before stopping
@@ -172,6 +172,9 @@ public class Elbow extends SubsystemBase
       SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
       SmartDashboard.putNumber("EL_targetDegrees", m_elbowTargetDegrees);
       m_elbowLigament.setAngle(m_elbowCurDegrees);
+
+      m_elbowTotalFF = calculateTotalFF( );
+      SmartDashboard.putNumber("EL_totalFF", m_elbowTotalFF);
 
       double currentDraw = m_elbow.getStatorCurrent( );
       SmartDashboard.putNumber("EL_currentDraw", currentDraw);
@@ -370,13 +373,12 @@ public class Elbow extends SubsystemBase
     return m_elbowCurDegrees;
   }
 
-  private double calculateArbFF( )
+  private double calculateTotalFF( )
   {
     double extensionLength = RobotContainer.getInstance( ).m_extension.getInches( );
-    double arbFF = Math.abs(Math.sin(Math.toRadians(m_elbowCurDegrees)))
+
+    return Math.abs(Math.sin(Math.toRadians(m_elbowCurDegrees)))
         * (ELConsts.kElbowArbitraryFF + ELConsts.kEXCArbitraryFF * ((extensionLength) / EXConsts.kExtensionLengthMax));
-    SmartDashboard.putNumber("EL_arbFF", arbFF);
-    return arbFF;
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
@@ -452,12 +454,13 @@ public class Elbow extends SubsystemBase
       }
 
       // Start the safety timer
-      m_safetyTimeout = 1.8;
+      m_safetyTimeout = 2.0;
       m_safetyTimer.reset( );
       m_safetyTimer.start( );
 
-      if (m_elbowValid)
-        m_elbow.set(ControlMode.MotionMagic, elbowDegreesToCounts(m_elbowTargetDegrees));
+      if (m_elbowValid && ELConsts.kElbowCalibrated)
+        m_elbow.set(ControlMode.MotionMagic, elbowDegreesToCounts(m_elbowTargetDegrees), DemandType.ArbitraryFeedForward,
+            m_elbowTotalFF);
 
       DataLogManager
           .log(String.format("%s: moving: %.1f -> %.1f degrees", getSubsystem( ), m_elbowCurDegrees, m_elbowTargetDegrees));
@@ -474,7 +477,7 @@ public class Elbow extends SubsystemBase
   {
     if (m_elbowValid && ELConsts.kElbowCalibrated)
       m_elbow.set(ControlMode.MotionMagic, elbowDegreesToCounts(m_elbowTargetDegrees), DemandType.ArbitraryFeedForward,
-          calculateArbFF( ));
+          m_elbowTotalFF);
   }
 
   public boolean moveElbowAngleIsFinished( )
