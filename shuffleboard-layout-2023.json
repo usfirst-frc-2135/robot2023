@@ -2485,6 +2485,45 @@
               "_glyph": 148,
               "_showGlyph": false
             }
+          },
+          "0,3": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EL_arbFF",
+              "_title": "SmartDashboard/EL_arbFF",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "3,3": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_arbFF",
+              "_title": "SmartDashboard/EX_arbFF",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "3,5": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/WR_arbFF",
+              "_title": "SmartDashboard/WR_arbFF",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
           }
         }
       }
@@ -2494,6 +2533,6 @@
     "x": 0.0,
     "y": 25.0,
     "width": 1077.0,
-    "height": 483.0
+    "height": 670.0
   }
 }

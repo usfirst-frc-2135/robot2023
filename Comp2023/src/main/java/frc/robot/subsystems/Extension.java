@@ -68,7 +68,6 @@ public class Extension extends SubsystemBase
   private double                          m_pidKd                 = EXConsts.kExtensionPidKd;             // PID derivative
   private int                             m_extensionAllowedError = EXConsts.kExtensionAllowedError;      // PID allowable closed loop error
   private double                          m_toleranceInches       = EXConsts.kExtensionToleranceInches;   // PID tolerance in inches
-  private double                          m_arbitraryFF           = EXConsts.kExtensionArbitraryFF;       // Arbitrary Feedfoward (elevators and arms)
 
   private double                          m_extensionLengthMin    = EXConsts.kExtensionLengthMin;          // minimum extension allowable length
   private double                          m_extensionLengthStow   = EXConsts.kExtensionLengthStow;         // extension Stow length
@@ -350,6 +349,14 @@ public class Extension extends SubsystemBase
     SmartDashboard.putBoolean("EX_calibrated", m_calibrated);
   }
 
+  private double calculateArbFF( )
+  {
+    double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
+    double arbFF = EXConsts.kExtensionArbitraryFF * Math.abs(Math.cos(Math.toRadians(elbowDegrees)));
+    SmartDashboard.putNumber("EX_arbFF", arbFF);
+    return arbFF;
+  }
+
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
   public void moveExtensionLengthInit(ExtensionLength length)
@@ -430,7 +437,7 @@ public class Extension extends SubsystemBase
       if (m_extensionValid)
         //m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches));
         m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches),
-            DemandType.ArbitraryFeedForward, m_arbitraryFF);
+            DemandType.ArbitraryFeedForward, EXConsts.kExtensionArbitraryFF);
 
       DataLogManager.log(String.format("%s: moving: %.1f -> %.1f inches | counts %.1f -> %.1f", getSubsystem( ),
           m_extensionCurInches, m_extensionTargetInches, m_extensionCurInches, m_extensionTargetInches));
@@ -445,11 +452,9 @@ public class Extension extends SubsystemBase
 
   public void moveExtensionLengthExecute( )
   {
-    double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
-    double wristDegrees = RobotContainer.getInstance( ).m_wrist.getAngle( );
-    // if (m_extensionValid && EXConsts.kExtensionCalibrated)
-    //   m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches), DemandType.ArbitraryFeedForward,
-    //       m_arbitraryFF);
+    if (m_extensionValid && EXConsts.kExtensionCalibrated)
+      m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches), DemandType.ArbitraryFeedForward,
+          calculateArbFF( ));
   }
 
   public boolean moveExtensionLengthIsFinished( )

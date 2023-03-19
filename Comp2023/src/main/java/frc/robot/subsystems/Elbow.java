@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.ELConsts;
+import frc.robot.Constants.EXConsts;
 import frc.robot.Constants.ELConsts.ElbowAngle;
 import frc.robot.Constants.ELConsts.ElbowMode;
 import frc.robot.lib.math.Conversions;
@@ -369,6 +370,15 @@ public class Elbow extends SubsystemBase
     return m_elbowCurDegrees;
   }
 
+  private double calculateArbFF( )
+  {
+    double extensionLength = RobotContainer.getInstance( ).m_extension.getInches( );
+    double arbFF = Math.abs(Math.sin(Math.toRadians(m_elbowCurDegrees)))
+        * (ELConsts.kElbowArbitraryFF + ELConsts.kEXCArbitraryFF * ((extensionLength) / EXConsts.kExtensionLengthMax));
+    SmartDashboard.putNumber("EL_arbFF", arbFF);
+    return arbFF;
+  }
+
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
   public void moveElbowAngleInit(ElbowAngle angle)
@@ -462,11 +472,9 @@ public class Elbow extends SubsystemBase
 
   public void moveElbowAngleExecute( )
   {
-    double extensionDegrees = RobotContainer.getInstance( ).m_extension.getInches( );
-    double wristDegrees = RobotContainer.getInstance( ).m_wrist.getAngle( );
     if (m_elbowValid && ELConsts.kElbowCalibrated)
       m_elbow.set(ControlMode.MotionMagic, elbowDegreesToCounts(m_elbowTargetDegrees), DemandType.ArbitraryFeedForward,
-          m_arbitraryFF * Math.sin(Units.degreesToRadians((m_elbowCurDegrees))));
+          calculateArbFF( ));
   }
 
   public boolean moveElbowAngleIsFinished( )

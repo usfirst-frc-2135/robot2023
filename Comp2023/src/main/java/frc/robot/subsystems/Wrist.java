@@ -363,6 +363,15 @@ public class Wrist extends SubsystemBase
     m_wrist.setSelectedSensorPosition(wristDegreesToCounts(0));
   }
 
+  private double calculateArbFF( )
+  {
+    double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
+    double wristDegrees = RobotContainer.getInstance( ).m_wrist.getAngle( );
+    double arbFF = WRConsts.kWristArbitraryFF * Math.abs(Math.cos(Math.toRadians(elbowDegrees - wristDegrees)));
+    SmartDashboard.putNumber("WR_arbFF", arbFF);
+    return arbFF;
+  }
+
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
   public void moveWristAngleInit(WristAngle angle)
@@ -456,10 +465,9 @@ public class Wrist extends SubsystemBase
 
   public void moveWristAngleExecute( )
   {
-    double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
     if (m_wristValid && WRConsts.kWristCalibrated)
       m_wrist.set(ControlMode.MotionMagic, wristDegreesToCounts(m_wristTargetDegrees), DemandType.ArbitraryFeedForward,
-          m_arbitraryFF * Math.sin(Units.degreesToRadians((m_wristCurDegrees))));
+          calculateArbFF( ));
   }
 
   public boolean moveWristAngleIsFinished( )
