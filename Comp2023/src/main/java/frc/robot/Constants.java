@@ -207,8 +207,8 @@ public class Constants
     public static final double kElbowPidKd            = 0.0;    // Elbow PID derivative constant
     public static final int    kElbowAllowedError     = 0;      // Elbow PID allowable closed loop error in counts
     public static final double kElbowToleranceDegrees = 1.0;    // Elbow PID tolerance in degrees (1 deg is 1" at 48" extension)
-    public static final double kElbowArbitraryFF      = 0.070;  // Elbow motor output for arm at 90 degrees
-    public static final double kElbowExtArbFF         = 0.003;  // Elbow motor output for arm at 90 degrees with full extension
+    public static final double kElbowArbitraryFF      = 0.045;  // Elbow motor output for arm at 90 degrees
+    public static final double kElbowExtArbFF         = 0.007;  // Elbow motor output for arm at 90 degrees with full extension
   }
 
   public static final class EXConsts
@@ -354,7 +354,7 @@ public class Constants
     public static final double kWristPidKd            = 0.0;    // Wrist PID derivative constant
     public static final int    kWristAllowedError     = 0;      // Wrist PID allowable closed loop error in counts
     public static final double kWristToleranceDegrees = 1.0;    // Wrist PID tolerance in degrees (1 deg is 0.25" at 15" length)
-    public static final double kWristArbitraryFF      = 0.058;  // Wrist motor output for 90 degrees
+    public static final double kWristArbitraryFF      = -0.01;  // Wrist motor output for 90 degrees
   }
 
   public static final class GRConsts
