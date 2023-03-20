@@ -197,9 +197,10 @@ public class Constants
       ELBOW_SHELF         // Move elbow to substation loading shelf angle
     }
 
+    public static final double kElbowNeutralDeadband  = 0.02;   // Elbow motor output deadband
     public static final int    kElbowMMVelocity       = 16646;  // Elbow motion magic velocity
     public static final int    kElbowMMAcceleration   = 16646;  // Elbow motion magic acceleration
-    public static final int    kElbowMMSCurveStrength = 0;      // Elbow motion magic S curve smoothing strength
+    public static final int    kElbowMMSCurveStrength = 1;      // Elbow motion magic S curve smoothing strength
     public static final double kElbowPidKf            = 0.0461; // Elbow PID force constant
     public static final double kElbowPidKp            = 0.0246; // Elbow PID proportional constant
     public static final double kElbowPidKi            = 0.0;    // Elbow PID integral constant
@@ -272,9 +273,10 @@ public class Constants
       EXTENSION_SHELF,        // Move extension to high-scoring length
     }
 
+    public static final double kExtensionNeutralDeadband  = 0.02;  // Extension motor output deadband
     public static final int    kExtensionMMVelocity       = 16646 * 3 / 4;  // Extension motion magic velocity
     public static final int    kExtensionMMAcceleration   = 16646 * 3 / 4;  // Extension motion magic acceleration
-    public static final int    kExtensionMMSCurveStrength = 0;      // Extension motion magic S curve smoothing strength
+    public static final int    kExtensionMMSCurveStrength = 1;      // Extension motion magic S curve smoothing strength
     public static final double kExtensionPidKf            = 0.0461; // Extension PID force constant
     public static final double kExtensionPidKp            = 0.0246; // Extension PID proportional constant
     public static final double kExtensionPidKi            = 0.0;    // Extension PID integral constant
@@ -343,8 +345,9 @@ public class Constants
     }
 
     public static final int    kWristMMVelocity       = 16466;  // Wrist motion magic velocity
+    public static final double kWristNeutralDeadband  = 0.02;   // Wrist motor output deadband
     public static final int    kWristMMAcceleration   = 16466;  // Wrist motion magic acceleration
-    public static final int    kWristMMSCurveStrength = 0;      // Wrist motion magic S curve smoothing strength
+    public static final int    kWristMMSCurveStrength = 1;      // Wrist motion magic S curve smoothing strength
     public static final double kWristPidKf            = 0.0466; // Wrist PID force constant
     public static final double kWristPidKp            = 0.0246; // Wrist PID proportional constant
     public static final double kWristPidKi            = 0.0;    // Wrist PID integral constant

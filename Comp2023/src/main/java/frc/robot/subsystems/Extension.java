@@ -59,6 +59,7 @@ public class Extension extends SubsystemBase
       EXConsts.kStatorCurrentLimit, EXConsts.kStatorTriggerCurrent, EXConsts.kStatorTriggerTime);
 
   // Declare module variables
+  private double                          m_neutralDeadband       = EXConsts.kExtensionNeutralDeadband;   // motor output deadband
   private int                             m_velocity              = EXConsts.kExtensionMMVelocity;        // motion magic velocity
   private int                             m_acceleration          = EXConsts.kExtensionMMAcceleration;    // motion magic acceleration
   private int                             m_sCurveStrength        = EXConsts.kExtensionMMSCurveStrength;  // motion magic S curve smoothing
@@ -247,6 +248,8 @@ public class Extension extends SubsystemBase
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
     motor.setSafetyEnabled(false);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSafetyEnabled");
+    motor.configNeutralDeadband(m_neutralDeadband, Constants.kLongCANTimeoutMs);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "configNeutralDeadband");
 
     motor.configVoltageCompSaturation(12.0);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configVoltageCompSaturation");

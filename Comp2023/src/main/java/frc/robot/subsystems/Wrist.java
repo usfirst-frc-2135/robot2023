@@ -73,6 +73,7 @@ public class Wrist extends SubsystemBase
       WRConsts.kStatorCurrentLimit, WRConsts.kStatorTriggerCurrent, WRConsts.kStatorTriggerTime);
 
   // Declare module variables
+  private double                          m_neutralDeadband     = WRConsts.kWristNeutralDeadband;   // motor output deadband
   private int                             m_velocity            = WRConsts.kWristMMVelocity;         // motion magic velocity
   private int                             m_acceleration        = WRConsts.kWristMMAcceleration;     // motion magic acceleration
   private int                             m_sCurveStrength      = WRConsts.kWristMMSCurveStrength;   // motion magic S curve smoothing
@@ -276,6 +277,8 @@ public class Wrist extends SubsystemBase
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
     motor.setSafetyEnabled(false);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSafetyEnabled");
+    motor.configNeutralDeadband(m_neutralDeadband, Constants.kLongCANTimeoutMs);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "configNeutralDeadband");
 
     motor.configVoltageCompSaturation(12.0);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configVoltageCompSaturation");
