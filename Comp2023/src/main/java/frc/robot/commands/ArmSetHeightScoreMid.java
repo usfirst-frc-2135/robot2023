@@ -33,25 +33,20 @@ public class ArmSetHeightScoreMid extends SequentialCommandGroup
           new WaitUntilCommand(extension::moveExtensionLengthIsFinished),
           new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_STOW)
         ),
+        new PrintCommand(getName() + ": Move Wrist"),
+        new ParallelDeadlineGroup(
+          new WaitUntilCommand(wrist::moveWristAngleIsFinished),
+          new WristMoveToAngle(wrist, WristAngle.WRIST_STOW)
+        ),
         new ConditionalCommand(
           new SequentialCommandGroup(
             new PrintCommand(getName() + ": Move Elbow"),
             new ParallelDeadlineGroup(
               new WaitUntilCommand(elbow::moveElbowAngleIsFinished),
               new ElbowMoveToAngle(elbow, ElbowAngle.ELBOW_MID)
-            ), 
-            new PrintCommand(getName() + ": Move Wrist"),
-            new ParallelDeadlineGroup(
-               new WaitUntilCommand(wrist::moveWristAngleIsFinished),
-               new WristMoveToAngle(wrist, WristAngle.WRIST_MID)
             )
           ),
           new SequentialCommandGroup(
-            new PrintCommand(getName() + ": Move Wrist"),
-            new ParallelDeadlineGroup(
-              new WaitUntilCommand(wrist::moveWristAngleIsFinished),
-              new WristMoveToAngle(wrist, WristAngle.WRIST_MID)
-           ),
            new PrintCommand(getName() + ": Move Elbow"),
            new ParallelDeadlineGroup(
             new WaitUntilCommand(elbow::moveElbowAngleIsFinished),
