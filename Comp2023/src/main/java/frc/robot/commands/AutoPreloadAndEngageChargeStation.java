@@ -36,10 +36,9 @@ public class AutoPreloadAndEngageChargeStation extends SequentialCommandGroup
         ),
 
         new GripperRun(gripper, GRMode.GR_STOP),
+        
         new PrintCommand(getName() + ": AUTO: Run to ChargeStation"),
-        new ParallelDeadlineGroup(
-          new AutoEngageChargeStation(swerve, pathName, trajectory)
-        ),
+        new AutoEngageChargeStation(swerve, pathName, trajectory),
 
         new PrintCommand(getName() + ": AUTO: Hold in place"),
         new AutoStop(swerve)
