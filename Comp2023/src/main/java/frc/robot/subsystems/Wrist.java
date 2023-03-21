@@ -446,7 +446,7 @@ public class Wrist extends SubsystemBase
         case WRIST_SCORE :
           m_wristTargetDegrees = m_wristAngleScore;
           break;
-      }
+      }   
     }
 
     DataLogManager.log(String.format("%s: TARGET ANGLE %.1f", getSubsystem( ), m_wristTargetDegrees));

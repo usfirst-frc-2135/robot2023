@@ -30,7 +30,7 @@ public class ArmSetHeightScoreHigh extends SequentialCommandGroup
 
         new PrintCommand(getName() + ": Moving Wrist"),
         new WristMoveToAngle(wrist, WristAngle.WRIST_HIGH),
-
+        
         new PrintCommand(getName() + ": Moving Extension"),
         new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_HIGH)
         // @formatter:on
