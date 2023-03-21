@@ -90,6 +90,7 @@ public class Wrist extends SubsystemBase
   private double                          m_wristAngleLow       = WRConsts.kWristAngleScoreLow;      // low-peg scoring angle   
   private double                          m_wristAngleMid       = WRConsts.kWristAngleScoreMid;      // mid-peg scoring angle
   private double                          m_wristAngleHigh      = WRConsts.kWristAngleScoreHigh;     // high-peg scoring angle
+  private double                          m_wristAngleScore     = WRConsts.kWristAngleScore;         // scoring angle
   private double                          m_wristAngleShelf     = WRConsts.kWristAngleSubstation;    // substation loading shelf
   private double                          m_wristAngleMax       = WRConsts.kWristAngleMax;           // maximum wrist allowable angle
 
@@ -432,6 +433,9 @@ public class Wrist extends SubsystemBase
         break;
       case WRIST_SHELF :
         m_wristTargetDegrees = m_wristAngleShelf;
+        break;
+      case WRIST_SCORE :
+        m_wristTargetDegrees = m_wristAngleScore;
         break;
       default :
         DataLogManager.log(String.format("%s: requested angle is invalid - %.1f", getSubsystem( ), angle));
