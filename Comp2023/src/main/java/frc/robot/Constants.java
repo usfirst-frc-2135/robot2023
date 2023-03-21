@@ -197,16 +197,18 @@ public class Constants
       ELBOW_SHELF         // Move elbow to substation loading shelf angle
     }
 
+    public static final double kElbowNeutralDeadband  = 0.02;   // Elbow motor output deadband
     public static final int    kElbowMMVelocity       = 16646;  // Elbow motion magic velocity
     public static final int    kElbowMMAcceleration   = 16646;  // Elbow motion magic acceleration
-    public static final int    kElbowMMSCurveStrength = 0;      // Elbow motion magic S curve smoothing strength
+    public static final int    kElbowMMSCurveStrength = 1;      // Elbow motion magic S curve smoothing strength
     public static final double kElbowPidKf            = 0.0461; // Elbow PID force constant
     public static final double kElbowPidKp            = 0.0246; // Elbow PID proportional constant
     public static final double kElbowPidKi            = 0.0;    // Elbow PID integral constant
     public static final double kElbowPidKd            = 0.0;    // Elbow PID derivative constant
     public static final int    kElbowAllowedError     = 0;      // Elbow PID allowable closed loop error in counts
     public static final double kElbowToleranceDegrees = 1.0;    // Elbow PID tolerance in degrees (1 deg is 1" at 48" extension)
-    public static final double kElbowArbitraryFF      = 0.070;  // Elbow motor output for arm at 90 degrees
+    public static final double kElbowArbitraryFF      = 0.045;  // Elbow motor output for arm at 90 degrees
+    public static final double kElbowExtArbFF         = 0.007;  // Elbow motor output for arm at 90 degrees with full extension
   }
 
   public static final class EXConsts
@@ -271,9 +273,10 @@ public class Constants
       EXTENSION_SHELF,        // Move extension to high-scoring length
     }
 
+    public static final double kExtensionNeutralDeadband  = 0.02;  // Extension motor output deadband
     public static final int    kExtensionMMVelocity       = 16646 * 3 / 4;  // Extension motion magic velocity
     public static final int    kExtensionMMAcceleration   = 16646 * 3 / 4;  // Extension motion magic acceleration
-    public static final int    kExtensionMMSCurveStrength = 0;      // Extension motion magic S curve smoothing strength
+    public static final int    kExtensionMMSCurveStrength = 1;      // Extension motion magic S curve smoothing strength
     public static final double kExtensionPidKf            = 0.0461; // Extension PID force constant
     public static final double kExtensionPidKp            = 0.0246; // Extension PID proportional constant
     public static final double kExtensionPidKi            = 0.0;    // Extension PID integral constant
@@ -344,15 +347,16 @@ public class Constants
     }
 
     public static final int    kWristMMVelocity       = 16466;  // Wrist motion magic velocity
+    public static final double kWristNeutralDeadband  = 0.02;   // Wrist motor output deadband
     public static final int    kWristMMAcceleration   = 16466;  // Wrist motion magic acceleration
-    public static final int    kWristMMSCurveStrength = 0;      // Wrist motion magic S curve smoothing strength
+    public static final int    kWristMMSCurveStrength = 1;      // Wrist motion magic S curve smoothing strength
     public static final double kWristPidKf            = 0.0466; // Wrist PID force constant
     public static final double kWristPidKp            = 0.0246; // Wrist PID proportional constant
     public static final double kWristPidKi            = 0.0;    // Wrist PID integral constant
     public static final double kWristPidKd            = 0.0;    // Wrist PID derivative constant
     public static final int    kWristAllowedError     = 0;      // Wrist PID allowable closed loop error in counts
     public static final double kWristToleranceDegrees = 1.0;    // Wrist PID tolerance in degrees (1 deg is 0.25" at 15" length)
-    public static final double kWristArbitraryFF      = 0.058;  // Wrist motor output for 90 degrees
+    public static final double kWristArbitraryFF      = -0.01;  // Wrist motor output for 90 degrees
   }
 
   public static final class GRConsts

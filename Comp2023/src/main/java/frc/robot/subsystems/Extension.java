@@ -25,6 +25,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.EXConsts;
 import frc.robot.Constants.EXConsts.ExtensionLength;
 import frc.robot.Constants.EXConsts.ExtensionMode;
+import frc.robot.RobotContainer;
 import frc.robot.team2135.PhoenixUtil;
 
 //
@@ -58,6 +59,7 @@ public class Extension extends SubsystemBase
       EXConsts.kStatorCurrentLimit, EXConsts.kStatorTriggerCurrent, EXConsts.kStatorTriggerTime);
 
   // Declare module variables
+  private double                          m_neutralDeadband       = EXConsts.kExtensionNeutralDeadband;   // motor output deadband
   private int                             m_velocity              = EXConsts.kExtensionMMVelocity;        // motion magic velocity
   private int                             m_acceleration          = EXConsts.kExtensionMMAcceleration;    // motion magic acceleration
   private int                             m_sCurveStrength        = EXConsts.kExtensionMMSCurveStrength;  // motion magic S curve smoothing
@@ -67,7 +69,6 @@ public class Extension extends SubsystemBase
   private double                          m_pidKd                 = EXConsts.kExtensionPidKd;             // PID derivative
   private int                             m_extensionAllowedError = EXConsts.kExtensionAllowedError;      // PID allowable closed loop error
   private double                          m_toleranceInches       = EXConsts.kExtensionToleranceInches;   // PID tolerance in inches
-  private double                          m_arbitraryFF           = EXConsts.kExtensionArbitraryFF;       // Arbitrary Feedfoward (elevators and arms)
 
   private double                          m_extensionLengthMin    = EXConsts.kExtensionLengthMin;          // minimum extension allowable length
   private double                          m_extensionLengthStow   = EXConsts.kExtensionLengthStow;         // extension Stow length
@@ -86,6 +87,7 @@ public class Extension extends SubsystemBase
   private double                          m_extensionTargetInches = 0.0;    // Target length in inches
   private double                          m_extensionCurInches    = 0.0;    // Current length in inches
   private int                             m_withinTolerance       = 0;      // Counter for consecutive readings within tolerance
+  private double                          m_extensionTotalFF;
   private boolean                         m_calibrated            = EXConsts.kExtensionCalibrated;  // Indicates whether the extension has been calibrated
 
   private Timer                           m_safetyTimer           = new Timer( ); // Safety timer for use in extension
@@ -140,6 +142,9 @@ public class Extension extends SubsystemBase
       SmartDashboard.putNumber("EX_curInches", m_extensionCurInches);
       SmartDashboard.putNumber("EX_targetInches", m_extensionTargetInches);
       m_extensionLigament.setLength(m_extensionCurInches);
+
+      m_extensionTotalFF = calculateTotalFF( );
+      SmartDashboard.putNumber("EX_totalFF", m_extensionTotalFF);
 
       double currentDraw = m_extension.getStatorCurrent( );
       SmartDashboard.putNumber("EX_currentDraw", currentDraw);
@@ -227,6 +232,11 @@ public class Extension extends SubsystemBase
     return (inches > m_extensionLengthMin) && (inches < m_extensionLengthMax);
   }
 
+  public double getInches( )
+  {
+    return m_extensionCurInches;
+  }
+
   private void extensionTalonInitialize(WPI_TalonFX motor, boolean inverted)
   {
     motor.setInverted(inverted);
@@ -238,6 +248,8 @@ public class Extension extends SubsystemBase
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
     motor.setSafetyEnabled(false);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSafetyEnabled");
+    motor.configNeutralDeadband(m_neutralDeadband, Constants.kLongCANTimeoutMs);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "configNeutralDeadband");
 
     motor.configVoltageCompSaturation(12.0);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configVoltageCompSaturation");
@@ -344,6 +356,13 @@ public class Extension extends SubsystemBase
     SmartDashboard.putBoolean("EX_calibrated", m_calibrated);
   }
 
+  private double calculateTotalFF( )
+  {
+    double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
+
+    return EXConsts.kExtensionArbitraryFF * Math.cos(Math.toRadians(elbowDegrees));
+  }
+
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
   public void moveExtensionLengthInit(ExtensionLength length)
@@ -421,10 +440,9 @@ public class Extension extends SubsystemBase
       m_safetyTimer.reset( );
       m_safetyTimer.start( );
 
-      if (m_extensionValid)
-        //m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches));
+      if (m_extensionValid && EXConsts.kExtensionCalibrated)
         m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches),
-            DemandType.ArbitraryFeedForward, m_arbitraryFF);
+            DemandType.ArbitraryFeedForward, m_extensionTotalFF);
 
       DataLogManager.log(String.format("%s: moving: %.1f -> %.1f inches | counts %.1f -> %.1f", getSubsystem( ),
           m_extensionCurInches, m_extensionTargetInches, m_extensionCurInches, m_extensionTargetInches));
@@ -439,9 +457,9 @@ public class Extension extends SubsystemBase
 
   public void moveExtensionLengthExecute( )
   {
-    // if (m_extensionValid && EXConsts.kExtensionCalibrated)
-    //   m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches), DemandType.ArbitraryFeedForward,
-    //       m_arbitraryFF);
+    if (m_extensionValid && EXConsts.kExtensionCalibrated)
+      m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches), DemandType.ArbitraryFeedForward,
+          m_extensionTotalFF);
   }
 
   public boolean moveExtensionLengthIsFinished( )

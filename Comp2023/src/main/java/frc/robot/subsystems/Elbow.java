@@ -33,7 +33,9 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.ELConsts;
+import frc.robot.Constants.EXConsts;
 import frc.robot.Constants.ELConsts.ElbowAngle;
 import frc.robot.Constants.ELConsts.ElbowMode;
 import frc.robot.lib.math.Conversions;
@@ -72,6 +74,7 @@ public class Elbow extends SubsystemBase
       ELConsts.kStatorCurrentLimit, ELConsts.kStatorTriggerCurrent, ELConsts.kStatorTriggerTime);
 
   // Declare module variables
+  private double                          m_neutralDeadband     = ELConsts.kElbowNeutralDeadband;   // motor output deadband
   private int                             m_velocity            = ELConsts.kElbowMMVelocity;        // motion magic velocity
   private int                             m_acceleration        = ELConsts.kElbowMMAcceleration;    // motion magic acceleration
   private int                             m_sCurveStrength      = ELConsts.kElbowMMSCurveStrength;  // motion magic S curve smoothing
@@ -81,7 +84,6 @@ public class Elbow extends SubsystemBase
   private double                          m_pidKd               = ELConsts.kElbowPidKd;             // PID derivative
   private int                             m_elbowAllowedError   = ELConsts.kElbowAllowedError;      // PID allowable closed loop error
   private double                          m_toleranceDegrees    = ELConsts.kElbowToleranceDegrees;  // PID tolerance in inches
-  private double                          m_arbitraryFF         = ELConsts.kElbowArbitraryFF;       // Arbitrary Feedfoward (elevators and arms)
 
   private double                          m_elbowAngleMin       = ELConsts.kElbowAngleMin;          // minimum elbow allowable angle
   private double                          m_elbowAngleStow      = ELConsts.kElbowAngleStow;         // elbow Stow angle
@@ -100,6 +102,7 @@ public class Elbow extends SubsystemBase
   private double                          m_elbowTargetDegrees  = 0.0;    // Target angle in degrees
   private double                          m_elbowCurDegrees     = 0.0;    // Current angle in degrees
   private int                             m_withinTolerance     = 0;      // Counter for consecutive readings within tolerance
+  private double                          m_elbowTotalFF;
 
   private Timer                           m_safetyTimer         = new Timer( ); // Safety timer for use in elbow
   private double                          m_safetyTimeout;                // Seconds that the timer ran before stopping
@@ -170,6 +173,9 @@ public class Elbow extends SubsystemBase
       SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
       SmartDashboard.putNumber("EL_targetDegrees", m_elbowTargetDegrees);
       m_elbowLigament.setAngle(m_elbowCurDegrees);
+
+      m_elbowTotalFF = calculateTotalFF( );
+      SmartDashboard.putNumber("EL_totalFF", m_elbowTotalFF);
 
       double currentDraw = m_elbow.getStatorCurrent( );
       SmartDashboard.putNumber("EL_currentDraw", currentDraw);
@@ -273,6 +279,8 @@ public class Elbow extends SubsystemBase
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
     motor.setSafetyEnabled(false);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSafetyEnabled");
+    motor.configNeutralDeadband(m_neutralDeadband, Constants.kLongCANTimeoutMs);
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "configNeutralDeadband");
 
     motor.configVoltageCompSaturation(12.0);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configVoltageCompSaturation");
@@ -363,6 +371,14 @@ public class Elbow extends SubsystemBase
     m_elbow.setSelectedSensorPosition(elbowDegreesToCounts(0));
   }
 
+  private double calculateTotalFF( )
+  {
+    double extensionLength = RobotContainer.getInstance( ).m_extension.getInches( );
+
+    return Math.sin(Math.toRadians(m_elbowCurDegrees))
+        * (ELConsts.kElbowArbitraryFF + ELConsts.kElbowExtArbFF * ((extensionLength) / EXConsts.kExtensionLengthMax));
+  }
+
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
   public void moveElbowAngleInit(ElbowAngle angle)
@@ -436,12 +452,13 @@ public class Elbow extends SubsystemBase
       }
 
       // Start the safety timer
-      m_safetyTimeout = 1.8;
+      m_safetyTimeout = 2.0;
       m_safetyTimer.reset( );
       m_safetyTimer.start( );
 
-      if (m_elbowValid)
-        m_elbow.set(ControlMode.MotionMagic, elbowDegreesToCounts(m_elbowTargetDegrees));
+      if (m_elbowValid && ELConsts.kElbowCalibrated)
+        m_elbow.set(ControlMode.MotionMagic, elbowDegreesToCounts(m_elbowTargetDegrees), DemandType.ArbitraryFeedForward,
+            m_elbowTotalFF);
 
       DataLogManager
           .log(String.format("%s: moving: %.1f -> %.1f degrees", getSubsystem( ), m_elbowCurDegrees, m_elbowTargetDegrees));
@@ -458,7 +475,7 @@ public class Elbow extends SubsystemBase
   {
     if (m_elbowValid && ELConsts.kElbowCalibrated)
       m_elbow.set(ControlMode.MotionMagic, elbowDegreesToCounts(m_elbowTargetDegrees), DemandType.ArbitraryFeedForward,
-          m_arbitraryFF * Math.sin(Units.degreesToRadians((m_elbowCurDegrees))));
+          m_elbowTotalFF);
   }
 
   public boolean moveElbowAngleIsFinished( )
