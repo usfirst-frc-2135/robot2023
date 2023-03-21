@@ -209,6 +209,7 @@ public class Constants
     public static final double kElbowToleranceDegrees = 1.0;    // Elbow PID tolerance in degrees (1 deg is 1" at 48" extension)
     public static final double kElbowArbitraryFF      = 0.045;  // Elbow motor output for arm at 90 degrees
     public static final double kElbowExtArbFF         = 0.007;  // Elbow motor output for arm at 90 degrees with full extension
+    public static final double kMMSafetyTimeout       = 2.5;    // Seconds allowed for a Motion Magic movement
   }
 
   public static final class EXConsts
@@ -274,8 +275,8 @@ public class Constants
     }
 
     public static final double kExtensionNeutralDeadband  = 0.02;  // Extension motor output deadband
-    public static final int    kExtensionMMVelocity       = 16646 * 3 / 4;  // Extension motion magic velocity
-    public static final int    kExtensionMMAcceleration   = 16646 * 3 / 4;  // Extension motion magic acceleration
+    public static final int    kExtensionMMVelocity       = 16646 * 3 / 4;  // Extension motion magic velocity (0.625 of max velocity)
+    public static final int    kExtensionMMAcceleration   = 16646 * 3 / 4;  // Extension motion magic acceleration ()
     public static final int    kExtensionMMSCurveStrength = 1;      // Extension motion magic S curve smoothing strength
     public static final double kExtensionPidKf            = 0.0461; // Extension PID force constant
     public static final double kExtensionPidKp            = 0.0246; // Extension PID proportional constant
@@ -284,6 +285,7 @@ public class Constants
     public static final int    kExtensionAllowedError     = 0;      // Extension PID allowable closed loop error in counts
     public static final double kExtensionToleranceInches  = 0.5;    // Extension PID tolerance in inches
     public static final double kExtensionArbitraryFF      = -0.032; // Extension motor output for extension when fully retracted
+    public static final double kMMSafetyTimeout           = 2.0;    // Seconds allowed for a Motion Magic movement
   }
 
   public static final class WRConsts
@@ -355,6 +357,7 @@ public class Constants
     public static final int    kWristAllowedError     = 0;      // Wrist PID allowable closed loop error in counts
     public static final double kWristToleranceDegrees = 1.0;    // Wrist PID tolerance in degrees (1 deg is 0.25" at 15" length)
     public static final double kWristArbitraryFF      = -0.01;  // Wrist motor output for 90 degrees
+    public static final double kMMSafetyTimeout       = 3.5;    // Seconds allowed for a Motion Magic movement
   }
 
   public static final class GRConsts

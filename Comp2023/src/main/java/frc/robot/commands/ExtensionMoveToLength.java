@@ -47,7 +47,7 @@ public class ExtensionMoveToLength extends CommandBase
   @Override
   public boolean isFinished( )
   {
-    return false;
+    return m_extension.moveExtensionLengthIsFinished( );
   }
 
   @Override

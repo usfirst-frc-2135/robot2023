@@ -3,7 +3,6 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.GRConsts;
@@ -26,21 +25,15 @@ public class AutoPreloadHigh extends SequentialCommandGroup
 
         // @formatter:off
         new PrintCommand(getName() + ": AUTO: Move Arm for Preload"),        
-        new ParallelDeadlineGroup(
-            new ArmSetHeightScoreHigh(elbow, extension, wrist)
-        ),
+        new ArmSetHeightScoreHigh(elbow, extension, wrist),
+
         new PrintCommand(getName() + ": AUTO: Gripper Score"),
-        new ParallelDeadlineGroup(
-          new GripperRun(gripper, GRConsts.GRMode.GR_EXPEL).withTimeout(1)
-        ),
-        new ParallelDeadlineGroup(
-          new GripperRun(gripper, GRConsts.GRMode.GR_STOP)
-          ),
+        new GripperRun(gripper, GRConsts.GRMode.GR_EXPEL).withTimeout(1),
+
+        new GripperRun(gripper, GRConsts.GRMode.GR_STOP),
 
         new PrintCommand(getName() + ": AUTO: Move Arm Down"),
-        new ParallelDeadlineGroup(
-          new ArmSetHeightIdle(elbow, extension, wrist)
-        )
+        new ArmSetHeightIdle(elbow, extension, wrist)
         // @formatter:on
     );
   }

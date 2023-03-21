@@ -47,7 +47,7 @@ public class WristMoveToAngle extends CommandBase
   @Override
   public boolean isFinished( )
   {
-    return false;
+    return m_wrist.moveWristAngleIsFinished( );
   }
 
   @Override

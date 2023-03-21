@@ -99,13 +99,14 @@ public class Elbow extends SubsystemBase
 
   private boolean                         m_elbowDebug          = false;  // DEBUG flag to disable/enable extra logging calls
 
+  private ElbowAngle                      m_elbowAngle;                   // Desired elbow angle
+  private boolean                         m_moveIsFinished;
   private double                          m_elbowTargetDegrees  = 0.0;    // Target angle in degrees
   private double                          m_elbowCurDegrees     = 0.0;    // Current angle in degrees
   private int                             m_withinTolerance     = 0;      // Counter for consecutive readings within tolerance
   private double                          m_elbowTotalFF;
 
   private Timer                           m_safetyTimer         = new Timer( ); // Safety timer for use in elbow
-  private double                          m_safetyTimeout;                // Seconds that the timer ran before stopping
 
   private int                             maxVelocity;
 
@@ -409,34 +410,40 @@ public class Elbow extends SubsystemBase
       m_elbowAngleShelf = SmartDashboard.getNumber("EL_angleShelf", m_elbowAngleShelf);
     }
 
-    switch (angle)
+    if (angle != m_elbowAngle)
     {
-      case ELBOW_NOCHANGE : // Do not change from current level!
-        m_elbowTargetDegrees = m_elbowCurDegrees;
-        if (m_elbowTargetDegrees < 0.25)
-          m_elbowTargetDegrees = 0.25;
-        break;
-      case ELBOW_STOW :
-        m_elbowTargetDegrees = m_elbowAngleStow;
-        break;
-      case ELBOW_IDLE :
-        m_elbowTargetDegrees = m_elbowAngleIdle;
-        break;
-      case ELBOW_LOW :
-        m_elbowTargetDegrees = m_elbowAngleLow;
-        break;
-      case ELBOW_MID :
-        m_elbowTargetDegrees = m_elbowAngleMid;
-        break;
-      case ELBOW_HIGH :
-        m_elbowTargetDegrees = m_elbowAngleHigh;
-        break;
-      case ELBOW_SHELF :
-        m_elbowTargetDegrees = m_elbowAngleShelf;
-        break;
-      default :
-        DataLogManager.log(String.format("%s: requested angle is invalid - %.1f", getSubsystem( ), angle));
-        return;
+      m_elbowAngle = angle;
+      m_moveIsFinished = false;
+      DataLogManager.log(String.format("%s: new mode request - %s", getSubsystem( ), m_elbowAngle));
+
+      switch (m_elbowAngle)
+      {
+        default : // Fall through to NOCHANGE if invalid
+          DataLogManager.log(String.format("%s: requested angle is invalid - %s", getSubsystem( ), m_elbowAngle));
+        case ELBOW_NOCHANGE : // Do not change from current level!
+          m_elbowTargetDegrees = m_elbowCurDegrees;
+          if (m_elbowTargetDegrees < 0.25)
+            m_elbowTargetDegrees = 0.25;
+          break;
+        case ELBOW_STOW :
+          m_elbowTargetDegrees = m_elbowAngleStow;
+          break;
+        case ELBOW_IDLE :
+          m_elbowTargetDegrees = m_elbowAngleIdle;
+          break;
+        case ELBOW_LOW :
+          m_elbowTargetDegrees = m_elbowAngleLow;
+          break;
+        case ELBOW_MID :
+          m_elbowTargetDegrees = m_elbowAngleMid;
+          break;
+        case ELBOW_HIGH :
+          m_elbowTargetDegrees = m_elbowAngleHigh;
+          break;
+        case ELBOW_SHELF :
+          m_elbowTargetDegrees = m_elbowAngleShelf;
+          break;
+      }
     }
 
     DataLogManager.log(String.format("%s: TARGET ANGLE %.1f", getSubsystem( ), m_elbowTargetDegrees));
@@ -451,10 +458,7 @@ public class Elbow extends SubsystemBase
         m_elbowTargetDegrees = m_elbowCurDegrees;
       }
 
-      // Start the safety timer
-      m_safetyTimeout = 2.0;
-      m_safetyTimer.reset( );
-      m_safetyTimer.start( );
+      m_safetyTimer.restart( );
 
       if (m_elbowValid && ELConsts.kElbowCalibrated)
         m_elbow.set(ControlMode.MotionMagic, elbowDegreesToCounts(m_elbowTargetDegrees), DemandType.ArbitraryFeedForward,
@@ -480,7 +484,6 @@ public class Elbow extends SubsystemBase
 
   public boolean moveElbowAngleIsFinished( )
   {
-    boolean isFinished = false;
     double errorInDegrees = 0.0;
 
     errorInDegrees = m_elbowTargetDegrees - m_elbowCurDegrees;
@@ -489,7 +492,7 @@ public class Elbow extends SubsystemBase
     {
       if (++m_withinTolerance >= 5)
       {
-        isFinished = true;
+        m_moveIsFinished = true;
         DataLogManager.log(String.format("%s: move finished - Time: %.3f  |  Cur degrees: %.1f", getSubsystem( ),
             m_safetyTimer.get( ), m_elbowCurDegrees));
       }
@@ -499,19 +502,19 @@ public class Elbow extends SubsystemBase
       m_withinTolerance = 0;
     }
 
-    if (m_safetyTimer.get( ) >= m_safetyTimeout)
+    if (m_safetyTimer.hasElapsed(ELConsts.kMMSafetyTimeout))
     {
-      isFinished = true;
+      m_moveIsFinished = true;
       DataLogManager.log(getSubsystem( ) + ": Move Safety timer has timed out!");
     }
 
-    if (isFinished)
+    if (m_moveIsFinished)
     {
       m_withinTolerance = 0;
       m_safetyTimer.stop( );
     }
 
-    return isFinished;
+    return (m_elbowAngle == ElbowAngle.ELBOW_NOCHANGE) ? false : m_moveIsFinished;
   }
 
   public boolean isElbowBelowIdle( )

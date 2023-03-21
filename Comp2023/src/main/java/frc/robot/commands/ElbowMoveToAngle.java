@@ -47,7 +47,7 @@ public class ElbowMoveToAngle extends CommandBase
   @Override
   public boolean isFinished( )
   {
-    return false;
+    return m_elbow.moveElbowAngleIsFinished( );
   }
 
   @Override
