@@ -50,7 +50,7 @@ public class Extension extends SubsystemBase
       m_extensionRoot.append(new MechanismLigament2d("extension", 1, 0, 6, new Color8Bit(Color.kBlue)));
 
   private boolean                         m_extensionValid;              // Health indicator for extension Talon 
-  private double                          m_extensionLengthOffset = 0.0; // CANCoder length measured at reference point
+  // private double                          m_extensionLengthOffset = 0.0; // CANCoder length measured at reference point
 
   //Devices and simulation objs
   private SupplyCurrentLimitConfiguration m_supplyCurrentLimits   = new SupplyCurrentLimitConfiguration(true,
@@ -84,6 +84,8 @@ public class Extension extends SubsystemBase
 
   private boolean                         m_extensionDebug        = false;  // DEBUG flag to disable/enable extra logging calls
 
+  private ExtensionLength                 m_extensionLength;                // Desired extension length
+  private boolean                         m_moveIsFinished;
   private double                          m_extensionTargetInches = 0.0;    // Target length in inches
   private double                          m_extensionCurInches    = 0.0;    // Current length in inches
   private int                             m_withinTolerance       = 0;      // Counter for consecutive readings within tolerance
@@ -91,7 +93,6 @@ public class Extension extends SubsystemBase
   private boolean                         m_calibrated            = EXConsts.kExtensionCalibrated;  // Indicates whether the extension has been calibrated
 
   private Timer                           m_safetyTimer           = new Timer( ); // Safety timer for use in extension
-  private double                          m_safetyTimeout;                // Seconds that the timer ran before stopping
 
   private int                             maxVelocity;
 
@@ -243,7 +244,6 @@ public class Extension extends SubsystemBase
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setInverted");
     motor.setSensorPhase(true);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSensorPhase");
-    DataLogManager.log("extensionTalonInitialize");
     motor.setNeutralMode(NeutralMode.Brake);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
     motor.setSafetyEnabled(false);
@@ -285,8 +285,6 @@ public class Extension extends SubsystemBase
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kD");
     motor.selectProfileSlot(SLOTINDEX, PIDINDEX);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "selectProfileSlot");
-
-    motor.configNeutralDeadband(0.01, Constants.kLongCANTimeoutMs);
 
     motor.set(ControlMode.PercentOutput, 0.0);
   }
@@ -393,34 +391,40 @@ public class Extension extends SubsystemBase
       m_extensionLengthShelf = SmartDashboard.getNumber("EX_lengthShelf", m_extensionLengthShelf);
     }
 
-    switch (length)
+    if (length != m_extensionLength)
     {
-      case EXTENSION_NOCHANGE : // Do not change from current level!
-        m_extensionTargetInches = m_extensionCurInches;
-        if (m_extensionTargetInches < 0.25)
-          m_extensionTargetInches = 0.25;
-        break;
-      case EXTENSION_STOW :
-        m_extensionTargetInches = m_extensionLengthStow;
-        break;
-      case EXTENSION_IDLE :
-        m_extensionTargetInches = m_extensionLengthIdle;
-        break;
-      case EXTENSION_LOW :
-        m_extensionTargetInches = m_extensionLengthLow;
-        break;
-      case EXTENSION_MID :
-        m_extensionTargetInches = m_extensionLengthMid;
-        break;
-      case EXTENSION_HIGH :
-        m_extensionTargetInches = m_extensionLengthHigh;
-        break;
-      case EXTENSION_SHELF :
-        m_extensionTargetInches = m_extensionLengthShelf;
-        break;
-      default :
-        DataLogManager.log(String.format("%s: requested length is invalid - %.1f", getSubsystem( ), length));
-        return;
+      m_extensionLength = length;
+      m_moveIsFinished = false;
+      DataLogManager.log(String.format("%s: new mode request - %s", getSubsystem( ), m_extensionLength));
+
+      switch (m_extensionLength)
+      {
+        default : // Fall through to NOCHANGE if invalid
+          DataLogManager.log(String.format("%s: requested length is invalid - %s", getSubsystem( ), m_extensionLength));
+        case EXTENSION_NOCHANGE : // Do not change from current level!
+          m_extensionTargetInches = m_extensionCurInches;
+          if (m_extensionTargetInches < 0.25)
+            m_extensionTargetInches = 0.25;
+          break;
+        case EXTENSION_STOW :
+          m_extensionTargetInches = m_extensionLengthStow;
+          break;
+        case EXTENSION_IDLE :
+          m_extensionTargetInches = m_extensionLengthIdle;
+          break;
+        case EXTENSION_LOW :
+          m_extensionTargetInches = m_extensionLengthLow;
+          break;
+        case EXTENSION_MID :
+          m_extensionTargetInches = m_extensionLengthMid;
+          break;
+        case EXTENSION_HIGH :
+          m_extensionTargetInches = m_extensionLengthHigh;
+          break;
+        case EXTENSION_SHELF :
+          m_extensionTargetInches = m_extensionLengthShelf;
+          break;
+      }
     }
 
     DataLogManager.log(String.format("%s: TARGET INCHES %.1f", getSubsystem( ), m_extensionTargetInches));
@@ -435,10 +439,7 @@ public class Extension extends SubsystemBase
         m_extensionTargetInches = m_extensionCurInches;
       }
 
-      // Start the safety timer
-      m_safetyTimeout = 1.8;
-      m_safetyTimer.reset( );
-      m_safetyTimer.start( );
+      m_safetyTimer.restart( );
 
       if (m_extensionValid && EXConsts.kExtensionCalibrated)
         m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches),
@@ -464,7 +465,6 @@ public class Extension extends SubsystemBase
 
   public boolean moveExtensionLengthIsFinished( )
   {
-    boolean isFinished = false;
     double errorInInches = 0.0;
 
     errorInInches = m_extensionTargetInches - m_extensionCurInches;
@@ -473,7 +473,7 @@ public class Extension extends SubsystemBase
     {
       if (++m_withinTolerance >= 5)
       {
-        isFinished = true;
+        m_moveIsFinished = true;
         DataLogManager.log(String.format("%s: move finished - Time: %.3f  |  Cur inches: %.1f", getSubsystem( ),
             m_safetyTimer.get( ), m_extensionCurInches));
       }
@@ -483,18 +483,26 @@ public class Extension extends SubsystemBase
       m_withinTolerance = 0;
     }
 
-    if (m_safetyTimer.get( ) >= m_safetyTimeout)
+    if (m_safetyTimer.hasElapsed(EXConsts.kMMSafetyTimeout))
     {
-      isFinished = true;
+      m_moveIsFinished = true;
       DataLogManager.log(getSubsystem( ) + ": Move Safety timer has timed out!");
     }
 
-    if (isFinished)
+    if (m_moveIsFinished)
     {
       m_withinTolerance = 0;
       m_safetyTimer.stop( );
     }
 
-    return isFinished;
+    return (m_extensionLength == ExtensionLength.EXTENSION_NOCHANGE) ? false : m_moveIsFinished;
   }
+
+  public void moveExtensionLengthEnd( )
+  {
+    m_moveIsFinished = false;
+    m_withinTolerance = 0;
+    m_safetyTimer.stop( );
+  }
+
 }
