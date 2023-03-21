@@ -305,6 +305,7 @@ public class Constants
     public static final double  kWristAngleScoreLow   = 33.0;  // From Mech Design (floor, feet art 5" high), empirically checked
     public static final double  kWristAngleScoreMid   = kWristAngleIdle;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), ready to score
     public static final double  kWristAngleScoreHigh  = kWristAngleIdle;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
+    public static final double  kWristAngleScore      = 90;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
     public static final double  kWristAngleSubstation = 103.0; // From Mech Design (3'1-38" above floor)
     public static final double  kWristAngleMax        = 110.0; // Wrist maximum allowable angle (a few degrees more than substation/horizontal)
 
@@ -344,7 +345,8 @@ public class Constants
       WRIST_LOW,          // Move wrist to low-scoring angle
       WRIST_MID,          // Move wrist to shelf angle; slightly higher than mid-scoring angle so this is used for both
       WRIST_HIGH,         // Move wrist to high-scoring angle
-      WRIST_SHELF         // Move wrist to substation loading shelf angle
+      WRIST_SHELF,        // Move wrist to substation loading shelf angle
+      WRIST_SCORE         // Move wrist to scoring height 
     }
 
     public static final double kWristNeutralDeadband  = 0.02;   // Wrist motor output deadband

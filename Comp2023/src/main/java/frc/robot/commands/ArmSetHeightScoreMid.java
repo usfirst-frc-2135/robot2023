@@ -31,16 +31,16 @@ public class ArmSetHeightScoreMid extends SequentialCommandGroup
 
         new ConditionalCommand(
           new SequentialCommandGroup(
-            new PrintCommand(getName() + ": Move Elbow"),
-            new ElbowMoveToAngle(elbow,  ElbowAngle.ELBOW_MID),
-              
             new PrintCommand(getName() + ": Move Wrist"),
-            new WristMoveToAngle(wrist, WristAngle.WRIST_MID)
+            new WristMoveToAngle(wrist, WristAngle.WRIST_STOW),
+
+            new PrintCommand(getName() + ": Move Elbow"),
+            new ElbowMoveToAngle(elbow,  ElbowAngle.ELBOW_MID)
           ),
 
           new SequentialCommandGroup(
             new PrintCommand(getName() + ": Move Wrist"),
-            new WristMoveToAngle(wrist, WristAngle.WRIST_MID),
+            new WristMoveToAngle(wrist, WristAngle.WRIST_STOW),
            
             new PrintCommand(getName() + ": Move Elbow"),
             new ElbowMoveToAngle(elbow,  ElbowAngle.ELBOW_MID)

@@ -35,6 +35,7 @@ import frc.robot.commands.AutoEngageChargeStation;
 import frc.robot.commands.AutoPreloadAndEngageChargeStation;
 import frc.robot.commands.AutoPreloadAndLeaveCommunityLong;
 import frc.robot.commands.AutoPreloadAndLeaveCommunityShort;
+import frc.robot.commands.AutoPreloadHigh;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.DriveLimelightPath;
 import frc.robot.commands.DriveSnap;
@@ -139,6 +140,7 @@ public class RobotContainer
 
     // Autonomous buttons  for main routines - complexity order (simplest first)
     SmartDashboard.putData("AutoStop", new AutoStop(m_swerve));
+    SmartDashboard.putData("AutoPreloadHigh", new AutoPreloadHigh(m_elbow, m_extension, m_wrist, m_gripper));
 
     SmartDashboard.putData("AutoDriveOutOfCommunityShort",
         new AutoDrivePath(m_swerve, "driveOutOfCommunityShort", m_driveOutOfCommunityShort, true));
