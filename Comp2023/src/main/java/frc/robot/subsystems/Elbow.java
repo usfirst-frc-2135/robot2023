@@ -537,4 +537,12 @@ public class Elbow extends SubsystemBase
     m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
     return m_elbowCurDegrees < m_elbowAngleMid;
   }
+
+  public void moveElbowAngleEnd( )
+  {
+    m_moveIsFinished = false;
+    m_withinTolerance = 0;
+    m_safetyTimer.stop( );
+  }
+
 }

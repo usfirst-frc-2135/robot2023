@@ -497,4 +497,12 @@ public class Extension extends SubsystemBase
 
     return (m_extensionLength == ExtensionLength.EXTENSION_NOCHANGE) ? false : m_moveIsFinished;
   }
+
+  public void moveExtensionLengthEnd( )
+  {
+    m_moveIsFinished = false;
+    m_withinTolerance = 0;
+    m_safetyTimer.stop( );
+  }
+
 }

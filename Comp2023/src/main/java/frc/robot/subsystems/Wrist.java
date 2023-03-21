@@ -519,4 +519,12 @@ public class Wrist extends SubsystemBase
 
     return (m_wristAngle == WristAngle.WRIST_NOCHANGE) ? false : m_moveIsFinished;
   }
+
+  public void moveWristAngleEnd( )
+  {
+    m_moveIsFinished = false;
+    m_withinTolerance = 0;
+    m_safetyTimer.stop( );
+  }
+
 }
