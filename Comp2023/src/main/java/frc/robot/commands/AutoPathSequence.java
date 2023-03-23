@@ -5,10 +5,8 @@ package frc.robot.commands;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
 
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.Swerve;
 
 /**
@@ -26,16 +24,10 @@ public class AutoPathSequence extends SequentialCommandGroup
 
         // @formatter:off
         new PrintCommand(getName() + ": AUTO PATH SEQUENCE: Run first path"),
-        new ParallelDeadlineGroup(
-          new WaitUntilCommand(swerve::driveWithPathFollowerIsFinished),
-          new AutoDrivePath (swerve, pathname1, trajectory1, true)
-        ),
+        new AutoDrivePath (swerve, pathname1, trajectory1, true),
 
         new PrintCommand(getName() + ": AUTO: Run second path"),
-        new ParallelDeadlineGroup(
-          new WaitUntilCommand(swerve::driveWithPathFollowerIsFinished),
-          new AutoDrivePath ( swerve, pathname2, trajectory2, false)
-        ),
+        new AutoDrivePath ( swerve, pathname2, trajectory2, false),
 
         new PrintCommand(getName() + ": AUTO: Hold in place"),
         new AutoStop(swerve)
