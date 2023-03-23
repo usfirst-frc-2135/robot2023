@@ -8,7 +8,6 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
@@ -35,13 +34,12 @@ public class AutoPreloadAndLeaveCommunityShort extends SequentialCommandGroup
           new ExtensionCalibrate(extension), 
           new GripperRun(gripper, GRMode.GR_EXPEL)
         ),
+
         new GripperRun(gripper, GRMode.GR_STOP),
 
         new PrintCommand(getName() + ": AUTO: Drive Off Community"),
-        new ParallelDeadlineGroup(
-          new WaitUntilCommand(swerve::driveWithPathFollowerIsFinished),
-          new AutoDrivePath (swerve, pathName, trajectory, true)
-        ),
+        new AutoDrivePath (swerve, pathName, trajectory, true),
+        
         new PrintCommand(getName() + ": AUTO: Hold in place"),
         new AutoStop(swerve)
         // @formatter:on

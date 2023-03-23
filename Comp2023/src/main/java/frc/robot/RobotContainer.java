@@ -35,7 +35,7 @@ import frc.robot.commands.AutoEngageChargeStation;
 import frc.robot.commands.AutoPreloadAndEngageChargeStation;
 import frc.robot.commands.AutoPreloadAndLeaveCommunityLong;
 import frc.robot.commands.AutoPreloadAndLeaveCommunityShort;
-import frc.robot.commands.AutoPreloadAndScoreAnother;
+import frc.robot.commands.AutoPreloadHigh;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.DriveLimelightPath;
 import frc.robot.commands.DriveSnap;
@@ -44,7 +44,6 @@ import frc.robot.commands.Dummy;
 import frc.robot.commands.ElbowMoveToAngle;
 import frc.robot.commands.ExtensionCalibrate;
 import frc.robot.commands.ExtensionMoveToLength;
-import frc.robot.commands.ExtensionRun;
 import frc.robot.commands.GripperRun;
 import frc.robot.commands.LEDSet;
 import frc.robot.commands.ManualMode;
@@ -141,6 +140,7 @@ public class RobotContainer
 
     // Autonomous buttons  for main routines - complexity order (simplest first)
     SmartDashboard.putData("AutoStop", new AutoStop(m_swerve));
+    SmartDashboard.putData("AutoPreloadHigh", new AutoPreloadHigh(m_elbow, m_extension, m_wrist, m_gripper));
 
     SmartDashboard.putData("AutoDriveOutOfCommunityShort",
         new AutoDrivePath(m_swerve, "driveOutOfCommunityShort", m_driveOutOfCommunityShort, true));
@@ -344,10 +344,11 @@ public class RobotContainer
     m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_elbow, m_driverPad));
 
     m_elbow.setDefaultCommand(new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_NOCHANGE));
-    //m_extension.setDefaultCommand(new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_NOCHANGE));
+    m_extension.setDefaultCommand(new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_NOCHANGE));
     m_wrist.setDefaultCommand(new WristMoveToAngle(m_wrist, WristAngle.WRIST_NOCHANGE));
+
     // m_elbow.setDefaultCommand(new ElbowRun(m_elbow, m_operatorPad));
-    m_extension.setDefaultCommand(new ExtensionRun(m_extension, m_operatorPad));
+    // m_extension.setDefaultCommand(new ExtensionRun(m_extension, m_operatorPad));
     // m_wrist.setDefaultCommand(new WristRun(m_wrist, m_operatorPad));
   }
 

@@ -771,6 +771,19 @@
               "_glyph": 148,
               "_showGlyph": false
             }
+          },
+          "18,6": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EL_totalFF",
+              "_title": "SmartDashboard/EL_totalFF",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
           }
         }
       }
@@ -1152,6 +1165,19 @@
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/EX_currentDraw",
               "_title": "SmartDashboard/EX_currentDraw",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "18,6": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_totalFF",
+              "_title": "SmartDashboard/EX_totalFF",
               "_glyph": 148,
               "_showGlyph": false
             }
@@ -1562,6 +1588,19 @@
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/WR_currentDraw",
               "_title": "SmartDashboard/WR_currentDraw",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "18,6": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/WR_totalFF",
+              "_title": "SmartDashboard/WR_totalFF",
               "_glyph": 148,
               "_showGlyph": false
             }
@@ -2527,12 +2566,403 @@
           }
         }
       }
+    },
+    {
+      "title": "Arm",
+      "autoPopulate": false,
+      "autoPopulatePrefix": "",
+      "widgetPane": {
+        "gridSize": 32.0,
+        "showGrid": true,
+        "hgap": 16.0,
+        "vgap": 16.0,
+        "titleType": 0,
+        "tiles": {
+          "0,2": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ArmSetHeightIdle",
+              "_title": "SmartDashboard/ArmSetHeightIdle",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "12,0": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ArmSetHeightScoreHigh",
+              "_title": "SmartDashboard/ArmSetHeightScoreHigh",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "0,4": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ArmSetHeightScoreLow",
+              "_title": "SmartDashboard/ArmSetHeightScoreLow",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "0,6": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ArmSetHeightScoreMid",
+              "_title": "SmartDashboard/ArmSetHeightScoreMid",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "0,0": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ArmSetHeightStow",
+              "_title": "SmartDashboard/ArmSetHeightStow",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "15,0": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ElbowHigh",
+              "_title": "SmartDashboard/ElbowHigh",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "3,2": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ElbowIdle",
+              "_title": "SmartDashboard/ElbowIdle",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "3,4": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ElbowLow",
+              "_title": "SmartDashboard/ElbowLow",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "3,6": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ElbowMid",
+              "_title": "SmartDashboard/ElbowMid",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "15,2": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ElbowShelf",
+              "_title": "SmartDashboard/ElbowShelf",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "3,0": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ElbowStow",
+              "_title": "SmartDashboard/ElbowStow",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "18,0": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ExtensionHigh",
+              "_title": "SmartDashboard/ExtensionHigh",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "6,2": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ExtensionIdle",
+              "_title": "SmartDashboard/ExtensionIdle",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "6,4": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ExtensionLow",
+              "_title": "SmartDashboard/ExtensionLow",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "6,6": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ExtensionMid",
+              "_title": "SmartDashboard/ExtensionMid",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "18,2": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ExtensionShelf",
+              "_title": "SmartDashboard/ExtensionShelf",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "6,0": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ExtensionStow",
+              "_title": "SmartDashboard/ExtensionStow",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "21,0": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/WristHigh",
+              "_title": "SmartDashboard/WristHigh",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "9,2": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/WristIdle",
+              "_title": "SmartDashboard/WristIdle",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "9,4": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/WristLow",
+              "_title": "SmartDashboard/WristLow",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "21,2": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/WristShelf",
+              "_title": "SmartDashboard/WristShelf",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "9,0": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/WristStow",
+              "_title": "SmartDashboard/WristStow",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "15,4": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EL_curDegrees",
+              "_title": "SmartDashboard/EL_curDegrees",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "18,4": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_curInches",
+              "_title": "SmartDashboard/EX_curInches",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "21,4": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/WR_curDegrees",
+              "_title": "SmartDashboard/WR_curDegrees",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "21,6": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/WR_totalFF",
+              "_title": "SmartDashboard/WR_totalFF",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "18,6": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_totalFF",
+              "_title": "SmartDashboard/EX_totalFF",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "15,6": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EL_totalFF",
+              "_title": "SmartDashboard/EL_totalFF",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "9,6": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/WristMid",
+              "_title": "SmartDashboard/WristMid",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          }
+        }
+      }
     }
   ],
   "windowGeometry": {
     "x": 0.0,
     "y": 25.0,
-    "width": 1077.0,
-    "height": 670.0
+    "width": 1181.0,
+    "height": 492.0
   }
 }
