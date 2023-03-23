@@ -51,7 +51,9 @@ import frc.robot.commands.ResetGyro;
 import frc.robot.commands.ResetOdometryToLimelight;
 import frc.robot.commands.SetELAngleZero;
 import frc.robot.commands.SetWRAngleZero;
+import frc.robot.commands.WristMoveNinety;
 import frc.robot.commands.WristMoveToAngle;
+import frc.robot.commands.WristMoveZero;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
 import frc.robot.subsystems.Gripper;
@@ -324,9 +326,9 @@ public class RobotContainer
     operStart.onTrue(new Dummy("Start")); // aka Menu
     //
     // Operator - POV buttons
-    operUp.onTrue(new Dummy("POV up"));
+    operUp.onTrue(new WristMoveNinety(m_wrist));
     operRight.onTrue(new Dummy("POV right"));
-    operDown.onTrue(new Dummy("POV down"));
+    operDown.onTrue(new WristMoveZero(m_wrist));
     operLeft.onTrue(new Dummy("POV left"));
     //
     // Operator Left/Right Trigger
