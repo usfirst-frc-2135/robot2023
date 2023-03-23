@@ -275,9 +275,9 @@ public class Constants
       EXTENSION_SHELF,        // Move extension to high-scoring length
     }
 
-    public static final double kExtensionNeutralDeadband  = 0.02;  // Extension motor output deadband
-    public static final int    kExtensionMMVelocity       = 16646 * 3 / 4;  // Extension motion magic velocity (0.625 of max motor RPM)
-    public static final int    kExtensionMMAcceleration   = 16646 * 3 / 4;  // Extension motion magic acceleration (target velocity in 4/3s)
+    public static final double kExtensionNeutralDeadband  = 0.02;   // Extension motor output deadband
+    public static final int    kExtensionMMVelocity       = 12485;  // Extension motion magic velocity (0.625 of max motor RPM)
+    public static final int    kExtensionMMAcceleration   = 12485;  // Extension motion magic acceleration (target velocity in 4/3s)
     public static final int    kExtensionMMSCurveStrength = 1;      // Extension motion magic S curve smoothing strength
     public static final double kExtensionPidKf            = 0.0461; // Extension PID force constant
     public static final double kExtensionPidKp            = 0.0246; // Extension PID proportional constant
@@ -350,16 +350,16 @@ public class Constants
     }
 
     public static final double kWristNeutralDeadband  = 0.02;   // Wrist motor output deadband
-    public static final int    kWristMMVelocity       = 16466;  // Wrist motion magic velocity (75% of max motor RPM)
-    public static final int    kWristMMAcceleration   = 16466 * 2;  // Wrist motion magic acceleration (target velocity in 1/2s)
+    public static final int    kWristMMVelocity       = 12075;  // Wrist motion magic velocity (75% of max motor RPM)
+    public static final int    kWristMMAcceleration   = 24151;  // Wrist motion magic acceleration (target velocity in 1/2s)
     public static final int    kWristMMSCurveStrength = 1;      // Wrist motion magic S curve smoothing strength
     public static final double kWristPidKf            = 0.0466; // Wrist PID force constant
-    public static final double kWristPidKp            = 0.0246; // Wrist PID proportional constant
+    public static final double kWristPidKp            = 0.01968; // Wrist PID proportional constant
     public static final double kWristPidKi            = 0.0;    // Wrist PID integral constant
     public static final double kWristPidKd            = 0.0;    // Wrist PID derivative constant
     public static final int    kWristAllowedError     = 0;      // Wrist PID allowable closed loop error in counts
     public static final double kWristToleranceDegrees = 2.0;    // Wrist PID tolerance in degrees (1 deg is 0.25" at 15" length)
-    public static final double kWristArbitraryFF      = 0.0;    //-0.034; // Wrist motor output for 90 degrees
+    public static final double kWristArbitraryFF      = -0.034; // Wrist motor output for 90 degrees
     public static final double kMMSafetyTimeout       = 3.5;    // Seconds allowed for a Motion Magic movement
   }
 
