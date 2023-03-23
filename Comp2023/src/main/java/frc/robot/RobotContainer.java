@@ -326,9 +326,9 @@ public class RobotContainer
     operStart.onTrue(new Dummy("Start")); // aka Menu
     //
     // Operator - POV buttons
-    operUp.onTrue(new WristMoveZero(m_wrist));
+    operUp.onTrue(new Dummy("POV up"));
     operRight.onTrue(new Dummy("POV right"));
-    operDown.onTrue(new WristMoveNinety(m_wrist));
+    operDown.onTrue(new Dummy("POV down"));
     operLeft.onTrue(new Dummy("POV left"));
     //
     // Operator Left/Right Trigger

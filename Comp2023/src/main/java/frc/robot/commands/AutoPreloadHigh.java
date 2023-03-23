@@ -43,16 +43,16 @@ public class AutoPreloadHigh extends SequentialCommandGroup
         new PrintCommand(getName() + ": Move Extension for Preload"),   
         new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_HIGH),
 
-        new ParallelDeadlineGroup(
+        new SequentialCommandGroup(
           new PrintCommand(getName() + ": Move Wrist for Preload"),   
           new WristMoveToAngle(wrist, WristAngle.WRIST_SCORE),
 
           new PrintCommand(getName() + ": AUTO: Gripper Score"),
-          new GripperRun(gripper, GRConsts.GRMode.GR_EXPEL)
-        ),
+          new GripperRun(gripper, GRConsts.GRMode.GR_EXPEL),
 
-        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_STOW),
-        new GripperRun(gripper, GRConsts.GRMode.GR_STOP),
+          new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_MID),
+          new GripperRun(gripper, GRConsts.GRMode.GR_STOP)
+        ),
 
         new PrintCommand(getName() + ": AUTO: Move Arm Down"),
         new ArmSetHeightIdle(elbow, extension, wrist)
