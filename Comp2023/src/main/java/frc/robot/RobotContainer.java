@@ -35,6 +35,7 @@ import frc.robot.commands.AutoEngageChargeStation;
 import frc.robot.commands.AutoPreloadAndEngageChargeStation;
 import frc.robot.commands.AutoPreloadAndLeaveCommunityLong;
 import frc.robot.commands.AutoPreloadAndLeaveCommunityShort;
+import frc.robot.commands.AutoPreloadAndStop;
 import frc.robot.commands.AutoPreloadHigh;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.DriveLimelightPath;
@@ -368,11 +369,12 @@ public class RobotContainer
     m_autoChooser.addOption("3 - AutoEngageChargeStation",
         new AutoEngageChargeStation(m_swerve, "driveOntoChargeStation", m_driveOntoChargeStation));
 
-    m_autoChooser.addOption("4 - AutoPreloadAndLeaveCommunityShort", new AutoPreloadAndLeaveCommunityShort(m_swerve, m_elbow,
+    m_autoChooser.addOption("4 - AutoPreloadAndStop", new AutoPreloadAndStop(m_swerve, m_elbow, m_extension, m_wrist, m_gripper));
+    m_autoChooser.addOption("5 - AutoPreloadAndLeaveCommunityShort", new AutoPreloadAndLeaveCommunityShort(m_swerve, m_elbow,
         m_extension, m_wrist, m_gripper, "driveOutOfCommunityShort", m_driveOutOfCommunityShort));
-    m_autoChooser.addOption("5 - AutoPreloadAndLeaveCommunityLong", new AutoPreloadAndLeaveCommunityLong(m_swerve, m_elbow,
+    m_autoChooser.addOption("6 - AutoPreloadAndLeaveCommunityLong", new AutoPreloadAndLeaveCommunityLong(m_swerve, m_elbow,
         m_extension, m_wrist, m_gripper, "driveOutOfCommunityLong", m_driveOutOfCommunityLong));
-    m_autoChooser.addOption("6 - AutoPreloadAndEngageChargeStation", new AutoPreloadAndEngageChargeStation(m_swerve, m_elbow,
+    m_autoChooser.addOption("7 - AutoPreloadAndEngageChargeStation", new AutoPreloadAndEngageChargeStation(m_swerve, m_elbow,
         m_extension, m_wrist, m_gripper, "driveOntoChargeStation", m_driveOntoChargeStation));
 
     // m_chooser.addOption("7 - AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve));

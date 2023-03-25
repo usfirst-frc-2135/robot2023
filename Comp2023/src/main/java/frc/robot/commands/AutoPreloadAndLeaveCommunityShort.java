@@ -29,11 +29,10 @@ public class AutoPreloadAndLeaveCommunityShort extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
+        new ExtensionCalibrate(extension), 
+
         new PrintCommand(getName() + ": AUTO: Score Preload"),        
-        new ParallelDeadlineGroup(
-          new ExtensionCalibrate(extension), 
-          new GripperRun(gripper, GRMode.GR_EXPEL)
-        ),
+        new AutoPreloadHigh(elbow, extension, wrist, gripper),
 
         new GripperRun(gripper, GRMode.GR_STOP),
 
