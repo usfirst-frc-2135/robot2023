@@ -3,6 +3,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.ELConsts.ElbowAngle;
@@ -46,9 +47,9 @@ public class AutoPreloadHigh extends SequentialCommandGroup
         new WristMoveToAngle(wrist, WristAngle.WRIST_SCORE),
 
         new PrintCommand(getName() + ": AUTO: Gripper Score"),
-        new GripperRun(gripper, GRConsts.GRMode.GR_EXPEL).withTimeout(1.5),
+        new GripperRun(gripper, GRConsts.GRMode.GR_EXPEL),
 
-        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_STOW),
+        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_MID),
         new GripperRun(gripper, GRConsts.GRMode.GR_STOP),
 
         new PrintCommand(getName() + ": AUTO: Move Arm Down"),

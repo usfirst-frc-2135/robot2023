@@ -384,7 +384,7 @@ public class Constants
 
     public static final double kGripperSpeedAcquire = 1.0;  // Acquire game piece from loading station or floor
     public static final double kGripperSpeedHold    = 0.1;  // Hold game piece while traversing the field (must be < 2V equiv)
-    public static final double kGripperSpeedExpel   = -0.25; // Score game piece on cone node or cube shelf
+    public static final double kGripperSpeedExpel   = -0.2; // Score game piece on cone node or cube shelf
   }
 
   public static final class LEDConsts
