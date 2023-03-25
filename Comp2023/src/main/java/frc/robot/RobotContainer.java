@@ -28,6 +28,7 @@ import frc.robot.commands.ArmSetHeightIdle;
 import frc.robot.commands.ArmSetHeightScoreHigh;
 import frc.robot.commands.ArmSetHeightScoreLow;
 import frc.robot.commands.ArmSetHeightScoreMid;
+import frc.robot.commands.ArmSetHeightShelf;
 import frc.robot.commands.ArmSetHeightStow;
 import frc.robot.commands.AutoDriveBalance;
 import frc.robot.commands.AutoDrivePath;
@@ -325,7 +326,7 @@ public class RobotContainer
     operStart.onTrue(new Dummy("Start")); // aka Menu
     //
     // Operator - POV buttons
-    operUp.onTrue(new Dummy("POV up"));
+    operUp.onTrue(new ArmSetHeightShelf(m_elbow, m_extension, m_wrist));
     operRight.onTrue(new Dummy("POV right"));
     operDown.onTrue(new Dummy("POV down"));
     operLeft.onTrue(new Dummy("POV left"));
