@@ -293,7 +293,7 @@ public class Constants
   {
     // Global settings
 
-    public static final double  kWristGearRatio       = 375;   // Gear reduction for wrist
+    public static final double  kWristGearRatio       = 213.9;   // Gear reduction for wrist
     public static final double  kWristDegreesPerCount = 360 / Falcon500.kEncoderCPR / kWristGearRatio;
     public static final double  kGripperLengthMeters  = 0.3;   // Sim value: 11.8 in
     public static final double  kGripperMassKg        = 3.0;   // Sim value: 6.6 lbs
