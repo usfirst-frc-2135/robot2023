@@ -9,6 +9,7 @@ package frc.robot;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -402,53 +403,36 @@ public class RobotContainer
    */
   public Command getAutonomousCommand( )
   {
+    String pathName = null;
     AutoChooser mode = m_autoChooser.getSelected( );
     // The selected command will be run in autonomous
     switch (mode)
     {
+      default :
       case AUTOSTOP :
-        break;
-      case AUTOCOMSHORT :
-        if (DriverStation.getAlliance( ) == Alliance.Red)
-          autoTrajectory = PathPlanner.loadPath("driveOutOfCommunityShortRed", AutoConstants.defaultPathConfig);
-        else
-          autoTrajectory = PathPlanner.loadPath("driveOffCommunityShortBlue", AutoConstants.defaultPathConfig);
-        break;
-      case AUTOCOMLONG :
-        if (DriverStation.getAlliance( ) == Alliance.Red)
-          autoTrajectory = PathPlanner.loadPath("driveOutOfCommunityLongRed", AutoConstants.defaultPathConfig);
-        else
-          autoTrajectory = PathPlanner.loadPath("driveOffCommunityLongBlue", AutoConstants.defaultPathConfig);
-        break;
-      case AUTOCHARGE :
-        if (DriverStation.getAlliance( ) == Alliance.Red)
-          autoTrajectory = PathPlanner.loadPath("driveOntoChargeStationRed", AutoConstants.defaultPathConfig);
-        else
-          autoTrajectory = PathPlanner.loadPath("driveOntoChargeStationBlue", AutoConstants.defaultPathConfig);
-        break;
       case AUTOPRESTOP :
         break;
+      case AUTOCOMSHORT :
       case AUTOPRECOMSHORT :
-        if (DriverStation.getAlliance( ) == Alliance.Red)
-          autoTrajectory = PathPlanner.loadPath("driveOutOfCommunityShortRed", AutoConstants.defaultPathConfig);
-        else
-          autoTrajectory = PathPlanner.loadPath("driveOffCommunityShortBlue", AutoConstants.defaultPathConfig);
+        pathName =
+            (DriverStation.getAlliance( ) == Alliance.Red) ? "driveOutOfCommunityShortRed" : "driveOutOfCommunityShortBlue";
         break;
+      case AUTOCOMLONG :
       case AUTOPRECOMLONG :
-        if (DriverStation.getAlliance( ) == Alliance.Red)
-          autoTrajectory = PathPlanner.loadPath("driveOutOfCommunityLongRed", AutoConstants.defaultPathConfig);
-        else
-          autoTrajectory = PathPlanner.loadPath("driveOffCommunityLongBlue", AutoConstants.defaultPathConfig);
+        pathName = (DriverStation.getAlliance( ) == Alliance.Red) ? "driveOutOfCommunityLongRed" : "driveOutOfCommunityLongBlue";
         break;
+      case AUTOCHARGE :
       case AUTOPRECHARGE :
-        if (DriverStation.getAlliance( ) == Alliance.Red)
-          autoTrajectory = PathPlanner.loadPath("driveOntoChargeStationRed", AutoConstants.defaultPathConfig);
-        else
-          autoTrajectory = PathPlanner.loadPath("driveOntoChargeStationBlue", AutoConstants.defaultPathConfig);
+        pathName = (DriverStation.getAlliance( ) == Alliance.Red) ? "driveOntoChargeStationRed" : "driveOntoChargeStationBlue";
         break;
     }
+    if (pathName != null)
+      autoTrajectory = PathPlanner.loadPath(pathName, AutoConstants.defaultPathConfig);
+    DataLogManager.log("getAutonomousCommand: " + pathName);
+
     switch (mode)
     {
+      default :
       case AUTOSTOP :
         autoCommand = new AutoStop(m_swerve);
         break;
