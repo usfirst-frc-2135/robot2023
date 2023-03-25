@@ -323,6 +323,16 @@ public class Wrist extends SubsystemBase
   public void moveWristWithJoystick(XboxController joystick)
   {
     double axisValue = -joystick.getRightY( );
+    moveWristInput(axisValue);
+  }
+
+  public void moveWristConstantSpeed(double speed)
+  {
+    moveWristInput(speed);
+  }
+
+  public void moveWristInput(double axisValue)
+  {
     boolean outOfRange = false;
     WristMode newMode = WristMode.WRIST_STOPPED;
 
@@ -446,7 +456,7 @@ public class Wrist extends SubsystemBase
         case WRIST_SCORE :
           m_wristTargetDegrees = m_wristAngleScore;
           break;
-      }   
+      }
     }
 
     DataLogManager.log(String.format("%s: TARGET ANGLE %.1f", getSubsystem( ), m_wristTargetDegrees));
