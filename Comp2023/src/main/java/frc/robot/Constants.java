@@ -608,6 +608,18 @@ public class Constants
 
   public static final class AutoConstants
   {
+    enum AutoChooser
+    {
+      AUTOSTOP,             //AutoStop
+      AUTOCOMSHORT,         //AutoDriveOffCommunityShort
+      AUTOCOMLONG,          //AutoDriveOffCommunityLong
+      AUTOCHARGE,           //AutoEngageChargeStation
+      AUTOPRESTOP,          //AutoPreloadAndStop
+      AUTOPRECOMSHORT,      //AutoPreloadAndDriveOffCommunityShort
+      AUTOPRECOMLONG,       //AutoPreloadAndDriveOffCommunityLong
+      AUTOPRECHARGE         //AutoPreloadAndEngageChargeStation
+    }
+
     public static final double                       kMaxSpeedMetersPerSecond                    = 2.2;
     public static final double                       kMaxAccelerationMetersPerSecondSquared      = 2.3;
 
