@@ -30,10 +30,8 @@ public class AutoPreloadAndEngageChargeStation extends SequentialCommandGroup
 
         // @formatter:off
         new PrintCommand(getName() + ": AUTO: Preload"),        
-        new ParallelDeadlineGroup(
-          new ExtensionCalibrate(extension), 
-          new GripperRun(gripper, GRMode.GR_EXPEL)
-        ),
+        new ExtensionCalibrate(extension), 
+        new AutoPreloadHigh(elbow, extension, wrist, gripper),
 
         new GripperRun(gripper, GRMode.GR_STOP),
         

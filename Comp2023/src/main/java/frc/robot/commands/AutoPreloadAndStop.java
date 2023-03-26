@@ -18,25 +18,18 @@ import frc.robot.subsystems.Wrist;
 /**
  *
  */
-public class AutoPreloadAndLeaveCommunityLong extends SequentialCommandGroup
+public class AutoPreloadAndStop extends SequentialCommandGroup
 {
-  public AutoPreloadAndLeaveCommunityLong(Swerve swerve, Elbow elbow, Extension extension, Wrist wrist, Gripper gripper,
-      String pathName, PathPlannerTrajectory trajectory)
+  public AutoPreloadAndStop(Swerve swerve, Elbow elbow, Extension extension, Wrist wrist, Gripper gripper)
   {
-    setName("AutoPreloadAndLeaveCommunityLong");
+    setName("AutoPreloadAndStop");
 
     addCommands(
         // Add Commands here:
 
         // @formatter:off
         new PrintCommand(getName() + ": AUTO: Score Preload"),        
-        new ExtensionCalibrate(extension), 
         new AutoPreloadHigh(elbow, extension, wrist, gripper),
-
-        new GripperRun(gripper, GRMode.GR_STOP),
-        
-        new PrintCommand(getName() +": AUTO: Drive Off Community"),
-        new AutoDrivePath ( swerve, pathName, trajectory, true),
 
         new PrintCommand(getName() + ": AUTO: Hold in place"),
         new AutoStop(swerve)
