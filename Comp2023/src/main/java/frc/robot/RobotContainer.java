@@ -9,8 +9,11 @@ package frc.robot;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.AutoConstants.AutoChooser;
 import frc.robot.Constants.ELConsts.ElbowAngle;
 import frc.robot.Constants.EXConsts.ExtensionLength;
 import frc.robot.Constants.GRConsts.GRMode;
@@ -28,6 +32,7 @@ import frc.robot.commands.ArmSetHeightIdle;
 import frc.robot.commands.ArmSetHeightScoreHigh;
 import frc.robot.commands.ArmSetHeightScoreLow;
 import frc.robot.commands.ArmSetHeightScoreMid;
+import frc.robot.commands.ArmSetHeightShelf;
 import frc.robot.commands.ArmSetHeightStow;
 import frc.robot.commands.AutoDriveBalance;
 import frc.robot.commands.AutoDrivePath;
@@ -35,6 +40,7 @@ import frc.robot.commands.AutoEngageChargeStation;
 import frc.robot.commands.AutoPreloadAndEngageChargeStation;
 import frc.robot.commands.AutoPreloadAndLeaveCommunityLong;
 import frc.robot.commands.AutoPreloadAndLeaveCommunityShort;
+import frc.robot.commands.AutoPreloadAndStop;
 import frc.robot.commands.AutoPreloadHigh;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.DriveLimelightPath;
@@ -52,6 +58,7 @@ import frc.robot.commands.ResetOdometryToLimelight;
 import frc.robot.commands.SetELAngleZero;
 import frc.robot.commands.SetWRAngleZero;
 import frc.robot.commands.WristMoveToAngle;
+import frc.robot.commands.WristRunConstant;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
 import frc.robot.subsystems.Gripper;
@@ -69,33 +76,36 @@ import frc.robot.subsystems.Wrist;
  */
 public class RobotContainer
 {
-  private static RobotContainer    m_instance;
+  private static RobotContainer        m_instance;
 
   // Joysticks
-  private final XboxController     m_driverPad          = new XboxController(Constants.kDriverPadPort);
-  private final XboxController     m_operatorPad        = new XboxController(Constants.kOperatorPadPort);
+  private final XboxController         m_driverPad          = new XboxController(Constants.kDriverPadPort);
+  private final XboxController         m_operatorPad        = new XboxController(Constants.kOperatorPadPort);
 
   // The robot's shared subsystems
-  public final LED                 m_led                = new LED( );
-  public final Vision              m_vision             = new Vision( );
+  public final LED                     m_led                = new LED( );
+  public final Vision                  m_vision             = new Vision( );
 
   // These subsystems can use LED or vision and must be created afterward
-  public final Elbow               m_elbow              = new Elbow( );
-  public final Extension           m_extension          = new Extension( );
-  public final Wrist               m_wrist              = new Wrist( );
-  public final Gripper             m_gripper            = new Gripper( );
-  public final Power               m_power              = new Power( );
-  public final Swerve              m_swerve             = new Swerve( );
+  public final Elbow                   m_elbow              = new Elbow( );
+  public final Extension               m_extension          = new Extension( );
+  public final Wrist                   m_wrist              = new Wrist( );
+  public final Gripper                 m_gripper            = new Gripper( );
+  public final Power                   m_power              = new Power( );
+  public final Swerve                  m_swerve             = new Swerve( );
 
   // A chooser for autonomous commands
-  private SendableChooser<Command> m_autoChooser        = new SendableChooser<>( );
+  private SendableChooser<AutoChooser> m_autoChooser        = new SendableChooser<>( );
+  private Command                      autoCommand;
 
   // Command Scheduler
-  public Command                   m_extensionCalibrate = new ExtensionCalibrate(m_extension);
+  public Command                       m_extensionCalibrate = new ExtensionCalibrate(m_extension);
 
-  PathPlannerTrajectory            m_driveOutOfCommunityShort;
-  PathPlannerTrajectory            m_driveOutOfCommunityLong;
-  PathPlannerTrajectory            m_driveOntoChargeStation;
+  PathPlannerTrajectory                autoTrajectory;
+
+  PathPlannerTrajectory                m_driveOutOfCommunityShort;
+  PathPlannerTrajectory                m_driveOutOfCommunityLong;
+  PathPlannerTrajectory                m_driveOntoChargeStation;
   // PathPlannerTrajectory            m_driveToGamePiece;
   // PathPlannerTrajectory            m_driveFromGamePiece;
 
@@ -316,7 +326,7 @@ public class RobotContainer
     operY.onTrue(new ArmSetHeightScoreHigh(m_elbow, m_extension, m_wrist));
     //
     // Operator - Bumpers, start, back
-    operLeftBumper.onTrue(new Dummy("left bumper"));
+    operLeftBumper.whileTrue(new WristRunConstant(m_wrist, true));
     operRightBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
     operRightBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
     operBack.toggleOnTrue(new ManualMode(m_elbow, m_extension, m_wrist, m_operatorPad)); // aka View
@@ -324,13 +334,13 @@ public class RobotContainer
     operStart.onTrue(new Dummy("Start")); // aka Menu
     //
     // Operator - POV buttons
-    operUp.onTrue(new Dummy("POV up"));
+    operUp.onTrue(new ArmSetHeightShelf(m_elbow, m_extension, m_wrist));
     operRight.onTrue(new Dummy("POV right"));
     operDown.onTrue(new Dummy("POV down"));
     operLeft.onTrue(new Dummy("POV left"));
     //
     // Operator Left/Right Trigger
-    operLeftTrigger.onTrue(new Dummy("left trigger"));
+    operLeftTrigger.whileTrue(new WristRunConstant(m_wrist, false));
     operRightTrigger.onTrue(new GripperRun(m_gripper, GRMode.GR_EXPEL));
     operRightTrigger.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
   }
@@ -359,23 +369,18 @@ public class RobotContainer
   private void initAutonomousChooser( )
   {
     // Autonomous Chooser
-    m_autoChooser.setDefaultOption("0 - AutoStop", new AutoStop(m_swerve));
+    m_autoChooser.setDefaultOption("0 - AutoStop", AutoChooser.AUTOSTOP);
 
-    m_autoChooser.addOption("1 - AutoDriveOffCommunityShort",
-        new AutoDrivePath(m_swerve, "driveOutOfCommunityShort", m_driveOutOfCommunityShort, true));
-    m_autoChooser.addOption("2 - AutoDriveOffCommunityLong",
-        new AutoDrivePath(m_swerve, "driveOutOfCommunityLong", m_driveOutOfCommunityLong, true));
-    m_autoChooser.addOption("3 - AutoEngageChargeStation",
-        new AutoEngageChargeStation(m_swerve, "driveOntoChargeStation", m_driveOntoChargeStation));
+    m_autoChooser.addOption("1 - AutoDriveOffCommunityShort", AutoChooser.AUTOCOMSHORT);
+    m_autoChooser.addOption("2 - AutoDriveOffCommunityLong", AutoChooser.AUTOCOMLONG);
+    m_autoChooser.addOption("3 - AutoEngageChargeStation", AutoChooser.AUTOCHARGE);
 
-    m_autoChooser.addOption("4 - AutoPreloadAndLeaveCommunityShort", new AutoPreloadAndLeaveCommunityShort(m_swerve, m_elbow,
-        m_extension, m_wrist, m_gripper, "driveOutOfCommunityShort", m_driveOutOfCommunityShort));
-    m_autoChooser.addOption("5 - AutoPreloadAndLeaveCommunityLong", new AutoPreloadAndLeaveCommunityLong(m_swerve, m_elbow,
-        m_extension, m_wrist, m_gripper, "driveOutOfCommunityLong", m_driveOutOfCommunityLong));
-    m_autoChooser.addOption("6 - AutoPreloadAndEngageChargeStation", new AutoPreloadAndEngageChargeStation(m_swerve, m_elbow,
-        m_extension, m_wrist, m_gripper, "driveOntoChargeStation", m_driveOntoChargeStation));
+    m_autoChooser.addOption("4 - AutoPreloadAndStop", AutoChooser.AUTOPRESTOP);
+    m_autoChooser.addOption("5 - AutoPreloadAndLeaveCommunityShort", AutoChooser.AUTOPRECOMSHORT);
+    m_autoChooser.addOption("6 - AutoPreloadAndLeaveCommunityLong", AutoChooser.AUTOPRECOMLONG);
+    m_autoChooser.addOption("7 - AutoPreloadAndEngageChargeStation", AutoChooser.AUTOPRECHARGE);
 
-    // m_chooser.addOption("7 - AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve));
+    //m_chooser.addOption("7 - AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve));
 
     // Configure autonomous sendable chooser
     SmartDashboard.putData("Auto Mode", m_autoChooser);
@@ -398,7 +403,65 @@ public class RobotContainer
    */
   public Command getAutonomousCommand( )
   {
+    String pathName = null;
+    AutoChooser mode = m_autoChooser.getSelected( );
     // The selected command will be run in autonomous
-    return m_autoChooser.getSelected( );
+    switch (mode)
+    {
+      default :
+      case AUTOSTOP :
+      case AUTOPRESTOP :
+        break;
+      case AUTOCOMSHORT :
+      case AUTOPRECOMSHORT :
+        pathName =
+            (DriverStation.getAlliance( ) == Alliance.Red) ? "driveOutOfCommunityShortRed" : "driveOutOfCommunityShortBlue";
+        break;
+      case AUTOCOMLONG :
+      case AUTOPRECOMLONG :
+        pathName = (DriverStation.getAlliance( ) == Alliance.Red) ? "driveOutOfCommunityLongRed" : "driveOutOfCommunityLongBlue";
+        break;
+      case AUTOCHARGE :
+      case AUTOPRECHARGE :
+        pathName = (DriverStation.getAlliance( ) == Alliance.Red) ? "driveOntoChargeStationRed" : "driveOntoChargeStationBlue";
+        break;
+    }
+    if (pathName != null)
+      autoTrajectory = PathPlanner.loadPath(pathName, AutoConstants.defaultPathConfig);
+    DataLogManager.log("getAutonomousCommand: " + pathName);
+
+    switch (mode)
+    {
+      default :
+      case AUTOSTOP :
+        autoCommand = new AutoStop(m_swerve);
+        break;
+      case AUTOCOMSHORT :
+        autoCommand = new AutoDrivePath(m_swerve, "driveOutOfCommunityShort", autoTrajectory, true);
+        break;
+      case AUTOCOMLONG :
+        autoCommand = new AutoDrivePath(m_swerve, "driveOutOfCommunityLong", autoTrajectory, true);
+        break;
+      case AUTOCHARGE :
+        autoCommand = new AutoEngageChargeStation(m_swerve, "driveOntoChargeStation", autoTrajectory);
+        break;
+      case AUTOPRESTOP :
+        autoCommand = new AutoPreloadAndStop(m_swerve, m_elbow, m_extension, m_wrist, m_gripper);
+        break;
+      case AUTOPRECOMSHORT :
+        autoCommand = new AutoPreloadAndLeaveCommunityShort(m_swerve, m_elbow, m_extension, m_wrist, m_gripper,
+            "AutoPreloadAndLeaveCommunityShort", autoTrajectory);
+        break;
+      case AUTOPRECOMLONG :
+        autoCommand = new AutoPreloadAndLeaveCommunityLong(m_swerve, m_elbow, m_extension, m_wrist, m_gripper,
+            "AutoPreloadAndLeaveCommunityLong", autoTrajectory);
+        break;
+      case AUTOPRECHARGE :
+        autoCommand = new AutoPreloadAndEngageChargeStation(m_swerve, m_elbow, m_extension, m_wrist, m_gripper,
+            "AutoPreloadAndEngageChargeStation", autoTrajectory);
+        break;
+    }
+
+    return autoCommand;
   }
 }

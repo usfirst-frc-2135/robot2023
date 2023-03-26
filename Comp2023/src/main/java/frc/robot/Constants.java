@@ -169,7 +169,7 @@ public class Constants
     // CANCoder elbow absolute offset
     public static final boolean kInvertCANCoder       = true;  // CANCoder direction for positive angle in relative mode
     public static final boolean kElbowCalibrated      = true;  // Indicates whether the elbow has been calibrated by CANCoder
-    public static final double  kCompElbowOffset      = -50.01; // CANCoder offset angle for comp bot
+    public static final double  kCompElbowOffset      = -169.1; // CANCoder offset angle for comp bot
     public static final double  kBetaElbowOffset      = 0.000; // (TODO: Beta requires an offset) CANCoder offset angle for beta bot
 
     // Manual config parameters
@@ -293,7 +293,7 @@ public class Constants
   {
     // Global settings
 
-    public static final double  kWristGearRatio       = 375;   // Gear reduction for wrist
+    public static final double  kWristGearRatio       = 213.9;   // Gear reduction for wrist
     public static final double  kWristDegreesPerCount = 360 / Falcon500.kEncoderCPR / kWristGearRatio;
     public static final double  kGripperLengthMeters  = 0.3;   // Sim value: 11.8 in
     public static final double  kGripperMassKg        = 3.0;   // Sim value: 6.6 lbs
@@ -320,7 +320,7 @@ public class Constants
     // CANCoder wrist absolute offset
     public static final boolean kInvertCANCoder       = true;  // CANCoder direction for positive angle in relative mode
     public static final boolean kWristCalibrated      = true;  // Indicates whether the wrist has been calibrated by CANCoder
-    public static final double  kCompWristOffset      = -48.4; // CANCoder offset angle for comp bot
+    public static final double  kCompWristOffset      = 132.7; // CANCoder offset angle for comp bot
     public static final double  kBetaWristOffset      = 0.000; // CANCoder offset angle for beta bot
 
     // Manual config parameters
@@ -384,7 +384,7 @@ public class Constants
 
     public static final double kGripperSpeedAcquire = 1.0;  // Acquire game piece from loading station or floor
     public static final double kGripperSpeedHold    = 0.1;  // Hold game piece while traversing the field (must be < 2V equiv)
-    public static final double kGripperSpeedExpel   = -0.25; // Score game piece on cone node or cube shelf
+    public static final double kGripperSpeedExpel   = -0.2; // Score game piece on cone node or cube shelf
   }
 
   public static final class LEDConsts
@@ -608,6 +608,18 @@ public class Constants
 
   public static final class AutoConstants
   {
+    enum AutoChooser
+    {
+      AUTOSTOP,             //AutoStop
+      AUTOCOMSHORT,         //AutoDriveOffCommunityShort
+      AUTOCOMLONG,          //AutoDriveOffCommunityLong
+      AUTOCHARGE,           //AutoEngageChargeStation
+      AUTOPRESTOP,          //AutoPreloadAndStop
+      AUTOPRECOMSHORT,      //AutoPreloadAndDriveOffCommunityShort
+      AUTOPRECOMLONG,       //AutoPreloadAndDriveOffCommunityLong
+      AUTOPRECHARGE         //AutoPreloadAndEngageChargeStation
+    }
+
     public static final double                       kMaxSpeedMetersPerSecond                    = 2.2;
     public static final double                       kMaxAccelerationMetersPerSecondSquared      = 2.3;
 
