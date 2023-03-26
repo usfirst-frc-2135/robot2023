@@ -169,7 +169,7 @@ public class Constants
     // CANCoder elbow absolute offset
     public static final boolean kInvertCANCoder       = true;  // CANCoder direction for positive angle in relative mode
     public static final boolean kElbowCalibrated      = true;  // Indicates whether the elbow has been calibrated by CANCoder
-    public static final double  kCompElbowOffset      = -50.01; // CANCoder offset angle for comp bot
+    public static final double  kCompElbowOffset      = -169.1; // CANCoder offset angle for comp bot
     public static final double  kBetaElbowOffset      = 0.000; // (TODO: Beta requires an offset) CANCoder offset angle for beta bot
 
     // Manual config parameters
@@ -320,7 +320,7 @@ public class Constants
     // CANCoder wrist absolute offset
     public static final boolean kInvertCANCoder       = true;  // CANCoder direction for positive angle in relative mode
     public static final boolean kWristCalibrated      = true;  // Indicates whether the wrist has been calibrated by CANCoder
-    public static final double  kCompWristOffset      = -48.4; // CANCoder offset angle for comp bot
+    public static final double  kCompWristOffset      = 132.7; // CANCoder offset angle for comp bot
     public static final double  kBetaWristOffset      = 0.000; // CANCoder offset angle for beta bot
 
     // Manual config parameters
