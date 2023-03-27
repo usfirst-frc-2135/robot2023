@@ -46,7 +46,7 @@ public class AutoDriveBalance extends CommandBase
   @Override
   public boolean isFinished( )
   {
-    return (m_timer.hasElapsed(15) || RobotState.isDisabled( ));
+    return (m_timer.hasElapsed(10.0) || RobotState.isDisabled( ));
   }
 
   @Override
