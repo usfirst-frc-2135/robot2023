@@ -27,29 +27,29 @@ public class ArmSetHeightIdle extends SequentialCommandGroup
 
         // @formatter:off
         new PrintCommand(getName()+": Retract Extension"),
-        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_STOW),
+        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_STOW).asProxy(),
         new ConditionalCommand(
           new SequentialCommandGroup(
             new PrintCommand(getName() + ": Move Elbow"),
-            new ElbowMoveToAngle(elbow,  ElbowAngle.ELBOW_IDLE),
+            new ElbowMoveToAngle(elbow,  ElbowAngle.ELBOW_IDLE).asProxy(),
 
             new PrintCommand(getName() + ": Move Wrist"),
-            new WristMoveToAngle(wrist, WristAngle.WRIST_IDLE)
+            new WristMoveToAngle(wrist, WristAngle.WRIST_IDLE).asProxy()
           ),
 
           new SequentialCommandGroup(
             new PrintCommand(getName() + ": Move Wrist"),
-            new WristMoveToAngle(wrist, WristAngle.WRIST_IDLE),
+            new WristMoveToAngle(wrist, WristAngle.WRIST_IDLE).asProxy(),
 
             new PrintCommand(getName() + ": Move Elbow"),
-            new ElbowMoveToAngle(elbow,  ElbowAngle.ELBOW_IDLE)
+            new ElbowMoveToAngle(elbow,  ElbowAngle.ELBOW_IDLE).asProxy()
           ),
 
           elbow::isElbowBelowIdle
         ),
 
         new PrintCommand(getName() + ": Extend Extension"),
-        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_IDLE)
+        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_IDLE).asProxy()
         // @formatter:on
     );
   }
