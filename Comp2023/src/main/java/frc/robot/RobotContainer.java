@@ -11,12 +11,13 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -97,17 +98,10 @@ public class RobotContainer
   // A chooser for autonomous commands
   private SendableChooser<AutoChooser> m_autoChooser        = new SendableChooser<>( );
   private Command                      autoCommand;
+  PathPlannerTrajectory                autoTrajectory;
 
   // Command Scheduler
   public Command                       m_extensionCalibrate = new ExtensionCalibrate(m_extension);
-
-  PathPlannerTrajectory                autoTrajectory;
-
-  PathPlannerTrajectory                m_driveOutOfCommunityShort;
-  PathPlannerTrajectory                m_driveOutOfCommunityLong;
-  PathPlannerTrajectory                m_driveOntoChargeStation;
-  // PathPlannerTrajectory            m_driveToGamePiece;
-  // PathPlannerTrajectory            m_driveFromGamePiece;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -141,34 +135,7 @@ public class RobotContainer
     // For future work to set up Shuffleboard layout from code
     // ShuffleboardTab m_autoTab = Shuffleboard.getTab("Auto");
     // ComplexWidget autoStopEntry = m_autoTab.add("AutoStop", new AutoStop(m_swerve)).withSize(3, 2).withPosition(0, 0);
-
-    m_driveOutOfCommunityShort = PathPlanner.loadPath("driveOutOfCommunityShort", AutoConstants.defaultPathConfig);
-    m_driveOutOfCommunityLong = PathPlanner.loadPath("driveOutOfCommunityLong", AutoConstants.defaultPathConfig);
-    m_driveOntoChargeStation = PathPlanner.loadPath("driveOntoChargeStation", AutoConstants.chargePathConfig);
-    // m_driveToGamePiece = PathPlanner.loadPath("driveToGamePiece", AutoConstants.defaultPathConfig);
-    // m_driveFromGamePiece = PathPlanner.loadPath("driveFromGamePiece", AutoConstants.defaultPathConfig);
-
-    // Autonomous buttons  for main routines - complexity order (simplest first)
-    SmartDashboard.putData("AutoStop", new AutoStop(m_swerve));
-    SmartDashboard.putData("AutoPreloadHigh", new AutoPreloadHigh(m_elbow, m_extension, m_wrist, m_gripper));
-
-    SmartDashboard.putData("AutoDriveOutOfCommunityShort",
-        new AutoDrivePath(m_swerve, "driveOutOfCommunityShort", m_driveOutOfCommunityShort, true));
-    SmartDashboard.putData("AutoDriveOutOfCommunityLong",
-        new AutoDrivePath(m_swerve, "driveOutOfCommunityLong", m_driveOutOfCommunityLong, true));
-    SmartDashboard.putData("AutoEngageChargeStation",
-        new AutoEngageChargeStation(m_swerve, "driveOntoChargeStation", m_driveOntoChargeStation));
-
-    SmartDashboard.putData("AutoPreloadAndLeaveCommunityShort", new AutoPreloadAndLeaveCommunityShort(m_swerve, m_elbow,
-        m_extension, m_wrist, m_gripper, "driveOutOfCommunityShort", m_driveOutOfCommunityShort));
-    SmartDashboard.putData("AutoPreloadAndLeaveCommunityLong", new AutoPreloadAndLeaveCommunityLong(m_swerve, m_elbow,
-        m_extension, m_wrist, m_gripper, "driveOutOfCommunityLong", m_driveOutOfCommunityLong));
-    SmartDashboard.putData("AutoPreloadAndEngageChargeStation", new AutoPreloadAndEngageChargeStation(m_swerve, m_elbow,
-        m_extension, m_wrist, m_gripper, "driveOntoChargeStation", m_driveOntoChargeStation));
-
-    // FUTURE WORK: unlikely to be able to score a second game piece at this time
-    // SmartDashboard.putData("AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve, "driveToGamePiece",
-    //     m_driveToGamePiece, "driveFromGamePiece", m_driveFromGamePiece));
+    SmartDashboard.putData("AutoChooserRun", new InstantCommand(( ) -> runAutonomousCommand( )));
 
     // Autonomous helper commands
     SmartDashboard.putData("AutoDriveBalance", new AutoDriveBalance(m_swerve));
@@ -426,9 +393,9 @@ public class RobotContainer
         pathName = (DriverStation.getAlliance( ) == Alliance.Red) ? "driveOntoChargeStationRed" : "driveOntoChargeStationBlue";
         break;
     }
+
     if (pathName != null)
       autoTrajectory = PathPlanner.loadPath(pathName, AutoConstants.defaultPathConfig);
-    DataLogManager.log("getAutonomousCommand: " + pathName);
 
     switch (mode)
     {
@@ -462,6 +429,15 @@ public class RobotContainer
         break;
     }
 
+    DataLogManager.log("getAutonomousCommand: mode is " + mode + " path is " + pathName);
+
     return autoCommand;
   }
+
+  public void runAutonomousCommand( )
+  {
+    Command autoCmd = getAutonomousCommand( );
+    autoCmd.schedule( );
+  }
+
 }
