@@ -126,7 +126,7 @@ public class Elbow extends SubsystemBase
     if (m_elbowCCValid)
     {
       m_elbowCANCoder.configAllSettings(CTREConfigs.elbowCancoderConfig( ));
-      double m_elbowCurDegrees = getCanCoder( ).getDegrees( );
+      m_elbowCurDegrees = getCanCoder( ).getDegrees( );
 
       // Slow status frame updates AFTER getting the absolute position
       m_elbowCANCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
@@ -543,6 +543,7 @@ public class Elbow extends SubsystemBase
     m_moveIsFinished = false;
     m_withinTolerance = 0;
     m_safetyTimer.stop( );
+    m_elbow.set(0.0);
   }
 
 }

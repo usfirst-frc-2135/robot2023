@@ -159,11 +159,11 @@ public class Constants
     public static final double  kElbowAngleMax        = 105.0; // Elbow maximum allowable degrees (10 deg more than high)
 
     // Current limit settings - elbow
-    public static final double  kSupplyCurrentLimit   = 35.0;  // Supply current limit (after trigger)
-    public static final double  kSupplyTriggerCurrent = 35.0;  // Supply trigger current that will cause limiting
+    public static final double  kSupplyCurrentLimit   = 25.0;  // Supply current limit (after trigger)
+    public static final double  kSupplyTriggerCurrent = 25.0;  // Supply trigger current that will cause limiting
     public static final double  kSupplyTriggerTime    = 0.001; // Supply time duration of trigger that will causing limiting
-    public static final double  kStatorCurrentLimit   = 35.0;  // Stator current limit (after trigger)
-    public static final double  kStatorTriggerCurrent = 35.0;  // Stator trigger current that will cause limiting
+    public static final double  kStatorCurrentLimit   = 25.0;  // Stator current limit (after trigger)
+    public static final double  kStatorTriggerCurrent = 25.0;  // Stator trigger current that will cause limiting
     public static final double  kStatorTriggerTime    = 0.001; // Stator time duration of trigger that will causing limiting
 
     // CANCoder elbow absolute offset
@@ -230,9 +230,9 @@ public class Constants
     public static final double  kExtensionLengthMin        = -0.5;  // Extension minimum allowable length (half inch less than stowed)
     public static final double  kExtensionLengthStow       = 0.25;   // By definition - extension fully retracted
     public static final double  kExtensionLengthIdle       = 0.25;  // Slightly off mechanical hard stop
-    public static final double  kExtensionLengthScoreLow   = 10.0;  // From Mech Design (floor, feet art 5" high), empirically checked
+    public static final double  kExtensionLengthScoreLow   = 9.0;  // From Mech Design (floor, feet art 5" high), empirically checked
     public static final double  kExtensionLengthScoreMid   = 1.25;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), empirically checked
-    public static final double  kExtensionLengthScoreHigh  = 15.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked
+    public static final double  kExtensionLengthScoreHigh  = 16.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked
     public static final double  kExtensionLengthSubstation = 1.25;  // From Mech Design (3'1-38" above floor)
     public static final double  kExtensionLengthMax        = 17.0;  // Extension maximum allowable length (2" beyond high length)
 
@@ -310,11 +310,11 @@ public class Constants
     public static final double  kWristAngleMax        = 110.0; // Wrist maximum allowable angle (a few degrees more than substation/horizontal)
 
     // Current limit settings - wrist
-    public static final double  kSupplyCurrentLimit   = 8.0;   // Supply current limit (after trigger)
-    public static final double  kSupplyTriggerCurrent = 8.0;   // Supply trigger current that will cause limiting
+    public static final double  kSupplyCurrentLimit   = 10.0;   // Supply current limit (after trigger)
+    public static final double  kSupplyTriggerCurrent = 10.0;   // Supply trigger current that will cause limiting
     public static final double  kSupplyTriggerTime    = 0.001; // Supply time duration of trigger that will causing limiting
-    public static final double  kStatorCurrentLimit   = 8.0;   // Stator current limit (after trigger)
-    public static final double  kStatorTriggerCurrent = 8.0;   // Stator trigger current that will cause limiting
+    public static final double  kStatorCurrentLimit   = 10.0;   // Stator current limit (after trigger)
+    public static final double  kStatorTriggerCurrent = 10.0;   // Stator trigger current that will cause limiting
     public static final double  kStatorTriggerTime    = 0.001; // Stator time duration of trigger that will causing limiting
 
     // CANCoder wrist absolute offset
@@ -333,7 +333,7 @@ public class Constants
       WRIST_UP            // Wrist moving up
     }
 
-    public static final double kWristSpeedMaxManual = 0.3;    // Motor percent output during manual operation
+    public static final double kWristSpeedMaxManual = 0.5;    // Motor percent output during manual operation
 
     // Motion Magic config parameters
 
@@ -360,7 +360,7 @@ public class Constants
     public static final int    kWristAllowedError     = 0;      // Wrist PID allowable closed loop error in counts
     public static final double kWristToleranceDegrees = 2.0;    // Wrist PID tolerance in degrees (1 deg is 0.25" at 15" length)
     public static final double kWristArbitraryFF      = -0.034; // Wrist motor output for 90 degrees
-    public static final double kMMSafetyTimeout       = 3.5;    // Seconds allowed for a Motion Magic movement
+    public static final double kMMSafetyTimeout       = 3;    // Seconds allowed for a Motion Magic movement
   }
 
   public static final class GRConsts

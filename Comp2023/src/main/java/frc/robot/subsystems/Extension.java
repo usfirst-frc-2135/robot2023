@@ -503,6 +503,7 @@ public class Extension extends SubsystemBase
     m_moveIsFinished = false;
     m_withinTolerance = 0;
     m_safetyTimer.stop( );
+    m_extension.set(0.0);
   }
 
 }
