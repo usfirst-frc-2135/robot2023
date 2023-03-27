@@ -42,7 +42,6 @@ import frc.robot.commands.AutoPreloadAndEngageChargeStation;
 import frc.robot.commands.AutoPreloadAndLeaveCommunityLong;
 import frc.robot.commands.AutoPreloadAndLeaveCommunityShort;
 import frc.robot.commands.AutoPreloadAndStop;
-import frc.robot.commands.AutoPreloadHigh;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.DriveLimelightPath;
 import frc.robot.commands.DriveSnap;
