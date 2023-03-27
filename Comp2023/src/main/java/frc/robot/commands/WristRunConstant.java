@@ -32,7 +32,7 @@ public class WristRunConstant extends CommandBase
   @Override
   public void execute( )
   {
-    m_wrist.moveWristConstantSpeed(m_moveUp ? 1 : -1);
+    m_wrist.moveWristConstantSpeed(m_moveUp ? 1.0 : -1.0);
   }
 
   // Called once the command ends or is interrupted.

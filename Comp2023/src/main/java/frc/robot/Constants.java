@@ -228,7 +228,7 @@ public class Constants
 
     // Extension lengths increase by 0.95" per 90 degrees of elbow rotation (lengths manually adjusted below)
     public static final double  kExtensionLengthMin        = -0.5;  // Extension minimum allowable length (half inch less than stowed)
-    public static final double  kExtensionLengthStow       = 0.25;   // By definition - extension fully retracted
+    public static final double  kExtensionLengthStow       = 0.25;  // By definition - extension fully retracted
     public static final double  kExtensionLengthIdle       = 0.25;  // Slightly off mechanical hard stop
     public static final double  kExtensionLengthScoreLow   = 10.0;  // From Mech Design (floor, feet art 5" high), empirically checked
     public static final double  kExtensionLengthScoreMid   = 1.25;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), empirically checked
