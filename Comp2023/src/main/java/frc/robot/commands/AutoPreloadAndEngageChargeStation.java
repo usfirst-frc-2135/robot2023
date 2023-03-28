@@ -30,7 +30,7 @@ public class AutoPreloadAndEngageChargeStation extends SequentialCommandGroup
         // @formatter:off
         new PrintCommand(getName() + ": Score Preload"),        
         new ExtensionCalibrate(extension).asProxy(), 
-        new AutoPreloadHigh(elbow, extension, wrist, gripper),
+        new AutoPreloadLow(elbow, extension, wrist, gripper),
 
         new GripperRun(gripper, GRMode.GR_STOP),
         
