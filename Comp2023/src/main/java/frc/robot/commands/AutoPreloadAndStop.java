@@ -29,6 +29,7 @@ public class AutoPreloadAndStop extends SequentialCommandGroup
 
         // @formatter:off
         new PrintCommand(getName() + ": AUTO: Score Preload"),        
+        new ExtensionCalibrate(extension).asProxy(), 
         new AutoPreloadHigh(elbow, extension, wrist, gripper),
 
         new PrintCommand(getName() + ": AUTO: Hold in place"),

@@ -26,13 +26,13 @@ public class ArmSetHeightScoreHigh extends SequentialCommandGroup
 
         // @formatter:off
         new PrintCommand(getName() + ": Moving Elbow"),
-        new ElbowMoveToAngle(elbow,  ElbowAngle.ELBOW_HIGH),
+        new ElbowMoveToAngle(elbow,  ElbowAngle.ELBOW_HIGH).asProxy(),
 
         new PrintCommand(getName() + ": Moving Wrist"),
-        new WristMoveToAngle(wrist, WristAngle.WRIST_HIGH),
+        new WristMoveToAngle(wrist, WristAngle.WRIST_HIGH).asProxy(),
         
         new PrintCommand(getName() + ": Moving Extension"),
-        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_HIGH)
+        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_HIGH).asProxy()
         // @formatter:on
     );
   }

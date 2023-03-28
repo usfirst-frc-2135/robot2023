@@ -30,7 +30,7 @@ public class AutoPreloadAndLeaveCommunityLong extends SequentialCommandGroup
 
         // @formatter:off
         new PrintCommand(getName() + ": AUTO: Score Preload"),        
-        new ExtensionCalibrate(extension), 
+        new ExtensionCalibrate(extension).asProxy(), 
         new AutoPreloadHigh(elbow, extension, wrist, gripper),
 
         new GripperRun(gripper, GRMode.GR_STOP),
