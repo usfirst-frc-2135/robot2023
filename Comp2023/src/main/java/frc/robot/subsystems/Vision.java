@@ -66,6 +66,7 @@ public class Vision extends SubsystemBase
 
     // Set camera and LED display
     setLEDMode(VIConsts.LED_OFF);
+    setCameraDisplay(VIConsts.PIP_SECONDARY);
 
     // Put all the needed widgets on the dashboard
     SmartDashboard.putNumber("VI_distance1", m_distance1);
