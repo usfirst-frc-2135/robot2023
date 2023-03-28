@@ -435,8 +435,6 @@ public class Elbow extends SubsystemBase
       }
     }
 
-    DataLogManager.log(String.format("%s: TARGET ANGLE %.1f", getSubsystem( ), m_elbowTargetDegrees));
-
     if (ELConsts.kElbowCalibrated && moveIsInRange(Math.abs(m_elbowTargetDegrees - m_elbowCurDegrees)))
     {
       // angle constraint check/soft limit for max and min angle before raising

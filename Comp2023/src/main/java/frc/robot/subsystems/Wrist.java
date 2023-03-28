@@ -448,8 +448,6 @@ public class Wrist extends SubsystemBase
       }
     }
 
-    DataLogManager.log(String.format("%s: TARGET ANGLE %.1f", getSubsystem( ), m_wristTargetDegrees));
-
     if (WRConsts.kWristCalibrated && moveIsInRange(Math.abs(m_wristTargetDegrees - m_wristCurDegrees)))
     {
       // angle constraint check/soft limit for max and min angle before raising

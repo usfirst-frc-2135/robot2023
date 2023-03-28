@@ -414,8 +414,6 @@ public class Extension extends SubsystemBase
       }
     }
 
-    DataLogManager.log(String.format("%s: TARGET INCHES %.1f", getSubsystem( ), m_extensionTargetInches));
-
     if (EXConsts.kExtensionCalibrated)
     {
       // length constraint check/soft limit for max and min length before raising
