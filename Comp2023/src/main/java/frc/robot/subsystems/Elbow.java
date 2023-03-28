@@ -505,7 +505,7 @@ public class Elbow extends SubsystemBase
     if (m_safetyTimer.hasElapsed(ELConsts.kMMSafetyTimeout))
     {
       m_moveIsFinished = true;
-      DataLogManager.log(getSubsystem( ) + ": Move Safety timer has timed out!");
+      DataLogManager.log(getSubsystem( ) + ": Move Safety timer has timed out! " + m_safetyTimer.get( ));
     }
 
     if (m_moveIsFinished)
