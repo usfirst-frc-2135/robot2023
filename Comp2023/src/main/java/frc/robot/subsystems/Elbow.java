@@ -477,7 +477,7 @@ public class Elbow extends SubsystemBase
 
     if (Math.abs(errorInDegrees) < m_toleranceDegrees)
     {
-      if (++m_withinTolerance >= 5)
+      if (++m_withinTolerance >= 3)
       {
         m_moveIsFinished = true;
         DataLogManager.log(String.format("%s: move finished - Time: %.3f  |  Cur degrees: %.1f", getSubsystem( ),

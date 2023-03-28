@@ -456,7 +456,7 @@ public class Extension extends SubsystemBase
 
     if (Math.abs(errorInInches) < m_toleranceInches)
     {
-      if (++m_withinTolerance >= 5)
+      if (++m_withinTolerance >= 3)
       {
         m_moveIsFinished = true;
         DataLogManager.log(String.format("%s: move finished - Time: %.3f  |  Cur inches: %.1f", getSubsystem( ),
