@@ -26,13 +26,13 @@ public class ArmSetHeightShelf extends SequentialCommandGroup
 
         // @formatter:off
         new PrintCommand(getName() + ": Moving Elbow"),
-        new ElbowMoveToAngle(elbow,  ElbowAngle.ELBOW_SHELF),
+        new ElbowMoveToAngle(elbow,  ElbowAngle.ELBOW_SHELF).asProxy(),
 
         new PrintCommand(getName() + ": Moving Wrist"),
-        new WristMoveToAngle(wrist, WristAngle.WRIST_SHELF),
+        new WristMoveToAngle(wrist, WristAngle.WRIST_SHELF).asProxy(),
         
         new PrintCommand(getName() + ": Moving Extension"),
-        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_SHELF)
+        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_SHELF).asProxy()
         // @formatter:on
     );
   }

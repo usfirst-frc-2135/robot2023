@@ -27,9 +27,8 @@ public class ExtensionCalibrate extends CommandBase
   @Override
   public void initialize( )
   {
-    m_calibrateTimer.reset( );
+    m_calibrateTimer.restart( );
     m_extension.moveToCalibrate( );
-    m_calibrateTimer.start( );
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -43,6 +42,7 @@ public class ExtensionCalibrate extends CommandBase
   {
     m_calibrateTimer.stop( );
     m_extension.calibrate( );
+    m_extension.setExtensionStopped( );
   }
 
   // Returns true when the command should end.

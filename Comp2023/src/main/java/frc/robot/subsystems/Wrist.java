@@ -126,7 +126,7 @@ public class Wrist extends SubsystemBase
     if (m_wristCCValid)
     {
       m_wristCANCoder.configAllSettings(CTREConfigs.wristCancoderConfig( ));
-      double m_wristCurDegrees = getCanCoder( ).getDegrees( );
+      m_wristCurDegrees = getCanCoder( ).getDegrees( );
 
       // Slow status frame updates AFTER getting the absolute position
       m_wristCANCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
@@ -365,7 +365,7 @@ public class Wrist extends SubsystemBase
     m_wristTargetDegrees = m_wristCurDegrees;
 
     if (m_wristValid)
-      m_wrist.set(ControlMode.PercentOutput, axisValue * WRConsts.kWristSpeedMaxManual + m_wristTotalFF);
+      m_wrist.set(ControlMode.PercentOutput, axisValue);
   }
 
   public void setWristStopped( )
@@ -518,7 +518,7 @@ public class Wrist extends SubsystemBase
     if (m_safetyTimer.hasElapsed(WRConsts.kMMSafetyTimeout))
     {
       m_moveIsFinished = true;
-      DataLogManager.log(getSubsystem( ) + ": Move Safety timer has timed out!");
+      DataLogManager.log(getSubsystem( ) + ": Move Safety timer has timed out! " + m_safetyTimer.get( ));
     }
 
     if (m_moveIsFinished)
@@ -535,6 +535,7 @@ public class Wrist extends SubsystemBase
     m_moveIsFinished = false;
     m_withinTolerance = 0;
     m_safetyTimer.stop( );
+    m_wrist.set(0.0);
   }
 
 }

@@ -486,7 +486,7 @@ public class Extension extends SubsystemBase
     if (m_safetyTimer.hasElapsed(EXConsts.kMMSafetyTimeout))
     {
       m_moveIsFinished = true;
-      DataLogManager.log(getSubsystem( ) + ": Move Safety timer has timed out!");
+      DataLogManager.log(getSubsystem( ) + ": Move Safety timer has timed out! " + m_safetyTimer.get( ));
     }
 
     if (m_moveIsFinished)
@@ -503,6 +503,7 @@ public class Extension extends SubsystemBase
     m_moveIsFinished = false;
     m_withinTolerance = 0;
     m_safetyTimer.stop( );
+    m_extension.set(0.0);
   }
 
 }

@@ -22,10 +22,10 @@ public class AutoEngageChargeStation extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
-        new PrintCommand(getName() + ": AUTO PATH SEQUENCE: go to ChargeStation"),
+        new PrintCommand(getName() + ": Drive to ChargeStation"),
         new AutoDrivePath (swerve, pathName, trajectory, true),
 
-        new PrintCommand(getName() + ": AUTO: Balance on ChargeStation"),
+        new PrintCommand(getName() + ": Balance on ChargeStation"),
         new AutoDriveBalance(swerve).withTimeout(6.0)
         // @formatter:on
     );

@@ -26,13 +26,13 @@ public class ArmSetHeightStow extends SequentialCommandGroup
 
         // @formatter:off
         new PrintCommand(getName() + ": Moving Wrist"),
-        new WristMoveToAngle(wrist, WristAngle.WRIST_STOW),
+        new WristMoveToAngle(wrist, WristAngle.WRIST_STOW).asProxy(),
 
         new PrintCommand(getName() + ": Moving Extension"),
-        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_STOW),
+        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_STOW).asProxy(),
 
         new PrintCommand(getName() + ": Moving Elbow"),
-        new ElbowMoveToAngle(elbow,  ElbowAngle.ELBOW_STOW)
+        new ElbowMoveToAngle(elbow,  ElbowAngle.ELBOW_STOW).asProxy()
         // @formatter:on
     );
   }

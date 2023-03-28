@@ -24,18 +24,18 @@ public class AutoPreloadAndScoreAnother extends SequentialCommandGroup
         // TODO: write this command
 
         // @formatter:off
-        new PrintCommand(getName() + ": AUTO PATH SEQUENCE: Run first path"),
+        new PrintCommand(getName() + ": Score Preload"),
         /* DRIVE BACKWARD + PRELOAD PATHS / COMMANDS
         */
         new AutoDrivePath (swerve, pathName1, trajectory1, true),
 
         // ADD COMMAND TO PICK UP GAME PIECE
-        new PrintCommand(getName() + ": AUTO: Run second path"),
+        new PrintCommand(getName() + ": Drive second path"),
         new AutoDrivePath ( swerve, pathName2, trajectory2, false),
 
         // ADD COMMAND TO SCORE GAME PIECE
 
-        new PrintCommand(getName() + ": AUTO: Hold in place"),
+        new PrintCommand(getName() + ": Hold in place"),
         new AutoStop(swerve)
         // @formatter:on
     );
