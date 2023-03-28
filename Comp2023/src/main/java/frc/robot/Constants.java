@@ -286,7 +286,7 @@ public class Constants
     public static final int    kExtensionAllowedError     = 0;      // Extension PID allowable closed loop error in counts
     public static final double kExtensionToleranceInches  = 1;    // Extension PID tolerance in inches
     public static final double kExtensionArbitraryFF      = -0.030; // Extension motor output for extension when fully retracted
-    public static final double kMMSafetyTimeout           = 2.0;    // Seconds allowed for a Motion Magic movement
+    public static final double kMMSafetyTimeoutRatio      = .13;    // Seconds allowed for a Motion Magic movement
   }
 
   public static final class WRConsts

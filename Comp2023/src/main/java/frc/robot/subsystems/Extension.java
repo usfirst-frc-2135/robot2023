@@ -468,7 +468,7 @@ public class Extension extends SubsystemBase
       m_withinTolerance = 0;
     }
 
-    if (m_safetyTimer.hasElapsed(EXConsts.kMMSafetyTimeout))
+    if (m_safetyTimer.hasElapsed(m_extensionTargetInches * EXConsts.kMMSafetyTimeoutRatio + 0.2))
     {
       m_moveIsFinished = true;
       DataLogManager.log(getSubsystem( ) + ": Move Safety timer has timed out! " + m_safetyTimer.get( ));
