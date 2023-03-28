@@ -207,20 +207,16 @@ public class Wrist extends SubsystemBase
     SmartDashboard.putBoolean("HL_validWR", m_wristValid);
 
     // Initialize Variables
-    SmartDashboard.putNumber("WR_velocity", m_velocity);
-    SmartDashboard.putNumber("WR_acceleration", m_acceleration);
-    SmartDashboard.putNumber("WR_sCurveStrength", m_sCurveStrength);
-    SmartDashboard.putNumber("WR_pidKf", m_pidKf);
-    SmartDashboard.putNumber("WR_pidKp", m_pidKp);
-    SmartDashboard.putNumber("WR_pidKi", m_pidKi);
-    SmartDashboard.putNumber("WR_pidKd", m_pidKd);
-
-    SmartDashboard.putNumber("WR_angleStow", m_wristAngleStow);
-    SmartDashboard.putNumber("WR_angleIdle", m_wristAngleIdle);
-    SmartDashboard.putNumber("WR_angleLow", m_wristAngleLow);
-    SmartDashboard.putNumber("WR_angleMid", m_wristAngleMid);
-    SmartDashboard.putNumber("WR_angleHigh", m_wristAngleHigh);
-    SmartDashboard.putNumber("WR_angleShelf", m_wristAngleShelf);
+    if (m_wristDebug)
+    {
+      SmartDashboard.putNumber("WR_velocity", m_velocity);
+      SmartDashboard.putNumber("WR_acceleration", m_acceleration);
+      SmartDashboard.putNumber("WR_sCurveStrength", m_sCurveStrength);
+      SmartDashboard.putNumber("WR_pidKf", m_pidKf);
+      SmartDashboard.putNumber("WR_pidKp", m_pidKp);
+      SmartDashboard.putNumber("WR_pidKi", m_pidKi);
+      SmartDashboard.putNumber("WR_pidKd", m_pidKd);
+    }
 
     SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
     SmartDashboard.putNumber("WR_targetDegrees", m_wristTargetDegrees);
@@ -411,13 +407,6 @@ public class Wrist extends SubsystemBase
       m_wrist.config_kP(SLOTINDEX, m_pidKp);
       m_wrist.config_kI(SLOTINDEX, m_pidKi);
       m_wrist.config_kD(SLOTINDEX, m_pidKd);
-
-      m_wristAngleStow = SmartDashboard.getNumber("WR_angleStow", m_wristAngleStow);
-      m_wristAngleIdle = SmartDashboard.getNumber("WR_angleIdle", m_wristAngleIdle);
-      m_wristAngleLow = SmartDashboard.getNumber("WR_angleLow", m_wristAngleLow);
-      m_wristAngleMid = SmartDashboard.getNumber("WR_angleMid", m_wristAngleMid);
-      m_wristAngleHigh = SmartDashboard.getNumber("WR_angleHigh", m_wristAngleHigh);
-      m_wristAngleShelf = SmartDashboard.getNumber("WR_angleShelf", m_wristAngleShelf);
     }
 
     if (angle != m_wristAngle)
@@ -458,8 +447,6 @@ public class Wrist extends SubsystemBase
           break;
       }
     }
-
-    DataLogManager.log(String.format("%s: TARGET ANGLE %.1f", getSubsystem( ), m_wristTargetDegrees));
 
     if (WRConsts.kWristCalibrated && moveIsInRange(Math.abs(m_wristTargetDegrees - m_wristCurDegrees)))
     {
