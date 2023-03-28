@@ -228,8 +228,8 @@ public class Constants
 
     // Extension lengths increase by 0.95" per 90 degrees of elbow rotation (lengths manually adjusted below)
     public static final double  kExtensionLengthMin        = -0.5;  // Extension minimum allowable length (half inch less than stowed)
-    public static final double  kExtensionLengthStow       = 0.25;   // By definition - extension fully retracted
-    public static final double  kExtensionLengthIdle       = 0.25;  // Slightly off mechanical hard stop
+    public static final double  kExtensionLengthStow       = 0.25;  // By definition - extension fully retracted
+    public static final double  kExtensionLengthIdle       = 0.5;  // Slightly off mechanical hard stop
     public static final double  kExtensionLengthScoreLow   = 9.0;  // From Mech Design (floor, feet art 5" high), empirically checked
     public static final double  kExtensionLengthScoreMid   = 1.25;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), empirically checked
     public static final double  kExtensionLengthScoreHigh  = 16.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked
@@ -276,7 +276,7 @@ public class Constants
     }
 
     public static final double kExtensionNeutralDeadband  = 0.02;   // Extension motor output deadband
-    public static final int    kExtensionMMVelocity       = 12485;  // Extension motion magic velocity (0.625 of max motor RPM)
+    public static final int    kExtensionMMVelocity       = 18728;  // Extension motion magic velocity (0.625 of max motor RPM)
     public static final int    kExtensionMMAcceleration   = 12485;  // Extension motion magic acceleration (target velocity in 4/3s)
     public static final int    kExtensionMMSCurveStrength = 1;      // Extension motion magic S curve smoothing strength
     public static final double kExtensionPidKf            = 0.0461; // Extension PID force constant
@@ -284,7 +284,7 @@ public class Constants
     public static final double kExtensionPidKi            = 0.0;    // Extension PID integral constant
     public static final double kExtensionPidKd            = 0.0;    // Extension PID derivative constant
     public static final int    kExtensionAllowedError     = 0;      // Extension PID allowable closed loop error in counts
-    public static final double kExtensionToleranceInches  = 0.5;    // Extension PID tolerance in inches
+    public static final double kExtensionToleranceInches  = 1;    // Extension PID tolerance in inches
     public static final double kExtensionArbitraryFF      = -0.030; // Extension motor output for extension when fully retracted
     public static final double kMMSafetyTimeout           = 2.0;    // Seconds allowed for a Motion Magic movement
   }
@@ -351,7 +351,7 @@ public class Constants
 
     public static final double kWristNeutralDeadband  = 0.02;   // Wrist motor output deadband
     public static final int    kWristMMVelocity       = 12075;  // Wrist motion magic velocity (75% of max motor RPM)
-    public static final int    kWristMMAcceleration   = 24151;  // Wrist motion magic acceleration (target velocity in 1/2s)
+    public static final int    kWristMMAcceleration   = 16100;  // Wrist motion magic acceleration (target velocity in 1/2s)
     public static final int    kWristMMSCurveStrength = 1;      // Wrist motion magic S curve smoothing strength
     public static final double kWristPidKf            = 0.0466; // Wrist PID force constant
     public static final double kWristPidKp            = 0.01968; // Wrist PID proportional constant

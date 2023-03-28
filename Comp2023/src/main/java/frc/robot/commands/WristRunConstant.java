@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.WRConsts;
@@ -32,7 +33,7 @@ public class WristRunConstant extends CommandBase
   @Override
   public void execute( )
   {
-    m_wrist.moveWristConstantSpeed(m_moveUp ? 1 : -1);
+    m_wrist.moveWristConstantSpeed(m_moveUp ? 2.0 : -2.0);
   }
 
   // Called once the command ends or is interrupted.

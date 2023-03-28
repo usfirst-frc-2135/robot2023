@@ -365,7 +365,7 @@ public class Wrist extends SubsystemBase
     m_wristTargetDegrees = m_wristCurDegrees;
 
     if (m_wristValid)
-      m_wrist.set(ControlMode.PercentOutput, axisValue * WRConsts.kWristSpeedMaxManual);
+      m_wrist.set(ControlMode.PercentOutput, axisValue);
   }
 
   public void setWristStopped( )
