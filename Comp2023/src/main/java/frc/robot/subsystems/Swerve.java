@@ -702,11 +702,9 @@ public class Swerve extends SubsystemBase
 
   public void resetOdometry(Pose2d pose)
   {
-    DataLogManager.log("GYRO BEFORE: " + m_pigeon.getYaw( ));
-    DataLogManager.log("Position Before : " + m_poseEstimator.getEstimatedPosition( ));
+    DataLogManager.log("Position Before : " + m_poseEstimator.getEstimatedPosition( ) + "Gyro : " + m_pigeon.getYaw( ));
     m_poseEstimator.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
-    DataLogManager.log("GYRO AFTER: " + m_pigeon.getYaw( ));
-    DataLogManager.log("Position After : " + m_poseEstimator.getEstimatedPosition( ));
+    DataLogManager.log("Position After : " + m_poseEstimator.getEstimatedPosition( ) + "Gyro : " + m_pigeon.getYaw( ));
   }
 
   public void resetLimelightOdometry(Pose2d pose)
