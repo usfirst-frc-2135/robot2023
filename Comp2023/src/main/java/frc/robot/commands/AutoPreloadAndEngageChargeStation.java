@@ -29,16 +29,16 @@ public class AutoPreloadAndEngageChargeStation extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
-        new PrintCommand(getName() + ": AUTO: Preload"),        
+        new PrintCommand(getName() + ": Score Preload"),        
         new ExtensionCalibrate(extension).asProxy(), 
         new AutoPreloadHigh(elbow, extension, wrist, gripper),
 
         new GripperRun(gripper, GRMode.GR_STOP),
         
-        new PrintCommand(getName() + ": AUTO: Run to ChargeStation"),
+        new PrintCommand(getName() + ": Drive to ChargeStation"),
         new AutoEngageChargeStation(swerve, pathName, trajectory),
 
-        new PrintCommand(getName() + ": AUTO: Hold in place"),
+        new PrintCommand(getName() + ": Hold in place"),
         new AutoStop(swerve)
         // @formatter:on
     );
