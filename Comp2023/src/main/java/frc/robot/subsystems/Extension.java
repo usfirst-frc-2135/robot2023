@@ -93,7 +93,7 @@ public class Extension extends SubsystemBase
   private boolean                         m_calibrated            = EXConsts.kExtensionCalibrated;  // Indicates whether the extension has been calibrated
 
   private Timer                           m_safetyTimer           = new Timer( ); // Safety timer for use in extension
-
+  private double                          m_extensionDistTravelled;
   private int                             maxVelocity;
 
   // Constructor
@@ -443,6 +443,8 @@ public class Extension extends SubsystemBase
 
   public void moveExtensionLengthExecute( )
   {
+    m_extensionDistTravelled = Math.abs(m_extensionTargetInches - m_extensionCurInches);
+
     if (m_extensionValid && EXConsts.kExtensionCalibrated)
       m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches), DemandType.ArbitraryFeedForward,
           m_extensionTotalFF);
@@ -468,7 +470,7 @@ public class Extension extends SubsystemBase
       m_withinTolerance = 0;
     }
 
-    if (m_safetyTimer.hasElapsed(m_extensionTargetInches * EXConsts.kMMSafetyTimeoutRatio + 0.2))
+    if (m_safetyTimer.hasElapsed(m_extensionDistTravelled * EXConsts.kMMSafetyTimeoutRatio + 0.2))
     {
       m_moveIsFinished = true;
       DataLogManager.log(getSubsystem( ) + ": Move Safety timer has timed out! " + m_safetyTimer.get( ));
