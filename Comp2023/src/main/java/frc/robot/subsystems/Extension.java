@@ -430,6 +430,7 @@ public class Extension extends SubsystemBase
         m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches),
             DemandType.ArbitraryFeedForward, m_extensionTotalFF);
 
+      m_extensionDistTravelled = Math.abs(m_extensionTargetInches - m_extensionCurInches);
       DataLogManager.log(String.format("%s: moving: %.1f -> %.1f inches | counts %.1f -> %.1f", getSubsystem( ),
           m_extensionCurInches, m_extensionTargetInches, m_extensionCurInches, m_extensionTargetInches));
     }
@@ -443,8 +444,6 @@ public class Extension extends SubsystemBase
 
   public void moveExtensionLengthExecute( )
   {
-    m_extensionDistTravelled = Math.abs(m_extensionTargetInches - m_extensionCurInches);
-
     if (m_extensionValid && EXConsts.kExtensionCalibrated)
       m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches), DemandType.ArbitraryFeedForward,
           m_extensionTotalFF);
