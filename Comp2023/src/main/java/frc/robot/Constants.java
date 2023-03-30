@@ -197,7 +197,7 @@ public class Constants
       ELBOW_SHELF         // Move elbow to substation loading shelf angle
     }
 
-    public static final double kElbowNeutralDeadband  = 0.02;   // Elbow motor output deadband
+    public static final double kElbowNeutralDeadband  = 0.001;  // Elbow motor output deadband
     public static final int    kElbowMMVelocity       = 16646;  // Elbow motion magic velocity (75% of max motor RPM)
     public static final int    kElbowMMAcceleration   = 16646 * 3 / 2;  // Elbow motion magic acceleration (target velocity in 2/3s)
     public static final int    kElbowMMSCurveStrength = 1;      // Elbow motion magic S curve smoothing strength
@@ -275,7 +275,7 @@ public class Constants
       EXTENSION_SHELF,        // Move extension to high-scoring length
     }
 
-    public static final double kExtensionNeutralDeadband  = 0.02;   // Extension motor output deadband
+    public static final double kExtensionNeutralDeadband  = 0.001;  // Extension motor output deadband
     public static final int    kExtensionMMVelocity       = 18728;  // Extension motion magic velocity (0.625 of max motor RPM)
     public static final int    kExtensionMMAcceleration   = 12485;  // Extension motion magic acceleration (target velocity in 4/3s)
     public static final int    kExtensionMMSCurveStrength = 1;      // Extension motion magic S curve smoothing strength
@@ -349,7 +349,7 @@ public class Constants
       WRIST_SCORE         // Move wrist to scoring height 
     }
 
-    public static final double kWristNeutralDeadband  = 0.02;   // Wrist motor output deadband
+    public static final double kWristNeutralDeadband  = 0.001;  // Wrist motor output deadband
     public static final int    kWristMMVelocity       = 12075;  // Wrist motion magic velocity (75% of max motor RPM)
     public static final int    kWristMMAcceleration   = 16100;  // Wrist motion magic acceleration (target velocity in 1/2s)
     public static final int    kWristMMSCurveStrength = 1;      // Wrist motion magic S curve smoothing strength
