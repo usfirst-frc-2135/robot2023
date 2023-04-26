@@ -5,6 +5,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.ELConsts.ElbowAngle;
 import frc.robot.Constants.EXConsts.ExtensionLength;
 import frc.robot.Constants.GRConsts;
@@ -32,7 +33,8 @@ public class AutoPreloadHigh extends SequentialCommandGroup
         new WristMoveToAngle(wrist, WristAngle.WRIST_STOW).asProxy(),
 
         new PrintCommand(getName() + ": Holding Game Piece"), 
-        new GripperRun(gripper, GRMode.GR_ACQUIRE).withTimeout(0.25),
+        new GripperRun(gripper, GRMode.GR_ACQUIRE),
+        new WaitCommand(0.25),
 
         new GripperRun(gripper, GRMode.GR_HOLD),  
 
