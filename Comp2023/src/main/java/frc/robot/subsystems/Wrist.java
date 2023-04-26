@@ -386,6 +386,11 @@ public class Wrist extends SubsystemBase
     return WRConsts.kWristArbitraryFF * Math.cos(Math.toRadians(elbowDegrees - wristDegrees));
   }
 
+  public void setMotorOutput(double brake)
+  {
+    m_wrist.set(ControlMode.PercentOutput, brake);
+  }
+
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
   public void moveWristAngleInit(WristAngle angle)
