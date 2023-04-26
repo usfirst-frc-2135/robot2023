@@ -147,7 +147,7 @@ public class Vision extends SubsystemBase
     DataLogManager.log(getSubsystem( ) + ": Subsystem initialized!");
 
     setLEDMode(VIConsts.LED_OFF);
-    //setCameraDisplay(VIConsts.PIP_SECONDARY);
+    setCameraDisplay(VIConsts.PIP_SECONDARY);
 
     syncStateFromDashboard( );
   }
