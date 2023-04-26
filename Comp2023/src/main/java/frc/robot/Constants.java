@@ -117,7 +117,7 @@ public class Constants
   {
     // Constants for balance
     public static final double kDriveBalancedAngle  = 5.0;    // Pitch values less than this stop driving
-    public static final double kDriveBalanceKp      = -0.045;  // Amount of power to apply per degree
+    public static final double kDriveBalanceKp      = -0.040;  // Amount of power to apply per degree
 
     // Limelight PID driving controls
     public static final double kTurnConstant        = 0.0;
@@ -154,9 +154,9 @@ public class Constants
     public static final double  kElbowAngleIdle       = 20.0;  // Slightly angled out, empirically checked
     public static final double  kElbowAngleScoreLow   = 35.0;  // From Mech Design (floor, feet art 5" high), empirically checked
     public static final double  kElbowAngleScoreMid   = 85.0;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), empirically checked
-    public static final double  kElbowAngleScoreHigh  = 95.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked
-    public static final double  kElbowAngleSubstation = 95.0;  // From Mech Design (3'1-38" above floor), empirical
-    public static final double  kElbowAngleMax        = 105.0; // Elbow maximum allowable degrees (10 deg more than high)
+    public static final double  kElbowAngleScoreHigh  = 98.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked
+    public static final double  kElbowAngleSubstation = 102.0;  // From Mech Design (3'1-38" above floor), empirical
+    public static final double  kElbowAngleMax        = 110.0; // Elbow maximum allowable degrees (10 deg more than high)
 
     // Current limit settings - elbow
     public static final double  kSupplyCurrentLimit   = 25.0;  // Supply current limit (after trigger)
@@ -169,7 +169,7 @@ public class Constants
     // CANCoder elbow absolute offset
     public static final boolean kInvertCANCoder       = true;  // CANCoder direction for positive angle in relative mode
     public static final boolean kElbowCalibrated      = true;  // Indicates whether the elbow has been calibrated by CANCoder
-    public static final double  kCompElbowOffset      = -169.1; // CANCoder offset angle for comp bot
+    public static final double  kCompElbowOffset      = -107.139; // CANCoder offset angle for comp bot
     public static final double  kBetaElbowOffset      = 0.000; // (TODO: Beta requires an offset) CANCoder offset angle for beta bot
 
     // Manual config parameters
@@ -224,17 +224,17 @@ public class Constants
     // public static final double  kForearmLengthMeters        = 1.22;   // Sim value: 48 inches (no sim for extension)
     // public static final double  kForearmMassKg              = 6.0;    // Sim value: 13.2 lbs 
     public static final boolean kInvertMotor               = true;  // Motor direction for positive input
-    public static final double  kSpeedCalibrate            = -0.12; // Motor percent output during calibration
+    public static final double  kSpeedCalibrate            = -0.15; // Motor percent output during calibration
 
     // Extension lengths increase by 0.95" per 90 degrees of elbow rotation (lengths manually adjusted below)
     public static final double  kExtensionLengthMin        = -0.5;  // Extension minimum allowable length (half inch less than stowed)
-    public static final double  kExtensionLengthStow       = 0.25;  // By definition - extension fully retracted
-    public static final double  kExtensionLengthIdle       = 0.5;  // Slightly off mechanical hard stop
-    public static final double  kExtensionLengthScoreLow   = 9.0;  // From Mech Design (floor, feet art 5" high), empirically checked
+    public static final double  kExtensionLengthStow       = 0.0;  // By definition - extension fully retracted
+    public static final double  kExtensionLengthIdle       = 0.25;   // Slightly off mechanical hard stop
+    public static final double  kExtensionLengthScoreLow   = 8.0;   // From Mech Design (floor, feet art 5" high), empirically checked
     public static final double  kExtensionLengthScoreMid   = 1.25;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), empirically checked
-    public static final double  kExtensionLengthScoreHigh  = 16.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked
+    public static final double  kExtensionLengthScoreHigh  = 17.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked
     public static final double  kExtensionLengthSubstation = 1.25;  // From Mech Design (3'1-38" above floor)
-    public static final double  kExtensionLengthMax        = 17.0;  // Extension maximum allowable length (2" beyond high length)
+    public static final double  kExtensionLengthMax        = 18.0;  // Extension maximum allowable length (2" beyond high length)
 
     // Current limit settings - extension
     public static final double  kSupplyCurrentLimit        = 15.0;  // Supply current limit (after trigger)
@@ -284,9 +284,9 @@ public class Constants
     public static final double kExtensionPidKi            = 0.0;    // Extension PID integral constant
     public static final double kExtensionPidKd            = 0.0;    // Extension PID derivative constant
     public static final int    kExtensionAllowedError     = 0;      // Extension PID allowable closed loop error in counts
-    public static final double kExtensionToleranceInches  = 1;      // Extension PID tolerance in inches
+    public static final double kExtensionToleranceInches  = 0.5;    // Extension PID tolerance in inches
     public static final double kExtensionArbitraryFF      = -0.030; // Extension motor output for extension when fully retracted
-    public static final double kMMSafetyTimeoutRatio      = .13;    // Seconds allowed for a Motion Magic movement
+    public static final double kMMSafetyTimeoutRatio      = 0.16;    // Seconds allowed for a Motion Magic movement
   }
 
   public static final class WRConsts
@@ -301,12 +301,12 @@ public class Constants
 
     public static final double  kWristAngleMin        = -2.0;  // Wrist minimum allowable angle (a few degrees less than stowed)
     public static final double  kWristAngleStow       = 0.0;   // By definition - wrist is 90 degrees perpendicular to arm
-    public static final double  kWristAngleIdle       = 5.0;   // Slightly off stowed value
+    public static final double  kWristAngleIdle       = 2.0;   // Slightly off stowed value
     public static final double  kWristAngleScoreLow   = 33.0;  // From Mech Design (floor, feet art 5" high), empirically checked
     public static final double  kWristAngleScoreMid   = kWristAngleIdle;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), ready to score
     public static final double  kWristAngleScoreHigh  = kWristAngleIdle;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
     public static final double  kWristAngleScore      = 90;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
-    public static final double  kWristAngleSubstation = 103.0; // From Mech Design (3'1-38" above floor)
+    public static final double  kWristAngleSubstation = 100.0; // From Mech Design (3'1-38" above floor)
     public static final double  kWristAngleMax        = 110.0; // Wrist maximum allowable angle (a few degrees more than substation/horizontal)
 
     // Current limit settings - wrist
@@ -320,7 +320,7 @@ public class Constants
     // CANCoder wrist absolute offset
     public static final boolean kInvertCANCoder       = true;  // CANCoder direction for positive angle in relative mode
     public static final boolean kWristCalibrated      = true;  // Indicates whether the wrist has been calibrated by CANCoder
-    public static final double  kCompWristOffset      = 132.7; // CANCoder offset angle for comp bot
+    public static final double  kCompWristOffset      = 133.418; // CANCoder offset angle for comp bot
     public static final double  kBetaWristOffset      = 0.000; // CANCoder offset angle for beta bot
 
     // Manual config parameters
@@ -383,7 +383,7 @@ public class Constants
     }
 
     public static final double kGripperSpeedAcquire = 1.0;  // Acquire game piece from loading station or floor
-    public static final double kGripperSpeedHold    = 0.1;  // Hold game piece while traversing the field (must be < 2V equiv)
+    public static final double kGripperSpeedHold    = 0.15;  // Hold game piece while traversing the field (must be < 2V equiv)
     public static final double kGripperSpeedExpel   = -0.2; // Score game piece on cone node or cube shelf
   }
 
