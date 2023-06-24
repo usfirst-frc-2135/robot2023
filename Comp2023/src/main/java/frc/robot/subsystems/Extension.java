@@ -66,15 +66,6 @@ public class Extension extends SubsystemBase
   private int                             m_extensionAllowedError = EXConsts.kExtensionAllowedError;      // PID allowable closed loop error
   private double                          m_toleranceInches       = EXConsts.kExtensionToleranceInches;   // PID tolerance in inches
 
-  private double                          m_extensionLengthMin    = EXConsts.kExtensionLengthMin;          // minimum extension allowable length
-  private double                          m_extensionLengthStow   = EXConsts.kExtensionLengthStow;         // extension Stow length
-  private double                          m_extensionLengthIdle   = EXConsts.kExtensionLengthIdle;         // extension Stow length
-  private double                          m_extensionLengthLow    = EXConsts.kExtensionLengthScoreLow;     // low-peg scoring length   
-  private double                          m_extensionLengthMid    = EXConsts.kExtensionLengthScoreMid;     // mid-peg scoring length
-  private double                          m_extensionLengthHigh   = EXConsts.kExtensionLengthScoreHigh;    // high-peg scoring length
-  private double                          m_extensionLengthShelf  = EXConsts.kExtensionLengthSubstation;   // substation loading shelf
-  private double                          m_extensionLengthMax    = EXConsts.kExtensionLengthMax;          // maximum extension allowable length
-
   private double                          m_stickDeadband         = Constants.kStickDeadband;              // joystick deadband
   private ExtensionMode                   m_extensionMode         = ExtensionMode.EXTENSION_INIT;          // Mode active with joysticks
 
@@ -219,7 +210,7 @@ public class Extension extends SubsystemBase
 
   public boolean moveIsInRange(double inches)
   {
-    return (inches > m_extensionLengthMin) && (inches < m_extensionLengthMax);
+    return (inches > EXConsts.kExtensionLengthMin) && (inches < EXConsts.kExtensionLengthMax);
   }
 
   public double getInches( )
@@ -288,14 +279,14 @@ public class Extension extends SubsystemBase
 
     if (axisValue < 0.0)
     {
-      if (m_extensionCurInches > m_extensionLengthMin)
+      if (m_extensionCurInches > EXConsts.kExtensionLengthMin)
         newMode = ExtensionMode.EXTENSION_IN;
       else
         outOfRange = true;
     }
     else if (axisValue > 0.0)
     {
-      if (m_extensionCurInches < m_extensionLengthMax)
+      if (m_extensionCurInches < EXConsts.kExtensionLengthMax)
         newMode = ExtensionMode.EXTENSION_OUT;
       else
         outOfRange = true;
@@ -383,22 +374,22 @@ public class Extension extends SubsystemBase
             m_extensionTargetInches = 0.25;
           break;
         case EXTENSION_STOW :
-          m_extensionTargetInches = m_extensionLengthStow;
+          m_extensionTargetInches = EXConsts.kExtensionLengthStow;
           break;
         case EXTENSION_IDLE :
-          m_extensionTargetInches = m_extensionLengthIdle;
+          m_extensionTargetInches = EXConsts.kExtensionLengthIdle;
           break;
         case EXTENSION_LOW :
-          m_extensionTargetInches = m_extensionLengthLow;
+          m_extensionTargetInches = EXConsts.kExtensionLengthScoreLow;
           break;
         case EXTENSION_MID :
-          m_extensionTargetInches = m_extensionLengthMid;
+          m_extensionTargetInches = EXConsts.kExtensionLengthScoreMid;
           break;
         case EXTENSION_HIGH :
-          m_extensionTargetInches = m_extensionLengthHigh;
+          m_extensionTargetInches = EXConsts.kExtensionLengthScoreHigh;
           break;
         case EXTENSION_SHELF :
-          m_extensionTargetInches = m_extensionLengthShelf;
+          m_extensionTargetInches = EXConsts.kExtensionLengthSubstation;
           break;
       }
     }
@@ -409,7 +400,7 @@ public class Extension extends SubsystemBase
       if (!moveIsInRange(m_extensionTargetInches))
       {
         DataLogManager.log(String.format("%s: Target %.1f inches is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
-            m_extensionTargetInches, m_extensionLengthMin, m_extensionLengthMax));
+            m_extensionTargetInches, EXConsts.kExtensionLengthMin, EXConsts.kExtensionLengthMax));
         m_extensionTargetInches = m_extensionCurInches;
       }
 
