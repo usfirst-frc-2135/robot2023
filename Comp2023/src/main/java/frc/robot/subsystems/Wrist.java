@@ -77,10 +77,6 @@ public class Wrist extends SubsystemBase
   private int                             m_velocity            = WRConsts.kWristMMVelocity;         // motion magic velocity
   private int                             m_acceleration        = WRConsts.kWristMMAcceleration;     // motion magic acceleration
   private int                             m_sCurveStrength      = WRConsts.kWristMMSCurveStrength;   // motion magic S curve smoothing
-  private double                          m_pidKf               = WRConsts.kWristPidKf;              // PID force constant
-  private double                          m_pidKp               = WRConsts.kWristPidKp;              // PID proportional
-  private double                          m_pidKi               = WRConsts.kWristPidKi;              // PID integral
-  private double                          m_pidKd               = WRConsts.kWristPidKd;              // PID derivative
   private int                             m_wristAllowedError   = WRConsts.kWristAllowedError;       // PID allowable closed loop error
   private double                          m_toleranceDegrees    = WRConsts.kWristToleranceDegrees;   // PID tolerance in Degrees
 
@@ -212,10 +208,6 @@ public class Wrist extends SubsystemBase
       SmartDashboard.putNumber("WR_velocity", m_velocity);
       SmartDashboard.putNumber("WR_acceleration", m_acceleration);
       SmartDashboard.putNumber("WR_sCurveStrength", m_sCurveStrength);
-      SmartDashboard.putNumber("WR_pidKf", m_pidKf);
-      SmartDashboard.putNumber("WR_pidKp", m_pidKp);
-      SmartDashboard.putNumber("WR_pidKi", m_pidKi);
-      SmartDashboard.putNumber("WR_pidKd", m_pidKd);
     }
 
     SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
@@ -302,13 +294,13 @@ public class Wrist extends SubsystemBase
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionSCurveStrength");
 
     // Configure Magic Motion settings
-    motor.config_kF(0, m_pidKf, Constants.kLongCANTimeoutMs);
+    motor.config_kF(0, WRConsts.kWristPidKf, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kF");
-    motor.config_kP(0, m_pidKp, Constants.kLongCANTimeoutMs);
+    motor.config_kP(0, WRConsts.kWristPidKp, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kP");
-    motor.config_kI(0, m_pidKi, Constants.kLongCANTimeoutMs);
+    motor.config_kI(0, WRConsts.kWristPidKi, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kI");
-    motor.config_kD(0, m_pidKd, Constants.kLongCANTimeoutMs);
+    motor.config_kD(0, WRConsts.kWristPidKd, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kD");
     motor.selectProfileSlot(SLOTINDEX, PIDINDEX);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "selectProfileSlot");
@@ -400,18 +392,14 @@ public class Wrist extends SubsystemBase
       m_velocity = (int) SmartDashboard.getNumber("WR_velocity", m_velocity);
       m_acceleration = (int) SmartDashboard.getNumber("WR_acceleration", m_acceleration);
       m_sCurveStrength = (int) SmartDashboard.getNumber("WR_sCurveStrength", m_sCurveStrength);
-      m_pidKf = SmartDashboard.getNumber("WR_pidKf", m_pidKf);
-      m_pidKp = SmartDashboard.getNumber("WR_pidKp", m_pidKp);
-      m_pidKi = SmartDashboard.getNumber("WR_pidKi", m_pidKi);
-      m_pidKd = SmartDashboard.getNumber("WR_pidKd", m_pidKd);
 
       m_wrist.configMotionCruiseVelocity(m_velocity);
       m_wrist.configMotionAcceleration(m_acceleration);
       m_wrist.configMotionSCurveStrength(m_sCurveStrength);
-      m_wrist.config_kF(SLOTINDEX, m_pidKf);
-      m_wrist.config_kP(SLOTINDEX, m_pidKp);
-      m_wrist.config_kI(SLOTINDEX, m_pidKi);
-      m_wrist.config_kD(SLOTINDEX, m_pidKd);
+      m_wrist.config_kF(SLOTINDEX, WRConsts.kWristPidKf);
+      m_wrist.config_kP(SLOTINDEX, WRConsts.kWristPidKp);
+      m_wrist.config_kI(SLOTINDEX, WRConsts.kWristPidKi);
+      m_wrist.config_kD(SLOTINDEX, WRConsts.kWristPidKd);
     }
 
     if (angle != m_wristAngle)
