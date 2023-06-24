@@ -5,9 +5,9 @@ package frc.robot.commands;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
 
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
@@ -29,18 +29,18 @@ public class AutoPreloadAndEngageChargeStation extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
-        new PrintCommand(getName() + ": AUTO: Preload"),        
-        new ParallelDeadlineGroup(
-          new ExtensionCalibrate(extension), 
-          new GripperRun(gripper, GRMode.GR_EXPEL)
-        ),
+        new PrintCommand(getName() + ": Score Preload"),        
+        new ExtensionCalibrate(extension).asProxy(), 
+        new ArmSetHeightIdle(elbow, extension, wrist),
+        new GripperRun(gripper, GRMode.GR_EXPEL),
+        new WaitCommand(0.25),
 
         new GripperRun(gripper, GRMode.GR_STOP),
         
-        new PrintCommand(getName() + ": AUTO: Run to ChargeStation"),
+        new PrintCommand(getName() + ": Drive to ChargeStation"),
         new AutoEngageChargeStation(swerve, pathName, trajectory),
 
-        new PrintCommand(getName() + ": AUTO: Hold in place"),
+        new PrintCommand(getName() + ": Hold in place"),
         new AutoStop(swerve)
         // @formatter:on
     );

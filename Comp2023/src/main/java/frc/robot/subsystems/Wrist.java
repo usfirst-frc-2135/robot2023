@@ -126,7 +126,7 @@ public class Wrist extends SubsystemBase
     if (m_wristCCValid)
     {
       m_wristCANCoder.configAllSettings(CTREConfigs.wristCancoderConfig( ));
-      double m_wristCurDegrees = getCanCoder( ).getDegrees( );
+      m_wristCurDegrees = getCanCoder( ).getDegrees( );
 
       // Slow status frame updates AFTER getting the absolute position
       m_wristCANCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
@@ -207,20 +207,16 @@ public class Wrist extends SubsystemBase
     SmartDashboard.putBoolean("HL_validWR", m_wristValid);
 
     // Initialize Variables
-    SmartDashboard.putNumber("WR_velocity", m_velocity);
-    SmartDashboard.putNumber("WR_acceleration", m_acceleration);
-    SmartDashboard.putNumber("WR_sCurveStrength", m_sCurveStrength);
-    SmartDashboard.putNumber("WR_pidKf", m_pidKf);
-    SmartDashboard.putNumber("WR_pidKp", m_pidKp);
-    SmartDashboard.putNumber("WR_pidKi", m_pidKi);
-    SmartDashboard.putNumber("WR_pidKd", m_pidKd);
-
-    SmartDashboard.putNumber("WR_angleStow", m_wristAngleStow);
-    SmartDashboard.putNumber("WR_angleIdle", m_wristAngleIdle);
-    SmartDashboard.putNumber("WR_angleLow", m_wristAngleLow);
-    SmartDashboard.putNumber("WR_angleMid", m_wristAngleMid);
-    SmartDashboard.putNumber("WR_angleHigh", m_wristAngleHigh);
-    SmartDashboard.putNumber("WR_angleShelf", m_wristAngleShelf);
+    if (m_wristDebug)
+    {
+      SmartDashboard.putNumber("WR_velocity", m_velocity);
+      SmartDashboard.putNumber("WR_acceleration", m_acceleration);
+      SmartDashboard.putNumber("WR_sCurveStrength", m_sCurveStrength);
+      SmartDashboard.putNumber("WR_pidKf", m_pidKf);
+      SmartDashboard.putNumber("WR_pidKp", m_pidKp);
+      SmartDashboard.putNumber("WR_pidKi", m_pidKi);
+      SmartDashboard.putNumber("WR_pidKd", m_pidKd);
+    }
 
     SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
     SmartDashboard.putNumber("WR_targetDegrees", m_wristTargetDegrees);
@@ -323,6 +319,16 @@ public class Wrist extends SubsystemBase
   public void moveWristWithJoystick(XboxController joystick)
   {
     double axisValue = -joystick.getRightY( );
+    moveWristInput(axisValue);
+  }
+
+  public void moveWristConstantSpeed(double speed)
+  {
+    moveWristInput(speed);
+  }
+
+  public void moveWristInput(double axisValue)
+  {
     boolean outOfRange = false;
     WristMode newMode = WristMode.WRIST_STOPPED;
 
@@ -355,7 +361,7 @@ public class Wrist extends SubsystemBase
     m_wristTargetDegrees = m_wristCurDegrees;
 
     if (m_wristValid)
-      m_wrist.set(ControlMode.PercentOutput, axisValue * WRConsts.kWristSpeedMaxManual + m_wristTotalFF);
+      m_wrist.set(ControlMode.PercentOutput, axisValue);
   }
 
   public void setWristStopped( )
@@ -380,6 +386,11 @@ public class Wrist extends SubsystemBase
     return WRConsts.kWristArbitraryFF * Math.cos(Math.toRadians(elbowDegrees - wristDegrees));
   }
 
+  public void setMotorOutput(double brake)
+  {
+    m_wrist.set(ControlMode.PercentOutput, brake);
+  }
+
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
   public void moveWristAngleInit(WristAngle angle)
@@ -401,13 +412,6 @@ public class Wrist extends SubsystemBase
       m_wrist.config_kP(SLOTINDEX, m_pidKp);
       m_wrist.config_kI(SLOTINDEX, m_pidKi);
       m_wrist.config_kD(SLOTINDEX, m_pidKd);
-
-      m_wristAngleStow = SmartDashboard.getNumber("WR_angleStow", m_wristAngleStow);
-      m_wristAngleIdle = SmartDashboard.getNumber("WR_angleIdle", m_wristAngleIdle);
-      m_wristAngleLow = SmartDashboard.getNumber("WR_angleLow", m_wristAngleLow);
-      m_wristAngleMid = SmartDashboard.getNumber("WR_angleMid", m_wristAngleMid);
-      m_wristAngleHigh = SmartDashboard.getNumber("WR_angleHigh", m_wristAngleHigh);
-      m_wristAngleShelf = SmartDashboard.getNumber("WR_angleShelf", m_wristAngleShelf);
     }
 
     if (angle != m_wristAngle)
@@ -446,10 +450,8 @@ public class Wrist extends SubsystemBase
         case WRIST_SCORE :
           m_wristTargetDegrees = m_wristAngleScore;
           break;
-      }   
+      }
     }
-
-    DataLogManager.log(String.format("%s: TARGET ANGLE %.1f", getSubsystem( ), m_wristTargetDegrees));
 
     if (WRConsts.kWristCalibrated && moveIsInRange(Math.abs(m_wristTargetDegrees - m_wristCurDegrees)))
     {
@@ -493,7 +495,7 @@ public class Wrist extends SubsystemBase
 
     if (Math.abs(errorInDegrees) < m_toleranceDegrees)
     {
-      if (++m_withinTolerance >= 5)
+      if (++m_withinTolerance >= 3)
       {
         m_moveIsFinished = true;
         DataLogManager.log(String.format("%s: move finished - Time: %.3f  |  Cur degrees: %.1f", getSubsystem( ),
@@ -508,7 +510,7 @@ public class Wrist extends SubsystemBase
     if (m_safetyTimer.hasElapsed(WRConsts.kMMSafetyTimeout))
     {
       m_moveIsFinished = true;
-      DataLogManager.log(getSubsystem( ) + ": Move Safety timer has timed out!");
+      DataLogManager.log(getSubsystem( ) + ": Move Safety timer has timed out! " + m_safetyTimer.get( ));
     }
 
     if (m_moveIsFinished)
@@ -525,6 +527,7 @@ public class Wrist extends SubsystemBase
     m_moveIsFinished = false;
     m_withinTolerance = 0;
     m_safetyTimer.stop( );
+    m_wrist.set(0.0);
   }
 
 }

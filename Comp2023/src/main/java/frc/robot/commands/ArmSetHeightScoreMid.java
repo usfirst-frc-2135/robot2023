@@ -27,29 +27,29 @@ public class ArmSetHeightScoreMid extends SequentialCommandGroup
 
         // @formatter:off
         new PrintCommand(getName()+": Retract Extension"),
-        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_STOW),
+        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_IDLE).asProxy(),
 
         new ConditionalCommand(
           new SequentialCommandGroup(
             new PrintCommand(getName() + ": Move Wrist"),
-            new WristMoveToAngle(wrist, WristAngle.WRIST_STOW),
+            new WristMoveToAngle(wrist, WristAngle.WRIST_MID).asProxy(),
 
             new PrintCommand(getName() + ": Move Elbow"),
-            new ElbowMoveToAngle(elbow,  ElbowAngle.ELBOW_MID)
+            new ElbowMoveToAngle(elbow,  ElbowAngle.ELBOW_MID).asProxy()
           ),
 
           new SequentialCommandGroup(
             new PrintCommand(getName() + ": Move Wrist"),
-            new WristMoveToAngle(wrist, WristAngle.WRIST_STOW),
+            new WristMoveToAngle(wrist, WristAngle.WRIST_MID).asProxy(),
            
             new PrintCommand(getName() + ": Move Elbow"),
-            new ElbowMoveToAngle(elbow,  ElbowAngle.ELBOW_MID)
+            new ElbowMoveToAngle(elbow,  ElbowAngle.ELBOW_MID).asProxy()
           ),
           elbow::isElbowBelowMid
         ),
 
         new PrintCommand(getName() + ": Extend Extension"),
-        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_MID)
+        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_MID).asProxy()
         // @formatter:on
     );
   }

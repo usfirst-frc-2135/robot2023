@@ -126,7 +126,7 @@ public class Elbow extends SubsystemBase
     if (m_elbowCCValid)
     {
       m_elbowCANCoder.configAllSettings(CTREConfigs.elbowCancoderConfig( ));
-      double m_elbowCurDegrees = getCanCoder( ).getDegrees( );
+      m_elbowCurDegrees = getCanCoder( ).getDegrees( );
 
       // Slow status frame updates AFTER getting the absolute position
       m_elbowCANCoder.setStatusFramePeriod(CANCoderStatusFrame.SensorData, 255);
@@ -208,20 +208,16 @@ public class Elbow extends SubsystemBase
     SmartDashboard.putBoolean("HL_validEL", m_elbowValid);
 
     // Initialize Variables
-    SmartDashboard.putNumber("EL_velocity", m_velocity);
-    SmartDashboard.putNumber("EL_acceleration", m_acceleration);
-    SmartDashboard.putNumber("EL_sCurveStrength", m_sCurveStrength);
-    SmartDashboard.putNumber("EL_pidKf", m_pidKf);
-    SmartDashboard.putNumber("EL_pidKp", m_pidKp);
-    SmartDashboard.putNumber("EL_pidKi", m_pidKi);
-    SmartDashboard.putNumber("EL_pidKd", m_pidKd);
-
-    SmartDashboard.putNumber("EL_angleStow", m_elbowAngleStow);
-    SmartDashboard.putNumber("EL_angleIdle", m_elbowAngleIdle);
-    SmartDashboard.putNumber("EL_angleLow", m_elbowAngleLow);
-    SmartDashboard.putNumber("EL_angleMid", m_elbowAngleMid);
-    SmartDashboard.putNumber("EL_angleHigh", m_elbowAngleHigh);
-    SmartDashboard.putNumber("EL_angleShelf", m_elbowAngleShelf);
+    if (m_elbowDebug)
+    {
+      SmartDashboard.putNumber("EL_velocity", m_velocity);
+      SmartDashboard.putNumber("EL_acceleration", m_acceleration);
+      SmartDashboard.putNumber("EL_sCurveStrength", m_sCurveStrength);
+      SmartDashboard.putNumber("EL_pidKf", m_pidKf);
+      SmartDashboard.putNumber("EL_pidKp", m_pidKp);
+      SmartDashboard.putNumber("EL_pidKi", m_pidKi);
+      SmartDashboard.putNumber("EL_pidKd", m_pidKd);
+    }
 
     SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
     SmartDashboard.putNumber("EL_targetDegrees", m_elbowTargetDegrees);
@@ -401,13 +397,6 @@ public class Elbow extends SubsystemBase
       m_elbow.config_kP(SLOTINDEX, m_pidKp);
       m_elbow.config_kI(SLOTINDEX, m_pidKi);
       m_elbow.config_kD(SLOTINDEX, m_pidKd);
-
-      m_elbowAngleStow = SmartDashboard.getNumber("EL_angleStow", m_elbowAngleStow);
-      m_elbowAngleIdle = SmartDashboard.getNumber("EL_angleIdle", m_elbowAngleIdle);
-      m_elbowAngleLow = SmartDashboard.getNumber("EL_angleLow", m_elbowAngleLow);
-      m_elbowAngleMid = SmartDashboard.getNumber("EL_angleMid", m_elbowAngleMid);
-      m_elbowAngleHigh = SmartDashboard.getNumber("EL_angleHigh", m_elbowAngleHigh);
-      m_elbowAngleShelf = SmartDashboard.getNumber("EL_angleShelf", m_elbowAngleShelf);
     }
 
     if (angle != m_elbowAngle)
@@ -445,8 +434,6 @@ public class Elbow extends SubsystemBase
           break;
       }
     }
-
-    DataLogManager.log(String.format("%s: TARGET ANGLE %.1f", getSubsystem( ), m_elbowTargetDegrees));
 
     if (ELConsts.kElbowCalibrated && moveIsInRange(Math.abs(m_elbowTargetDegrees - m_elbowCurDegrees)))
     {
@@ -490,7 +477,7 @@ public class Elbow extends SubsystemBase
 
     if (Math.abs(errorInDegrees) < m_toleranceDegrees)
     {
-      if (++m_withinTolerance >= 5)
+      if (++m_withinTolerance >= 3)
       {
         m_moveIsFinished = true;
         DataLogManager.log(String.format("%s: move finished - Time: %.3f  |  Cur degrees: %.1f", getSubsystem( ),
@@ -505,7 +492,7 @@ public class Elbow extends SubsystemBase
     if (m_safetyTimer.hasElapsed(ELConsts.kMMSafetyTimeout))
     {
       m_moveIsFinished = true;
-      DataLogManager.log(getSubsystem( ) + ": Move Safety timer has timed out!");
+      DataLogManager.log(getSubsystem( ) + ": Move Safety timer has timed out! " + m_safetyTimer.get( ));
     }
 
     if (m_moveIsFinished)
@@ -543,6 +530,7 @@ public class Elbow extends SubsystemBase
     m_moveIsFinished = false;
     m_withinTolerance = 0;
     m_safetyTimer.stop( );
+    m_elbow.set(0.0);
   }
 
 }

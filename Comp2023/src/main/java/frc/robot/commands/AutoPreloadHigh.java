@@ -5,6 +5,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.ELConsts.ElbowAngle;
 import frc.robot.Constants.EXConsts.ExtensionLength;
 import frc.robot.Constants.GRConsts;
@@ -29,26 +30,27 @@ public class AutoPreloadHigh extends SequentialCommandGroup
 
         // @formatter:off
         new PrintCommand(getName() + ": Making Sure Wrist is Set at Stow"),
-        new WristMoveToAngle(wrist, WristAngle.WRIST_STOW),
+        new WristMoveToAngle(wrist, WristAngle.WRIST_STOW).asProxy(),
 
         new PrintCommand(getName() + ": Holding Game Piece"), 
-        new GripperRun(gripper, GRMode.GR_ACQUIRE).withTimeout(0.5),
+        new GripperRun(gripper, GRMode.GR_ACQUIRE),
+        new WaitCommand(0.25),
 
         new GripperRun(gripper, GRMode.GR_HOLD),  
 
         new PrintCommand(getName() + ": Move Elbow for Preload"),   
-        new ElbowMoveToAngle(elbow, ElbowAngle.ELBOW_HIGH),
+        new ElbowMoveToAngle(elbow, ElbowAngle.ELBOW_HIGH).asProxy(),
 
         new PrintCommand(getName() + ": Move Extension for Preload"),   
-        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_HIGH),
+        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_HIGH).asProxy(),
 
         new PrintCommand(getName() + ": Move Wrist for Preload"),   
-        new WristMoveToAngle(wrist, WristAngle.WRIST_SCORE),
+        new WristMoveToAngle(wrist, WristAngle.WRIST_SCORE).asProxy(),
 
         new PrintCommand(getName() + ": AUTO: Gripper Score"),
-        new GripperRun(gripper, GRConsts.GRMode.GR_EXPEL).withTimeout(1.5),
+        new GripperRun(gripper, GRConsts.GRMode.GR_EXPEL),
 
-        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_STOW),
+        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_MID).asProxy(),
         new GripperRun(gripper, GRConsts.GRMode.GR_STOP),
 
         new PrintCommand(getName() + ": AUTO: Move Arm Down"),

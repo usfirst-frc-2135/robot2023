@@ -27,30 +27,30 @@ public class ArmSetHeightScoreLow extends SequentialCommandGroup
 
         // @formatter:off
         new PrintCommand(getName() + ": Retract Extension"),
-        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_STOW),
+        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_IDLE).asProxy(),
 
         new ConditionalCommand(
           new SequentialCommandGroup(
             new PrintCommand(getName() + ": Move Elbow"),
-            new ElbowMoveToAngle(elbow,  ElbowAngle.ELBOW_LOW),
+            new ElbowMoveToAngle(elbow,  ElbowAngle.ELBOW_LOW).asProxy(),
 
             new PrintCommand(getName() + ": Move Wrist"),
-            new WristMoveToAngle(wrist, WristAngle.WRIST_LOW)
+            new WristMoveToAngle(wrist, WristAngle.WRIST_LOW).asProxy()
           ),
 
           new SequentialCommandGroup(
             new PrintCommand(getName() + ": Move Wrist"),
-            new WristMoveToAngle(wrist, WristAngle.WRIST_LOW),
+            new WristMoveToAngle(wrist, WristAngle.WRIST_LOW).asProxy(),
 
             new PrintCommand(getName() + ": Move Elbow"),
-            new ElbowMoveToAngle(elbow,  ElbowAngle.ELBOW_LOW)
+            new ElbowMoveToAngle(elbow,  ElbowAngle.ELBOW_LOW).asProxy()
           ),
 
           elbow::isElbowBelowLow
         ),
 
         new PrintCommand(getName() + ": Extend Extension"),
-        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_LOW)
+        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_LOW).asProxy()
         // @formatter:on
     );
   }

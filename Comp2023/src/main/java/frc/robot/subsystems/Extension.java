@@ -93,7 +93,7 @@ public class Extension extends SubsystemBase
   private boolean                         m_calibrated            = EXConsts.kExtensionCalibrated;  // Indicates whether the extension has been calibrated
 
   private Timer                           m_safetyTimer           = new Timer( ); // Safety timer for use in extension
-
+  private double                          m_extensionDistTravelled;
   private int                             maxVelocity;
 
   // Constructor
@@ -179,20 +179,16 @@ public class Extension extends SubsystemBase
     SmartDashboard.putBoolean("HL_validEX", m_extensionValid);
 
     // Initialize Variables
-    SmartDashboard.putNumber("EX_velocity", m_velocity);
-    SmartDashboard.putNumber("EX_acceleration", m_acceleration);
-    SmartDashboard.putNumber("EX_sCurveStrength", m_sCurveStrength);
-    SmartDashboard.putNumber("EX_pidKf", m_pidKf);
-    SmartDashboard.putNumber("EX_pidKp", m_pidKp);
-    SmartDashboard.putNumber("EX_pidKi", m_pidKi);
-    SmartDashboard.putNumber("EX_pidKd", m_pidKd);
-
-    SmartDashboard.putNumber("EX_lengthStow", m_extensionLengthStow);
-    SmartDashboard.putNumber("EX_lengthIdle", m_extensionLengthIdle);
-    SmartDashboard.putNumber("EX_lengthLow", m_extensionLengthLow);
-    SmartDashboard.putNumber("EX_lengthMid", m_extensionLengthMid);
-    SmartDashboard.putNumber("EX_lengthHigh", m_extensionLengthHigh);
-    SmartDashboard.putNumber("EX_lengthShelf", m_extensionLengthShelf);
+    if (m_extensionDebug)
+    {
+      SmartDashboard.putNumber("EX_velocity", m_velocity);
+      SmartDashboard.putNumber("EX_acceleration", m_acceleration);
+      SmartDashboard.putNumber("EX_sCurveStrength", m_sCurveStrength);
+      SmartDashboard.putNumber("EX_pidKf", m_pidKf);
+      SmartDashboard.putNumber("EX_pidKp", m_pidKp);
+      SmartDashboard.putNumber("EX_pidKi", m_pidKi);
+      SmartDashboard.putNumber("EX_pidKd", m_pidKd);
+    }
 
     SmartDashboard.putNumber("EX_curInches", m_extensionCurInches);
     SmartDashboard.putNumber("EX_targetInches", m_extensionTargetInches);
@@ -337,10 +333,8 @@ public class Extension extends SubsystemBase
 
   public void moveToCalibrate( )
   {
-    double motorCalibrateSpeed = EXConsts.kSpeedCalibrate;
-
     if (m_extensionValid)
-      m_extension.set(ControlMode.PercentOutput, motorCalibrateSpeed);
+      m_extension.set(ControlMode.PercentOutput, EXConsts.kSpeedCalibrate);
   }
 
   public void calibrate( )
@@ -382,13 +376,6 @@ public class Extension extends SubsystemBase
       m_extension.config_kP(SLOTINDEX, m_pidKp);
       m_extension.config_kI(SLOTINDEX, m_pidKi);
       m_extension.config_kD(SLOTINDEX, m_pidKd);
-
-      m_extensionLengthStow = SmartDashboard.getNumber("EX_lengthStow", m_extensionLengthStow);
-      m_extensionLengthIdle = SmartDashboard.getNumber("EX_lengthIdle", m_extensionLengthIdle);
-      m_extensionLengthLow = SmartDashboard.getNumber("EX_lengthLow", m_extensionLengthLow);
-      m_extensionLengthMid = SmartDashboard.getNumber("EX_lengthMid", m_extensionLengthMid);
-      m_extensionLengthHigh = SmartDashboard.getNumber("EX_lengthHigh", m_extensionLengthHigh);
-      m_extensionLengthShelf = SmartDashboard.getNumber("EX_lengthShelf", m_extensionLengthShelf);
     }
 
     if (length != m_extensionLength)
@@ -427,8 +414,6 @@ public class Extension extends SubsystemBase
       }
     }
 
-    DataLogManager.log(String.format("%s: TARGET INCHES %.1f", getSubsystem( ), m_extensionTargetInches));
-
     if (EXConsts.kExtensionCalibrated)
     {
       // length constraint check/soft limit for max and min length before raising
@@ -445,6 +430,7 @@ public class Extension extends SubsystemBase
         m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches),
             DemandType.ArbitraryFeedForward, m_extensionTotalFF);
 
+      m_extensionDistTravelled = Math.abs(m_extensionTargetInches - m_extensionCurInches);
       DataLogManager.log(String.format("%s: moving: %.1f -> %.1f inches | counts %.1f -> %.1f", getSubsystem( ),
           m_extensionCurInches, m_extensionTargetInches, m_extensionCurInches, m_extensionTargetInches));
     }
@@ -471,7 +457,7 @@ public class Extension extends SubsystemBase
 
     if (Math.abs(errorInInches) < m_toleranceInches)
     {
-      if (++m_withinTolerance >= 5)
+      if (++m_withinTolerance >= 3)
       {
         m_moveIsFinished = true;
         DataLogManager.log(String.format("%s: move finished - Time: %.3f  |  Cur inches: %.1f", getSubsystem( ),
@@ -483,10 +469,10 @@ public class Extension extends SubsystemBase
       m_withinTolerance = 0;
     }
 
-    if (m_safetyTimer.hasElapsed(EXConsts.kMMSafetyTimeout))
+    if (m_safetyTimer.hasElapsed(m_extensionDistTravelled * EXConsts.kMMSafetyTimeoutRatio + 0.2))
     {
       m_moveIsFinished = true;
-      DataLogManager.log(getSubsystem( ) + ": Move Safety timer has timed out!");
+      DataLogManager.log(getSubsystem( ) + ": Move Safety timer has timed out! " + m_safetyTimer.get( ));
     }
 
     if (m_moveIsFinished)
@@ -503,6 +489,7 @@ public class Extension extends SubsystemBase
     m_moveIsFinished = false;
     m_withinTolerance = 0;
     m_safetyTimer.stop( );
+    m_extension.set(0.0);
   }
 
 }

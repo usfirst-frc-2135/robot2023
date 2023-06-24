@@ -419,7 +419,6 @@ public class Swerve extends SubsystemBase
     if (useInitialPose)
     {
       resetOdometry(m_trajectory.getInitialHolonomicPose( ));
-      resetOdometry(m_trajectory.getInitialHolonomicPose( ));
       DataLogManager.log("GYRO : " + m_pigeon.getYaw( ));
     }
 
@@ -557,7 +556,7 @@ public class Swerve extends SubsystemBase
       return true;
     }
 
-    return (m_trajTimer.hasElapsed(m_trajectory.getTotalTimeSeconds( ) + 0.55));
+    return (m_trajTimer.hasElapsed(m_trajectory.getTotalTimeSeconds( ) + 0.120));
   }
 
   public void driveWithPathFollowerEnd( )
@@ -703,10 +702,9 @@ public class Swerve extends SubsystemBase
 
   public void resetOdometry(Pose2d pose)
   {
-    DataLogManager.log("GYRO: " + m_pigeon.getYaw( ));
-    DataLogManager.log("GYRO Before : " + m_poseEstimator.getEstimatedPosition( ));
+    DataLogManager.log("Position Before : " + m_poseEstimator.getEstimatedPosition( ) + "Gyro : " + m_pigeon.getYaw( ));
     m_poseEstimator.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
-    zeroGyro(pose.getRotation( ).getDegrees( ));
+    DataLogManager.log("Position After : " + m_poseEstimator.getEstimatedPosition( ) + "Gyro : " + m_pigeon.getYaw( ));
   }
 
   public void resetLimelightOdometry(Pose2d pose)
@@ -769,6 +767,11 @@ public class Swerve extends SubsystemBase
   public double[ ] getAnglePIDValues(int index)
   {
     return m_swerveMods[index].getAnglePIDValues( );
+  }
+
+  public double getYaw( )
+  {
+    return m_pigeon.getYaw( ).getDegrees( );
   }
 
   public void zeroGyro( )

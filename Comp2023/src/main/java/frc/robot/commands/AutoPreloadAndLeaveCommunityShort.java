@@ -5,7 +5,6 @@ package frc.robot.commands;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
 
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.GRConsts.GRMode;
@@ -29,18 +28,16 @@ public class AutoPreloadAndLeaveCommunityShort extends SequentialCommandGroup
         // Add Commands here:
 
         // @formatter:off
-        new PrintCommand(getName() + ": AUTO: Score Preload"),        
-        new ParallelDeadlineGroup(
-          new ExtensionCalibrate(extension), 
-          new GripperRun(gripper, GRMode.GR_EXPEL)
-        ),
+        new PrintCommand(getName() + ": Score Preload"),        
+        new ExtensionCalibrate(extension).asProxy(),
+        new AutoPreloadHigh(elbow, extension, wrist, gripper),
 
         new GripperRun(gripper, GRMode.GR_STOP),
 
-        new PrintCommand(getName() + ": AUTO: Drive Off Community"),
-        new AutoDrivePath (swerve, pathName, trajectory, true),
+        new PrintCommand(getName() + ": Drive Off Community"),
+        new AutoDrivePath(swerve, pathName, trajectory, true),
         
-        new PrintCommand(getName() + ": AUTO: Hold in place"),
+        new PrintCommand(getName() + ": Hold in place"),
         new AutoStop(swerve)
         // @formatter:on
     );
