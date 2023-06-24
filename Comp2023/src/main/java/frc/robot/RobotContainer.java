@@ -58,6 +58,7 @@ import frc.robot.commands.ResetOdometryToLimelight;
 import frc.robot.commands.SetELAngleZero;
 import frc.robot.commands.SetWRAngleZero;
 import frc.robot.commands.WristMoveToAngle;
+import frc.robot.commands.WristRunBrake;
 import frc.robot.commands.WristRunConstant;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
@@ -293,6 +294,7 @@ public class RobotContainer
     //
     // Operator - Bumpers, start, back
     operLeftBumper.whileTrue(new WristRunConstant(m_wrist, true));
+    operLeftBumper.onFalse(new WristRunBrake(m_wrist, true));
     operRightBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
     operRightBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
     operBack.toggleOnTrue(new ManualMode(m_elbow, m_extension, m_wrist, m_operatorPad)); // aka View
@@ -307,6 +309,7 @@ public class RobotContainer
     //
     // Operator Left/Right Trigger
     operLeftTrigger.whileTrue(new WristRunConstant(m_wrist, false));
+    operLeftTrigger.onFalse(new WristRunBrake(m_wrist, false));
     operRightTrigger.onTrue(new GripperRun(m_gripper, GRMode.GR_EXPEL));
     operRightTrigger.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
   }
