@@ -80,16 +80,6 @@ public class Wrist extends SubsystemBase
   private int                             m_wristAllowedError   = WRConsts.kWristAllowedError;       // PID allowable closed loop error
   private double                          m_toleranceDegrees    = WRConsts.kWristToleranceDegrees;   // PID tolerance in Degrees
 
-  private double                          m_wristAngleMin       = WRConsts.kWristAngleMin;           // minimum wrist allowable angle
-  private double                          m_wristAngleStow      = WRConsts.kWristAngleStow;          // wrist Stow angle
-  private double                          m_wristAngleIdle      = WRConsts.kWristAngleIdle;          // wrist Idle angle  
-  private double                          m_wristAngleLow       = WRConsts.kWristAngleScoreLow;      // low-peg scoring angle   
-  private double                          m_wristAngleMid       = WRConsts.kWristAngleScoreMid;      // mid-peg scoring angle
-  private double                          m_wristAngleHigh      = WRConsts.kWristAngleScoreHigh;     // high-peg scoring angle
-  private double                          m_wristAngleScore     = WRConsts.kWristAngleScore;         // scoring angle
-  private double                          m_wristAngleShelf     = WRConsts.kWristAngleSubstation;    // substation loading shelf
-  private double                          m_wristAngleMax       = WRConsts.kWristAngleMax;           // maximum wrist allowable angle
-
   private double                          m_stickDeadband       = Constants.kStickDeadband;          // joystick deadband
   private WristMode                       m_wristMode           = WristMode.WRIST_INIT;              // Mode active with joysticks
 
@@ -135,10 +125,10 @@ public class Wrist extends SubsystemBase
         m_wrist.setSelectedSensorPosition(absolutePosition);
     }
 
-    m_wrist.configReverseSoftLimitThreshold(Conversions.degreesToFalcon(m_wristAngleMin, WRConsts.kWristGearRatio),
+    m_wrist.configReverseSoftLimitThreshold(Conversions.degreesToFalcon(WRConsts.kWristAngleMin, WRConsts.kWristGearRatio),
         Constants.kCANTimeoutMs);
     m_wrist.configReverseSoftLimitEnable(true, Constants.kCANTimeoutMs);
-    m_wrist.configForwardSoftLimitThreshold(Conversions.degreesToFalcon(m_wristAngleMax, WRConsts.kWristGearRatio),
+    m_wrist.configForwardSoftLimitThreshold(Conversions.degreesToFalcon(WRConsts.kWristAngleMax, WRConsts.kWristGearRatio),
         Constants.kCANTimeoutMs);
     m_wrist.configForwardSoftLimitEnable(true, Constants.kCANTimeoutMs);
 
@@ -251,7 +241,7 @@ public class Wrist extends SubsystemBase
 
   public boolean moveIsInRange(double degrees)
   {
-    return (degrees > m_wristAngleMin) && (degrees < m_wristAngleMax);
+    return (degrees > WRConsts.kWristAngleMin) && (degrees < WRConsts.kWristAngleMax);
   }
 
   public double getAngle( )
@@ -328,14 +318,14 @@ public class Wrist extends SubsystemBase
 
     if (axisValue < 0.0)
     {
-      if (m_wristCurDegrees > m_wristAngleMin)
+      if (m_wristCurDegrees > WRConsts.kWristAngleMin)
         newMode = WristMode.WRIST_UP;
       else
         outOfRange = true;
     }
     else if (axisValue > 0.0)
     {
-      if (m_wristCurDegrees < m_wristAngleMax)
+      if (m_wristCurDegrees < WRConsts.kWristAngleMax)
         newMode = WristMode.WRIST_DOWN;
       else
         outOfRange = true;
@@ -418,25 +408,25 @@ public class Wrist extends SubsystemBase
             m_wristTargetDegrees = 0.25;
           break;
         case WRIST_STOW :
-          m_wristTargetDegrees = m_wristAngleStow;
+          m_wristTargetDegrees = WRConsts.kWristAngleStow;
           break;
         case WRIST_IDLE :
-          m_wristTargetDegrees = m_wristAngleIdle;
+          m_wristTargetDegrees = WRConsts.kWristAngleIdle;
           break;
         case WRIST_LOW :
-          m_wristTargetDegrees = m_wristAngleLow;
+          m_wristTargetDegrees = WRConsts.kWristAngleScoreLow;
           break;
         case WRIST_MID :
-          m_wristTargetDegrees = m_wristAngleMid;
+          m_wristTargetDegrees = WRConsts.kWristAngleScoreMid;
           break;
         case WRIST_HIGH :
-          m_wristTargetDegrees = m_wristAngleHigh;
+          m_wristTargetDegrees = WRConsts.kWristAngleScoreHigh;
           break;
         case WRIST_SHELF :
-          m_wristTargetDegrees = m_wristAngleShelf;
+          m_wristTargetDegrees = WRConsts.kWristAngleSubstation;
           break;
         case WRIST_SCORE :
-          m_wristTargetDegrees = m_wristAngleScore;
+          m_wristTargetDegrees = WRConsts.kWristAngleScore;
           break;
       }
     }
@@ -447,7 +437,7 @@ public class Wrist extends SubsystemBase
       if (!moveIsInRange(m_wristTargetDegrees))
       {
         DataLogManager.log(String.format("%s: Target %.1f degrees is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
-            m_wristTargetDegrees, m_wristAngleMin, m_wristAngleMax));
+            m_wristTargetDegrees, WRConsts.kWristAngleMin, WRConsts.kWristAngleMax));
         m_wristTargetDegrees = m_wristCurDegrees;
       }
 
