@@ -63,10 +63,6 @@ public class Extension extends SubsystemBase
   private int                             m_velocity              = EXConsts.kExtensionMMVelocity;        // motion magic velocity
   private int                             m_acceleration          = EXConsts.kExtensionMMAcceleration;    // motion magic acceleration
   private int                             m_sCurveStrength        = EXConsts.kExtensionMMSCurveStrength;  // motion magic S curve smoothing
-  private double                          m_pidKf                 = EXConsts.kExtensionPidKf;             // PID force constant
-  private double                          m_pidKp                 = EXConsts.kExtensionPidKp;             // PID proportional
-  private double                          m_pidKi                 = EXConsts.kExtensionPidKi;             // PID integral
-  private double                          m_pidKd                 = EXConsts.kExtensionPidKd;             // PID derivative
   private int                             m_extensionAllowedError = EXConsts.kExtensionAllowedError;      // PID allowable closed loop error
   private double                          m_toleranceInches       = EXConsts.kExtensionToleranceInches;   // PID tolerance in inches
 
@@ -184,10 +180,7 @@ public class Extension extends SubsystemBase
       SmartDashboard.putNumber("EX_velocity", m_velocity);
       SmartDashboard.putNumber("EX_acceleration", m_acceleration);
       SmartDashboard.putNumber("EX_sCurveStrength", m_sCurveStrength);
-      SmartDashboard.putNumber("EX_pidKf", m_pidKf);
-      SmartDashboard.putNumber("EX_pidKp", m_pidKp);
-      SmartDashboard.putNumber("EX_pidKi", m_pidKi);
-      SmartDashboard.putNumber("EX_pidKd", m_pidKd);
+
     }
 
     SmartDashboard.putNumber("EX_curInches", m_extensionCurInches);
@@ -271,13 +264,13 @@ public class Extension extends SubsystemBase
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionSCurveStrength");
 
     // Configure Magic Motion settings
-    motor.config_kF(0, m_pidKf, Constants.kLongCANTimeoutMs);
+    motor.config_kF(0, EXConsts.kExtensionPidKf, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kF");
-    motor.config_kP(0, m_pidKp, Constants.kLongCANTimeoutMs);
+    motor.config_kP(0, EXConsts.kExtensionPidKp, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kP");
-    motor.config_kI(0, m_pidKi, Constants.kLongCANTimeoutMs);
+    motor.config_kI(0, EXConsts.kExtensionPidKi, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kI");
-    motor.config_kD(0, m_pidKd, Constants.kLongCANTimeoutMs);
+    motor.config_kD(0, EXConsts.kExtensionPidKd, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kD");
     motor.selectProfileSlot(SLOTINDEX, PIDINDEX);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "selectProfileSlot");
@@ -364,18 +357,14 @@ public class Extension extends SubsystemBase
       m_velocity = (int) SmartDashboard.getNumber("EX_velocity", m_velocity);
       m_acceleration = (int) SmartDashboard.getNumber("EX_acceleration", m_acceleration);
       m_sCurveStrength = (int) SmartDashboard.getNumber("EX_sCurveStrength", m_sCurveStrength);
-      m_pidKf = SmartDashboard.getNumber("EX_pidKf", m_pidKf);
-      m_pidKp = SmartDashboard.getNumber("EX_pidKp", m_pidKp);
-      m_pidKi = SmartDashboard.getNumber("EX_pidKi", m_pidKi);
-      m_pidKd = SmartDashboard.getNumber("EX_pidKd", m_pidKd);
 
       m_extension.configMotionCruiseVelocity(m_velocity);
       m_extension.configMotionAcceleration(m_acceleration);
       m_extension.configMotionSCurveStrength(m_sCurveStrength);
-      m_extension.config_kF(SLOTINDEX, m_pidKf);
-      m_extension.config_kP(SLOTINDEX, m_pidKp);
-      m_extension.config_kI(SLOTINDEX, m_pidKi);
-      m_extension.config_kD(SLOTINDEX, m_pidKd);
+      m_extension.config_kF(SLOTINDEX, EXConsts.kExtensionPidKf);
+      m_extension.config_kP(SLOTINDEX, EXConsts.kExtensionPidKp);
+      m_extension.config_kI(SLOTINDEX, EXConsts.kExtensionPidKi);
+      m_extension.config_kD(SLOTINDEX, EXConsts.kExtensionPidKd);
     }
 
     if (length != m_extensionLength)
