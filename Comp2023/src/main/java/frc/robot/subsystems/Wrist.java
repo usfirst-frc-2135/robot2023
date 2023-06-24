@@ -77,22 +77,8 @@ public class Wrist extends SubsystemBase
   private int                             m_velocity            = WRConsts.kWristMMVelocity;         // motion magic velocity
   private int                             m_acceleration        = WRConsts.kWristMMAcceleration;     // motion magic acceleration
   private int                             m_sCurveStrength      = WRConsts.kWristMMSCurveStrength;   // motion magic S curve smoothing
-  private double                          m_pidKf               = WRConsts.kWristPidKf;              // PID force constant
-  private double                          m_pidKp               = WRConsts.kWristPidKp;              // PID proportional
-  private double                          m_pidKi               = WRConsts.kWristPidKi;              // PID integral
-  private double                          m_pidKd               = WRConsts.kWristPidKd;              // PID derivative
   private int                             m_wristAllowedError   = WRConsts.kWristAllowedError;       // PID allowable closed loop error
   private double                          m_toleranceDegrees    = WRConsts.kWristToleranceDegrees;   // PID tolerance in Degrees
-
-  private double                          m_wristAngleMin       = WRConsts.kWristAngleMin;           // minimum wrist allowable angle
-  private double                          m_wristAngleStow      = WRConsts.kWristAngleStow;          // wrist Stow angle
-  private double                          m_wristAngleIdle      = WRConsts.kWristAngleIdle;          // wrist Idle angle  
-  private double                          m_wristAngleLow       = WRConsts.kWristAngleScoreLow;      // low-peg scoring angle   
-  private double                          m_wristAngleMid       = WRConsts.kWristAngleScoreMid;      // mid-peg scoring angle
-  private double                          m_wristAngleHigh      = WRConsts.kWristAngleScoreHigh;     // high-peg scoring angle
-  private double                          m_wristAngleScore     = WRConsts.kWristAngleScore;         // scoring angle
-  private double                          m_wristAngleShelf     = WRConsts.kWristAngleSubstation;    // substation loading shelf
-  private double                          m_wristAngleMax       = WRConsts.kWristAngleMax;           // maximum wrist allowable angle
 
   private double                          m_stickDeadband       = Constants.kStickDeadband;          // joystick deadband
   private WristMode                       m_wristMode           = WristMode.WRIST_INIT;              // Mode active with joysticks
@@ -139,10 +125,10 @@ public class Wrist extends SubsystemBase
         m_wrist.setSelectedSensorPosition(absolutePosition);
     }
 
-    m_wrist.configReverseSoftLimitThreshold(Conversions.degreesToFalcon(m_wristAngleMin, WRConsts.kWristGearRatio),
+    m_wrist.configReverseSoftLimitThreshold(Conversions.degreesToFalcon(WRConsts.kWristAngleMin, WRConsts.kWristGearRatio),
         Constants.kCANTimeoutMs);
     m_wrist.configReverseSoftLimitEnable(true, Constants.kCANTimeoutMs);
-    m_wrist.configForwardSoftLimitThreshold(Conversions.degreesToFalcon(m_wristAngleMax, WRConsts.kWristGearRatio),
+    m_wrist.configForwardSoftLimitThreshold(Conversions.degreesToFalcon(WRConsts.kWristAngleMax, WRConsts.kWristGearRatio),
         Constants.kCANTimeoutMs);
     m_wrist.configForwardSoftLimitEnable(true, Constants.kCANTimeoutMs);
 
@@ -212,10 +198,6 @@ public class Wrist extends SubsystemBase
       SmartDashboard.putNumber("WR_velocity", m_velocity);
       SmartDashboard.putNumber("WR_acceleration", m_acceleration);
       SmartDashboard.putNumber("WR_sCurveStrength", m_sCurveStrength);
-      SmartDashboard.putNumber("WR_pidKf", m_pidKf);
-      SmartDashboard.putNumber("WR_pidKp", m_pidKp);
-      SmartDashboard.putNumber("WR_pidKi", m_pidKi);
-      SmartDashboard.putNumber("WR_pidKd", m_pidKd);
     }
 
     SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
@@ -259,7 +241,7 @@ public class Wrist extends SubsystemBase
 
   public boolean moveIsInRange(double degrees)
   {
-    return (degrees > m_wristAngleMin) && (degrees < m_wristAngleMax);
+    return (degrees > WRConsts.kWristAngleMin) && (degrees < WRConsts.kWristAngleMax);
   }
 
   public double getAngle( )
@@ -302,13 +284,13 @@ public class Wrist extends SubsystemBase
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionSCurveStrength");
 
     // Configure Magic Motion settings
-    motor.config_kF(0, m_pidKf, Constants.kLongCANTimeoutMs);
+    motor.config_kF(0, WRConsts.kWristPidKf, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kF");
-    motor.config_kP(0, m_pidKp, Constants.kLongCANTimeoutMs);
+    motor.config_kP(0, WRConsts.kWristPidKp, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kP");
-    motor.config_kI(0, m_pidKi, Constants.kLongCANTimeoutMs);
+    motor.config_kI(0, WRConsts.kWristPidKi, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kI");
-    motor.config_kD(0, m_pidKd, Constants.kLongCANTimeoutMs);
+    motor.config_kD(0, WRConsts.kWristPidKd, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kD");
     motor.selectProfileSlot(SLOTINDEX, PIDINDEX);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "selectProfileSlot");
@@ -336,14 +318,14 @@ public class Wrist extends SubsystemBase
 
     if (axisValue < 0.0)
     {
-      if (m_wristCurDegrees > m_wristAngleMin)
+      if (m_wristCurDegrees > WRConsts.kWristAngleMin)
         newMode = WristMode.WRIST_UP;
       else
         outOfRange = true;
     }
     else if (axisValue > 0.0)
     {
-      if (m_wristCurDegrees < m_wristAngleMax)
+      if (m_wristCurDegrees < WRConsts.kWristAngleMax)
         newMode = WristMode.WRIST_DOWN;
       else
         outOfRange = true;
@@ -400,18 +382,14 @@ public class Wrist extends SubsystemBase
       m_velocity = (int) SmartDashboard.getNumber("WR_velocity", m_velocity);
       m_acceleration = (int) SmartDashboard.getNumber("WR_acceleration", m_acceleration);
       m_sCurveStrength = (int) SmartDashboard.getNumber("WR_sCurveStrength", m_sCurveStrength);
-      m_pidKf = SmartDashboard.getNumber("WR_pidKf", m_pidKf);
-      m_pidKp = SmartDashboard.getNumber("WR_pidKp", m_pidKp);
-      m_pidKi = SmartDashboard.getNumber("WR_pidKi", m_pidKi);
-      m_pidKd = SmartDashboard.getNumber("WR_pidKd", m_pidKd);
 
       m_wrist.configMotionCruiseVelocity(m_velocity);
       m_wrist.configMotionAcceleration(m_acceleration);
       m_wrist.configMotionSCurveStrength(m_sCurveStrength);
-      m_wrist.config_kF(SLOTINDEX, m_pidKf);
-      m_wrist.config_kP(SLOTINDEX, m_pidKp);
-      m_wrist.config_kI(SLOTINDEX, m_pidKi);
-      m_wrist.config_kD(SLOTINDEX, m_pidKd);
+      m_wrist.config_kF(SLOTINDEX, WRConsts.kWristPidKf);
+      m_wrist.config_kP(SLOTINDEX, WRConsts.kWristPidKp);
+      m_wrist.config_kI(SLOTINDEX, WRConsts.kWristPidKi);
+      m_wrist.config_kD(SLOTINDEX, WRConsts.kWristPidKd);
     }
 
     if (angle != m_wristAngle)
@@ -430,25 +408,25 @@ public class Wrist extends SubsystemBase
             m_wristTargetDegrees = 0.25;
           break;
         case WRIST_STOW :
-          m_wristTargetDegrees = m_wristAngleStow;
+          m_wristTargetDegrees = WRConsts.kWristAngleStow;
           break;
         case WRIST_IDLE :
-          m_wristTargetDegrees = m_wristAngleIdle;
+          m_wristTargetDegrees = WRConsts.kWristAngleIdle;
           break;
         case WRIST_LOW :
-          m_wristTargetDegrees = m_wristAngleLow;
+          m_wristTargetDegrees = WRConsts.kWristAngleScoreLow;
           break;
         case WRIST_MID :
-          m_wristTargetDegrees = m_wristAngleMid;
+          m_wristTargetDegrees = WRConsts.kWristAngleScoreMid;
           break;
         case WRIST_HIGH :
-          m_wristTargetDegrees = m_wristAngleHigh;
+          m_wristTargetDegrees = WRConsts.kWristAngleScoreHigh;
           break;
         case WRIST_SHELF :
-          m_wristTargetDegrees = m_wristAngleShelf;
+          m_wristTargetDegrees = WRConsts.kWristAngleSubstation;
           break;
         case WRIST_SCORE :
-          m_wristTargetDegrees = m_wristAngleScore;
+          m_wristTargetDegrees = WRConsts.kWristAngleScore;
           break;
       }
     }
@@ -459,7 +437,7 @@ public class Wrist extends SubsystemBase
       if (!moveIsInRange(m_wristTargetDegrees))
       {
         DataLogManager.log(String.format("%s: Target %.1f degrees is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
-            m_wristTargetDegrees, m_wristAngleMin, m_wristAngleMax));
+            m_wristTargetDegrees, WRConsts.kWristAngleMin, WRConsts.kWristAngleMax));
         m_wristTargetDegrees = m_wristCurDegrees;
       }
 

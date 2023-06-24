@@ -78,21 +78,8 @@ public class Elbow extends SubsystemBase
   private int                             m_velocity            = ELConsts.kElbowMMVelocity;        // motion magic velocity
   private int                             m_acceleration        = ELConsts.kElbowMMAcceleration;    // motion magic acceleration
   private int                             m_sCurveStrength      = ELConsts.kElbowMMSCurveStrength;  // motion magic S curve smoothing
-  private double                          m_pidKf               = ELConsts.kElbowPidKf;             // PID force constant
-  private double                          m_pidKp               = ELConsts.kElbowPidKp;             // PID proportional
-  private double                          m_pidKi               = ELConsts.kElbowPidKi;             // PID integral
-  private double                          m_pidKd               = ELConsts.kElbowPidKd;             // PID derivative
   private int                             m_elbowAllowedError   = ELConsts.kElbowAllowedError;      // PID allowable closed loop error
   private double                          m_toleranceDegrees    = ELConsts.kElbowToleranceDegrees;  // PID tolerance in inches
-
-  private double                          m_elbowAngleMin       = ELConsts.kElbowAngleMin;          // minimum elbow allowable angle
-  private double                          m_elbowAngleStow      = ELConsts.kElbowAngleStow;         // elbow Stow angle
-  private double                          m_elbowAngleIdle      = ELConsts.kElbowAngleIdle;         // elbow Idle angle
-  private double                          m_elbowAngleLow       = ELConsts.kElbowAngleScoreLow;     // low-peg scoring angle   
-  private double                          m_elbowAngleMid       = ELConsts.kElbowAngleScoreMid;     // mid-peg scoring angle
-  private double                          m_elbowAngleHigh      = ELConsts.kElbowAngleScoreHigh;    // high-peg scoring angle
-  private double                          m_elbowAngleShelf     = ELConsts.kElbowAngleSubstation;   // substation loading shelf
-  private double                          m_elbowAngleMax       = ELConsts.kElbowAngleMax;          // maximum elbow allowable angle
 
   private double                          m_stickDeadband       = Constants.kStickDeadband;         // joystick deadband
   private ElbowMode                       m_elbowMode           = ElbowMode.ELBOW_INIT;             // Mode active with joysticks
@@ -139,10 +126,10 @@ public class Elbow extends SubsystemBase
         m_elbow.setSelectedSensorPosition(absolutePosition);
     }
 
-    m_elbow.configReverseSoftLimitThreshold(Conversions.degreesToFalcon(m_elbowAngleMin, ELConsts.kElbowGearRatio),
+    m_elbow.configReverseSoftLimitThreshold(Conversions.degreesToFalcon(ELConsts.kElbowAngleMin, ELConsts.kElbowGearRatio),
         Constants.kCANTimeoutMs);
     m_elbow.configReverseSoftLimitEnable(true, Constants.kCANTimeoutMs);
-    m_elbow.configForwardSoftLimitThreshold(Conversions.degreesToFalcon(m_elbowAngleMax, ELConsts.kElbowGearRatio),
+    m_elbow.configForwardSoftLimitThreshold(Conversions.degreesToFalcon(ELConsts.kElbowAngleMax, ELConsts.kElbowGearRatio),
         Constants.kCANTimeoutMs);
     m_elbow.configForwardSoftLimitEnable(true, Constants.kCANTimeoutMs);
 
@@ -213,10 +200,6 @@ public class Elbow extends SubsystemBase
       SmartDashboard.putNumber("EL_velocity", m_velocity);
       SmartDashboard.putNumber("EL_acceleration", m_acceleration);
       SmartDashboard.putNumber("EL_sCurveStrength", m_sCurveStrength);
-      SmartDashboard.putNumber("EL_pidKf", m_pidKf);
-      SmartDashboard.putNumber("EL_pidKp", m_pidKp);
-      SmartDashboard.putNumber("EL_pidKi", m_pidKi);
-      SmartDashboard.putNumber("EL_pidKd", m_pidKd);
     }
 
     SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
@@ -260,7 +243,7 @@ public class Elbow extends SubsystemBase
 
   public boolean moveIsInRange(double degrees)
   {
-    return (degrees > m_elbowAngleMin) && (degrees < m_elbowAngleMax);
+    return (degrees > ELConsts.kElbowAngleMin) && (degrees < ELConsts.kElbowAngleMax);
   }
 
   public double getAngle( )
@@ -303,13 +286,13 @@ public class Elbow extends SubsystemBase
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionSCurveStrength");
 
     // Configure Magic Motion settings
-    motor.config_kF(0, m_pidKf, Constants.kLongCANTimeoutMs);
+    motor.config_kF(0, ELConsts.kElbowPidKf, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kF");
-    motor.config_kP(0, m_pidKp, Constants.kLongCANTimeoutMs);
+    motor.config_kP(0, ELConsts.kElbowPidKp, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kP");
-    motor.config_kI(0, m_pidKi, Constants.kLongCANTimeoutMs);
+    motor.config_kI(0, ELConsts.kElbowPidKi, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kI");
-    motor.config_kD(0, m_pidKd, Constants.kLongCANTimeoutMs);
+    motor.config_kD(0, ELConsts.kElbowPidKd, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kD");
     motor.selectProfileSlot(SLOTINDEX, PIDINDEX);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "selectProfileSlot");
@@ -327,14 +310,14 @@ public class Elbow extends SubsystemBase
 
     if (axisValue < 0.0)
     {
-      if (m_elbowCurDegrees > m_elbowAngleMin)
+      if (m_elbowCurDegrees > ELConsts.kElbowAngleMin)
         newMode = ElbowMode.ELBOW_DOWN;
       else
         outOfRange = true;
     }
     else if (axisValue > 0.0)
     {
-      if (m_elbowCurDegrees < m_elbowAngleMax)
+      if (m_elbowCurDegrees < ELConsts.kElbowAngleMax)
         newMode = ElbowMode.ELBOW_UP;
       else
         outOfRange = true;
@@ -385,18 +368,14 @@ public class Elbow extends SubsystemBase
       m_velocity = (int) SmartDashboard.getNumber("EL_velocity", m_velocity);
       m_acceleration = (int) SmartDashboard.getNumber("EL_acceleration", m_acceleration);
       m_sCurveStrength = (int) SmartDashboard.getNumber("EL_sCurveStrength", m_sCurveStrength);
-      m_pidKf = SmartDashboard.getNumber("EL_pidKf", m_pidKf);
-      m_pidKp = SmartDashboard.getNumber("EL_pidKp", m_pidKp);
-      m_pidKi = SmartDashboard.getNumber("EL_pidKi", m_pidKi);
-      m_pidKd = SmartDashboard.getNumber("EL_pidKd", m_pidKd);
 
       m_elbow.configMotionCruiseVelocity(m_velocity);
       m_elbow.configMotionAcceleration(m_acceleration);
       m_elbow.configMotionSCurveStrength(m_sCurveStrength);
-      m_elbow.config_kF(SLOTINDEX, m_pidKf);
-      m_elbow.config_kP(SLOTINDEX, m_pidKp);
-      m_elbow.config_kI(SLOTINDEX, m_pidKi);
-      m_elbow.config_kD(SLOTINDEX, m_pidKd);
+      m_elbow.config_kF(SLOTINDEX, ELConsts.kElbowPidKf);
+      m_elbow.config_kP(SLOTINDEX, ELConsts.kElbowPidKp);
+      m_elbow.config_kI(SLOTINDEX, ELConsts.kElbowPidKi);
+      m_elbow.config_kD(SLOTINDEX, ELConsts.kElbowPidKd);
     }
 
     if (angle != m_elbowAngle)
@@ -415,22 +394,22 @@ public class Elbow extends SubsystemBase
             m_elbowTargetDegrees = 0.25;
           break;
         case ELBOW_STOW :
-          m_elbowTargetDegrees = m_elbowAngleStow;
+          m_elbowTargetDegrees = ELConsts.kElbowAngleStow;
           break;
         case ELBOW_IDLE :
-          m_elbowTargetDegrees = m_elbowAngleIdle;
+          m_elbowTargetDegrees = ELConsts.kElbowAngleScoreLow;
           break;
         case ELBOW_LOW :
-          m_elbowTargetDegrees = m_elbowAngleLow;
+          m_elbowTargetDegrees = ELConsts.kElbowAngleScoreLow;
           break;
         case ELBOW_MID :
-          m_elbowTargetDegrees = m_elbowAngleMid;
+          m_elbowTargetDegrees = ELConsts.kElbowAngleScoreMid;
           break;
         case ELBOW_HIGH :
-          m_elbowTargetDegrees = m_elbowAngleHigh;
+          m_elbowTargetDegrees = ELConsts.kElbowAngleScoreHigh;
           break;
         case ELBOW_SHELF :
-          m_elbowTargetDegrees = m_elbowAngleShelf;
+          m_elbowTargetDegrees = ELConsts.kElbowAngleSubstation;
           break;
       }
     }
@@ -441,7 +420,7 @@ public class Elbow extends SubsystemBase
       if (!moveIsInRange(m_elbowTargetDegrees))
       {
         DataLogManager.log(String.format("%s: Target %.1f degrees is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
-            m_elbowTargetDegrees, m_elbowAngleMin, m_elbowAngleMax));
+            m_elbowTargetDegrees, ELConsts.kElbowAngleMin, ELConsts.kElbowAngleMax));
         m_elbowTargetDegrees = m_elbowCurDegrees;
       }
 
@@ -508,21 +487,21 @@ public class Elbow extends SubsystemBase
   {
     int curCounts = (int) m_elbow.getSelectedSensorPosition(0);
     m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
-    return m_elbowCurDegrees < m_elbowAngleIdle;
+    return m_elbowCurDegrees < ELConsts.kElbowAngleIdle;
   }
 
   public boolean isElbowBelowLow( )
   {
     int curCounts = (int) m_elbow.getSelectedSensorPosition(0);
     m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
-    return m_elbowCurDegrees < m_elbowAngleLow;
+    return m_elbowCurDegrees < ELConsts.kElbowAngleScoreLow;
   }
 
   public boolean isElbowBelowMid( )
   {
     int curCounts = (int) m_elbow.getSelectedSensorPosition(0);
     m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
-    return m_elbowCurDegrees < m_elbowAngleMid;
+    return m_elbowCurDegrees < ELConsts.kElbowAngleScoreMid;
   }
 
   public void moveElbowAngleEnd( )
