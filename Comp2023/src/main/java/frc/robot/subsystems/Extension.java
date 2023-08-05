@@ -58,14 +58,6 @@ public class Extension extends SubsystemBase
   private StatorCurrentLimitConfiguration m_statorCurrentLimits   = new StatorCurrentLimitConfiguration(true,
       EXConsts.kStatorCurrentLimit, EXConsts.kStatorTriggerCurrent, EXConsts.kStatorTriggerTime);
 
-  // Declare module variables
-  private double                          m_neutralDeadband       = EXConsts.kExtensionNeutralDeadband;   // motor output deadband
-  private int                             m_velocity              = EXConsts.kExtensionMMVelocity;        // motion magic velocity
-  private int                             m_acceleration          = EXConsts.kExtensionMMAcceleration;    // motion magic acceleration
-  private int                             m_sCurveStrength        = EXConsts.kExtensionMMSCurveStrength;  // motion magic S curve smoothing
-  private int                             m_extensionAllowedError = EXConsts.kExtensionAllowedError;      // PID allowable closed loop error
-  private double                          m_toleranceInches       = EXConsts.kExtensionToleranceInches;   // PID tolerance in inches
-
   private double                          m_stickDeadband         = Constants.kStickDeadband;              // joystick deadband
   private ExtensionMode                   m_extensionMode         = ExtensionMode.EXTENSION_INIT;          // Mode active with joysticks
 
@@ -77,7 +69,7 @@ public class Extension extends SubsystemBase
   private double                          m_extensionCurInches    = 0.0;    // Current length in inches
   private int                             m_withinTolerance       = 0;      // Counter for consecutive readings within tolerance
   private double                          m_extensionTotalFF;
-  private boolean                         m_calibrated            = EXConsts.kExtensionCalibrated;  // Indicates whether the extension has been calibrated
+  private boolean                         m_calibrated            = EXConsts.kCalibrated;  // Indicates whether the extension has been calibrated
 
   private Timer                           m_safetyTimer           = new Timer( ); // Safety timer for use in extension
   private double                          m_extensionDistTravelled;
@@ -168,15 +160,15 @@ public class Extension extends SubsystemBase
     // Initialize Variables
     if (m_extensionDebug)
     {
-      SmartDashboard.putNumber("EX_velocity", m_velocity);
-      SmartDashboard.putNumber("EX_acceleration", m_acceleration);
-      SmartDashboard.putNumber("EX_sCurveStrength", m_sCurveStrength);
+      SmartDashboard.putNumber("EX_velocity", EXConsts.kMMVelocity);
+      SmartDashboard.putNumber("EX_acceleration", EXConsts.kMMAcceleration);
+      SmartDashboard.putNumber("EX_sCurveStrength", EXConsts.kMMSCurveStrength);
 
     }
 
     SmartDashboard.putNumber("EX_curInches", m_extensionCurInches);
     SmartDashboard.putNumber("EX_targetInches", m_extensionTargetInches);
-    SmartDashboard.putBoolean("EX_calibrated", EXConsts.kExtensionCalibrated);
+    SmartDashboard.putBoolean("EX_calibrated", EXConsts.kCalibrated);
     SmartDashboard.putBoolean("EX_normalMode", !m_extensionDebug);
 
     // post the mechanism to the dashboard
@@ -200,17 +192,17 @@ public class Extension extends SubsystemBase
 
   private int extensionInchesToCounts(double inches)
   {
-    return (int) (inches / EXConsts.kExtensionInchesPerCount);
+    return (int) (inches / EXConsts.kInchesPerCount);
   }
 
   private double extensionCountsToInches(int counts)
   {
-    return counts * EXConsts.kExtensionInchesPerCount;
+    return counts * EXConsts.kInchesPerCount;
   }
 
   public boolean moveIsInRange(double inches)
   {
-    return (inches > EXConsts.kExtensionLengthMin) && (inches < EXConsts.kExtensionLengthMax);
+    return (inches > EXConsts.kLengthMin) && (inches < EXConsts.kLengthMax);
   }
 
   public double getInches( )
@@ -228,7 +220,7 @@ public class Extension extends SubsystemBase
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
     motor.setSafetyEnabled(false);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSafetyEnabled");
-    motor.configNeutralDeadband(m_neutralDeadband, Constants.kLongCANTimeoutMs);
+    motor.configNeutralDeadband(EXConsts.kNeutralDeadband, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configNeutralDeadband");
 
     motor.configVoltageCompSaturation(12.0);
@@ -244,24 +236,24 @@ public class Extension extends SubsystemBase
     // Configure sensor settings
     motor.setSelectedSensorPosition(0.0);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSelectedSensorPosition");
-    motor.configAllowableClosedloopError(SLOTINDEX, m_extensionAllowedError, Constants.kLongCANTimeoutMs);
+    motor.configAllowableClosedloopError(SLOTINDEX, EXConsts.kAllowedError, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllowableClosedloopError");
 
-    motor.configMotionCruiseVelocity(m_velocity, Constants.kLongCANTimeoutMs);
+    motor.configMotionCruiseVelocity(EXConsts.kMMVelocity, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionCruiseVelocity");
-    motor.configMotionAcceleration(m_acceleration, Constants.kLongCANTimeoutMs);
+    motor.configMotionAcceleration(EXConsts.kMMAcceleration, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionAcceleration");
-    motor.configMotionSCurveStrength(m_sCurveStrength, Constants.kLongCANTimeoutMs);
+    motor.configMotionSCurveStrength(EXConsts.kMMSCurveStrength, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionSCurveStrength");
 
     // Configure Magic Motion settings
-    motor.config_kF(0, EXConsts.kExtensionPidKf, Constants.kLongCANTimeoutMs);
+    motor.config_kF(0, EXConsts.kPidKf, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kF");
-    motor.config_kP(0, EXConsts.kExtensionPidKp, Constants.kLongCANTimeoutMs);
+    motor.config_kP(0, EXConsts.kPidKp, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kP");
-    motor.config_kI(0, EXConsts.kExtensionPidKi, Constants.kLongCANTimeoutMs);
+    motor.config_kI(0, EXConsts.kPidKi, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kI");
-    motor.config_kD(0, EXConsts.kExtensionPidKd, Constants.kLongCANTimeoutMs);
+    motor.config_kD(0, EXConsts.kPidKd, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kD");
     motor.selectProfileSlot(SLOTINDEX, PIDINDEX);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "selectProfileSlot");
@@ -279,14 +271,14 @@ public class Extension extends SubsystemBase
 
     if (axisValue < 0.0)
     {
-      if (m_extensionCurInches > EXConsts.kExtensionLengthMin)
+      if (m_extensionCurInches > EXConsts.kLengthMin)
         newMode = ExtensionMode.EXTENSION_IN;
       else
         outOfRange = true;
     }
     else if (axisValue > 0.0)
     {
-      if (m_extensionCurInches < EXConsts.kExtensionLengthMax)
+      if (m_extensionCurInches < EXConsts.kLengthMax)
         newMode = ExtensionMode.EXTENSION_OUT;
       else
         outOfRange = true;
@@ -304,7 +296,7 @@ public class Extension extends SubsystemBase
     m_extensionTargetInches = m_extensionCurInches;
 
     if (m_extensionValid)
-      m_extension.set(ControlMode.PercentOutput, axisValue * EXConsts.kExtensionSpeedMaxManual + EXConsts.kExtensionArbitraryFF);
+      m_extension.set(ControlMode.PercentOutput, axisValue * EXConsts.kExtensionSpeedMaxManual + EXConsts.kArbitraryFF);
   }
 
   public void setExtensionStopped( )
@@ -336,7 +328,7 @@ public class Extension extends SubsystemBase
   {
     double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
 
-    return EXConsts.kExtensionArbitraryFF * Math.cos(Math.toRadians(elbowDegrees));
+    return EXConsts.kArbitraryFF * Math.cos(Math.toRadians(elbowDegrees));
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
@@ -345,17 +337,13 @@ public class Extension extends SubsystemBase
   {
     if (m_extensionDebug)
     {
-      m_velocity = (int) SmartDashboard.getNumber("EX_velocity", m_velocity);
-      m_acceleration = (int) SmartDashboard.getNumber("EX_acceleration", m_acceleration);
-      m_sCurveStrength = (int) SmartDashboard.getNumber("EX_sCurveStrength", m_sCurveStrength);
-
-      m_extension.configMotionCruiseVelocity(m_velocity);
-      m_extension.configMotionAcceleration(m_acceleration);
-      m_extension.configMotionSCurveStrength(m_sCurveStrength);
-      m_extension.config_kF(SLOTINDEX, EXConsts.kExtensionPidKf);
-      m_extension.config_kP(SLOTINDEX, EXConsts.kExtensionPidKp);
-      m_extension.config_kI(SLOTINDEX, EXConsts.kExtensionPidKi);
-      m_extension.config_kD(SLOTINDEX, EXConsts.kExtensionPidKd);
+      m_extension.configMotionCruiseVelocity(EXConsts.kMMVelocity);
+      m_extension.configMotionAcceleration(EXConsts.kMMAcceleration);
+      m_extension.configMotionSCurveStrength(EXConsts.kMMSCurveStrength);
+      m_extension.config_kF(SLOTINDEX, EXConsts.kPidKf);
+      m_extension.config_kP(SLOTINDEX, EXConsts.kPidKp);
+      m_extension.config_kI(SLOTINDEX, EXConsts.kPidKi);
+      m_extension.config_kD(SLOTINDEX, EXConsts.kPidKd);
     }
 
     if (length != m_extensionLength)
@@ -374,39 +362,39 @@ public class Extension extends SubsystemBase
             m_extensionTargetInches = 0.25;
           break;
         case EXTENSION_STOW :
-          m_extensionTargetInches = EXConsts.kExtensionLengthStow;
+          m_extensionTargetInches = EXConsts.kLengthStow;
           break;
         case EXTENSION_IDLE :
-          m_extensionTargetInches = EXConsts.kExtensionLengthIdle;
+          m_extensionTargetInches = EXConsts.kLengthIdle;
           break;
         case EXTENSION_LOW :
-          m_extensionTargetInches = EXConsts.kExtensionLengthScoreLow;
+          m_extensionTargetInches = EXConsts.kLengthScoreLow;
           break;
         case EXTENSION_MID :
-          m_extensionTargetInches = EXConsts.kExtensionLengthScoreMid;
+          m_extensionTargetInches = EXConsts.kLengthScoreMid;
           break;
         case EXTENSION_HIGH :
-          m_extensionTargetInches = EXConsts.kExtensionLengthScoreHigh;
+          m_extensionTargetInches = EXConsts.kLengthScoreHigh;
           break;
         case EXTENSION_SHELF :
-          m_extensionTargetInches = EXConsts.kExtensionLengthSubstation;
+          m_extensionTargetInches = EXConsts.kLengthSubstation;
           break;
       }
     }
 
-    if (EXConsts.kExtensionCalibrated)
+    if (EXConsts.kCalibrated)
     {
       // length constraint check/soft limit for max and min length before raising
       if (!moveIsInRange(m_extensionTargetInches))
       {
         DataLogManager.log(String.format("%s: Target %.1f inches is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
-            m_extensionTargetInches, EXConsts.kExtensionLengthMin, EXConsts.kExtensionLengthMax));
+            m_extensionTargetInches, EXConsts.kLengthMin, EXConsts.kLengthMax));
         m_extensionTargetInches = m_extensionCurInches;
       }
 
       m_safetyTimer.restart( );
 
-      if (m_extensionValid && EXConsts.kExtensionCalibrated)
+      if (m_extensionValid && EXConsts.kCalibrated)
         m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches),
             DemandType.ArbitraryFeedForward, m_extensionTotalFF);
 
@@ -424,7 +412,7 @@ public class Extension extends SubsystemBase
 
   public void moveExtensionLengthExecute( )
   {
-    if (m_extensionValid && EXConsts.kExtensionCalibrated)
+    if (m_extensionValid && EXConsts.kCalibrated)
       m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches), DemandType.ArbitraryFeedForward,
           m_extensionTotalFF);
   }
@@ -435,7 +423,7 @@ public class Extension extends SubsystemBase
 
     errorInInches = m_extensionTargetInches - m_extensionCurInches;
 
-    if (Math.abs(errorInInches) < m_toleranceInches)
+    if (Math.abs(errorInInches) < EXConsts.kToleranceInches)
     {
       if (++m_withinTolerance >= 3)
       {

@@ -55,7 +55,7 @@ public class Wrist extends SubsystemBase
   private final CANCoder                  m_wristCANCoder       = new CANCoder(Constants.Ports.kCANID_WRCANCoder);
   private final TalonFXSimCollection      m_wristMotorSim       = new TalonFXSimCollection(m_wrist);
   private final SingleJointedArmSim       m_wristSim            = new SingleJointedArmSim(DCMotor.getFalcon500(1),
-      WRConsts.kWristGearRatio, 2.0, WRConsts.kGripperLengthMeters, -Math.PI, Math.PI, false);
+      WRConsts.kGearRatio, 2.0, WRConsts.kGripperLengthMeters, -Math.PI, Math.PI, false);
 
   // Mechanism2d
   private final Mechanism2d               m_wristMech           = new Mechanism2d(3, 3);
@@ -71,14 +71,6 @@ public class Wrist extends SubsystemBase
       WRConsts.kSupplyCurrentLimit, WRConsts.kSupplyTriggerCurrent, WRConsts.kSupplyTriggerTime);
   private StatorCurrentLimitConfiguration m_statorCurrentLimits = new StatorCurrentLimitConfiguration(true,
       WRConsts.kStatorCurrentLimit, WRConsts.kStatorTriggerCurrent, WRConsts.kStatorTriggerTime);
-
-  // Declare module variables
-  private double                          m_neutralDeadband     = WRConsts.kWristNeutralDeadband;   // motor output deadband
-  private int                             m_velocity            = WRConsts.kWristMMVelocity;         // motion magic velocity
-  private int                             m_acceleration        = WRConsts.kWristMMAcceleration;     // motion magic acceleration
-  private int                             m_sCurveStrength      = WRConsts.kWristMMSCurveStrength;   // motion magic S curve smoothing
-  private int                             m_wristAllowedError   = WRConsts.kWristAllowedError;       // PID allowable closed loop error
-  private double                          m_toleranceDegrees    = WRConsts.kWristToleranceDegrees;   // PID tolerance in Degrees
 
   private double                          m_stickDeadband       = Constants.kStickDeadband;          // joystick deadband
   private WristMode                       m_wristMode           = WristMode.WRIST_INIT;              // Mode active with joysticks
@@ -119,16 +111,16 @@ public class Wrist extends SubsystemBase
       m_wristCANCoder.setStatusFramePeriod(CANCoderStatusFrame.VbatAndFaults, 255);
 
       DataLogManager.log(getSubsystem( ) + ": Initial degrees " + m_wristCurDegrees);
-      double absolutePosition = Conversions.degreesToFalcon(m_wristCurDegrees, WRConsts.kWristGearRatio);
+      double absolutePosition = Conversions.degreesToFalcon(m_wristCurDegrees, WRConsts.kGearRatio);
 
       if (RobotBase.isReal( ))
         m_wrist.setSelectedSensorPosition(absolutePosition);
     }
 
-    m_wrist.configReverseSoftLimitThreshold(Conversions.degreesToFalcon(WRConsts.kWristAngleMin, WRConsts.kWristGearRatio),
+    m_wrist.configReverseSoftLimitThreshold(Conversions.degreesToFalcon(WRConsts.kAngleMin, WRConsts.kGearRatio),
         Constants.kCANTimeoutMs);
     m_wrist.configReverseSoftLimitEnable(true, Constants.kCANTimeoutMs);
-    m_wrist.configForwardSoftLimitThreshold(Conversions.degreesToFalcon(WRConsts.kWristAngleMax, WRConsts.kWristGearRatio),
+    m_wrist.configForwardSoftLimitThreshold(Conversions.degreesToFalcon(WRConsts.kAngleMax, WRConsts.kGearRatio),
         Constants.kCANTimeoutMs);
     m_wrist.configForwardSoftLimitEnable(true, Constants.kCANTimeoutMs);
 
@@ -195,14 +187,14 @@ public class Wrist extends SubsystemBase
     // Initialize Variables
     if (m_wristDebug)
     {
-      SmartDashboard.putNumber("WR_velocity", m_velocity);
-      SmartDashboard.putNumber("WR_acceleration", m_acceleration);
-      SmartDashboard.putNumber("WR_sCurveStrength", m_sCurveStrength);
+      SmartDashboard.putNumber("WR_velocity", WRConsts.kMMVelocity);
+      SmartDashboard.putNumber("WR_acceleration", WRConsts.kMMAcceleration);
+      SmartDashboard.putNumber("WR_sCurveStrength", WRConsts.kMMSCurveStrength);
     }
 
     SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
     SmartDashboard.putNumber("WR_targetDegrees", m_wristTargetDegrees);
-    SmartDashboard.putBoolean("WR_calibrated", WRConsts.kWristCalibrated);
+    SmartDashboard.putBoolean("WR_calibrated", WRConsts.kCalibrated);
     SmartDashboard.putBoolean("WR_normalMode", !m_wristDebug);
 
     // post the mechanism to the dashboard
@@ -231,17 +223,17 @@ public class Wrist extends SubsystemBase
 
   private int wristDegreesToCounts(double degrees)
   {
-    return (int) (degrees / WRConsts.kWristDegreesPerCount);
+    return (int) (degrees / WRConsts.kDegreesPerCount);
   }
 
   private double wristCountsToDegrees(int counts)
   {
-    return counts * WRConsts.kWristDegreesPerCount;
+    return counts * WRConsts.kDegreesPerCount;
   }
 
   public boolean moveIsInRange(double degrees)
   {
-    return (degrees > WRConsts.kWristAngleMin) && (degrees < WRConsts.kWristAngleMax);
+    return (degrees > WRConsts.kAngleMin) && (degrees < WRConsts.kAngleMax);
   }
 
   public double getAngle( )
@@ -257,7 +249,7 @@ public class Wrist extends SubsystemBase
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
     motor.setSafetyEnabled(false);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSafetyEnabled");
-    motor.configNeutralDeadband(m_neutralDeadband, Constants.kLongCANTimeoutMs);
+    motor.configNeutralDeadband(WRConsts.kNeutralDeadband, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configNeutralDeadband");
 
     motor.configVoltageCompSaturation(12.0);
@@ -273,24 +265,24 @@ public class Wrist extends SubsystemBase
     // Configure sensor settings
     motor.setSelectedSensorPosition(0.0);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSelectedSensorPosition");
-    motor.configAllowableClosedloopError(SLOTINDEX, m_wristAllowedError, Constants.kLongCANTimeoutMs);
+    motor.configAllowableClosedloopError(SLOTINDEX, WRConsts.kAllowedError, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllowableClosedloopError");
 
-    motor.configMotionCruiseVelocity(m_velocity, Constants.kLongCANTimeoutMs);
+    motor.configMotionCruiseVelocity(WRConsts.kMMVelocity, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionCruiseVelocity");
-    motor.configMotionAcceleration(m_acceleration, Constants.kLongCANTimeoutMs);
+    motor.configMotionAcceleration(WRConsts.kMMAcceleration, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionAcceleration");
-    motor.configMotionSCurveStrength(m_sCurveStrength, Constants.kLongCANTimeoutMs);
+    motor.configMotionSCurveStrength(WRConsts.kMMSCurveStrength, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionSCurveStrength");
 
     // Configure Magic Motion settings
-    motor.config_kF(0, WRConsts.kWristPidKf, Constants.kLongCANTimeoutMs);
+    motor.config_kF(0, WRConsts.kPidKf, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kF");
-    motor.config_kP(0, WRConsts.kWristPidKp, Constants.kLongCANTimeoutMs);
+    motor.config_kP(0, WRConsts.kPidKp, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kP");
-    motor.config_kI(0, WRConsts.kWristPidKi, Constants.kLongCANTimeoutMs);
+    motor.config_kI(0, WRConsts.kPidKi, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kI");
-    motor.config_kD(0, WRConsts.kWristPidKd, Constants.kLongCANTimeoutMs);
+    motor.config_kD(0, WRConsts.kPidKd, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kD");
     motor.selectProfileSlot(SLOTINDEX, PIDINDEX);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "selectProfileSlot");
@@ -318,14 +310,14 @@ public class Wrist extends SubsystemBase
 
     if (axisValue < 0.0)
     {
-      if (m_wristCurDegrees > WRConsts.kWristAngleMin)
+      if (m_wristCurDegrees > WRConsts.kAngleMin)
         newMode = WristMode.WRIST_UP;
       else
         outOfRange = true;
     }
     else if (axisValue > 0.0)
     {
-      if (m_wristCurDegrees < WRConsts.kWristAngleMax)
+      if (m_wristCurDegrees < WRConsts.kAngleMax)
         newMode = WristMode.WRIST_DOWN;
       else
         outOfRange = true;
@@ -365,7 +357,7 @@ public class Wrist extends SubsystemBase
     double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
     double wristDegrees = RobotContainer.getInstance( ).m_wrist.getAngle( );
 
-    return WRConsts.kWristArbitraryFF * Math.cos(Math.toRadians(elbowDegrees - wristDegrees));
+    return WRConsts.kArbitraryFF * Math.cos(Math.toRadians(elbowDegrees - wristDegrees));
   }
 
   public void setMotorOutput(double brake)
@@ -379,17 +371,13 @@ public class Wrist extends SubsystemBase
   {
     if (m_wristDebug)
     {
-      m_velocity = (int) SmartDashboard.getNumber("WR_velocity", m_velocity);
-      m_acceleration = (int) SmartDashboard.getNumber("WR_acceleration", m_acceleration);
-      m_sCurveStrength = (int) SmartDashboard.getNumber("WR_sCurveStrength", m_sCurveStrength);
-
-      m_wrist.configMotionCruiseVelocity(m_velocity);
-      m_wrist.configMotionAcceleration(m_acceleration);
-      m_wrist.configMotionSCurveStrength(m_sCurveStrength);
-      m_wrist.config_kF(SLOTINDEX, WRConsts.kWristPidKf);
-      m_wrist.config_kP(SLOTINDEX, WRConsts.kWristPidKp);
-      m_wrist.config_kI(SLOTINDEX, WRConsts.kWristPidKi);
-      m_wrist.config_kD(SLOTINDEX, WRConsts.kWristPidKd);
+      m_wrist.configMotionCruiseVelocity(WRConsts.kMMVelocity);
+      m_wrist.configMotionAcceleration(WRConsts.kMMAcceleration);
+      m_wrist.configMotionSCurveStrength(WRConsts.kMMSCurveStrength);
+      m_wrist.config_kF(SLOTINDEX, WRConsts.kPidKf);
+      m_wrist.config_kP(SLOTINDEX, WRConsts.kPidKp);
+      m_wrist.config_kI(SLOTINDEX, WRConsts.kPidKi);
+      m_wrist.config_kD(SLOTINDEX, WRConsts.kPidKd);
     }
 
     if (angle != m_wristAngle)
@@ -408,42 +396,42 @@ public class Wrist extends SubsystemBase
             m_wristTargetDegrees = 0.25;
           break;
         case WRIST_STOW :
-          m_wristTargetDegrees = WRConsts.kWristAngleStow;
+          m_wristTargetDegrees = WRConsts.kAngleStow;
           break;
         case WRIST_IDLE :
-          m_wristTargetDegrees = WRConsts.kWristAngleIdle;
+          m_wristTargetDegrees = WRConsts.kAngleIdle;
           break;
         case WRIST_LOW :
-          m_wristTargetDegrees = WRConsts.kWristAngleScoreLow;
+          m_wristTargetDegrees = WRConsts.kAngleScoreLow;
           break;
         case WRIST_MID :
-          m_wristTargetDegrees = WRConsts.kWristAngleScoreMid;
+          m_wristTargetDegrees = WRConsts.kAngleScoreMid;
           break;
         case WRIST_HIGH :
-          m_wristTargetDegrees = WRConsts.kWristAngleScoreHigh;
+          m_wristTargetDegrees = WRConsts.kAngleScoreHigh;
           break;
         case WRIST_SHELF :
-          m_wristTargetDegrees = WRConsts.kWristAngleSubstation;
+          m_wristTargetDegrees = WRConsts.kAngleSubstation;
           break;
         case WRIST_SCORE :
-          m_wristTargetDegrees = WRConsts.kWristAngleScore;
+          m_wristTargetDegrees = WRConsts.kAngleScore;
           break;
       }
     }
 
-    if (WRConsts.kWristCalibrated && moveIsInRange(Math.abs(m_wristTargetDegrees - m_wristCurDegrees)))
+    if (WRConsts.kCalibrated && moveIsInRange(Math.abs(m_wristTargetDegrees - m_wristCurDegrees)))
     {
       // angle constraint check/soft limit for max and min angle before raising
       if (!moveIsInRange(m_wristTargetDegrees))
       {
         DataLogManager.log(String.format("%s: Target %.1f degrees is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
-            m_wristTargetDegrees, WRConsts.kWristAngleMin, WRConsts.kWristAngleMax));
+            m_wristTargetDegrees, WRConsts.kAngleMin, WRConsts.kAngleMax));
         m_wristTargetDegrees = m_wristCurDegrees;
       }
 
       m_safetyTimer.restart( );
 
-      if (m_wristValid && WRConsts.kWristCalibrated)
+      if (m_wristValid && WRConsts.kCalibrated)
         m_wrist.set(ControlMode.MotionMagic, wristDegreesToCounts(m_wristTargetDegrees), DemandType.ArbitraryFeedForward,
             m_wristTotalFF);
 
@@ -460,7 +448,7 @@ public class Wrist extends SubsystemBase
 
   public void moveWristAngleExecute( )
   {
-    if (m_wristValid && WRConsts.kWristCalibrated)
+    if (m_wristValid && WRConsts.kCalibrated)
       m_wrist.set(ControlMode.MotionMagic, wristDegreesToCounts(m_wristTargetDegrees), DemandType.ArbitraryFeedForward,
           m_wristTotalFF);
   }
@@ -471,7 +459,7 @@ public class Wrist extends SubsystemBase
 
     errorInDegrees = m_wristTargetDegrees - m_wristCurDegrees;
 
-    if (Math.abs(errorInDegrees) < m_toleranceDegrees)
+    if (Math.abs(errorInDegrees) < WRConsts.kToleranceDegrees)
     {
       if (++m_withinTolerance >= 3)
       {
