@@ -84,8 +84,6 @@ public class Wrist extends SubsystemBase
 
   private Timer                           m_safetyTimer         = new Timer( ); // Safety timer for use in wrist
 
-  private int                             maxVelocity;
-
   // Constructor
   public Wrist( )
   {

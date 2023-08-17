@@ -85,8 +85,6 @@ public class Elbow extends SubsystemBase
 
   private Timer                           m_safetyTimer         = new Timer( ); // Safety timer for use in elbow
 
-  private int                             maxVelocity;
-
   // Constructor
   public Elbow( )
   {

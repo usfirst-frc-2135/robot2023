@@ -71,7 +71,6 @@ public class Extension extends SubsystemBase
 
   private Timer                           m_safetyTimer           = new Timer( ); // Safety timer for use in extension
   private double                          m_extensionDistTravelled;
-  private int                             maxVelocity;
 
   // Constructor
   public Extension( )
