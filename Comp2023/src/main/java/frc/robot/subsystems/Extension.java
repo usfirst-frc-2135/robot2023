@@ -58,10 +58,8 @@ public class Extension extends SubsystemBase
   private StatorCurrentLimitConfiguration m_statorCurrentLimits   = new StatorCurrentLimitConfiguration(true,
       EXConsts.kStatorCurrentLimit, EXConsts.kStatorTriggerCurrent, EXConsts.kStatorTriggerTime);
 
-  private double                          m_stickDeadband         = Constants.kStickDeadband;              // joystick deadband
+  // Declare module variables
   private ExtensionMode                   m_extensionMode         = ExtensionMode.EXTENSION_INIT;          // Mode active with joysticks
-
-  private boolean                         m_extensionDebug        = false;  // DEBUG flag to disable/enable extra logging calls
 
   private ExtensionLength                 m_extensionLength;                // Desired extension length
   private boolean                         m_moveIsFinished;
@@ -108,16 +106,6 @@ public class Extension extends SubsystemBase
         m_extensionTargetInches = extensionCountsToInches(curCounts);
       }
 
-      if (m_extensionDebug)
-      {
-        int curVelocity = (int) m_extension.getSelectedSensorVelocity(0);
-        maxVelocity = (maxVelocity > curVelocity) ? maxVelocity : curVelocity;
-
-        SmartDashboard.putNumber("EX_maxVelocity", maxVelocity);
-        SmartDashboard.putNumber("EX_curVelocity", curVelocity);
-        SmartDashboard.putNumber("EX_curCounts", curCounts);
-      }
-
       m_extensionCurInches = extensionCountsToInches(curCounts);
       SmartDashboard.putNumber("EX_curInches", m_extensionCurInches);
       SmartDashboard.putNumber("EX_targetInches", m_extensionTargetInches);
@@ -158,18 +146,9 @@ public class Extension extends SubsystemBase
     SmartDashboard.putBoolean("HL_validEX", m_extensionValid);
 
     // Initialize Variables
-    if (m_extensionDebug)
-    {
-      SmartDashboard.putNumber("EX_velocity", EXConsts.kMMVelocity);
-      SmartDashboard.putNumber("EX_acceleration", EXConsts.kMMAcceleration);
-      SmartDashboard.putNumber("EX_sCurveStrength", EXConsts.kMMSCurveStrength);
-
-    }
-
     SmartDashboard.putNumber("EX_curInches", m_extensionCurInches);
     SmartDashboard.putNumber("EX_targetInches", m_extensionTargetInches);
     SmartDashboard.putBoolean("EX_calibrated", EXConsts.kCalibrated);
-    SmartDashboard.putBoolean("EX_normalMode", !m_extensionDebug);
 
     // post the mechanism to the dashboard
     SmartDashboard.putData("ExtensionMech", m_extensionMech);
@@ -267,7 +246,7 @@ public class Extension extends SubsystemBase
     boolean outOfRange = false;
     ExtensionMode newMode = ExtensionMode.EXTENSION_STOPPED;
 
-    axisValue = MathUtil.applyDeadband(axisValue, m_stickDeadband);
+    axisValue = MathUtil.applyDeadband(axisValue, Constants.kStickDeadband);
 
     if (axisValue < 0.0)
     {
@@ -335,17 +314,6 @@ public class Extension extends SubsystemBase
 
   public void moveExtensionLengthInit(ExtensionLength length)
   {
-    if (m_extensionDebug)
-    {
-      m_extension.configMotionCruiseVelocity(EXConsts.kMMVelocity);
-      m_extension.configMotionAcceleration(EXConsts.kMMAcceleration);
-      m_extension.configMotionSCurveStrength(EXConsts.kMMSCurveStrength);
-      m_extension.config_kF(SLOTINDEX, EXConsts.kPidKf);
-      m_extension.config_kP(SLOTINDEX, EXConsts.kPidKp);
-      m_extension.config_kI(SLOTINDEX, EXConsts.kPidKi);
-      m_extension.config_kD(SLOTINDEX, EXConsts.kPidKd);
-    }
-
     if (length != m_extensionLength)
     {
       m_extensionLength = length;

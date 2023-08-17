@@ -73,10 +73,8 @@ public class Elbow extends SubsystemBase
   private StatorCurrentLimitConfiguration m_statorCurrentLimits = new StatorCurrentLimitConfiguration(true,
       ELConsts.kStatorCurrentLimit, ELConsts.kStatorTriggerCurrent, ELConsts.kStatorTriggerTime);
 
-  private double                          m_stickDeadband       = Constants.kStickDeadband;         // joystick deadband
+  // Declare module variables
   private ElbowMode                       m_elbowMode           = ElbowMode.ELBOW_INIT;             // Mode active with joysticks
-
-  private boolean                         m_elbowDebug          = false;  // DEBUG flag to disable/enable extra logging calls
 
   private ElbowAngle                      m_elbowAngle;                   // Desired elbow angle
   private boolean                         m_moveIsFinished;
@@ -139,16 +137,6 @@ public class Elbow extends SubsystemBase
     {
       int curCounts = (int) m_elbow.getSelectedSensorPosition(0);
 
-      if (m_elbowDebug)
-      {
-        int curVelocity = (int) m_elbow.getSelectedSensorVelocity(0);
-        maxVelocity = (maxVelocity > curVelocity) ? maxVelocity : curVelocity;
-
-        SmartDashboard.putNumber("EL_maxVelocity", maxVelocity);
-        SmartDashboard.putNumber("EL_curVelocity", curVelocity);
-        SmartDashboard.putNumber("EL_curCounts", curCounts);
-      }
-
       m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
       SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
       SmartDashboard.putNumber("EL_targetDegrees", m_elbowTargetDegrees);
@@ -187,17 +175,9 @@ public class Elbow extends SubsystemBase
     SmartDashboard.putBoolean("HL_validEL", m_elbowValid);
 
     // Initialize Variables
-    if (m_elbowDebug)
-    {
-      SmartDashboard.putNumber("EL_velocity", ELConsts.kMMVelocity);
-      SmartDashboard.putNumber("EL_acceleration", ELConsts.kMMAcceleration);
-      SmartDashboard.putNumber("EL_sCurveStrength", ELConsts.kMMSCurveStrength);
-    }
-
     SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
     SmartDashboard.putNumber("EL_targetDegrees", m_elbowTargetDegrees);
     SmartDashboard.putBoolean("EL_calibrated", ELConsts.kCalibrated);
-    SmartDashboard.putBoolean("EL_normalMode", !m_elbowDebug);
 
     // post the mechanism to the dashboard
     SmartDashboard.putData("ElbowMech", m_elbowMech);
@@ -298,7 +278,7 @@ public class Elbow extends SubsystemBase
     boolean outOfRange = false;
     ElbowMode newMode = ElbowMode.ELBOW_STOPPED;
 
-    axisValue = MathUtil.applyDeadband(axisValue, m_stickDeadband);
+    axisValue = MathUtil.applyDeadband(axisValue, Constants.kStickDeadband);
 
     if (axisValue < 0.0)
     {
@@ -355,17 +335,6 @@ public class Elbow extends SubsystemBase
 
   public void moveElbowAngleInit(ElbowAngle angle)
   {
-    if (m_elbowDebug)
-    {
-      m_elbow.configMotionCruiseVelocity(ELConsts.kMMVelocity);
-      m_elbow.configMotionAcceleration(ELConsts.kMMAcceleration);
-      m_elbow.configMotionSCurveStrength(ELConsts.kMMSCurveStrength);
-      m_elbow.config_kF(SLOTINDEX, ELConsts.kPidKf);
-      m_elbow.config_kP(SLOTINDEX, ELConsts.kPidKp);
-      m_elbow.config_kI(SLOTINDEX, ELConsts.kPidKi);
-      m_elbow.config_kD(SLOTINDEX, ELConsts.kPidKd);
-    }
-
     if (angle != m_elbowAngle)
     {
       m_elbowAngle = angle;

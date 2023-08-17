@@ -72,10 +72,8 @@ public class Wrist extends SubsystemBase
   private StatorCurrentLimitConfiguration m_statorCurrentLimits = new StatorCurrentLimitConfiguration(true,
       WRConsts.kStatorCurrentLimit, WRConsts.kStatorTriggerCurrent, WRConsts.kStatorTriggerTime);
 
-  private double                          m_stickDeadband       = Constants.kStickDeadband;          // joystick deadband
+  // Declare module variables
   private WristMode                       m_wristMode           = WristMode.WRIST_INIT;              // Mode active with joysticks
-
-  private boolean                         m_wristDebug          = false;  // DEBUG flag to disable/enable extra logging calls
 
   private WristAngle                      m_wristAngle;                   // Desired extension length
   private boolean                         m_moveIsFinished;
@@ -138,15 +136,6 @@ public class Wrist extends SubsystemBase
     {
       int curCounts = (int) m_wrist.getSelectedSensorPosition(0);
 
-      if (m_wristDebug)
-      {
-        int curVelocity = (int) m_wrist.getSelectedSensorVelocity(0);
-        maxVelocity = (maxVelocity > curVelocity) ? maxVelocity : curVelocity;
-        SmartDashboard.putNumber("WR_maxVelocity", maxVelocity);
-        SmartDashboard.putNumber("WR_curVelocity", curVelocity);
-        SmartDashboard.putNumber("WR_curCounts", curCounts);
-      }
-
       m_wristCurDegrees = wristCountsToDegrees(curCounts);
       SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
       SmartDashboard.putNumber("WR_targetDegrees", m_wristTargetDegrees);
@@ -185,17 +174,9 @@ public class Wrist extends SubsystemBase
     SmartDashboard.putBoolean("HL_validWR", m_wristValid);
 
     // Initialize Variables
-    if (m_wristDebug)
-    {
-      SmartDashboard.putNumber("WR_velocity", WRConsts.kMMVelocity);
-      SmartDashboard.putNumber("WR_acceleration", WRConsts.kMMAcceleration);
-      SmartDashboard.putNumber("WR_sCurveStrength", WRConsts.kMMSCurveStrength);
-    }
-
     SmartDashboard.putNumber("WR_curDegrees", m_wristCurDegrees);
     SmartDashboard.putNumber("WR_targetDegrees", m_wristTargetDegrees);
     SmartDashboard.putBoolean("WR_calibrated", WRConsts.kCalibrated);
-    SmartDashboard.putBoolean("WR_normalMode", !m_wristDebug);
 
     // post the mechanism to the dashboard
     SmartDashboard.putData("WristMech", m_wristMech);
@@ -306,7 +287,7 @@ public class Wrist extends SubsystemBase
     boolean outOfRange = false;
     WristMode newMode = WristMode.WRIST_STOPPED;
 
-    axisValue = MathUtil.applyDeadband(axisValue, m_stickDeadband);
+    axisValue = MathUtil.applyDeadband(axisValue, Constants.kStickDeadband);
 
     if (axisValue < 0.0)
     {
@@ -369,17 +350,6 @@ public class Wrist extends SubsystemBase
 
   public void moveWristAngleInit(WristAngle angle)
   {
-    if (m_wristDebug)
-    {
-      m_wrist.configMotionCruiseVelocity(WRConsts.kMMVelocity);
-      m_wrist.configMotionAcceleration(WRConsts.kMMAcceleration);
-      m_wrist.configMotionSCurveStrength(WRConsts.kMMSCurveStrength);
-      m_wrist.config_kF(SLOTINDEX, WRConsts.kPidKf);
-      m_wrist.config_kP(SLOTINDEX, WRConsts.kPidKp);
-      m_wrist.config_kI(SLOTINDEX, WRConsts.kPidKi);
-      m_wrist.config_kD(SLOTINDEX, WRConsts.kPidKd);
-    }
-
     if (angle != m_wristAngle)
     {
       m_wristAngle = angle;
