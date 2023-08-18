@@ -222,24 +222,17 @@ public class Wrist extends SubsystemBase
 
   private void wristTalonInitialize(WPI_TalonFX motor, boolean inverted)
   {
+    motor.configFactoryDefault( );
+    motor.configAllSettings(CTREConfigs.wristAngleFXConfig( ));
     motor.setInverted(inverted);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setInverted");
     motor.setNeutralMode(NeutralMode.Brake);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
     motor.setSafetyEnabled(false);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSafetyEnabled");
-    motor.configNeutralDeadband(WRConsts.kNeutralDeadband, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configNeutralDeadband");
 
-    motor.configVoltageCompSaturation(12.0);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configVoltageCompSaturation");
     motor.enableVoltageCompensation(true);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "enableVoltageCompensation");
-
-    motor.configSupplyCurrentLimit(m_supplyCurrentLimits);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configSupplyCurrentLimits");
-    motor.configStatorCurrentLimit(m_statorCurrentLimits);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configStatorCurrentLimits");
 
     // Configure sensor settings
     motor.setSelectedSensorPosition(0.0);
@@ -247,22 +240,7 @@ public class Wrist extends SubsystemBase
     motor.configAllowableClosedloopError(SLOTINDEX, WRConsts.kAllowedError, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllowableClosedloopError");
 
-    motor.configMotionCruiseVelocity(WRConsts.kMMVelocity, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionCruiseVelocity");
-    motor.configMotionAcceleration(WRConsts.kMMAcceleration, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionAcceleration");
-    motor.configMotionSCurveStrength(WRConsts.kMMSCurveStrength, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionSCurveStrength");
-
     // Configure Magic Motion settings
-    motor.config_kF(0, WRConsts.kPidKf, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kF");
-    motor.config_kP(0, WRConsts.kPidKp, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kP");
-    motor.config_kI(0, WRConsts.kPidKi, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kI");
-    motor.config_kD(0, WRConsts.kPidKd, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kD");
     motor.selectProfileSlot(SLOTINDEX, PIDINDEX);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "selectProfileSlot");
 

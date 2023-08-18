@@ -48,42 +48,36 @@ import frc.robot.team2135.PhoenixUtil;
 public class Elbow extends SubsystemBase
 {
   // Constants
-  private static final int                PIDINDEX              = 0;   // PID in use (0-primary, 1-aux)
-  private static final int                SLOTINDEX             = 0;   // Use first PID slot
+  private static final int           PIDINDEX             = 0;   // PID in use (0-primary, 1-aux)
+  private static final int           SLOTINDEX            = 0;   // Use first PID slot
 
   // Member objects
-  private final WPI_TalonFX               m_elbow               = new WPI_TalonFX(Constants.Ports.kCANID_Elbow);  //elbow
-  private final CANCoder                  m_elbowCANCoder       = new CANCoder(Constants.Ports.kCANID_ELCANCoder);
-  private final TalonFXSimCollection      m_elbowMotorSim       = new TalonFXSimCollection(m_elbow);
-  private final SingleJointedArmSim       m_elbowSim            = new SingleJointedArmSim(DCMotor.getFalcon500(1),
-      ELConsts.kGearRatio, 2.0, ELConsts.kForearmLengthMeters, -Math.PI, Math.PI, false);
+  private final WPI_TalonFX          m_elbow              = new WPI_TalonFX(Constants.Ports.kCANID_Elbow);  //elbow
+  private final CANCoder             m_elbowCANCoder      = new CANCoder(Constants.Ports.kCANID_ELCANCoder);
+  private final TalonFXSimCollection m_elbowMotorSim      = new TalonFXSimCollection(m_elbow);
+  private final SingleJointedArmSim  m_elbowSim           = new SingleJointedArmSim(DCMotor.getFalcon500(1), ELConsts.kGearRatio,
+      2.0, ELConsts.kForearmLengthMeters, -Math.PI, Math.PI, false);
 
   // Mechanism2d
-  private final Mechanism2d               m_elbowMech           = new Mechanism2d(3, 3);
-  private final MechanismRoot2d           m_elbowRoot           = m_elbowMech.getRoot("elbow", 1.5, 2);
-  private final MechanismLigament2d       m_elbowLigament       =
+  private final Mechanism2d          m_elbowMech          = new Mechanism2d(3, 3);
+  private final MechanismRoot2d      m_elbowRoot          = m_elbowMech.getRoot("elbow", 1.5, 2);
+  private final MechanismLigament2d  m_elbowLigament      =
       m_elbowRoot.append(new MechanismLigament2d("elbow", 1, 0, 6, new Color8Bit(Color.kBlue)));
 
-  private boolean                         m_elbowValid;                 // Health indicator for elbow Talon 
-  private boolean                         m_elbowCCValid;               // Health indicator for elbow CANCoder 
-
-  //Devices and simulation objs
-  private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true,
-      ELConsts.kSupplyCurrentLimit, ELConsts.kSupplyTriggerCurrent, ELConsts.kSupplyTriggerTime);
-  private StatorCurrentLimitConfiguration m_statorCurrentLimits = new StatorCurrentLimitConfiguration(true,
-      ELConsts.kStatorCurrentLimit, ELConsts.kStatorTriggerCurrent, ELConsts.kStatorTriggerTime);
+  private boolean                    m_elbowValid;                 // Health indicator for elbow Talon 
+  private boolean                    m_elbowCCValid;               // Health indicator for elbow CANCoder 
 
   // Declare module variables
-  private ElbowMode                       m_elbowMode           = ElbowMode.ELBOW_INIT;             // Mode active with joysticks
+  private ElbowMode                  m_elbowMode          = ElbowMode.ELBOW_INIT;             // Mode active with joysticks
 
-  private ElbowAngle                      m_elbowAngle;                   // Desired elbow angle
-  private boolean                         m_moveIsFinished;
-  private double                          m_elbowTargetDegrees  = 0.0;    // Target angle in degrees
-  private double                          m_elbowCurDegrees     = 0.0;    // Current angle in degrees
-  private int                             m_withinTolerance     = 0;      // Counter for consecutive readings within tolerance
-  private double                          m_elbowTotalFF;
+  private ElbowAngle                 m_elbowAngle;                   // Desired elbow angle
+  private boolean                    m_moveIsFinished;
+  private double                     m_elbowTargetDegrees = 0.0;    // Target angle in degrees
+  private double                     m_elbowCurDegrees    = 0.0;    // Current angle in degrees
+  private int                        m_withinTolerance    = 0;      // Counter for consecutive readings within tolerance
+  private double                     m_elbowTotalFF;
 
-  private Timer                           m_safetyTimer         = new Timer( ); // Safety timer for use in elbow
+  private Timer                      m_safetyTimer        = new Timer( ); // Safety timer for use in elbow
 
   // Constructor
   public Elbow( )
@@ -223,24 +217,17 @@ public class Elbow extends SubsystemBase
 
   private void elbowTalonInitialize(WPI_TalonFX motor, boolean inverted)
   {
+    motor.configFactoryDefault( );
+    motor.configAllSettings(CTREConfigs.elbowAngleFXConfig( ));
     motor.setInverted(inverted);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setInverted");
     motor.setNeutralMode(NeutralMode.Brake);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
     motor.setSafetyEnabled(false);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSafetyEnabled");
-    motor.configNeutralDeadband(ELConsts.kNeutralDeadband, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configNeutralDeadband");
 
-    motor.configVoltageCompSaturation(12.0);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configVoltageCompSaturation");
     motor.enableVoltageCompensation(true);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "enableVoltageCompensation");
-
-    motor.configSupplyCurrentLimit(m_supplyCurrentLimits);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configSupplyCurrentLimits");
-    motor.configStatorCurrentLimit(m_statorCurrentLimits);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configStatorCurrentLimits");
 
     // Configure sensor settings
     motor.setSelectedSensorPosition(0.0);
@@ -248,22 +235,7 @@ public class Elbow extends SubsystemBase
     motor.configAllowableClosedloopError(SLOTINDEX, ELConsts.kAllowedError, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllowableClosedloopError");
 
-    motor.configMotionCruiseVelocity(ELConsts.kMMVelocity, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionCruiseVelocity");
-    motor.configMotionAcceleration(ELConsts.kMMAcceleration, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionAcceleration");
-    motor.configMotionSCurveStrength(ELConsts.kMMSCurveStrength, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionSCurveStrength");
-
     // Configure Magic Motion settings
-    motor.config_kF(0, ELConsts.kPidKf, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kF");
-    motor.config_kP(0, ELConsts.kPidKp, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kP");
-    motor.config_kI(0, ELConsts.kPidKi, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kI");
-    motor.config_kD(0, ELConsts.kPidKd, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kD");
     motor.selectProfileSlot(SLOTINDEX, PIDINDEX);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "selectProfileSlot");
 

@@ -25,6 +25,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.EXConsts;
 import frc.robot.Constants.EXConsts.ExtensionLength;
 import frc.robot.Constants.EXConsts.ExtensionMode;
+import frc.robot.lib.util.CTREConfigs;
 import frc.robot.RobotContainer;
 import frc.robot.team2135.PhoenixUtil;
 
@@ -34,43 +35,37 @@ import frc.robot.team2135.PhoenixUtil;
 public class Extension extends SubsystemBase
 {
   // Constants
-  private static final int                PIDINDEX                = 0;   // PID in use (0-primary, 1-aux)
-  private static final int                SLOTINDEX               = 0;   // Use first PID slot
+  private static final int      PIDINDEX                = 0;   // PID in use (0-primary, 1-aux)
+  private static final int      SLOTINDEX               = 0;   // Use first PID slot
 
   // Member objects
-  private final WPI_TalonFX               m_extension             = new WPI_TalonFX(Constants.Ports.kCANID_Extension);  //extension
+  private final WPI_TalonFX     m_extension             = new WPI_TalonFX(Constants.Ports.kCANID_Extension);  //extension
   // private final TalonFXSimCollection      m_extensionMotorSim     = new TalonFXSimCollection(m_extension);
   // private final SingleJointedArmSim       m_extensionSim          = new SingleJointedArmSim(DCMotor.getFalcon500(1),
   //     EXConsts.kExtensionGearRatio, 2.0, EXConsts.kForearmLengthMeters, 0.0, Math.PI, false);
 
   // Mechanism2d
-  private final Mechanism2d               m_extensionMech         = new Mechanism2d(3, 3);
-  private final MechanismRoot2d           m_extensionRoot         = m_extensionMech.getRoot("extension", 1.5, 2);
-  private MechanismLigament2d             m_extensionLigament     =
+  private final Mechanism2d     m_extensionMech         = new Mechanism2d(3, 3);
+  private final MechanismRoot2d m_extensionRoot         = m_extensionMech.getRoot("extension", 1.5, 2);
+  private MechanismLigament2d   m_extensionLigament     =
       m_extensionRoot.append(new MechanismLigament2d("extension", 1, 0, 6, new Color8Bit(Color.kBlue)));
 
-  private boolean                         m_extensionValid;              // Health indicator for extension Talon 
+  private boolean               m_extensionValid;              // Health indicator for extension Talon 
   // private double                          m_extensionLengthOffset = 0.0; // CANCoder length measured at reference point
 
-  //Devices and simulation objs
-  private SupplyCurrentLimitConfiguration m_supplyCurrentLimits   = new SupplyCurrentLimitConfiguration(true,
-      EXConsts.kSupplyCurrentLimit, EXConsts.kSupplyTriggerCurrent, EXConsts.kSupplyTriggerTime);
-  private StatorCurrentLimitConfiguration m_statorCurrentLimits   = new StatorCurrentLimitConfiguration(true,
-      EXConsts.kStatorCurrentLimit, EXConsts.kStatorTriggerCurrent, EXConsts.kStatorTriggerTime);
-
   // Declare module variables
-  private ExtensionMode                   m_extensionMode         = ExtensionMode.EXTENSION_INIT;          // Mode active with joysticks
+  private ExtensionMode         m_extensionMode         = ExtensionMode.EXTENSION_INIT;          // Mode active with joysticks
 
-  private ExtensionLength                 m_extensionLength;                // Desired extension length
-  private boolean                         m_moveIsFinished;
-  private double                          m_extensionTargetInches = 0.0;    // Target length in inches
-  private double                          m_extensionCurInches    = 0.0;    // Current length in inches
-  private int                             m_withinTolerance       = 0;      // Counter for consecutive readings within tolerance
-  private double                          m_extensionTotalFF;
-  private boolean                         m_calibrated            = EXConsts.kCalibrated;  // Indicates whether the extension has been calibrated
+  private ExtensionLength       m_extensionLength;                // Desired extension length
+  private boolean               m_moveIsFinished;
+  private double                m_extensionTargetInches = 0.0;    // Target length in inches
+  private double                m_extensionCurInches    = 0.0;    // Current length in inches
+  private int                   m_withinTolerance       = 0;      // Counter for consecutive readings within tolerance
+  private double                m_extensionTotalFF;
+  private boolean               m_calibrated            = EXConsts.kCalibrated;  // Indicates whether the extension has been calibrated
 
-  private Timer                           m_safetyTimer           = new Timer( ); // Safety timer for use in extension
-  private double                          m_extensionDistTravelled;
+  private Timer                 m_safetyTimer           = new Timer( ); // Safety timer for use in extension
+  private double                m_extensionDistTravelled;
 
   // Constructor
   public Extension( )
@@ -190,6 +185,8 @@ public class Extension extends SubsystemBase
 
   private void extensionTalonInitialize(WPI_TalonFX motor, boolean inverted)
   {
+    motor.configFactoryDefault( );
+    motor.configAllSettings(CTREConfigs.extensionLengthFXConfig( ));
     motor.setInverted(inverted);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setInverted");
     motor.setSensorPhase(true);
@@ -198,18 +195,9 @@ public class Extension extends SubsystemBase
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
     motor.setSafetyEnabled(false);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSafetyEnabled");
-    motor.configNeutralDeadband(EXConsts.kNeutralDeadband, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configNeutralDeadband");
 
-    motor.configVoltageCompSaturation(12.0);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configVoltageCompSaturation");
     motor.enableVoltageCompensation(true);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "enableVoltageCompensation");
-
-    motor.configSupplyCurrentLimit(m_supplyCurrentLimits);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configSupplyCurrentLimits");
-    motor.configStatorCurrentLimit(m_statorCurrentLimits);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configStatorCurrentLimits");
 
     // Configure sensor settings
     motor.setSelectedSensorPosition(0.0);
@@ -217,22 +205,7 @@ public class Extension extends SubsystemBase
     motor.configAllowableClosedloopError(SLOTINDEX, EXConsts.kAllowedError, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllowableClosedloopError");
 
-    motor.configMotionCruiseVelocity(EXConsts.kMMVelocity, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionCruiseVelocity");
-    motor.configMotionAcceleration(EXConsts.kMMAcceleration, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionAcceleration");
-    motor.configMotionSCurveStrength(EXConsts.kMMSCurveStrength, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionSCurveStrength");
-
     // Configure Magic Motion settings
-    motor.config_kF(0, EXConsts.kPidKf, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kF");
-    motor.config_kP(0, EXConsts.kPidKp, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kP");
-    motor.config_kI(0, EXConsts.kPidKi, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kI");
-    motor.config_kD(0, EXConsts.kPidKd, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kD");
     motor.selectProfileSlot(SLOTINDEX, PIDINDEX);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "selectProfileSlot");
 
