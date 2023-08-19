@@ -6,8 +6,6 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
@@ -47,42 +45,36 @@ import frc.robot.team2135.PhoenixUtil;
 public class Wrist extends SubsystemBase
 {
   // Constants
-  private static final int                PIDINDEX              = 0;   // PID in use (0-primary, 1-aux)
-  private static final int                SLOTINDEX             = 0;   // Use first PID slot
+  private static final int           PIDINDEX             = 0;   // PID in use (0-primary, 1-aux)
+  private static final int           SLOTINDEX            = 0;   // Use first PID slot
 
   // Member objects
-  private final WPI_TalonFX               m_wrist               = new WPI_TalonFX(Constants.Ports.kCANID_Wrist);  //wrist
-  private final CANCoder                  m_wristCANCoder       = new CANCoder(Constants.Ports.kCANID_WRCANCoder);
-  private final TalonFXSimCollection      m_wristMotorSim       = new TalonFXSimCollection(m_wrist);
-  private final SingleJointedArmSim       m_wristSim            = new SingleJointedArmSim(DCMotor.getFalcon500(1),
-      WRConsts.kGearRatio, 2.0, WRConsts.kGripperLengthMeters, -Math.PI, Math.PI, false);
+  private final WPI_TalonFX          m_wrist              = new WPI_TalonFX(Constants.Ports.kCANID_Wrist);  //wrist
+  private final CANCoder             m_wristCANCoder      = new CANCoder(Constants.Ports.kCANID_WRCANCoder);
+  private final TalonFXSimCollection m_wristMotorSim      = new TalonFXSimCollection(m_wrist);
+  private final SingleJointedArmSim  m_wristSim           = new SingleJointedArmSim(DCMotor.getFalcon500(1), WRConsts.kGearRatio,
+      2.0, WRConsts.kGripperLengthMeters, -Math.PI, Math.PI, false);
 
   // Mechanism2d
-  private final Mechanism2d               m_wristMech           = new Mechanism2d(3, 3);
-  private final MechanismRoot2d           m_wristRoot           = m_wristMech.getRoot("wrist", 1.5, 2);
-  private final MechanismLigament2d       m_wristLigament       =
+  private final Mechanism2d          m_wristMech          = new Mechanism2d(3, 3);
+  private final MechanismRoot2d      m_wristRoot          = m_wristMech.getRoot("wrist", 1.5, 2);
+  private final MechanismLigament2d  m_wristLigament      =
       m_wristRoot.append(new MechanismLigament2d("wrist", 0.5, 0, 6, new Color8Bit(Color.kPurple)));
 
-  private boolean                         m_wristValid;                 // Health indicator for wrist Talon 
-  private boolean                         m_wristCCValid;               // Health indicator for wrist CANCoder 
-
-  //Devices and simulation objs
-  private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true,
-      WRConsts.kSupplyCurrentLimit, WRConsts.kSupplyTriggerCurrent, WRConsts.kSupplyTriggerTime);
-  private StatorCurrentLimitConfiguration m_statorCurrentLimits = new StatorCurrentLimitConfiguration(true,
-      WRConsts.kStatorCurrentLimit, WRConsts.kStatorTriggerCurrent, WRConsts.kStatorTriggerTime);
+  private boolean                    m_wristValid;                 // Health indicator for wrist Talon 
+  private boolean                    m_wristCCValid;               // Health indicator for wrist CANCoder 
 
   // Declare module variables
-  private WristMode                       m_wristMode           = WristMode.WRIST_INIT;              // Mode active with joysticks
+  private WristMode                  m_wristMode          = WristMode.WRIST_INIT;              // Mode active with joysticks
 
-  private WristAngle                      m_wristAngle;                   // Desired extension length
-  private boolean                         m_moveIsFinished;
-  private double                          m_wristTargetDegrees  = 0.0;    // Target angle in degrees
-  private double                          m_wristCurDegrees     = 0.0;    // Current angle in degrees
-  private int                             m_withinTolerance     = 0;      // Counter for consecutive readings within tolerance
-  private double                          m_wristTotalFF;
+  private WristAngle                 m_wristAngle;                   // Desired extension length
+  private boolean                    m_moveIsFinished;
+  private double                     m_wristTargetDegrees = 0.0;    // Target angle in degrees
+  private double                     m_wristCurDegrees    = 0.0;    // Current angle in degrees
+  private int                        m_withinTolerance    = 0;      // Counter for consecutive readings within tolerance
+  private double                     m_wristTotalFF;
 
-  private Timer                           m_safetyTimer         = new Timer( ); // Safety timer for use in wrist
+  private Timer                      m_safetyTimer        = new Timer( ); // Safety timer for use in wrist
 
   // Constructor
   public Wrist( )
