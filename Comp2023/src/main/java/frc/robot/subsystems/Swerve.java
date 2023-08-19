@@ -84,6 +84,17 @@ public class Swerve extends SubsystemBase
   private boolean                  m_swerveDebug       = false; // Debug flag to disable extra ramsete logging calls
 
   // Limelight drive
+  private double                   m_turnConstant      = SWConsts.kTurnConstant;
+  private double                   m_turnPidKp         = SWConsts.kTurnPidKp;
+  private double                   m_turnPidKi         = SWConsts.kTurnPidKi;
+  private double                   m_turnPidKd         = SWConsts.kTurnPidKd;
+  private double                   m_turnMax           = SWConsts.kTurnMax;
+  private double                   m_throttlePidKp     = SWConsts.kThrottlePidKp;
+  private double                   m_throttlePidKi     = SWConsts.kThrottlePidKi;
+  private double                   m_throttlePidKd     = SWConsts.kThrottlePidKd;
+  private double                   m_throttleMax       = SWConsts.kThrottleMax;
+  private double                   m_throttleShape     = SWConsts.kThrottleShape;
+
   private double                   m_targetAngle       = SWConsts.kTargetAngle;      // Optimal shooting angle
   private double                   m_setPointDistance  = SWConsts.kSetPointDistance; // Optimal shooting distance
   private double                   m_angleThreshold    = SWConsts.kAngleThreshold;   // Tolerance around optimal
@@ -253,14 +264,27 @@ public class Swerve extends SubsystemBase
   //
   public void driveWithLimelightInit(boolean m_endAtTarget)
   {
+    // get pid values from dashboard
+    m_turnConstant = SmartDashboard.getNumber("DLL_turnConstant", m_turnConstant);
+    m_turnPidKp = SmartDashboard.getNumber("DLL_turnPidKp", m_turnPidKp);
+    m_turnPidKi = SmartDashboard.getNumber("DLL_turnPidKi", m_turnPidKi);
+    m_turnPidKd = SmartDashboard.getNumber("DLL_turnPidKd", m_turnPidKd);
+    m_turnMax = SmartDashboard.getNumber("DLL_turnMax", m_turnMax);
+
+    m_throttlePidKp = SmartDashboard.getNumber("DLL_throttlePidKp", m_throttlePidKp);
+    m_throttlePidKi = SmartDashboard.getNumber("DLL_throttlePidKi", m_throttlePidKi);
+    m_throttlePidKd = SmartDashboard.getNumber("DLL_throttlePidKd", m_throttlePidKd);
+    m_throttleMax = SmartDashboard.getNumber("DLL_throttleMax", m_throttleMax);
+    m_throttleShape = SmartDashboard.getNumber("DLL_throttleShape", m_throttleShape);
+
     m_targetAngle = SmartDashboard.getNumber("DLL_targetAngle", m_targetAngle);
     m_setPointDistance = SmartDashboard.getNumber("DLL_setPointDistance", m_setPointDistance);
     m_angleThreshold = SmartDashboard.getNumber("DLL_angleThreshold", m_angleThreshold);
     m_distThreshold = SmartDashboard.getNumber("DLL_distThreshold", m_distThreshold);
 
     // load in Pid constants to controller
-    m_turnPid = new PIDController(SWConsts.kTurnPidKp, SWConsts.kTurnPidKi, SWConsts.kTurnPidKd);
-    m_throttlePid = new PIDController(SWConsts.kThrottlePidKp, SWConsts.kThrottlePidKi, SWConsts.kThrottlePidKd);
+    m_turnPid = new PIDController(m_turnPidKp, m_turnPidKi, m_turnPidKd);
+    m_throttlePid = new PIDController(m_throttlePidKp, m_throttlePidKi, m_throttlePidKd);
 
     RobotContainer rc = RobotContainer.getInstance( );
     rc.m_vision.m_tyfilter.reset( );
@@ -288,15 +312,15 @@ public class Swerve extends SubsystemBase
     double turnOutput = -m_turnPid.calculate(tx, m_targetAngle);
 
     if (turnOutput > 0)
-      turnOutput = turnOutput + SWConsts.kTurnConstant;
+      turnOutput = turnOutput + m_turnConstant;
     else if (turnOutput < 0)
-      turnOutput = turnOutput - SWConsts.kTurnConstant;
+      turnOutput = turnOutput - m_turnConstant;
 
     // get throttle value
     m_limelightDistance = RobotContainer.getInstance( ).m_vision.getDistLimelight( );
 
     double throttleDistance = m_throttlePid.calculate(m_limelightDistance, m_setPointDistance);
-    double throttleOutput = throttleDistance * Math.pow(Math.cos(turnOutput * Math.PI / 180), SWConsts.kThrottleShape);
+    double throttleOutput = throttleDistance * Math.pow(Math.cos(turnOutput * Math.PI / 180), m_throttleShape);
 
     // put turn and throttle outputs on the dashboard
     SmartDashboard.putNumber("DLL_turnOutput", turnOutput);
@@ -304,8 +328,8 @@ public class Swerve extends SubsystemBase
     SmartDashboard.putNumber("DLL_limeLightDist", m_limelightDistance);
 
     // cap max turn and throttle output
-    turnOutput = MathUtil.clamp(turnOutput, -SWConsts.kTurnMax, SWConsts.kTurnMax);
-    throttleOutput = MathUtil.clamp(throttleOutput, -SWConsts.kThrottleMax, SWConsts.kThrottleMax);
+    turnOutput = MathUtil.clamp(turnOutput, -m_turnMax, m_turnMax);
+    throttleOutput = MathUtil.clamp(throttleOutput, -m_throttleMax, m_throttleMax);
 
     // put turn and throttle outputs on the dashboard
     SmartDashboard.putNumber("DLL_turnClamped", turnOutput);
