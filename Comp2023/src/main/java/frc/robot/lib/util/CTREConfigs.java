@@ -51,86 +51,81 @@ public final class CTREConfigs
 
   public static TalonFXConfiguration wristAngleFXConfig( )
   {
-    TalonFXConfiguration angleConfig = new TalonFXConfiguration( );
-    SupplyCurrentLimitConfiguration angleSupplyLimit = new SupplyCurrentLimitConfiguration(true,
-        Constants.WRConsts.kSupplyCurrentLimit, Constants.WRConsts.kSupplyTriggerCurrent, Constants.WRConsts.kSupplyTriggerTime);
-    StatorCurrentLimitConfiguration angleStatorCurrentLimits = new StatorCurrentLimitConfiguration(true,
-        WRConsts.kStatorCurrentLimit, WRConsts.kStatorTriggerCurrent, WRConsts.kStatorTriggerTime);
+    TalonFXConfiguration wristConfig = new TalonFXConfiguration( );
 
-    angleConfig.slot0.kP = Constants.WRConsts.kPidKp;
-    angleConfig.slot0.kI = Constants.WRConsts.kPidKi;
-    angleConfig.slot0.kD = Constants.WRConsts.kPidKd;
-    angleConfig.slot0.kF = Constants.WRConsts.kPidKf;
+    wristConfig.slot0.kP = Constants.WRConsts.kPidKp;
+    wristConfig.slot0.kI = Constants.WRConsts.kPidKi;
+    wristConfig.slot0.kD = Constants.WRConsts.kPidKd;
+    wristConfig.slot0.kF = Constants.WRConsts.kPidKf;
 
-    angleConfig.supplyCurrLimit = angleSupplyLimit;
-    angleConfig.statorCurrLimit = angleStatorCurrentLimits;
+    wristConfig.supplyCurrLimit = new SupplyCurrentLimitConfiguration(true, Constants.WRConsts.kSupplyCurrentLimit,
+        Constants.WRConsts.kSupplyTriggerCurrent, Constants.WRConsts.kSupplyTriggerTime);
+    wristConfig.statorCurrLimit = new StatorCurrentLimitConfiguration(true, WRConsts.kStatorCurrentLimit,
+        WRConsts.kStatorTriggerCurrent, WRConsts.kStatorTriggerTime);
+    ;
 
-    angleConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
-    angleConfig.voltageCompSaturation = 12.0;
+    wristConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
+    wristConfig.voltageCompSaturation = 12.0;
 
-    angleConfig.motionCruiseVelocity = WRConsts.kMMVelocity;
-    angleConfig.motionAcceleration = WRConsts.kMMAcceleration;
-    angleConfig.motionCurveStrength = WRConsts.kMMSCurveStrength;
+    wristConfig.motionCruiseVelocity = WRConsts.kMMVelocity;
+    wristConfig.motionAcceleration = WRConsts.kMMAcceleration;
+    wristConfig.motionCurveStrength = WRConsts.kMMSCurveStrength;
 
-    angleConfig.neutralDeadband = WRConsts.kNeutralDeadband;
+    wristConfig.neutralDeadband = WRConsts.kNeutralDeadband;
 
-    return angleConfig;
+    return wristConfig;
   }
 
   public static TalonFXConfiguration elbowAngleFXConfig( )
   {
-    TalonFXConfiguration angleConfig = new TalonFXConfiguration( );
-    SupplyCurrentLimitConfiguration angleSupplyLimit = new SupplyCurrentLimitConfiguration(true,
-        Constants.ELConsts.kSupplyCurrentLimit, Constants.ELConsts.kSupplyTriggerCurrent, Constants.ELConsts.kSupplyTriggerTime);
-    StatorCurrentLimitConfiguration angleStatorCurrentLimits = new StatorCurrentLimitConfiguration(true,
-        ELConsts.kStatorCurrentLimit, ELConsts.kStatorTriggerCurrent, ELConsts.kStatorTriggerTime);
+    TalonFXConfiguration elbowConfig = new TalonFXConfiguration( );
 
-    angleConfig.slot0.kP = Constants.ELConsts.kPidKp;
-    angleConfig.slot0.kI = Constants.ELConsts.kPidKi;
-    angleConfig.slot0.kD = Constants.ELConsts.kPidKd;
-    angleConfig.slot0.kF = Constants.ELConsts.kPidKf;
+    elbowConfig.slot0.kP = Constants.ELConsts.kPidKp;
+    elbowConfig.slot0.kI = Constants.ELConsts.kPidKi;
+    elbowConfig.slot0.kD = Constants.ELConsts.kPidKd;
+    elbowConfig.slot0.kF = Constants.ELConsts.kPidKf;
 
-    angleConfig.supplyCurrLimit = angleSupplyLimit;
-    angleConfig.statorCurrLimit = angleStatorCurrentLimits;
+    elbowConfig.supplyCurrLimit = new SupplyCurrentLimitConfiguration(true, Constants.ELConsts.kSupplyCurrentLimit,
+        Constants.ELConsts.kSupplyTriggerCurrent, Constants.ELConsts.kSupplyTriggerTime);
+    elbowConfig.statorCurrLimit = new StatorCurrentLimitConfiguration(true, ELConsts.kStatorCurrentLimit,
+        ELConsts.kStatorTriggerCurrent, ELConsts.kStatorTriggerTime);
 
-    angleConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
-    angleConfig.voltageCompSaturation = 12.0;
+    elbowConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
+    elbowConfig.voltageCompSaturation = 12.0;
 
-    angleConfig.motionCruiseVelocity = ELConsts.kMMVelocity;
-    angleConfig.motionAcceleration = ELConsts.kMMAcceleration;
-    angleConfig.motionCurveStrength = ELConsts.kMMSCurveStrength;
+    elbowConfig.motionCruiseVelocity = ELConsts.kMMVelocity;
+    elbowConfig.motionAcceleration = ELConsts.kMMAcceleration;
+    elbowConfig.motionCurveStrength = ELConsts.kMMSCurveStrength;
 
-    angleConfig.neutralDeadband = ELConsts.kNeutralDeadband;
+    elbowConfig.neutralDeadband = ELConsts.kNeutralDeadband;
 
-    return angleConfig;
+    return elbowConfig;
   }
 
   public static TalonFXConfiguration extensionLengthFXConfig( )
   {
-    TalonFXConfiguration lengthConfig = new TalonFXConfiguration( );
-    SupplyCurrentLimitConfiguration angleSupplyLimit = new SupplyCurrentLimitConfiguration(true, EXConsts.kSupplyCurrentLimit,
+    TalonFXConfiguration extensionConfig = new TalonFXConfiguration( );
+
+    extensionConfig.slot0.kP = Constants.EXConsts.kPidKp;
+    extensionConfig.slot0.kI = Constants.EXConsts.kPidKi;
+    extensionConfig.slot0.kD = Constants.EXConsts.kPidKd;
+    extensionConfig.slot0.kF = Constants.EXConsts.kPidKf;
+
+    extensionConfig.supplyCurrLimit = new SupplyCurrentLimitConfiguration(true, EXConsts.kSupplyCurrentLimit,
         EXConsts.kSupplyTriggerCurrent, EXConsts.kSupplyTriggerTime);
-    StatorCurrentLimitConfiguration angleStatorCurrentLimits = new StatorCurrentLimitConfiguration(true,
-        EXConsts.kStatorCurrentLimit, EXConsts.kStatorTriggerCurrent, EXConsts.kStatorTriggerTime);
+    extensionConfig.statorCurrLimit = new StatorCurrentLimitConfiguration(true, EXConsts.kStatorCurrentLimit,
+        EXConsts.kStatorTriggerCurrent, EXConsts.kStatorTriggerTime);
 
-    lengthConfig.slot0.kP = Constants.EXConsts.kPidKp;
-    lengthConfig.slot0.kI = Constants.EXConsts.kPidKi;
-    lengthConfig.slot0.kD = Constants.EXConsts.kPidKd;
-    lengthConfig.slot0.kF = Constants.EXConsts.kPidKf;
+    extensionConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
+    extensionConfig.voltageCompSaturation = 12.0;
 
-    lengthConfig.supplyCurrLimit = angleSupplyLimit;
-    lengthConfig.statorCurrLimit = angleStatorCurrentLimits;
+    extensionConfig.motionCruiseVelocity = EXConsts.kMMVelocity;
+    extensionConfig.motionAcceleration = EXConsts.kMMAcceleration;
+    extensionConfig.motionCurveStrength = EXConsts.kMMSCurveStrength;
 
-    lengthConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
-    lengthConfig.voltageCompSaturation = 12.0;
+    extensionConfig.neutralDeadband = EXConsts.kNeutralDeadband;
 
-    lengthConfig.motionCruiseVelocity = EXConsts.kMMVelocity;
-    lengthConfig.motionAcceleration = EXConsts.kMMAcceleration;
-    lengthConfig.motionCurveStrength = EXConsts.kMMSCurveStrength;
-
-    lengthConfig.neutralDeadband = EXConsts.kNeutralDeadband;
-
-    return lengthConfig;
+    return extensionConfig;
   }
 
   public static CANCoderConfiguration swerveCancoderConfig( )
