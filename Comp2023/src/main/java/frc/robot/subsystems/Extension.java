@@ -6,8 +6,6 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import edu.wpi.first.math.MathUtil;
@@ -26,6 +24,7 @@ import frc.robot.Constants.EXConsts;
 import frc.robot.Constants.EXConsts.ExtensionLength;
 import frc.robot.Constants.EXConsts.ExtensionMode;
 import frc.robot.RobotContainer;
+import frc.robot.lib.util.CTREConfigs;
 import frc.robot.team2135.PhoenixUtil;
 
 //
@@ -34,54 +33,37 @@ import frc.robot.team2135.PhoenixUtil;
 public class Extension extends SubsystemBase
 {
   // Constants
-  private static final int                PIDINDEX                = 0;   // PID in use (0-primary, 1-aux)
-  private static final int                SLOTINDEX               = 0;   // Use first PID slot
+  private static final int      PIDINDEX                = 0;   // PID in use (0-primary, 1-aux)
+  private static final int      SLOTINDEX               = 0;   // Use first PID slot
 
   // Member objects
-  private final WPI_TalonFX               m_extension             = new WPI_TalonFX(Constants.Ports.kCANID_Extension);  //extension
+  private final WPI_TalonFX     m_extension             = new WPI_TalonFX(Constants.Ports.kCANID_Extension);  //extension
   // private final TalonFXSimCollection      m_extensionMotorSim     = new TalonFXSimCollection(m_extension);
   // private final SingleJointedArmSim       m_extensionSim          = new SingleJointedArmSim(DCMotor.getFalcon500(1),
   //     EXConsts.kExtensionGearRatio, 2.0, EXConsts.kForearmLengthMeters, 0.0, Math.PI, false);
 
   // Mechanism2d
-  private final Mechanism2d               m_extensionMech         = new Mechanism2d(3, 3);
-  private final MechanismRoot2d           m_extensionRoot         = m_extensionMech.getRoot("extension", 1.5, 2);
-  private MechanismLigament2d             m_extensionLigament     =
+  private final Mechanism2d     m_extensionMech         = new Mechanism2d(3, 3);
+  private final MechanismRoot2d m_extensionRoot         = m_extensionMech.getRoot("extension", 1.5, 2);
+  private MechanismLigament2d   m_extensionLigament     =
       m_extensionRoot.append(new MechanismLigament2d("extension", 1, 0, 6, new Color8Bit(Color.kBlue)));
 
-  private boolean                         m_extensionValid;              // Health indicator for extension Talon 
+  private boolean               m_extensionValid;              // Health indicator for extension Talon 
   // private double                          m_extensionLengthOffset = 0.0; // CANCoder length measured at reference point
 
-  //Devices and simulation objs
-  private SupplyCurrentLimitConfiguration m_supplyCurrentLimits   = new SupplyCurrentLimitConfiguration(true,
-      EXConsts.kSupplyCurrentLimit, EXConsts.kSupplyTriggerCurrent, EXConsts.kSupplyTriggerTime);
-  private StatorCurrentLimitConfiguration m_statorCurrentLimits   = new StatorCurrentLimitConfiguration(true,
-      EXConsts.kStatorCurrentLimit, EXConsts.kStatorTriggerCurrent, EXConsts.kStatorTriggerTime);
-
   // Declare module variables
-  private double                          m_neutralDeadband       = EXConsts.kExtensionNeutralDeadband;   // motor output deadband
-  private int                             m_velocity              = EXConsts.kExtensionMMVelocity;        // motion magic velocity
-  private int                             m_acceleration          = EXConsts.kExtensionMMAcceleration;    // motion magic acceleration
-  private int                             m_sCurveStrength        = EXConsts.kExtensionMMSCurveStrength;  // motion magic S curve smoothing
-  private int                             m_extensionAllowedError = EXConsts.kExtensionAllowedError;      // PID allowable closed loop error
-  private double                          m_toleranceInches       = EXConsts.kExtensionToleranceInches;   // PID tolerance in inches
+  private ExtensionMode         m_extensionMode         = ExtensionMode.EXTENSION_INIT;          // Mode active with joysticks
 
-  private double                          m_stickDeadband         = Constants.kStickDeadband;              // joystick deadband
-  private ExtensionMode                   m_extensionMode         = ExtensionMode.EXTENSION_INIT;          // Mode active with joysticks
+  private ExtensionLength       m_extensionLength;                // Desired extension length
+  private boolean               m_moveIsFinished;
+  private double                m_extensionTargetInches = 0.0;    // Target length in inches
+  private double                m_extensionCurInches    = 0.0;    // Current length in inches
+  private int                   m_withinTolerance       = 0;      // Counter for consecutive readings within tolerance
+  private double                m_extensionTotalFF;
+  private boolean               m_calibrated            = EXConsts.kCalibrated;  // Indicates whether the extension has been calibrated
 
-  private boolean                         m_extensionDebug        = false;  // DEBUG flag to disable/enable extra logging calls
-
-  private ExtensionLength                 m_extensionLength;                // Desired extension length
-  private boolean                         m_moveIsFinished;
-  private double                          m_extensionTargetInches = 0.0;    // Target length in inches
-  private double                          m_extensionCurInches    = 0.0;    // Current length in inches
-  private int                             m_withinTolerance       = 0;      // Counter for consecutive readings within tolerance
-  private double                          m_extensionTotalFF;
-  private boolean                         m_calibrated            = EXConsts.kExtensionCalibrated;  // Indicates whether the extension has been calibrated
-
-  private Timer                           m_safetyTimer           = new Timer( ); // Safety timer for use in extension
-  private double                          m_extensionDistTravelled;
-  private int                             maxVelocity;
+  private Timer                 m_safetyTimer           = new Timer( ); // Safety timer for use in extension
+  private double                m_extensionDistTravelled;
 
   // Constructor
   public Extension( )
@@ -114,16 +96,6 @@ public class Extension extends SubsystemBase
         curCounts = 0;
         m_extension.setSelectedSensorPosition(curCounts, PIDINDEX, Constants.kCANTimeoutMs);
         m_extensionTargetInches = extensionCountsToInches(curCounts);
-      }
-
-      if (m_extensionDebug)
-      {
-        int curVelocity = (int) m_extension.getSelectedSensorVelocity(0);
-        maxVelocity = (maxVelocity > curVelocity) ? maxVelocity : curVelocity;
-
-        SmartDashboard.putNumber("EX_maxVelocity", maxVelocity);
-        SmartDashboard.putNumber("EX_curVelocity", curVelocity);
-        SmartDashboard.putNumber("EX_curCounts", curCounts);
       }
 
       m_extensionCurInches = extensionCountsToInches(curCounts);
@@ -166,18 +138,9 @@ public class Extension extends SubsystemBase
     SmartDashboard.putBoolean("HL_validEX", m_extensionValid);
 
     // Initialize Variables
-    if (m_extensionDebug)
-    {
-      SmartDashboard.putNumber("EX_velocity", m_velocity);
-      SmartDashboard.putNumber("EX_acceleration", m_acceleration);
-      SmartDashboard.putNumber("EX_sCurveStrength", m_sCurveStrength);
-
-    }
-
     SmartDashboard.putNumber("EX_curInches", m_extensionCurInches);
     SmartDashboard.putNumber("EX_targetInches", m_extensionTargetInches);
-    SmartDashboard.putBoolean("EX_calibrated", EXConsts.kExtensionCalibrated);
-    SmartDashboard.putBoolean("EX_normalMode", !m_extensionDebug);
+    SmartDashboard.putBoolean("EX_calibrated", EXConsts.kCalibrated);
 
     // post the mechanism to the dashboard
     SmartDashboard.putData("ExtensionMech", m_extensionMech);
@@ -200,17 +163,17 @@ public class Extension extends SubsystemBase
 
   private int extensionInchesToCounts(double inches)
   {
-    return (int) (inches / EXConsts.kExtensionInchesPerCount);
+    return (int) (inches / EXConsts.kInchesPerCount);
   }
 
   private double extensionCountsToInches(int counts)
   {
-    return counts * EXConsts.kExtensionInchesPerCount;
+    return counts * EXConsts.kInchesPerCount;
   }
 
   public boolean moveIsInRange(double inches)
   {
-    return (inches > EXConsts.kExtensionLengthMin) && (inches < EXConsts.kExtensionLengthMax);
+    return (inches > EXConsts.kLengthMin) && (inches < EXConsts.kLengthMax);
   }
 
   public double getInches( )
@@ -220,6 +183,8 @@ public class Extension extends SubsystemBase
 
   private void extensionTalonInitialize(WPI_TalonFX motor, boolean inverted)
   {
+    motor.configFactoryDefault( );
+    motor.configAllSettings(CTREConfigs.extensionLengthFXConfig( ));
     motor.setInverted(inverted);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setInverted");
     motor.setSensorPhase(true);
@@ -228,41 +193,17 @@ public class Extension extends SubsystemBase
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
     motor.setSafetyEnabled(false);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSafetyEnabled");
-    motor.configNeutralDeadband(m_neutralDeadband, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configNeutralDeadband");
 
-    motor.configVoltageCompSaturation(12.0);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configVoltageCompSaturation");
     motor.enableVoltageCompensation(true);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "enableVoltageCompensation");
-
-    motor.configSupplyCurrentLimit(m_supplyCurrentLimits);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configSupplyCurrentLimits");
-    motor.configStatorCurrentLimit(m_statorCurrentLimits);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configStatorCurrentLimits");
 
     // Configure sensor settings
     motor.setSelectedSensorPosition(0.0);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSelectedSensorPosition");
-    motor.configAllowableClosedloopError(SLOTINDEX, m_extensionAllowedError, Constants.kLongCANTimeoutMs);
+    motor.configAllowableClosedloopError(SLOTINDEX, EXConsts.kAllowedError, Constants.kLongCANTimeoutMs);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllowableClosedloopError");
 
-    motor.configMotionCruiseVelocity(m_velocity, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionCruiseVelocity");
-    motor.configMotionAcceleration(m_acceleration, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionAcceleration");
-    motor.configMotionSCurveStrength(m_sCurveStrength, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionSCurveStrength");
-
     // Configure Magic Motion settings
-    motor.config_kF(0, EXConsts.kExtensionPidKf, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kF");
-    motor.config_kP(0, EXConsts.kExtensionPidKp, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kP");
-    motor.config_kI(0, EXConsts.kExtensionPidKi, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kI");
-    motor.config_kD(0, EXConsts.kExtensionPidKd, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kD");
     motor.selectProfileSlot(SLOTINDEX, PIDINDEX);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "selectProfileSlot");
 
@@ -275,18 +216,18 @@ public class Extension extends SubsystemBase
     boolean outOfRange = false;
     ExtensionMode newMode = ExtensionMode.EXTENSION_STOPPED;
 
-    axisValue = MathUtil.applyDeadband(axisValue, m_stickDeadband);
+    axisValue = MathUtil.applyDeadband(axisValue, Constants.kStickDeadband);
 
     if (axisValue < 0.0)
     {
-      if (m_extensionCurInches > EXConsts.kExtensionLengthMin)
+      if (m_extensionCurInches > EXConsts.kLengthMin)
         newMode = ExtensionMode.EXTENSION_IN;
       else
         outOfRange = true;
     }
     else if (axisValue > 0.0)
     {
-      if (m_extensionCurInches < EXConsts.kExtensionLengthMax)
+      if (m_extensionCurInches < EXConsts.kLengthMax)
         newMode = ExtensionMode.EXTENSION_OUT;
       else
         outOfRange = true;
@@ -304,7 +245,7 @@ public class Extension extends SubsystemBase
     m_extensionTargetInches = m_extensionCurInches;
 
     if (m_extensionValid)
-      m_extension.set(ControlMode.PercentOutput, axisValue * EXConsts.kExtensionSpeedMaxManual + EXConsts.kExtensionArbitraryFF);
+      m_extension.set(ControlMode.PercentOutput, axisValue * EXConsts.kExtensionSpeedMaxManual + EXConsts.kArbitraryFF);
   }
 
   public void setExtensionStopped( )
@@ -336,28 +277,13 @@ public class Extension extends SubsystemBase
   {
     double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
 
-    return EXConsts.kExtensionArbitraryFF * Math.cos(Math.toRadians(elbowDegrees));
+    return EXConsts.kArbitraryFF * Math.cos(Math.toRadians(elbowDegrees));
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
   public void moveExtensionLengthInit(ExtensionLength length)
   {
-    if (m_extensionDebug)
-    {
-      m_velocity = (int) SmartDashboard.getNumber("EX_velocity", m_velocity);
-      m_acceleration = (int) SmartDashboard.getNumber("EX_acceleration", m_acceleration);
-      m_sCurveStrength = (int) SmartDashboard.getNumber("EX_sCurveStrength", m_sCurveStrength);
-
-      m_extension.configMotionCruiseVelocity(m_velocity);
-      m_extension.configMotionAcceleration(m_acceleration);
-      m_extension.configMotionSCurveStrength(m_sCurveStrength);
-      m_extension.config_kF(SLOTINDEX, EXConsts.kExtensionPidKf);
-      m_extension.config_kP(SLOTINDEX, EXConsts.kExtensionPidKp);
-      m_extension.config_kI(SLOTINDEX, EXConsts.kExtensionPidKi);
-      m_extension.config_kD(SLOTINDEX, EXConsts.kExtensionPidKd);
-    }
-
     if (length != m_extensionLength)
     {
       m_extensionLength = length;
@@ -374,39 +300,39 @@ public class Extension extends SubsystemBase
             m_extensionTargetInches = 0.25;
           break;
         case EXTENSION_STOW :
-          m_extensionTargetInches = EXConsts.kExtensionLengthStow;
+          m_extensionTargetInches = EXConsts.kLengthStow;
           break;
         case EXTENSION_IDLE :
-          m_extensionTargetInches = EXConsts.kExtensionLengthIdle;
+          m_extensionTargetInches = EXConsts.kLengthIdle;
           break;
         case EXTENSION_LOW :
-          m_extensionTargetInches = EXConsts.kExtensionLengthScoreLow;
+          m_extensionTargetInches = EXConsts.kLengthScoreLow;
           break;
         case EXTENSION_MID :
-          m_extensionTargetInches = EXConsts.kExtensionLengthScoreMid;
+          m_extensionTargetInches = EXConsts.kLengthScoreMid;
           break;
         case EXTENSION_HIGH :
-          m_extensionTargetInches = EXConsts.kExtensionLengthScoreHigh;
+          m_extensionTargetInches = EXConsts.kLengthScoreHigh;
           break;
         case EXTENSION_SHELF :
-          m_extensionTargetInches = EXConsts.kExtensionLengthSubstation;
+          m_extensionTargetInches = EXConsts.kLengthSubstation;
           break;
       }
     }
 
-    if (EXConsts.kExtensionCalibrated)
+    if (EXConsts.kCalibrated)
     {
       // length constraint check/soft limit for max and min length before raising
       if (!moveIsInRange(m_extensionTargetInches))
       {
         DataLogManager.log(String.format("%s: Target %.1f inches is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
-            m_extensionTargetInches, EXConsts.kExtensionLengthMin, EXConsts.kExtensionLengthMax));
+            m_extensionTargetInches, EXConsts.kLengthMin, EXConsts.kLengthMax));
         m_extensionTargetInches = m_extensionCurInches;
       }
 
       m_safetyTimer.restart( );
 
-      if (m_extensionValid && EXConsts.kExtensionCalibrated)
+      if (m_extensionValid && EXConsts.kCalibrated)
         m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches),
             DemandType.ArbitraryFeedForward, m_extensionTotalFF);
 
@@ -424,7 +350,7 @@ public class Extension extends SubsystemBase
 
   public void moveExtensionLengthExecute( )
   {
-    if (m_extensionValid && EXConsts.kExtensionCalibrated)
+    if (m_extensionValid && EXConsts.kCalibrated)
       m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches), DemandType.ArbitraryFeedForward,
           m_extensionTotalFF);
   }
@@ -435,7 +361,7 @@ public class Extension extends SubsystemBase
 
     errorInInches = m_extensionTargetInches - m_extensionCurInches;
 
-    if (Math.abs(errorInInches) < m_toleranceInches)
+    if (Math.abs(errorInInches) < EXConsts.kToleranceInches)
     {
       if (++m_withinTolerance >= 3)
       {
