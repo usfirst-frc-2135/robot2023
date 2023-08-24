@@ -185,6 +185,8 @@ public class Extension extends SubsystemBase
   {
     motor.configFactoryDefault( );
     motor.configAllSettings(CTREConfigs.extensionLengthFXConfig( ));
+    // TODO - need a checkTalonError here
+
     motor.setInverted(inverted);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setInverted");
     motor.setSensorPhase(true);
@@ -193,14 +195,13 @@ public class Extension extends SubsystemBase
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
     motor.setSafetyEnabled(false);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSafetyEnabled");
-
     motor.enableVoltageCompensation(true);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "enableVoltageCompensation");
 
     // Configure sensor settings
     motor.setSelectedSensorPosition(0.0);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSelectedSensorPosition");
-    motor.configAllowableClosedloopError(SLOTINDEX, EXConsts.kAllowedError, Constants.kLongCANTimeoutMs);
+    motor.configAllowableClosedloopError(SLOTINDEX, EXConsts.kAllowedError, Constants.kLongCANTimeoutMs); // TODO - config
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllowableClosedloopError");
 
     // Configure Magic Motion settings

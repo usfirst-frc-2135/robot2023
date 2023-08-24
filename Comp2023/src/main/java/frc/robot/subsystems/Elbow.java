@@ -107,11 +107,11 @@ public class Elbow extends SubsystemBase
     }
 
     m_elbow.configReverseSoftLimitThreshold(Conversions.degreesToFalcon(ELConsts.kAngleMin, ELConsts.kGearRatio),
-        Constants.kCANTimeoutMs);
-    m_elbow.configReverseSoftLimitEnable(true, Constants.kCANTimeoutMs);
+        Constants.kCANTimeoutMs); // TODO - config
+    m_elbow.configReverseSoftLimitEnable(true, Constants.kCANTimeoutMs); // TODO - config
     m_elbow.configForwardSoftLimitThreshold(Conversions.degreesToFalcon(ELConsts.kAngleMax, ELConsts.kGearRatio),
-        Constants.kCANTimeoutMs);
-    m_elbow.configForwardSoftLimitEnable(true, Constants.kCANTimeoutMs);
+        Constants.kCANTimeoutMs); // TODO - config
+    m_elbow.configForwardSoftLimitEnable(true, Constants.kCANTimeoutMs); // TODO - config
 
     initSmartDashboard( );
 
@@ -217,20 +217,21 @@ public class Elbow extends SubsystemBase
   {
     motor.configFactoryDefault( );
     motor.configAllSettings(CTREConfigs.elbowAngleFXConfig( ));
+    // TODO - need a checkTalonError here
+
     motor.setInverted(inverted);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setInverted");
     motor.setNeutralMode(NeutralMode.Brake);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
     motor.setSafetyEnabled(false);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSafetyEnabled");
-
     motor.enableVoltageCompensation(true);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "enableVoltageCompensation");
 
     // Configure sensor settings
     motor.setSelectedSensorPosition(0.0);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSelectedSensorPosition");
-    motor.configAllowableClosedloopError(SLOTINDEX, ELConsts.kAllowedError, Constants.kLongCANTimeoutMs);
+    motor.configAllowableClosedloopError(SLOTINDEX, ELConsts.kAllowedError, Constants.kLongCANTimeoutMs); // TODO - config
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllowableClosedloopError");
 
     // Configure Magic Motion settings

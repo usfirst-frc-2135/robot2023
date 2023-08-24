@@ -77,12 +77,12 @@ public class Gripper extends SubsystemBase
     motor.setSafetyEnabled(false);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSafetyEnabled");
 
-    motor.configVoltageCompSaturation(12.0);
+    motor.configVoltageCompSaturation(12.0); // TODO - config
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configVoltageCompSaturation");
     motor.enableVoltageCompensation(true);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "enableVoltageCompensation");
 
-    motor.configSupplyCurrentLimit(m_supplyCurrentLimits);
+    motor.configSupplyCurrentLimit(m_supplyCurrentLimits); // TODO - config
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configSupplyCurrentLimits");
 
     motor.set(ControlMode.PercentOutput, 0.0);
