@@ -143,20 +143,20 @@ public class Constants
   {
     // Global settings
 
-    public static final double  kElbowGearRatio       = 300;   // Gear reduction for elbow
-    public static final double  kElbowDegreesPerCount = 360 / Falcon500.kEncoderCPR / kElbowGearRatio;
+    public static final double  kGearRatio            = 300;   // Gear reduction for elbow
+    public static final double  kDegreesPerCount      = 360 / Falcon500.kEncoderCPR / kGearRatio;
     public static final double  kForearmLengthMeters  = 1.22;  // Sim value: 48 inches
     public static final double  kForearmMassKg        = 6.0;   // Sim value: 13.2 lbs 
     public static final boolean kInvertMotor          = true;  // Motor direction for positive input
 
-    public static final double  kElbowAngleMin        = -3.0;  // Elbow minimum allowable degrees (a few degrees less than stowed)
-    public static final double  kElbowAngleStow       = 2.0;   // By definition - elbow is vertical
-    public static final double  kElbowAngleIdle       = 20.0;  // Slightly angled out, empirically checked
-    public static final double  kElbowAngleScoreLow   = 35.0;  // From Mech Design (floor, feet art 5" high), empirically checked
-    public static final double  kElbowAngleScoreMid   = 85.0;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), empirically checked
-    public static final double  kElbowAngleScoreHigh  = 98.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked
-    public static final double  kElbowAngleSubstation = 102.0;  // From Mech Design (3'1-38" above floor), empirical
-    public static final double  kElbowAngleMax        = 110.0; // Elbow maximum allowable degrees (10 deg more than high)
+    public static final double  kAngleMin             = -3.0;  // Elbow minimum allowable degrees (a few degrees less than stowed)
+    public static final double  kAngleStow            = 2.0;   // By definition - elbow is vertical
+    public static final double  kAngleIdle            = 20.0;  // Slightly angled out, empirically checked
+    public static final double  kAngleScoreLow        = 35.0;  // From Mech Design (floor, feet art 5" high), empirically checked
+    public static final double  kAngleScoreMid        = 85.0;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), empirically checked
+    public static final double  kAngleScoreHigh       = 98.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked
+    public static final double  kAngleSubstation      = 102.0;  // From Mech Design (3'1-38" above floor), empirical
+    public static final double  kAngleMax             = 110.0; // Elbow maximum allowable degrees (10 deg more than high)
 
     // Current limit settings - elbow
     public static final double  kSupplyCurrentLimit   = 25.0;  // Supply current limit (after trigger)
@@ -168,9 +168,9 @@ public class Constants
 
     // CANCoder elbow absolute offset
     public static final boolean kInvertCANCoder       = true;  // CANCoder direction for positive angle in relative mode
-    public static final boolean kElbowCalibrated      = true;  // Indicates whether the elbow has been calibrated by CANCoder
-    public static final double  kCompElbowOffset      = -107.139; // CANCoder offset angle for comp bot
-    public static final double  kBetaElbowOffset      = 0.000; // (TODO: Beta requires an offset) CANCoder offset angle for beta bot
+    public static final boolean kCalibrated           = true;  // Indicates whether the elbow has been calibrated by CANCoder
+    public static final double  kCompOffset           = -107.139; // CANCoder offset angle for comp bot
+    public static final double  kBetaOffset           = 0.000; // (TODO: Beta requires an offset) CANCoder offset angle for beta bot
 
     // Manual config parameters
 
@@ -197,58 +197,58 @@ public class Constants
       ELBOW_SHELF         // Move elbow to substation loading shelf angle
     }
 
-    public static final double kElbowNeutralDeadband  = 0.001;  // Elbow motor output deadband
-    public static final int    kElbowMMVelocity       = 16646;  // Elbow motion magic velocity (75% of max motor RPM)
-    public static final int    kElbowMMAcceleration   = 16646 * 3 / 2;  // Elbow motion magic acceleration (target velocity in 2/3s)
-    public static final int    kElbowMMSCurveStrength = 1;      // Elbow motion magic S curve smoothing strength
-    public static final double kElbowPidKf            = 0.0461; // Elbow PID force constant
-    public static final double kElbowPidKp            = 0.0246; // Elbow PID proportional constant
-    public static final double kElbowPidKi            = 0.0;    // Elbow PID integral constant
-    public static final double kElbowPidKd            = 0.0;    // Elbow PID derivative constant
-    public static final int    kElbowAllowedError     = 0;      // Elbow PID allowable closed loop error in counts
-    public static final double kElbowToleranceDegrees = 2.0;    // Elbow PID tolerance in degrees (1 deg is 1" at 48" extension)
-    public static final double kElbowArbitraryFF      = 0.045;  // Elbow motor output for arm at 90 degrees
-    public static final double kElbowExtArbFF         = 0.007;  // Elbow motor output for arm at 90 degrees with full extension
-    public static final double kMMSafetyTimeout       = 2.5;    // Seconds allowed for a Motion Magic movement
+    public static final double kNeutralDeadband  = 0.001;          // Elbow motor output deadband
+    public static final int    kMMVelocity       = 16646;          // Elbow motion magic velocity (75% of max motor RPM)
+    public static final int    kMMAcceleration   = 16646 * 3 / 2;  // Elbow motion magic acceleration (target velocity in 2/3s)
+    public static final int    kMMSCurveStrength = 1;              // Elbow motion magic S curve smoothing strength
+    public static final double kPidKf            = 0.0461;         // Elbow PID force constant
+    public static final double kPidKp            = 0.0246;         // Elbow PID proportional constant
+    public static final double kPidKi            = 0.0;            // Elbow PID integral constant
+    public static final double kPidKd            = 0.0;            // Elbow PID derivative constant
+    public static final int    kAllowedError     = 0;              // Elbow PID allowable closed loop error in counts
+    public static final double kToleranceDegrees = 2.0;            // Elbow PID tolerance in degrees (1 deg is 1" at 48" extension)
+    public static final double kArbitraryFF      = 0.045;          // Elbow motor output for arm at 90 degrees
+    public static final double kExtArbFF         = 0.007;          // Elbow motor output for arm at 90 degrees with full extension
+    public static final double kMMSafetyTimeout  = 2.5;            // Seconds allowed for a Motion Magic movement
   }
 
   public static final class EXConsts
   {
     // Global settings
 
-    public static final double  kExtensionGearRatio        = 18.23; // Gear reduction for extension
-    public static final double  kDrumDiameterInches        = 1.375; // Drum diameter in inches
-    public static final double  kDrumCircumInches          = kDrumDiameterInches * Math.PI;            // Drum diameter in inches
-    public static final double  kRolloutRatio              = kDrumCircumInches / kExtensionGearRatio;  // inches per shaft rotation
-    public static final double  kExtensionInchesPerCount   = kRolloutRatio / Falcon500.kEncoderCPR;
+    public static final double  kGearRatio            = 18.23; // Gear reduction for extension
+    public static final double  kDrumDiameterInches   = 1.375; // Drum diameter in inches
+    public static final double  kDrumCircumInches     = kDrumDiameterInches * Math.PI;            // Drum diameter in inches
+    public static final double  kRolloutRatio         = kDrumCircumInches / kGearRatio;  // inches per shaft rotation
+    public static final double  kInchesPerCount       = kRolloutRatio / Falcon500.kEncoderCPR;
     // public static final double  kForearmLengthMeters        = 1.22;   // Sim value: 48 inches (no sim for extension)
     // public static final double  kForearmMassKg              = 6.0;    // Sim value: 13.2 lbs 
-    public static final boolean kInvertMotor               = true;  // Motor direction for positive input
-    public static final double  kSpeedCalibrate            = -0.15; // Motor percent output during calibration
+    public static final boolean kInvertMotor          = true;  // Motor direction for positive input
+    public static final double  kSpeedCalibrate       = -0.15; // Motor percent output during calibration
 
     // Extension lengths increase by 0.95" per 90 degrees of elbow rotation (lengths manually adjusted below)
-    public static final double  kExtensionLengthMin        = -0.5;  // Extension minimum allowable length (half inch less than stowed)
-    public static final double  kExtensionLengthStow       = 0.0;  // By definition - extension fully retracted
-    public static final double  kExtensionLengthIdle       = 0.25;   // Slightly off mechanical hard stop
-    public static final double  kExtensionLengthScoreLow   = 8.0;   // From Mech Design (floor, feet art 5" high), empirically checked
-    public static final double  kExtensionLengthScoreMid   = 1.25;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), empirically checked
-    public static final double  kExtensionLengthScoreHigh  = 17.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked
-    public static final double  kExtensionLengthSubstation = 1.25;  // From Mech Design (3'1-38" above floor)
-    public static final double  kExtensionLengthMax        = 18.0;  // Extension maximum allowable length (2" beyond high length)
+    public static final double  kLengthMin            = -0.5;  // Extension minimum allowable length (half inch less than stowed)
+    public static final double  kLengthStow           = 0.0;  // By definition - extension fully retracted
+    public static final double  kLengthIdle           = 0.25;   // Slightly off mechanical hard stop
+    public static final double  kLengthScoreLow       = 8.0;   // From Mech Design (floor, feet art 5" high), empirically checked
+    public static final double  kLengthScoreMid       = 1.25;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), empirically checked
+    public static final double  kLengthScoreHigh      = 17.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked
+    public static final double  kLengthSubstation     = 1.25;  // From Mech Design (3'1-38" above floor)
+    public static final double  kLengthMax            = 18.0;  // Extension maximum allowable length (2" beyond high length)
 
     // Current limit settings - extension
-    public static final double  kSupplyCurrentLimit        = 15.0;  // Supply current limit (after trigger)
-    public static final double  kSupplyTriggerCurrent      = 15.0;  // Supply trigger current that will cause limiting
-    public static final double  kSupplyTriggerTime         = 0.001; // Supply time duration of trigger that will causing limiting
-    public static final double  kStatorCurrentLimit        = 15.0;  // Stator current limit (after trigger)
-    public static final double  kStatorTriggerCurrent      = 15.0;  // Stator trigger current that will cause limiting
-    public static final double  kStatorTriggerTime         = 0.001; // Stator time duration of trigger that will causing limiting
+    public static final double  kSupplyCurrentLimit   = 15.0;  // Supply current limit (after trigger)
+    public static final double  kSupplyTriggerCurrent = 15.0;  // Supply trigger current that will cause limiting
+    public static final double  kSupplyTriggerTime    = 0.001; // Supply time duration of trigger that will causing limiting
+    public static final double  kStatorCurrentLimit   = 15.0;  // Stator current limit (after trigger)
+    public static final double  kStatorTriggerCurrent = 15.0;  // Stator trigger current that will cause limiting
+    public static final double  kStatorTriggerTime    = 0.001; // Stator time duration of trigger that will causing limiting
 
     // CANCoder extension absolute offset
-    public static final boolean kInvertCANCoder            = false; // CANCoder direction for positive angle in relative mode
-    public static final boolean kExtensionCalibrated       = true;  // Indicates whether the extension has been calibrated by CANCoder
-    public static final double  kCompExtensionOffset       = 0.000; // CANCoder offset for comp bot
-    public static final double  kBetaExtensionOffset       = 0.000; // CANCoder offset for beta bot
+    public static final boolean kInvertCANCoder       = false; // CANCoder direction for positive angle in relative mode
+    public static final boolean kCalibrated           = true;  // Indicates whether the extension has been calibrated by CANCoder
+    public static final double  kCompOffset           = 0.000; // CANCoder offset for comp bot
+    public static final double  kBetaOffset           = 0.000; // CANCoder offset for beta bot
 
     // Manual config parameters
 
@@ -275,39 +275,39 @@ public class Constants
       EXTENSION_SHELF,        // Move extension to high-scoring length
     }
 
-    public static final double kExtensionNeutralDeadband  = 0.001;  // Extension motor output deadband
-    public static final int    kExtensionMMVelocity       = 18728;  // Extension motion magic velocity (0.625 of max motor RPM)
-    public static final int    kExtensionMMAcceleration   = 12485;  // Extension motion magic acceleration (target velocity in 4/3s)
-    public static final int    kExtensionMMSCurveStrength = 1;      // Extension motion magic S curve smoothing strength
-    public static final double kExtensionPidKf            = 0.0461; // Extension PID force constant
-    public static final double kExtensionPidKp            = 0.0246; // Extension PID proportional constant
-    public static final double kExtensionPidKi            = 0.0;    // Extension PID integral constant
-    public static final double kExtensionPidKd            = 0.0;    // Extension PID derivative constant
-    public static final int    kExtensionAllowedError     = 0;      // Extension PID allowable closed loop error in counts
-    public static final double kExtensionToleranceInches  = 0.5;    // Extension PID tolerance in inches
-    public static final double kExtensionArbitraryFF      = -0.030; // Extension motor output for extension when fully retracted
-    public static final double kMMSafetyTimeoutRatio      = 0.16;    // Seconds allowed for a Motion Magic movement
+    public static final double kNeutralDeadband      = 0.001;  // Extension motor output deadband
+    public static final int    kMMVelocity           = 18728;  // Extension motion magic velocity (0.625 of max motor RPM)
+    public static final int    kMMAcceleration       = 12485;  // Extension motion magic acceleration (target velocity in 4/3s)
+    public static final int    kMMSCurveStrength     = 1;      // Extension motion magic S curve smoothing strength
+    public static final double kPidKf                = 0.0461; // Extension PID force constant
+    public static final double kPidKp                = 0.0246; // Extension PID proportional constant
+    public static final double kPidKi                = 0.0;    // Extension PID integral constant
+    public static final double kPidKd                = 0.0;    // Extension PID derivative constant
+    public static final int    kAllowedError         = 0;      // Extension PID allowable closed loop error in counts
+    public static final double kToleranceInches      = 0.5;    // Extension PID tolerance in inches
+    public static final double kArbitraryFF          = -0.030; // Extension motor output for extension when fully retracted
+    public static final double kMMSafetyTimeoutRatio = 0.16;    // Seconds allowed for a Motion Magic movement
   }
 
   public static final class WRConsts
   {
     // Global settings
 
-    public static final double  kWristGearRatio       = 213.9;   // Gear reduction for wrist
-    public static final double  kWristDegreesPerCount = 360 / Falcon500.kEncoderCPR / kWristGearRatio;
+    public static final double  kGearRatio            = 213.9;   // Gear reduction for wrist
+    public static final double  kDegreesPerCount      = 360 / Falcon500.kEncoderCPR / kGearRatio;
     public static final double  kGripperLengthMeters  = 0.3;   // Sim value: 11.8 in
     public static final double  kGripperMassKg        = 3.0;   // Sim value: 6.6 lbs
     public static final boolean kInvertMotor          = false; // Motor direction for positive input
 
-    public static final double  kWristAngleMin        = -2.0;  // Wrist minimum allowable angle (a few degrees less than stowed)
-    public static final double  kWristAngleStow       = 0.0;   // By definition - wrist is 90 degrees perpendicular to arm
-    public static final double  kWristAngleIdle       = 2.0;   // Slightly off stowed value
-    public static final double  kWristAngleScoreLow   = 33.0;  // From Mech Design (floor, feet art 5" high), empirically checked
-    public static final double  kWristAngleScoreMid   = kWristAngleIdle;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), ready to score
-    public static final double  kWristAngleScoreHigh  = kWristAngleIdle;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
-    public static final double  kWristAngleScore      = 90;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
-    public static final double  kWristAngleSubstation = 100.0; // From Mech Design (3'1-38" above floor)
-    public static final double  kWristAngleMax        = 110.0; // Wrist maximum allowable angle (a few degrees more than substation/horizontal)
+    public static final double  kAngleMin             = -2.0;  // Wrist minimum allowable angle (a few degrees less than stowed)
+    public static final double  kAngleStow            = 0.0;   // By definition - wrist is 90 degrees perpendicular to arm
+    public static final double  kAngleIdle            = 2.0;   // Slightly off stowed value
+    public static final double  kAngleScoreLow        = 33.0;  // From Mech Design (floor, feet art 5" high), empirically checked
+    public static final double  kAngleScoreMid        = kAngleIdle;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), ready to score
+    public static final double  kAngleScoreHigh       = kAngleIdle;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
+    public static final double  kAngleScore           = 90;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
+    public static final double  kAngleSubstation      = 100.0; // From Mech Design (3'1-38" above floor)
+    public static final double  kAngleMax             = 110.0; // Wrist maximum allowable angle (a few degrees more than substation/horizontal)
 
     // Current limit settings - wrist
     public static final double  kSupplyCurrentLimit   = 10.0;   // Supply current limit (after trigger)
@@ -319,9 +319,9 @@ public class Constants
 
     // CANCoder wrist absolute offset
     public static final boolean kInvertCANCoder       = true;  // CANCoder direction for positive angle in relative mode
-    public static final boolean kWristCalibrated      = true;  // Indicates whether the wrist has been calibrated by CANCoder
-    public static final double  kCompWristOffset      = 133.418; // CANCoder offset angle for comp bot
-    public static final double  kBetaWristOffset      = 0.000; // CANCoder offset angle for beta bot
+    public static final boolean kCalibrated           = true;  // Indicates whether the wrist has been calibrated by CANCoder
+    public static final double  kCompOffset           = 133.418; // CANCoder offset angle for comp bot
+    public static final double  kBetaOffset           = 0.000; // CANCoder offset angle for beta bot
 
     // Manual config parameters
 
@@ -333,7 +333,7 @@ public class Constants
       WRIST_UP            // Wrist moving up
     }
 
-    public static final double kWristSpeedMaxManual = 0.5;    // Motor percent output during manual operation
+    public static final double kSpeedMaxManual = 0.5;    // Motor percent output during manual operation
 
     // Motion Magic config parameters
 
@@ -349,18 +349,18 @@ public class Constants
       WRIST_SCORE         // Move wrist to scoring height 
     }
 
-    public static final double kWristNeutralDeadband  = 0.001;  // Wrist motor output deadband
-    public static final int    kWristMMVelocity       = 12075;  // Wrist motion magic velocity (75% of max motor RPM)
-    public static final int    kWristMMAcceleration   = 16100;  // Wrist motion magic acceleration (target velocity in 1/2s)
-    public static final int    kWristMMSCurveStrength = 1;      // Wrist motion magic S curve smoothing strength
-    public static final double kWristPidKf            = 0.0466; // Wrist PID force constant
-    public static final double kWristPidKp            = 0.01968; // Wrist PID proportional constant
-    public static final double kWristPidKi            = 0.0;    // Wrist PID integral constant
-    public static final double kWristPidKd            = 0.0;    // Wrist PID derivative constant
-    public static final int    kWristAllowedError     = 0;      // Wrist PID allowable closed loop error in counts
-    public static final double kWristToleranceDegrees = 2.0;    // Wrist PID tolerance in degrees (1 deg is 0.25" at 15" length)
-    public static final double kWristArbitraryFF      = -0.034; // Wrist motor output for 90 degrees
-    public static final double kMMSafetyTimeout       = 3;    // Seconds allowed for a Motion Magic movement
+    public static final double kNeutralDeadband  = 0.001;  // Wrist motor output deadband
+    public static final int    kMMVelocity       = 12075;  // Wrist motion magic velocity (75% of max motor RPM)
+    public static final int    kMMAcceleration   = 16100;  // Wrist motion magic acceleration (target velocity in 1/2s)
+    public static final int    kMMSCurveStrength = 1;      // Wrist motion magic S curve smoothing strength
+    public static final double kPidKf            = 0.0466; // Wrist PID force constant
+    public static final double kPidKp            = 0.01968; // Wrist PID proportional constant
+    public static final double kPidKi            = 0.0;    // Wrist PID integral constant
+    public static final double kPidKd            = 0.0;    // Wrist PID derivative constant
+    public static final int    kAllowedError     = 0;      // Wrist PID allowable closed loop error in counts
+    public static final double kToleranceDegrees = 2.0;    // Wrist PID tolerance in degrees (1 deg is 0.25" at 15" length)
+    public static final double kArbitraryFF      = -0.034; // Wrist motor output for 90 degrees
+    public static final double kMMSafetyTimeout  = 3;    // Seconds allowed for a Motion Magic movement
   }
 
   public static final class GRConsts

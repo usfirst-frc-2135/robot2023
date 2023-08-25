@@ -1,5 +1,6 @@
 package frc.robot.lib.util;
 
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
@@ -9,6 +10,7 @@ import com.ctre.phoenix.sensors.SensorTimeBase;
 
 import frc.robot.Constants;
 import frc.robot.Constants.ELConsts;
+import frc.robot.Constants.EXConsts;
 import frc.robot.Constants.WRConsts;
 
 public final class CTREConfigs
@@ -47,6 +49,85 @@ public final class CTREConfigs
     return angleConfig;
   }
 
+  public static TalonFXConfiguration wristAngleFXConfig( )
+  {
+    TalonFXConfiguration wristConfig = new TalonFXConfiguration( );
+
+    wristConfig.slot0.kP = Constants.WRConsts.kPidKp;
+    wristConfig.slot0.kI = Constants.WRConsts.kPidKi;
+    wristConfig.slot0.kD = Constants.WRConsts.kPidKd;
+    wristConfig.slot0.kF = Constants.WRConsts.kPidKf;
+
+    wristConfig.supplyCurrLimit = new SupplyCurrentLimitConfiguration(true, Constants.WRConsts.kSupplyCurrentLimit,
+        Constants.WRConsts.kSupplyTriggerCurrent, Constants.WRConsts.kSupplyTriggerTime);
+    wristConfig.statorCurrLimit = new StatorCurrentLimitConfiguration(true, WRConsts.kStatorCurrentLimit,
+        WRConsts.kStatorTriggerCurrent, WRConsts.kStatorTriggerTime);
+    ;
+
+    wristConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
+    wristConfig.voltageCompSaturation = 12.0;
+
+    wristConfig.motionCruiseVelocity = WRConsts.kMMVelocity;
+    wristConfig.motionAcceleration = WRConsts.kMMAcceleration;
+    wristConfig.motionCurveStrength = WRConsts.kMMSCurveStrength;
+
+    wristConfig.neutralDeadband = WRConsts.kNeutralDeadband;
+
+    return wristConfig;
+  }
+
+  public static TalonFXConfiguration elbowAngleFXConfig( )
+  {
+    TalonFXConfiguration elbowConfig = new TalonFXConfiguration( );
+
+    elbowConfig.slot0.kP = Constants.ELConsts.kPidKp;
+    elbowConfig.slot0.kI = Constants.ELConsts.kPidKi;
+    elbowConfig.slot0.kD = Constants.ELConsts.kPidKd;
+    elbowConfig.slot0.kF = Constants.ELConsts.kPidKf;
+
+    elbowConfig.supplyCurrLimit = new SupplyCurrentLimitConfiguration(true, Constants.ELConsts.kSupplyCurrentLimit,
+        Constants.ELConsts.kSupplyTriggerCurrent, Constants.ELConsts.kSupplyTriggerTime);
+    elbowConfig.statorCurrLimit = new StatorCurrentLimitConfiguration(true, ELConsts.kStatorCurrentLimit,
+        ELConsts.kStatorTriggerCurrent, ELConsts.kStatorTriggerTime);
+
+    elbowConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
+    elbowConfig.voltageCompSaturation = 12.0;
+
+    elbowConfig.motionCruiseVelocity = ELConsts.kMMVelocity;
+    elbowConfig.motionAcceleration = ELConsts.kMMAcceleration;
+    elbowConfig.motionCurveStrength = ELConsts.kMMSCurveStrength;
+
+    elbowConfig.neutralDeadband = ELConsts.kNeutralDeadband;
+
+    return elbowConfig;
+  }
+
+  public static TalonFXConfiguration extensionLengthFXConfig( )
+  {
+    TalonFXConfiguration extensionConfig = new TalonFXConfiguration( );
+
+    extensionConfig.slot0.kP = Constants.EXConsts.kPidKp;
+    extensionConfig.slot0.kI = Constants.EXConsts.kPidKi;
+    extensionConfig.slot0.kD = Constants.EXConsts.kPidKd;
+    extensionConfig.slot0.kF = Constants.EXConsts.kPidKf;
+
+    extensionConfig.supplyCurrLimit = new SupplyCurrentLimitConfiguration(true, EXConsts.kSupplyCurrentLimit,
+        EXConsts.kSupplyTriggerCurrent, EXConsts.kSupplyTriggerTime);
+    extensionConfig.statorCurrLimit = new StatorCurrentLimitConfiguration(true, EXConsts.kStatorCurrentLimit,
+        EXConsts.kStatorTriggerCurrent, EXConsts.kStatorTriggerTime);
+
+    extensionConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
+    extensionConfig.voltageCompSaturation = 12.0;
+
+    extensionConfig.motionCruiseVelocity = EXConsts.kMMVelocity;
+    extensionConfig.motionAcceleration = EXConsts.kMMAcceleration;
+    extensionConfig.motionCurveStrength = EXConsts.kMMSCurveStrength;
+
+    extensionConfig.neutralDeadband = EXConsts.kNeutralDeadband;
+
+    return extensionConfig;
+  }
+
   public static CANCoderConfiguration swerveCancoderConfig( )
   {
     CANCoderConfiguration config = new CANCoderConfiguration( );
@@ -60,7 +141,7 @@ public final class CTREConfigs
   public static CANCoderConfiguration elbowCancoderConfig( )
   {
     CANCoderConfiguration config = new CANCoderConfiguration( );
-    config.magnetOffsetDegrees = (Constants.isComp) ? ELConsts.kCompElbowOffset : ELConsts.kBetaElbowOffset;
+    config.magnetOffsetDegrees = (Constants.isComp) ? ELConsts.kCompOffset : ELConsts.kBetaOffset;
     config.absoluteSensorRange = AbsoluteSensorRange.Signed_PlusMinus180;
     config.sensorDirection = Constants.ELConsts.kInvertCANCoder;
     config.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
@@ -72,7 +153,7 @@ public final class CTREConfigs
   {
     CANCoderConfiguration config = new CANCoderConfiguration( );
     config.absoluteSensorRange = AbsoluteSensorRange.Signed_PlusMinus180;
-    config.magnetOffsetDegrees = (Constants.isComp) ? WRConsts.kCompWristOffset : WRConsts.kBetaWristOffset;
+    config.magnetOffsetDegrees = (Constants.isComp) ? WRConsts.kCompOffset : WRConsts.kBetaOffset;
     config.sensorDirection = Constants.WRConsts.kInvertCANCoder;
     config.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
     config.sensorTimeBase = SensorTimeBase.PerSecond;
