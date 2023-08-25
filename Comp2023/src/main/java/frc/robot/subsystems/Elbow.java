@@ -10,6 +10,8 @@ import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderStatusFrame;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -105,13 +107,6 @@ public class Elbow extends SubsystemBase
       if (RobotBase.isReal( ))
         m_elbow.setSelectedSensorPosition(absolutePosition);
     }
-
-    m_elbow.configReverseSoftLimitThreshold(Conversions.degreesToFalcon(ELConsts.kAngleMin, ELConsts.kGearRatio),
-        Constants.kCANTimeoutMs); // TODO - config
-    m_elbow.configReverseSoftLimitEnable(true, Constants.kCANTimeoutMs); // TODO - config
-    m_elbow.configForwardSoftLimitThreshold(Conversions.degreesToFalcon(ELConsts.kAngleMax, ELConsts.kGearRatio),
-        Constants.kCANTimeoutMs); // TODO - config
-    m_elbow.configForwardSoftLimitEnable(true, Constants.kCANTimeoutMs); // TODO - config
 
     initSmartDashboard( );
 
@@ -217,7 +212,7 @@ public class Elbow extends SubsystemBase
   {
     motor.configFactoryDefault( );
     motor.configAllSettings(CTREConfigs.elbowAngleFXConfig( ));
-    // TODO - need a checkTalonError here
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllSettings");
 
     motor.setInverted(inverted);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setInverted");
@@ -231,8 +226,6 @@ public class Elbow extends SubsystemBase
     // Configure sensor settings
     motor.setSelectedSensorPosition(0.0);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSelectedSensorPosition");
-    motor.configAllowableClosedloopError(SLOTINDEX, ELConsts.kAllowedError, Constants.kLongCANTimeoutMs); // TODO - config
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllowableClosedloopError");
 
     // Configure Magic Motion settings
     motor.selectProfileSlot(SLOTINDEX, PIDINDEX);

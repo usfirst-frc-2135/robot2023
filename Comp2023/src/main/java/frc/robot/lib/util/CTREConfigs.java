@@ -12,6 +12,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.ELConsts;
 import frc.robot.Constants.EXConsts;
 import frc.robot.Constants.WRConsts;
+import frc.robot.lib.math.Conversions;
 
 public final class CTREConfigs
 {
@@ -86,6 +87,13 @@ public final class CTREConfigs
     elbowConfig.motionAcceleration = ELConsts.kMMAcceleration;
     elbowConfig.motionCurveStrength = ELConsts.kMMSCurveStrength;
 
+    elbowConfig.reverseSoftLimitThreshold = Conversions.degreesToFalcon(ELConsts.kAngleMin, ELConsts.kGearRatio);
+    elbowConfig.reverseSoftLimitEnable = true;
+    elbowConfig.forwardSoftLimitThreshold = Conversions.degreesToFalcon(ELConsts.kAngleMax, ELConsts.kGearRatio);
+    elbowConfig.forwardSoftLimitEnable = true;
+
+    elbowConfig.slot0.allowableClosedloopError = ELConsts.kAllowedError;
+
     elbowConfig.neutralDeadband = ELConsts.kNeutralDeadband;
 
     return elbowConfig;
@@ -127,6 +135,8 @@ public final class CTREConfigs
 
     extensionConfig.neutralDeadband = EXConsts.kNeutralDeadband;
 
+    extensionConfig.slot0.allowableClosedloopError = EXConsts.kAllowedError;
+
     return extensionConfig;
   }
 
@@ -154,7 +164,14 @@ public final class CTREConfigs
     wristConfig.motionAcceleration = WRConsts.kMMAcceleration;
     wristConfig.motionCurveStrength = WRConsts.kMMSCurveStrength;
 
+    wristConfig.reverseSoftLimitThreshold = Conversions.degreesToFalcon(WRConsts.kAngleMin, WRConsts.kGearRatio);
+    wristConfig.reverseSoftLimitEnable = true;
+    wristConfig.forwardSoftLimitThreshold = Conversions.degreesToFalcon(WRConsts.kAngleMax, WRConsts.kGearRatio);
+    wristConfig.forwardSoftLimitEnable = true;
+
     wristConfig.neutralDeadband = WRConsts.kNeutralDeadband;
+
+    wristConfig.slot0.allowableClosedloopError = WRConsts.kAllowedError;
 
     return wristConfig;
   }
