@@ -10,6 +10,8 @@ import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderStatusFrame;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -105,13 +107,6 @@ public class Elbow extends SubsystemBase
       if (RobotBase.isReal( ))
         m_elbow.setSelectedSensorPosition(absolutePosition);
     }
-
-    m_elbow.configReverseSoftLimitThreshold(Conversions.degreesToFalcon(ELConsts.kAngleMin, ELConsts.kGearRatio),
-        Constants.kCANTimeoutMs);
-    m_elbow.configReverseSoftLimitEnable(true, Constants.kCANTimeoutMs);
-    m_elbow.configForwardSoftLimitThreshold(Conversions.degreesToFalcon(ELConsts.kAngleMax, ELConsts.kGearRatio),
-        Constants.kCANTimeoutMs);
-    m_elbow.configForwardSoftLimitEnable(true, Constants.kCANTimeoutMs);
 
     initSmartDashboard( );
 
@@ -217,21 +212,20 @@ public class Elbow extends SubsystemBase
   {
     motor.configFactoryDefault( );
     motor.configAllSettings(CTREConfigs.elbowAngleFXConfig( ));
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllSettings");
+
     motor.setInverted(inverted);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setInverted");
     motor.setNeutralMode(NeutralMode.Brake);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
     motor.setSafetyEnabled(false);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSafetyEnabled");
-
     motor.enableVoltageCompensation(true);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "enableVoltageCompensation");
 
     // Configure sensor settings
     motor.setSelectedSensorPosition(0.0);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSelectedSensorPosition");
-    motor.configAllowableClosedloopError(SLOTINDEX, ELConsts.kAllowedError, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllowableClosedloopError");
 
     // Configure Magic Motion settings
     motor.selectProfileSlot(SLOTINDEX, PIDINDEX);

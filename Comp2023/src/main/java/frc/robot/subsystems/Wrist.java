@@ -105,13 +105,6 @@ public class Wrist extends SubsystemBase
         m_wrist.setSelectedSensorPosition(absolutePosition);
     }
 
-    m_wrist.configReverseSoftLimitThreshold(Conversions.degreesToFalcon(WRConsts.kAngleMin, WRConsts.kGearRatio),
-        Constants.kCANTimeoutMs);
-    m_wrist.configReverseSoftLimitEnable(true, Constants.kCANTimeoutMs);
-    m_wrist.configForwardSoftLimitThreshold(Conversions.degreesToFalcon(WRConsts.kAngleMax, WRConsts.kGearRatio),
-        Constants.kCANTimeoutMs);
-    m_wrist.configForwardSoftLimitEnable(true, Constants.kCANTimeoutMs);
-
     initSmartDashboard( );
 
     initialize( );
@@ -216,21 +209,20 @@ public class Wrist extends SubsystemBase
   {
     motor.configFactoryDefault( );
     motor.configAllSettings(CTREConfigs.wristAngleFXConfig( ));
+    PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllSettings");
+
     motor.setInverted(inverted);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setInverted");
     motor.setNeutralMode(NeutralMode.Brake);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
     motor.setSafetyEnabled(false);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSafetyEnabled");
-
     motor.enableVoltageCompensation(true);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "enableVoltageCompensation");
 
     // Configure sensor settings
     motor.setSelectedSensorPosition(0.0);
     PhoenixUtil.getInstance( ).checkTalonError(motor, "setSelectedSensorPosition");
-    motor.configAllowableClosedloopError(SLOTINDEX, WRConsts.kAllowedError, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllowableClosedloopError");
 
     // Configure Magic Motion settings
     motor.selectProfileSlot(SLOTINDEX, PIDINDEX);
