@@ -18,7 +18,7 @@ public class Pigeon
   public Pigeon(int port)
   {
     mGyro = new Pigeon2(port, "canivore1");
-    mGyro.configFactoryDefault( );
+    // mGyro.configFactoryDefault( ); - TODO Clean up later 
   }
 
   public Rotation2d getYaw( )

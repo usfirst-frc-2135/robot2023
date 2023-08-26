@@ -94,13 +94,13 @@ public class SwerveModule
 
   private void configAngleEncoder( )
   {
-    angleEncoder.configFactoryDefault( );
+    // angleEncoder.configFactoryDefault( ); - TODO Clean up later
     angleEncoder.configAllSettings(CTREConfigs.swerveCancoderConfig( ));
   }
 
   private void configAngleMotor( )
   {
-    mAngleMotor.configFactoryDefault( );
+    // mAngleMotor.configFactoryDefault( ); - TODO Clean up later
     mAngleMotor.configAllSettings(CTREConfigs.swerveAngleFXConfig( ));
     mAngleMotor.setInverted(Constants.SwerveConstants.angleMotorInvert);
     mAngleMotor.setNeutralMode(Constants.SwerveConstants.angleNeutralMode);
@@ -109,7 +109,7 @@ public class SwerveModule
 
   private void configDriveMotor( )
   {
-    mDriveMotor.configFactoryDefault( );
+    // mDriveMotor.configFactoryDefault( ); - TODO Clean up later
     mDriveMotor.configAllSettings(CTREConfigs.swerveDriveFXConfig( ));
     mDriveMotor.setInverted(Constants.SwerveConstants.driveMotorInvert);
     mDriveMotor.setNeutralMode(Constants.SwerveConstants.driveNeutralMode);

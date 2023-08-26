@@ -207,7 +207,7 @@ public class Wrist extends SubsystemBase
 
   private void wristTalonInitialize(WPI_TalonFX motor, boolean inverted)
   {
-    motor.configFactoryDefault( );
+    //motor.configFactoryDefault( ); - TODO Clean up later
     motor.configAllSettings(CTREConfigs.wristAngleFXConfig( ));
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllSettings");
 

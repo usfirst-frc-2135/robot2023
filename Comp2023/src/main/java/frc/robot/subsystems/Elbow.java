@@ -210,7 +210,7 @@ public class Elbow extends SubsystemBase
 
   private void elbowTalonInitialize(WPI_TalonFX motor, boolean inverted)
   {
-    motor.configFactoryDefault( );
+    //motor.configFactoryDefault( ); - TODO Clean up later
     motor.configAllSettings(CTREConfigs.elbowAngleFXConfig( ));
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllSettings");
 

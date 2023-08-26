@@ -183,7 +183,7 @@ public class Extension extends SubsystemBase
 
   private void extensionTalonInitialize(WPI_TalonFX motor, boolean inverted)
   {
-    motor.configFactoryDefault( );
+    //motor.configFactoryDefault( ); - TODO Clean up later
     motor.configAllSettings(CTREConfigs.extensionLengthFXConfig( ));
     PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllSettings");
 

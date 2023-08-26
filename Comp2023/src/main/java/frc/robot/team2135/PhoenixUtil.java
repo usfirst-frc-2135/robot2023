@@ -83,12 +83,12 @@ public class PhoenixUtil
     if (talonValid)
     {
       baseStr += "ver " + (fwVersion / 256.0) + " ";
-      error = talon.configFactoryDefault( );
-      if (error != ErrorCode.OK)
-        DataLogManager.log(
-            classString + ": Talon ID " + deviceID + " error " + error + " " + baseStr + " Message: configFactoryDefault error");
-      else
-        initialized = true;
+      // error = talon.configFactoryDefault( ); TODO Clean up later
+    //   if (error != ErrorCode.OK)
+    //     DataLogManager.log(
+    //         classString + ": Talon ID " + deviceID + " error " + error + " " + baseStr + " Message: configFactoryDefault error");
+    //   else
+    //     initialized = true;
     }
 
     if (talonValid && initialized)
@@ -179,12 +179,12 @@ public class PhoenixUtil
     if (canCoderValid)
     {
       baseStr += "ver " + (fwVersion / 256.0) + " ";
-      error = canCoder.configFactoryDefault( );
-      if (error != ErrorCode.OK)
-        DataLogManager.log(classString + ": CANCoder ID " + deviceID + " error " + error + " " + baseStr
-            + " Message: configFactoryDefault error");
-      else
-        initialized = true;
+      // error = canCoder.configFactoryDefault - TODO Clean up later
+      // if (error != ErrorCode.OK)
+      //   DataLogManager.log(classString + ": CANCoder ID " + deviceID + " error " + error + " " + baseStr
+      //       + " Message: configFactoryDefault error");
+      // else
+      //   initialized = true;
     }
 
     if (canCoderValid && initialized)
@@ -248,29 +248,29 @@ public class PhoenixUtil
     {
       baseStr += "ver " + (fwVersion / 256.0) + " ";
 
-      error = pigeon.configFactoryDefault( );
-      if (error != ErrorCode.OK)
-        DataLogManager.log(
-            classString + ": Pigeon ID " + deviceID + " error " + error + " " + baseStr + " Message: configFactoryDefault error");
-      else
-      {
-        double headingDeg = pigeon.getFusedHeading( );
-        error = checkPigeonError(pigeon, baseStr + "getFusedHeading error");
+      // error = pigeon.configFactoryDefault( ); - TODO Clean up later
+      // if (error != ErrorCode.OK)
+      //   DataLogManager.log(
+      //       classString + ": Pigeon ID " + deviceID + " error " + error + " " + baseStr + " Message: configFactoryDefault error");
+      //   else
+      // {
+      //   double headingDeg = pigeon.getFusedHeading( );
+      //   error = checkPigeonError(pigeon, baseStr + "getFusedHeading error");
 
-        boolean angleIsGood = (pigeon.getState( ) == PigeonIMU.PigeonState.Ready);
-        error = checkPigeonError(pigeon, baseStr + "getState error");
+      //   boolean angleIsGood = (pigeon.getState( ) == PigeonIMU.PigeonState.Ready);
+      //   error = checkPigeonError(pigeon, baseStr + "getState error");
 
-        DataLogManager.log(
-            classString + ": Pigeon ID " + deviceID + " " + baseStr + "fused heading: " + headingDeg + ", ready: " + angleIsGood);
+      //   DataLogManager.log(
+      //       classString + ": Pigeon ID " + deviceID + " " + baseStr + "fused heading: " + headingDeg + ", ready: " + angleIsGood);
 
-        pigeon.setYaw(0.0, Constants.kLongCANTimeoutMs);
-        error = checkPigeonError(pigeon, baseStr + "setYaw error");
+      //   pigeon.setYaw(0.0, Constants.kLongCANTimeoutMs);
+      //   error = checkPigeonError(pigeon, baseStr + "setYaw error");
 
-        pigeon.setFusedHeading(0.0, Constants.kLongCANTimeoutMs);
-        error = checkPigeonError(pigeon, baseStr + "setFusedHeading error");
+      //   pigeon.setFusedHeading(0.0, Constants.kLongCANTimeoutMs);
+      //   error = checkPigeonError(pigeon, baseStr + "setFusedHeading error");
 
-        initialized = true;
-      }
+      //   initialized = true;
+      // }
     }
 
     if (pigeonValid && initialized)
