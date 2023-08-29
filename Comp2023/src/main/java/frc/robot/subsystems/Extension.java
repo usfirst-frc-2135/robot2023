@@ -71,7 +71,7 @@ public class Extension extends SubsystemBase
     setName("Extension");
     setSubsystem("Extension");
 
-    m_extensionValid = PhoenixUtil.getInstance( ).talonFXInitialize(m_extension, "extension");
+    m_extensionValid = PhoenixUtil.getInstance( ).talonFXInitializeWPI(m_extension, "extension");
 
     if (m_extensionValid)
       extensionTalonInitialize(m_extension, EXConsts.kInvertMotor);

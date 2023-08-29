@@ -82,7 +82,7 @@ public class Wrist extends SubsystemBase
     setName("Wrist");
     setSubsystem("Wrist");
 
-    m_wristValid = PhoenixUtil.getInstance( ).talonFXInitialize(m_wrist, "wrist");
+    m_wristValid = PhoenixUtil.getInstance( ).talonFXInitializeWPI(m_wrist, "wrist");
 
     if (m_wristValid)
       wristTalonInitialize(m_wrist, WRConsts.kInvertMotor);

@@ -4,11 +4,13 @@ import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.Faults;
 import com.ctre.phoenix.motorcontrol.StickyFaults;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
+import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.ctre.phoenix.sensors.PigeonIMU_Faults;
+import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
@@ -34,17 +36,27 @@ public class PhoenixUtil
 
   // Talon FX and SRX handlers
 
-  public ErrorCode checkTalonError(BaseMotorController talon, String message)
+  public ErrorCode checkTalonError(BaseTalon motor, String message)
   {
-    ErrorCode errorCode = talon.getLastError( );
+    ErrorCode errorCode = motor.getLastError( );
 
     if (errorCode != ErrorCode.OK)
-      DataLogManager.log(classString + ": Talon ID " + talon.getDeviceID( ) + " error " + errorCode + " Message: " + message);
+      DataLogManager.log(classString + ": Talon ID " + motor.getDeviceID( ) + " error " + errorCode + " Message: " + message);
 
     return errorCode;
   }
 
-  private boolean talonInitialize(BaseMotorController talon, String motorName)
+  public void checkTalonFXError(TalonFX m_elbow, String message)
+  {
+    // ErrorCode errorCode = m_elbow.getError( );
+
+    // if (errorCode != ErrorCode.OK)
+    //   DataLogManager.log(classString + ": Talon ID " + m_elbow.getDeviceID( ) + " error " + errorCode + " Message: " + message);
+
+    //return errorCode;
+  }
+
+  private boolean talonInitialize(BaseTalon talon, String motorName)
   {
     ErrorCode error = ErrorCode.OK;
     int deviceID = 0;
@@ -84,11 +96,11 @@ public class PhoenixUtil
     {
       baseStr += "ver " + (fwVersion / 256.0) + " ";
       // error = talon.configFactoryDefault( ); TODO Clean up later
-    //   if (error != ErrorCode.OK)
-    //     DataLogManager.log(
-    //         classString + ": Talon ID " + deviceID + " error " + error + " " + baseStr + " Message: configFactoryDefault error");
-    //   else
-    //     initialized = true;
+      //   if (error != ErrorCode.OK)
+      //     DataLogManager.log(
+      //         classString + ": Talon ID " + deviceID + " error " + error + " " + baseStr + " Message: configFactoryDefault error");
+      //   else
+      //     initialized = true;
     }
 
     if (talonValid && initialized)
@@ -99,9 +111,69 @@ public class PhoenixUtil
     return talonValid && initialized;
   }
 
-  public boolean talonFXInitialize(WPI_TalonFX talon, String motorName)
+  private boolean talonInitializeFX(TalonFX m_elbow, String motorName)
   {
-    return talonInitialize(talon, motorName);
+    ErrorCode error = ErrorCode.OK;
+    int deviceID = 0;
+    int fwVersion = 0;
+    String baseStr = motorName + " ";
+    boolean talonValid = false;
+    boolean initialized = false;
+
+    // Display Talon firmware versions
+    deviceID = m_elbow.getDeviceID( );
+    //error = checkTalonFXError(m_elbow, baseStr + "getDeviceID error");
+
+    Timer.delay(0.250);
+
+    if (error == ErrorCode.OK)
+    {
+      // This can take multiple attempts before ready
+      for (int i = 0; i < m_retries; i++)
+      {
+        fwVersion = m_elbow.getVersion( ).getValue( );
+        //error = checkTalonFXError(m_elbow, baseStr + "getFirmwareVersion error");
+
+        if (error == ErrorCode.OK)
+        {
+          talonValid = true;
+          if (fwVersion < Falcon500.kTalonReqVersion)
+            DataLogManager
+                .log(classString + ": Talon ID " + deviceID + " " + baseStr + "Incorrect FW version - " + (fwVersion / 256.0));
+          break;
+        }
+
+        Timer.delay(0.100);
+      }
+    }
+
+    if (talonValid)
+    {
+      baseStr += "ver " + (fwVersion / 256.0) + " ";
+      // error = talon.configFactoryDefault( ); TODO Clean up later
+      //   if (error != ErrorCode.OK)
+      //     DataLogManager.log(
+      //         classString + ": Talon ID " + deviceID + " error " + error + " " + baseStr + " Message: configFactoryDefault error");
+      //   else
+      //     initialized = true;
+    }
+
+    if (talonValid && initialized)
+      DataLogManager.log(classString + ": Talon ID " + deviceID + " error " + error + " " + baseStr + "is INITIALIZED!");
+    else
+      DataLogManager.log(classString + ": Talon ID " + deviceID + " error " + error + " " + baseStr + "is UNRESPONSIVE!");
+
+    return talonValid && initialized;
+  }
+
+  public boolean talonFXInitialize(TalonFX m_elbow, String motorName)
+  {
+    return talonInitializeFX(m_elbow, motorName);
+  }
+
+  public boolean talonFXInitializeWPI(WPI_TalonFX m_elbow, String motorName)
+  {
+    return talonInitialize(m_elbow, motorName);
   }
 
   public boolean talonSRXInitialize(WPI_TalonSRX talon, String motorName)

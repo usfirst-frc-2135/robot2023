@@ -7,6 +7,7 @@ import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoderConfiguration;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.SensorTimeBase;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 
 import frc.robot.Constants;
 import frc.robot.Constants.ELConsts;
@@ -65,40 +66,45 @@ public final class CTREConfigs
   }
 
   // Elbow
-
-  public static TalonFXConfiguration elbowAngleFXConfig( )
-  {
-    TalonFXConfiguration elbowConfig = new TalonFXConfiguration( );
-
-    elbowConfig.slot0.kP = Constants.ELConsts.kPidKp;
-    elbowConfig.slot0.kI = Constants.ELConsts.kPidKi;
-    elbowConfig.slot0.kD = Constants.ELConsts.kPidKd;
-    elbowConfig.slot0.kF = Constants.ELConsts.kPidKf;
-
-    elbowConfig.supplyCurrLimit = new SupplyCurrentLimitConfiguration(true, Constants.ELConsts.kSupplyCurrentLimit,
-        Constants.ELConsts.kSupplyTriggerCurrent, Constants.ELConsts.kSupplyTriggerTime);
-    elbowConfig.statorCurrLimit = new StatorCurrentLimitConfiguration(true, ELConsts.kStatorCurrentLimit,
-        ELConsts.kStatorTriggerCurrent, ELConsts.kStatorTriggerTime);
-
-    elbowConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
-    elbowConfig.voltageCompSaturation = 12.0;
-
-    elbowConfig.motionCruiseVelocity = ELConsts.kMMVelocity;
-    elbowConfig.motionAcceleration = ELConsts.kMMAcceleration;
-    elbowConfig.motionCurveStrength = ELConsts.kMMSCurveStrength;
-
-    elbowConfig.reverseSoftLimitThreshold = Conversions.degreesToFalcon(ELConsts.kAngleMin, ELConsts.kGearRatio);
-    elbowConfig.reverseSoftLimitEnable = true;
-    elbowConfig.forwardSoftLimitThreshold = Conversions.degreesToFalcon(ELConsts.kAngleMax, ELConsts.kGearRatio);
-    elbowConfig.forwardSoftLimitEnable = true;
-
-    elbowConfig.slot0.allowableClosedloopError = ELConsts.kAllowedError;
-
-    elbowConfig.neutralDeadband = ELConsts.kNeutralDeadband;
-
-    return elbowConfig;
-  }
-
+  /*
+   * public static TalonFXConfiguration elbowAngleFXConfig( )
+   * {
+   * TalonFXConfiguration elbowConfig = new TalonFXConfiguration( );
+   * 
+   * elbowConfig.Slot0.kP = Constants.ELConsts.kPidKp;
+   * elbowConfig.Slot0.kI = Constants.ELConsts.kPidKi;
+   * elbowConfig.Slot0.kD = Constants.ELConsts.kPidKd;
+   * elbowConfig.Slot0.kV = Constants.ELConsts.kPidKf;
+   * 
+   * elbowConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+   * elbowConfig.CurrentLimits.SupplyCurrentLimit = Constants.ELConsts.kSupplyCurrentLimit;
+   * elbowConfig.CurrentLimits.SupplyCurrentThreshold = Constants.ELConsts.kSupplyTriggerCurrent;
+   * elbowConfig.CurrentLimits.SupplyTimeThreshold = Constants.ELConsts.kSupplyTriggerTime;
+   * 
+   * elbowConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+   * elbowConfig.CurrentLimits.StatorCurrentLimit = ELConsts.kStatorCurrentLimit;
+   * 
+   * elbowConfig.initializationStrategy = SensorInitializationStrategy.BootToZero;
+   * elbowConfig.voltageCompSaturation = 12.0;
+   * 
+   * elbowConfig.motionCruiseVelocity = ELConsts.kMMVelocity;
+   * elbowConfig.motionAcceleration = ELConsts.kMMAcceleration;
+   * elbowConfig.motionCurveStrength = ELConsts.kMMSCurveStrength;
+   * 
+   * elbowConfig.reverseSoftLimitThreshold = Conversions.degreesToFalcon(ELConsts.kAngleMin,
+   * ELConsts.kGearRatio);
+   * elbowConfig.reverseSoftLimitEnable = true;
+   * elbowConfig.forwardSoftLimitThreshold = Conversions.degreesToFalcon(ELConsts.kAngleMax,
+   * ELConsts.kGearRatio);
+   * elbowConfig.forwardSoftLimitEnable = true;
+   * 
+   * elbowConfig.slot0.allowableClosedloopError = ELConsts.kAllowedError;
+   * 
+   * elbowConfig.neutralDeadband = ELConsts.kNeutralDeadband;
+   * 
+   * return elbowConfig;
+   * }
+   */
   public static CANCoderConfiguration elbowCancoderConfig( )
   {
     CANCoderConfiguration config = new CANCoderConfiguration( );

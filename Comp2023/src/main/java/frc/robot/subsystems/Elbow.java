@@ -7,10 +7,12 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
+import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.CANCoderStatusFrame;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.MathUtil;
@@ -40,6 +42,7 @@ import frc.robot.Constants.EXConsts;
 import frc.robot.RobotContainer;
 import frc.robot.lib.math.Conversions;
 import frc.robot.lib.util.CTREConfigs;
+import frc.robot.lib.util.Phoenix6_CTREConfigs;
 import frc.robot.team2135.PhoenixUtil;
 
 //
@@ -48,36 +51,38 @@ import frc.robot.team2135.PhoenixUtil;
 public class Elbow extends SubsystemBase
 {
   // Constants
-  private static final int           PIDINDEX             = 0;   // PID in use (0-primary, 1-aux)
-  private static final int           SLOTINDEX            = 0;   // Use first PID slot
+  private static final int          PIDINDEX             = 0;   // PID in use (0-primary, 1-aux)
+  private static final int          SLOTINDEX            = 0;   // Use first PID slot
 
   // Member objects
-  private final WPI_TalonFX          m_elbow              = new WPI_TalonFX(Constants.Ports.kCANID_Elbow);  //elbow
-  private final CANCoder             m_elbowCANCoder      = new CANCoder(Constants.Ports.kCANID_ELCANCoder);
-  private final TalonFXSimCollection m_elbowMotorSim      = new TalonFXSimCollection(m_elbow);
-  private final SingleJointedArmSim  m_elbowSim           = new SingleJointedArmSim(DCMotor.getFalcon500(1), ELConsts.kGearRatio,
-      2.0, ELConsts.kForearmLengthMeters, -Math.PI, Math.PI, false);
+  private final TalonFX             m_elbow              = new TalonFX(Constants.Ports.kCANID_Elbow);  //elbow
+  private final CANCoder            m_elbowCANCoder      = new CANCoder(Constants.Ports.kCANID_ELCANCoder);
+  //private final TalonFXSimCollection m_elbowMotorSim      = new TalonFXSimCollection(m_elbow);
+  // private final SingleJointedArmSim m_elbowSim           = new SingleJointedArmSim(DCMotor.getFalcon500(1), ELConsts.kGearRatio,
+  //     2.0, ELConsts.kForearmLengthMeters, -Math.PI, Math.PI, false);
 
   // Mechanism2d
-  private final Mechanism2d          m_elbowMech          = new Mechanism2d(3, 3);
-  private final MechanismRoot2d      m_elbowRoot          = m_elbowMech.getRoot("elbow", 1.5, 2);
-  private final MechanismLigament2d  m_elbowLigament      =
+  private final Mechanism2d         m_elbowMech          = new Mechanism2d(3, 3);
+  private final MechanismRoot2d     m_elbowRoot          = m_elbowMech.getRoot("elbow", 1.5, 2);
+  private final MechanismLigament2d m_elbowLigament      =
       m_elbowRoot.append(new MechanismLigament2d("elbow", 1, 0, 6, new Color8Bit(Color.kBlue)));
 
-  private boolean                    m_elbowValid;                 // Health indicator for elbow Talon 
-  private boolean                    m_elbowCCValid;               // Health indicator for elbow CANCoder 
+  private boolean                   m_elbowValid;                 // Health indicator for elbow Talon 
+  private boolean                   m_elbowCCValid;               // Health indicator for elbow CANCoder 
 
   // Declare module variables
-  private ElbowMode                  m_elbowMode          = ElbowMode.ELBOW_INIT;             // Mode active with joysticks
+  private ElbowMode                 m_elbowMode          = ElbowMode.ELBOW_INIT;             // Mode active with joysticks
+  private MotionMagicVoltage        m_motmag             = new MotionMagicVoltage(0);
 
-  private ElbowAngle                 m_elbowAngle;                   // Desired elbow angle
-  private boolean                    m_moveIsFinished;
-  private double                     m_elbowTargetDegrees = 0.0;    // Target angle in degrees
-  private double                     m_elbowCurDegrees    = 0.0;    // Current angle in degrees
-  private int                        m_withinTolerance    = 0;      // Counter for consecutive readings within tolerance
-  private double                     m_elbowTotalFF;
+  private ElbowAngle                m_elbowAngle;                   // Desired elbow angle
+  private boolean                   m_moveIsFinished;
+  private double                    m_elbowTargetDegrees = 0.0;    // Target angle in degrees
+  private double                    m_elbowCurDegrees    = 0.0;    // Current angle in degrees
+  private int                       m_withinTolerance    = 0;      // Counter for consecutive readings within tolerance
+  private double                    m_elbowTotalFF;
+  private VoltageOut                m_request            = new VoltageOut(0);
 
-  private Timer                      m_safetyTimer        = new Timer( ); // Safety timer for use in elbow
+  private Timer                     m_safetyTimer        = new Timer( ); // Safety timer for use in elbow
 
   // Constructor
   public Elbow( )
@@ -88,7 +93,7 @@ public class Elbow extends SubsystemBase
     m_elbowValid = PhoenixUtil.getInstance( ).talonFXInitialize(m_elbow, "elbow");
 
     if (m_elbowValid)
-      elbowTalonInitialize(m_elbow, ELConsts.kInvertMotor);
+      elbowTalonInitialize(m_elbow);
 
     m_elbowCCValid = PhoenixUtil.getInstance( ).canCoderInitialize(m_elbowCANCoder, "elbow");
 
@@ -105,7 +110,7 @@ public class Elbow extends SubsystemBase
       double absolutePosition = Conversions.degreesToFalcon(m_elbowCurDegrees, ELConsts.kGearRatio);
 
       if (RobotBase.isReal( ))
-        m_elbow.setSelectedSensorPosition(absolutePosition);
+        m_elbow.setRotorPosition(absolutePosition);
     }
 
     initSmartDashboard( );
@@ -120,7 +125,8 @@ public class Elbow extends SubsystemBase
 
     if (m_elbowValid)
     {
-      int curCounts = (int) m_elbow.getSelectedSensorPosition(0);
+      double curCountsDouble = m_elbow.getRotorPosition( ).getValue( );
+      int curCounts = (int) curCountsDouble;
 
       m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
       SmartDashboard.putNumber("EL_curDegrees", m_elbowCurDegrees);
@@ -130,7 +136,7 @@ public class Elbow extends SubsystemBase
       m_elbowTotalFF = calculateTotalFF( );
       SmartDashboard.putNumber("EL_totalFF", m_elbowTotalFF);
 
-      double currentDraw = m_elbow.getStatorCurrent( );
+      double currentDraw = m_elbow.getStatorCurrent( ).getValue( );
       SmartDashboard.putNumber("EL_currentDraw", currentDraw);
     }
   }
@@ -141,18 +147,18 @@ public class Elbow extends SubsystemBase
     // This method will be called once per scheduler run during simulation
 
     // Set input motor voltage from the motor setting
-    m_elbowMotorSim.setBusVoltage(RobotController.getInputVoltage( ));
-    m_elbowSim.setInput(m_elbowMotorSim.getMotorOutputLeadVoltage( ));
+    //m_elbowMotorSim.setBusVoltage(RobotController.getInputVoltage( ));
+    //m_elbowSim.setInput(m_elbowMotorSim.getMotorOutputLeadVoltage( ));
 
     // update for 20 msec loop
-    m_elbowSim.update(0.020);
+    //m_elbowSim.update(0.020);
 
     // Finally, we set our simulated encoder's readings and simulated battery voltage
-    m_elbowMotorSim.setIntegratedSensorRawPosition(elbowDegreesToCounts(Units.radiansToDegrees(m_elbowSim.getAngleRads( ))));
-    m_elbowMotorSim.setIntegratedSensorVelocity(elbowDegreesToCounts(Units.radiansToDegrees(m_elbowSim.getVelocityRadPerSec( ))));
+    //m_elbowMotorSim.setIntegratedSensorRawPosition(elbowDegreesToCounts(Units.radiansToDegrees(m_elbowSim.getAngleRads( ))));
+    //m_elbowMotorSim.setIntegratedSensorVelocity(elbowDegreesToCounts(Units.radiansToDegrees(m_elbowSim.getVelocityRadPerSec( ))));
 
     // SimBattery estimates loaded battery voltages
-    RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_elbowSim.getCurrentDrawAmps( )));
+    //RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_elbowSim.getCurrentDrawAmps( )));
   }
 
   private void initSmartDashboard( )
@@ -177,7 +183,7 @@ public class Elbow extends SubsystemBase
     setElbowStopped( );
 
     if (m_elbowValid)
-      curELCounts = m_elbow.getSelectedSensorPosition(0);
+      curELCounts = m_elbow.getRotorPosition( ).getValue( );
     m_elbowCurDegrees = elbowCountsToDegrees((int) curELCounts);
     m_elbowTargetDegrees = m_elbowCurDegrees;
     DataLogManager.log(String.format("%s: Init Target Degrees: %.1f", getSubsystem( ), m_elbowTargetDegrees));
@@ -208,30 +214,39 @@ public class Elbow extends SubsystemBase
     return m_elbowCurDegrees;
   }
 
-  private void elbowTalonInitialize(WPI_TalonFX motor, boolean inverted)
+  private void elbowTalonInitialize(TalonFX m_elbow2)
   {
-    //motor.configFactoryDefault( ); - TODO Clean up later
-    motor.configAllSettings(CTREConfigs.elbowAngleFXConfig( ));
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllSettings");
+    //motor.configFactoryDefault( ); - TODO: Cleanup later
 
-    motor.setInverted(inverted);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "setInverted");
-    motor.setNeutralMode(NeutralMode.Brake);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
-    motor.setSafetyEnabled(false);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "setSafetyEnabled");
-    motor.enableVoltageCompensation(true);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "enableVoltageCompensation");
+    //m_elbow2.setInverted(inverted);
+    //PhoenixUtil.getInstance( ).checkTalonError(motor, "setInverted");
+
+    m_elbow2.getConfigurator( ).apply(Phoenix6_CTREConfigs.elbowAngleFXConfig( ));
+
+    //motor.configAllSettings(CTREConfigs.elbowAngleFXConfig( ));
+    //PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllSettings");
+    m_elbow2.setControl(m_request.withOutput(12.0));
+
+    //m_elbow2.setInverted(inverted);
+    //PhoenixUtil.getInstance( ).checkTalonError(motor, "setInverted");
+    //m_elbow2.setNeutralMode(NeutralMode.Brake);
+    //PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
+    m_elbow2.setSafetyEnabled(false);
+    //PhoenixUtil.getInstance( ).checkTalonError(motor, "setSafetyEnabled");
+
+    //m_elbow2.enableVoltageCompensation(true);
+    //PhoenixUtil.getInstance( ).checkTalonError(motor, "enableVoltageCompensation");
 
     // Configure sensor settings
-    motor.setSelectedSensorPosition(0.0);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "setSelectedSensorPosition");
+    m_elbow2.setRotorPosition(0.0);
+    //PhoenixUtil.getInstance( ).checkTalonError(motor, "setSelectedSensorPosition");
 
     // Configure Magic Motion settings
-    motor.selectProfileSlot(SLOTINDEX, PIDINDEX);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "selectProfileSlot");
+    //m_elbow2.selectProfileSlot(SLOTINDEX, PIDINDEX);
+    m_motmag.Slot = 0;
 
-    motor.set(ControlMode.PercentOutput, 0.0);
+    //PhoenixUtil.getInstance( ).checkTalonError(motor, "selectProfileSlot");
+
   }
 
   public void moveElbowWithJoystick(XboxController joystick)
@@ -269,7 +284,7 @@ public class Elbow extends SubsystemBase
     m_elbowTargetDegrees = m_elbowCurDegrees;
 
     if (m_elbowValid)
-      m_elbow.set(ControlMode.PercentOutput, axisValue * ELConsts.kElbowSpeedMaxManual);
+      m_elbow.setControl(m_request.withOutput(axisValue * ELConsts.kElbowSpeedMaxManual));
   }
 
   public void setElbowStopped( )
@@ -277,12 +292,12 @@ public class Elbow extends SubsystemBase
     DataLogManager.log(getSubsystem( ) + ": now STOPPED");
 
     if (m_elbowValid)
-      m_elbow.set(ControlMode.PercentOutput, 0.0);
+      m_elbow.setControl(m_request.withOutput(0.0));
   }
 
   public void setElbowAngleToZero( )
   {
-    m_elbow.setSelectedSensorPosition(elbowDegreesToCounts(0));
+    m_elbow.setRotorPosition(elbowDegreesToCounts(0));
   }
 
   private double calculateTotalFF( )
@@ -346,8 +361,9 @@ public class Elbow extends SubsystemBase
       m_safetyTimer.restart( );
 
       if (m_elbowValid && ELConsts.kCalibrated)
-        m_elbow.set(ControlMode.MotionMagic, elbowDegreesToCounts(m_elbowTargetDegrees), DemandType.ArbitraryFeedForward,
-            m_elbowTotalFF);
+        //m_elbow.set(ControlMode.MotionMagic, elbowDegreesToCounts(m_elbowTargetDegrees), DemandType.ArbitraryFeedForward,
+        //    m_elbowTotalFF);
+        m_elbow.setControl(m_motmag.withPosition(200)); // TODO - fix newPosition for # of rotations
 
       DataLogManager
           .log(String.format("%s: moving: %.1f -> %.1f degrees", getSubsystem( ), m_elbowCurDegrees, m_elbowTargetDegrees));
@@ -356,15 +372,16 @@ public class Elbow extends SubsystemBase
     {
       DataLogManager.log(getSubsystem( ) + ": not calibrated");
       if (m_elbowValid)
-        m_elbow.set(ControlMode.PercentOutput, 0.0);
+        m_elbow.setControl(m_request.withOutput(0));
     }
   }
 
   public void moveElbowAngleExecute( )
   {
     if (m_elbowValid && ELConsts.kCalibrated)
-      m_elbow.set(ControlMode.MotionMagic, elbowDegreesToCounts(m_elbowTargetDegrees), DemandType.ArbitraryFeedForward,
-          m_elbowTotalFF);
+      m_elbow.setControl(m_motmag.withPosition(200)); // TODO - fix newPosition for # of rotations
+    // m_elbow.set(ControlMode.MotionMagic, elbowDegreesToCounts(m_elbowTargetDegrees), DemandType.ArbitraryFeedForward,
+    //     m_elbowTotalFF);
   }
 
   public boolean moveElbowAngleIsFinished( )
@@ -404,21 +421,24 @@ public class Elbow extends SubsystemBase
 
   public boolean isElbowBelowIdle( )
   {
-    int curCounts = (int) m_elbow.getSelectedSensorPosition(0);
+    double curCountsDouble = m_elbow.getRotorPosition( ).getValue( );
+    int curCounts = (int) curCountsDouble;
     m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
     return m_elbowCurDegrees < ELConsts.kAngleIdle;
   }
 
   public boolean isElbowBelowLow( )
   {
-    int curCounts = (int) m_elbow.getSelectedSensorPosition(0);
+    double curCountsDouble = m_elbow.getRotorPosition( ).getValue( );
+    int curCounts = (int) curCountsDouble;
     m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
     return m_elbowCurDegrees < ELConsts.kAngleScoreLow;
   }
 
   public boolean isElbowBelowMid( )
   {
-    int curCounts = (int) m_elbow.getSelectedSensorPosition(0);
+    double curCountsDouble = m_elbow.getRotorPosition( ).getValue( );
+    int curCounts = (int) curCountsDouble;
     m_elbowCurDegrees = elbowCountsToDegrees(curCounts);
     return m_elbowCurDegrees < ELConsts.kAngleScoreMid;
   }
