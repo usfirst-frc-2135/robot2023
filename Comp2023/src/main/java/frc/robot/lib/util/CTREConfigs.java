@@ -67,7 +67,7 @@ public final class CTREConfigs
 
   // Elbow
   /*
-   * public static TalonFXConfiguration elbowAngleFXConfig( )
+   * public static TalonFXConfiguration elbowMotorFXConfig( )
    * {
    * TalonFXConfiguration elbowConfig = new TalonFXConfiguration( );
    * 
@@ -105,16 +105,16 @@ public final class CTREConfigs
    * return elbowConfig;
    * }
    */
-  public static CANCoderConfiguration elbowCancoderConfig( )
-  {
-    CANCoderConfiguration config = new CANCoderConfiguration( );
-    config.magnetOffsetDegrees = (Constants.isComp) ? ELConsts.kCompOffset : ELConsts.kBetaOffset;
-    config.absoluteSensorRange = AbsoluteSensorRange.Signed_PlusMinus180;
-    config.sensorDirection = Constants.ELConsts.kInvertCANCoder;
-    config.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
-    config.sensorTimeBase = SensorTimeBase.PerSecond;
-    return config;
-  }
+  // public static CANCoderConfiguration elbowCancoderConfig( )
+  // {
+  //   CANCoderConfiguration config = new CANCoderConfiguration( );
+  //   config.magnetOffsetDegrees = (Constants.isComp) ? ELConsts.kCompOffset : ELConsts.kBetaOffset;
+  //   config.absoluteSensorRange = AbsoluteSensorRange.Signed_PlusMinus180;
+  //   config.sensorDirection = Constants.ELConsts.kInvertCANCoder;
+  //   config.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
+  //   config.sensorTimeBase = SensorTimeBase.PerSecond;
+  //   return config;
+  // }
 
   // Extension
 

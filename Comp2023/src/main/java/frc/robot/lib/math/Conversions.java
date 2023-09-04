@@ -31,6 +31,31 @@ public class Conversions
   }
 
   /**
+   * @param rotations
+   *          Falcon rotations
+   * @param gearRatio
+   *          Gear Ratio between Falcon and Mechanism
+   * @return Degrees of Rotation of Mechanism
+   */
+  public static double rotationsToDegrees(double rotations, double gearRatio)
+  {
+    return rotations * (360.0 / gearRatio);
+  }
+
+  /**
+   * @param degrees
+   *          Degrees of rotation of Mechanism
+   * @param gearRatio
+   *          Gear Ratio between Falcon and Mechanism
+   * @return Falcon rotations
+   */
+  public static double degreesToRotations(double degrees, double gearRatio)
+  {
+    double rotations = degrees / (360.0 / gearRatio);
+    return rotations;
+  }
+
+  /**
    * @param velocityCounts
    *          Falcon Velocity Counts
    * @param gearRatio

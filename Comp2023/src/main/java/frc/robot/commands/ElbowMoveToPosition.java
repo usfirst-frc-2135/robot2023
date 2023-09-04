@@ -4,23 +4,23 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.ELConsts.ElbowAngle;
+import frc.robot.Constants.ELConsts.ElbowPosition;
 import frc.robot.subsystems.Elbow;
 
 /**
  *
  */
-public class ElbowMoveToAngle extends CommandBase
+public class ElbowMoveToPosition extends CommandBase
 {
-  private final Elbow m_elbow;
-  private ElbowAngle  m_angle;
+  private final Elbow   m_elbow;
+  private ElbowPosition m_position;
 
-  public ElbowMoveToAngle(Elbow elbow, ElbowAngle angle)
+  public ElbowMoveToPosition(Elbow elbow, ElbowPosition position)
   {
     m_elbow = elbow;
-    m_angle = angle;
+    m_position = position;
 
-    setName("ElbowMoveToAngle");
+    setName("ElbowMoveToPosition");
     addRequirements(m_elbow);
   }
 
@@ -28,28 +28,28 @@ public class ElbowMoveToAngle extends CommandBase
   @Override
   public void initialize( )
   {
-    m_elbow.moveElbowAngleInit(m_angle);
+    m_elbow.moveElbowToPositionInit(m_position);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute( )
   {
-    m_elbow.moveElbowAngleExecute( );
+    m_elbow.moveElbowToPositionExecute( );
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted)
   {
-    m_elbow.moveElbowAngleEnd( );
+    m_elbow.moveElbowToPositionEnd( );
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished( )
   {
-    return m_elbow.moveElbowAngleIsFinished( );
+    return m_elbow.moveElbowToPositionIsFinished( );
   }
 
   @Override
