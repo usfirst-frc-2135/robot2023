@@ -148,10 +148,8 @@ public class Constants
     // Global settings
 
     public static final double               kGearRatio                = 300;   // Gear reduction for elbow
-    public static final double               kDegreesPerCount          = 360 / Falcon500.kEncoderCPR / kGearRatio;
     public static final double               kForearmLengthMeters      = 1.22;  // Sim value: 48 inches
     public static final double               kForearmMassKg            = 6.0;   // Sim value: 13.2 lbs 
-    public static final InvertedValue        kInvertMotor              = InvertedValue.Clockwise_Positive;  // Motor direction for positive input
 
     public static final double               kAngleMin                 = -3.0;  // Elbow minimum allowable degrees (a few degrees less than stowed)
     public static final double               kAngleStow                = 2.0;   // By definition - elbow is vertical
@@ -162,59 +160,64 @@ public class Constants
     public static final double               kAngleSubstation          = 102.0; // From Mech Design (3'1-38" above floor), empirical
     public static final double               kAngleMax                 = 110.0; // Elbow maximum allowable degrees (10 deg more than high)
 
+    public static final InvertedValue        kInvertMotor              = InvertedValue.CounterClockwise_Positive;  // Motor direction for positive input
+
     // Current limit settings - elbow
-    public static final double               kSupplyCurrentLimit       = 25.0;  // Supply current limit (after trigger)
-    public static final double               kSupplyTriggerCurrent     = 25.0;  // Supply trigger current that will cause limiting
+    public static final double               kSupplyCurrentLimit       = 30.0;  // Supply current limit (after trigger)
+    public static final double               kSupplyTriggerCurrent     = 30.0;  // Supply trigger current that will cause limiting
     public static final double               kSupplyTriggerTime        = 0.001; // Supply time duration of trigger that will causing limiting
     public static final boolean              kSupplyCurrentLimitEnable = true;  // Supply current enable
 
-    public static final double               kStatorCurrentLimit       = 25.0;  // Stator current limit (after trigger)
-    public static final boolean              kStatorCurrentLimitEnable = true;  // Stator current enable
+    public static final double               kStatorCurrentLimit       = 100.0; // Stator current limit (after trigger)
+    public static final boolean              kStatorCurrentLimitEnable = false; // Stator current enable
 
-    public static final double               kNeutralDeadband          = 0.001;          // Elbow motor output deadband
+    public static final double               kNeutralDeadband          = 0.001; // Elbow motor output deadband
 
     // CANCoder elbow absolute offset
-    public static final boolean              kCalibrated               = true;    // TODO: Indicates whether the elbow has been calibrated by CANCoder
+    public static final boolean              kCalibrated               = true;     // TODO: Indicates whether the elbow has been calibrated by CANCoder
     public static final double               kCompOffset               = -107.139; // CANCoder offset angle for comp bot
     public static final double               kBetaOffset               = 0.000;    // (TODO: Beta requires an offset) CANCoder offset angle for beta bot
     public static final SensorDirectionValue kSensorDirection          = SensorDirectionValue.Clockwise_Positive;
 
-    // Manual config parameters
+    // Manual mode config parameters
 
     public enum ElbowMode
     {
-      ELBOW_INIT,         // Initialize elbow
-      ELBOW_DOWN,         // Elbow moving down
-      ELBOW_STOPPED,      // Elbow stop and hold position
-      ELBOW_UP            // Elbow moving up
+      ELBOW_INIT,      // Initialize elbow
+      ELBOW_DOWN,      // Elbow moving down
+      ELBOW_STOPPED,   // Elbow stop and hold position
+      ELBOW_UP         // Elbow moving up
     }
 
-    public static final double kManualSpeedMax = 0.3;    // Motor percent output during manual operation
+    public static final double kManualSpeedVolts = 4.0;    // Motor voltage during manual operation
 
     // Motion Magic config parameters
 
     public enum ElbowPosition
     {
-      ELBOW_NOCHANGE,     // No change in elbow angle--maintain current position
-      ELBOW_STOW,         // Move elbow to stow angle
-      ELBOW_IDLE,         // Move elbow to idle andgle
-      ELBOW_LOW,          // Move elbow to low-scoring angle
-      ELBOW_MID,          // Move elbow to shelf angle; slightly higher than mid-scoring angle so this is used for both
-      ELBOW_HIGH,         // Move elbow to high-scoring angle
-      ELBOW_SHELF         // Move elbow to substation loading shelf angle
+      ELBOW_NOCHANGE,  // No change in elbow angle--maintain current position
+      ELBOW_STOW,      // Move elbow to stow angle
+      ELBOW_IDLE,      // Move elbow to idle andgle
+      ELBOW_LOW,       // Move elbow to low-scoring angle
+      ELBOW_MID,       // Move elbow to shelf angle; slightly higher than mid-scoring angle so this is used for both
+      ELBOW_HIGH,      // Move elbow to high-scoring angle
+      ELBOW_SHELF      // Move elbow to substation loading shelf angle
     }
 
     public static final double kMMVelocity       = 81.28;          // Elbow motion magic velocity (75% of max motor RPM)
     public static final double kMMAcceleration   = 121.9;          // Elbow motion magic acceleration (target velocity in 2/3s)
     public static final double kMMJerk           = kMMAcceleration * 10; // Elbow motion magic jerk limit
+    public static final double kS                = 0.20;           // kS - voltage constant to overcome friction
     public static final double kV                = 0.1107;         // kV - voltage constant per desired RPM
-    public static final double kPidKp            = 0.05908;        // Elbow PID proportional constant
+    public static final double kPidKp            = 0.05908 * 8;    // Elbow PID proportional constant
     public static final double kPidKi            = 0.0;            // Elbow PID integral constant
-    public static final double kPidKd            = 0.5908;         // Elbow PID derivative constant
+    public static final double kPidKd            = 0.0;            // Elbow PID derivative constant
+    // public static final double kPidKd            = 0.5908;         // Elbow PID derivative constant
+
+    public static final double kArbitraryFF      = 0.045;          // Elbow motor output (duty cycle) for arm at 90 degrees
+    public static final double kExtArbFF         = 0.007;          // Elbow motor output (duty cycle) for arm at 90 degrees with full extension
 
     public static final double kToleranceDegrees = 2.0;            // Elbow PID tolerance in degrees (1 deg is 1" at 48" extension)
-    public static final double kArbitraryFF      = 0.045;          // Elbow motor output for arm at 90 degrees
-    public static final double kExtArbFF         = 0.007;          // Elbow motor output for arm at 90 degrees with full extension
     public static final double kMMSafetyTimeout  = 2.5;            // Seconds allowed for a Motion Magic movement
   }
 
@@ -234,8 +237,8 @@ public class Constants
 
     // Extension lengths increase by 0.95" per 90 degrees of elbow rotation (lengths manually adjusted below)
     public static final double  kLengthMin            = -0.5;  // Extension minimum allowable length (half inch less than stowed)
-    public static final double  kLengthStow           = 0.0;  // By definition - extension fully retracted
-    public static final double  kLengthIdle           = 0.25;   // Slightly off mechanical hard stop
+    public static final double  kLengthStow           = 0.0;   // By definition - extension fully retracted
+    public static final double  kLengthIdle           = 0.25;  // Slightly off mechanical hard stop
     public static final double  kLengthScoreLow       = 8.0;   // From Mech Design (floor, feet art 5" high), empirically checked
     public static final double  kLengthScoreMid       = 1.25;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), empirically checked
     public static final double  kLengthScoreHigh      = 17.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked

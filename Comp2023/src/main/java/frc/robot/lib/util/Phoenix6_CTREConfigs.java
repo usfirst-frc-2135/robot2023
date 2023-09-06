@@ -1,9 +1,9 @@
 package frc.robot.lib.util;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import frc.robot.Constants;
 import frc.robot.Constants.ELConsts;
@@ -18,8 +18,8 @@ public final class Phoenix6_CTREConfigs
     TalonFXConfiguration elbowConfig = new TalonFXConfiguration( );
 
     // Closed Loop settings
-    // elbowConfig.ClosedLoopGeneral.* = 0;
-    // elbowConfig.ClosedLoopRamps.* = 0;
+    // elbowConfig.ClosedLoopGeneral.*
+    // elbowConfig.ClosedLoopRamps.*
 
     // Current limit settings
     elbowConfig.CurrentLimits.SupplyCurrentLimit = Constants.ELConsts.kSupplyCurrentLimit;
@@ -31,10 +31,10 @@ public final class Phoenix6_CTREConfigs
     elbowConfig.CurrentLimits.StatorCurrentLimitEnable = Constants.ELConsts.kStatorCurrentLimitEnable;
 
     // Feedback settings
-    // elbowConfig.Feedback.* = 0;
+    // elbowConfig.Feedback.*
 
     // Hardware limit switches
-    // elbowConfig.HardwareLimitSwitch.* = 0;
+    // elbowConfig.HardwareLimitSwitch.*
 
     // Motion Magic settings
     elbowConfig.MotionMagic.MotionMagicCruiseVelocity = ELConsts.kMMVelocity;
@@ -50,11 +50,11 @@ public final class Phoenix6_CTREConfigs
 
     // Open Loop settings
     elbowConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0;
-    elbowConfig.OpenLoopRamps.TorqueOpenLoopRampPeriod = 0;
+    // elbowConfig.OpenLoopRamps.TorqueOpenLoopRampPeriod
     elbowConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0;
 
     // Slot settings
-    // elbowConfig.Slot0.kS = 0;
+    elbowConfig.Slot0.kS = Constants.ELConsts.kS;
     elbowConfig.Slot0.kV = Constants.ELConsts.kV;
     elbowConfig.Slot0.kP = Constants.ELConsts.kPidKp;
     elbowConfig.Slot0.kI = Constants.ELConsts.kPidKi;
@@ -74,6 +74,7 @@ public final class Phoenix6_CTREConfigs
   public static CANcoderConfiguration elbowCancoderConfig( )
   {
     CANcoderConfiguration config = new CANcoderConfiguration( );
+    config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
     config.MagnetSensor.SensorDirection = ELConsts.kSensorDirection;
     config.MagnetSensor.MagnetOffset = (Constants.isComp) ? ELConsts.kCompOffset : ELConsts.kBetaOffset;
     return config;

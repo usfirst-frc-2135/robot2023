@@ -70,7 +70,7 @@ public class PhoenixUtil6
       DataLogManager.log(String.format("%s: ID %d - %s motor: getConfigurator.apply - %s!", m_className, deviceID, name,
           status.getDescription( )));
 
-    if ((status = motor.setControl(new VoltageOut(0))) != StatusCode.OK)
+    if ((status = motor.setControl(new VoltageOut(0).withEnableFOC(false))) != StatusCode.OK)
       DataLogManager
           .log(String.format("%s: ID %d - %s motor: setControl - %s!", m_className, deviceID, name, status.getDescription( )));
 
