@@ -1,6 +1,7 @@
 package frc.robot.team2135;
 
 import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -33,6 +34,7 @@ public class PhoenixUtil6
 
   public boolean talonFXInitialize6(TalonFX motor, String name, TalonFXConfiguration config)
   {
+    StatusCode status = StatusCode.StatusCodeNotInitialized;
     int deviceID = 0;
     int fwvMajor = 0;
     int fwvMinor = 0;
@@ -43,28 +45,25 @@ public class PhoenixUtil6
     // Display Talon firmware versions
     deviceID = motor.getDeviceID( );
 
-    Timer.delay(0.5);
+    Timer.delay(0.25);
 
     // This can take multiple attempts before ready
-    for (int i = 0; i < m_retries; i++)
+    for (int i = 0; i < m_retries && fwvMajor == 0; i++)
     {
-      fwvMajor = motor.getVersionMajor( ).getValue( );
-      fwvMinor = motor.getVersionMinor( ).getValue( );
-      fwvBugfix = motor.getVersionBugfix( ).getValue( );
-      fwvBuild = motor.getVersionBuild( ).getValue( );
-
-      if (fwvMajor != 0 || fwvMinor != 0 || fwvBugfix != 0 || fwvBuild != 0)
+      StatusSignal<Integer> statusSignal = motor.getVersion( );
+      status = statusSignal.getError( );
+      if (status.isOK( ))
       {
-        talonValid = true;
-        break;
+        fwvMajor = (statusSignal.getValue( ) >> 24) & 0xff;
+        fwvMinor = (statusSignal.getValue( ) >> 16) & 0xff;
+        fwvBugfix = (statusSignal.getValue( ) >> 8) & 0xff;
+        fwvBuild = (statusSignal.getValue( ) >> 0) & 0xff;
       }
-      Timer.delay(0.1);
+      else
+        Timer.delay(0.1);
     }
 
-    if (fwvMajor < Constants.kPhoenixMajorVersion)
-      talonValid = false;
-
-    StatusCode status;
+    talonValid = (fwvMajor >= Constants.kPhoenixMajorVersion);
 
     if ((status = motor.getConfigurator( ).apply(config, m_timeout)) != StatusCode.OK)
       DataLogManager.log(String.format("%s: ID %d - %s motor: getConfigurator.apply - %s!", m_className, deviceID, name,
@@ -91,6 +90,7 @@ public class PhoenixUtil6
 
   public boolean canCoderInitialize6(CANcoder canCoder, String name, CANcoderConfiguration config)
   {
+    StatusCode status = StatusCode.StatusCodeNotInitialized;
     int deviceID = 0;
     int fwvMajor = 0;
     int fwvMinor = 0;
@@ -102,25 +102,22 @@ public class PhoenixUtil6
     deviceID = canCoder.getDeviceID( );
 
     // This can take multiple attempts before ready
-    for (int i = 0; i < m_retries; i++)
+    for (int i = 0; i < m_retries && fwvMajor == 0; i++)
     {
-      fwvMajor = canCoder.getVersionMajor( ).getValue( );
-      fwvMinor = canCoder.getVersionMinor( ).getValue( );
-      fwvBugfix = canCoder.getVersionBugfix( ).getValue( );
-      fwvBuild = canCoder.getVersionBuild( ).getValue( );
-
-      if (fwvMajor != 0 || fwvMinor != 0 || fwvBugfix != 0 || fwvBuild != 0)
+      StatusSignal<Integer> statusSignal = canCoder.getVersion( );
+      status = statusSignal.getError( );
+      if (status.isOK( ))
       {
-        canCoderValid = true;
-        break;
+        fwvMajor = (statusSignal.getValue( ) >> 24) & 0xff;
+        fwvMinor = (statusSignal.getValue( ) >> 16) & 0xff;
+        fwvBugfix = (statusSignal.getValue( ) >> 8) & 0xff;
+        fwvBuild = (statusSignal.getValue( ) >> 0) & 0xff;
       }
-      Timer.delay(0.1);
+      else
+        Timer.delay(0.1);
     }
 
-    if (fwvMajor < Constants.kPhoenixMajorVersion)
-      canCoderValid = false;
-
-    StatusCode status;
+    canCoderValid = (fwvMajor >= Constants.kPhoenixMajorVersion);
 
     if ((status = canCoder.getConfigurator( ).apply(config, m_timeout)) != StatusCode.OK)
       DataLogManager.log(String.format("%s: ID %d - %s CANCoder: getConfigurator.apply - %s!", m_className, deviceID, name,

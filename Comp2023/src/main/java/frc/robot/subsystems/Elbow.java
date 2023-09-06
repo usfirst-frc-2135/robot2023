@@ -38,7 +38,7 @@ import frc.robot.Constants.EXConsts;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.lib.math.Conversions;
-import frc.robot.lib.util.Phoenix6_CTREConfigs;
+import frc.robot.lib.util.CTREConfigs6;
 import frc.robot.team2135.PhoenixUtil6;
 
 //
@@ -87,8 +87,8 @@ public class Elbow extends SubsystemBase
     setName("Elbow");
     setSubsystem("Elbow");
 
-    m_motorValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_motor, "elbow", Phoenix6_CTREConfigs.elbowMotorFXConfig( ));
-    m_ccValid = PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANCoder, "elbow", Phoenix6_CTREConfigs.elbowCancoderConfig( ));
+    m_motorValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_motor, "elbow", CTREConfigs6.elbowMotorFXConfig( ));
+    m_ccValid = PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANCoder, "elbow", CTREConfigs6.elbowCancoderConfig( ));
 
     if (Robot.isReal( ))
       m_currentDegrees = getCANCoderDegrees( );

@@ -9,7 +9,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.ELConsts;
 import frc.robot.lib.math.Conversions;
 
-public final class Phoenix6_CTREConfigs
+public final class CTREConfigs6
 {
   // Elbow
 

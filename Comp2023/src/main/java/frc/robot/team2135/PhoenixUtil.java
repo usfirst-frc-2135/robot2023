@@ -3,7 +3,6 @@ package frc.robot.team2135;
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.Faults;
 import com.ctre.phoenix.motorcontrol.StickyFaults;
-import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -14,7 +13,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.Constants;
 import frc.robot.Constants.Falcon500;
 
 public class PhoenixUtil
