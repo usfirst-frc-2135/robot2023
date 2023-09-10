@@ -62,10 +62,10 @@ public final class CTREConfigs6
 
     // Software limit switches
     elbowConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
-        Conversions.degreesToRotations(ELConsts.kAngleMin, ELConsts.kGearRatio);
+        Conversions.degreesToInputRotations(ELConsts.kAngleMin, ELConsts.kGearRatio);
     elbowConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
     elbowConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
-        Conversions.degreesToRotations(ELConsts.kAngleMax, ELConsts.kGearRatio);
+        Conversions.degreesToInputRotations(ELConsts.kAngleMax, ELConsts.kGearRatio);
     elbowConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
 
     return elbowConfig;

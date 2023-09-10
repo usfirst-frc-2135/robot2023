@@ -92,7 +92,7 @@ public class Elbow extends SubsystemBase
 
     if (Robot.isReal( ))
       m_currentDegrees = getCANCoderDegrees( );
-    m_motor.setRotorPosition(Conversions.degreesToRotations(m_currentDegrees, ELConsts.kGearRatio));
+    m_motor.setRotorPosition(Conversions.degreesToInputRotations(m_currentDegrees, ELConsts.kGearRatio));
     DataLogManager.log(String.format("%s: CANCoder initial degrees %.1f", getSubsystem( ), m_currentDegrees));
 
     m_motorSim.Orientation = ChassisReference.CounterClockwise_Positive;
@@ -134,10 +134,8 @@ public class Elbow extends SubsystemBase
     m_armSim.update(0.020);
 
     // Finally, we set our simulated encoder's readings and simulated battery voltage
-    m_motorSim.setRawRotorPosition(
-        Conversions.degreesToRotations(Units.radiansToDegrees(m_armSim.getAngleRads( )), ELConsts.kGearRatio));
-    m_motorSim.setRotorVelocity(
-        Conversions.degreesToRotations(Units.radiansToDegrees(m_armSim.getVelocityRadPerSec( )), ELConsts.kGearRatio));
+    m_motorSim.setRawRotorPosition(Conversions.radiansToInputRotations(m_armSim.getAngleRads( ), ELConsts.kGearRatio));
+    m_motorSim.setRotorVelocity(Conversions.radiansToInputRotations(m_armSim.getVelocityRadPerSec( ), ELConsts.kGearRatio));
 
     m_CANCoderSim.setRawPosition(Units.radiansToRotations(m_armSim.getAngleRads( )));
     m_CANCoderSim.setVelocity(Units.radiansToRotations(m_armSim.getVelocityRadPerSec( )));
@@ -180,12 +178,12 @@ public class Elbow extends SubsystemBase
 
   public double getCANCoderDegrees( )
   {
-    return Conversions.rotationsToDegrees(m_CANCoder.getAbsolutePosition( ).refresh( ).getValue( ), 1.0);
+    return Conversions.rotationsToOutputDegrees(m_CANCoder.getAbsolutePosition( ).refresh( ).getValue( ), 1.0);
   }
 
   public double getTalonFXDegrees( )
   {
-    return Conversions.rotationsToDegrees(m_motor.getRotorPosition( ).refresh( ).getValue( ), ELConsts.kGearRatio);
+    return Conversions.rotationsToOutputDegrees(m_motor.getRotorPosition( ).refresh( ).getValue( ), ELConsts.kGearRatio);
   }
 
   public boolean isElbowBelowIdle( )
@@ -215,7 +213,7 @@ public class Elbow extends SubsystemBase
 
   public void setElbowAngleToZero( )
   {
-    m_motor.setRotorPosition(Conversions.degreesToRotations(0, ELConsts.kGearRatio));
+    m_motor.setRotorPosition(Conversions.degreesToInputRotations(0, ELConsts.kGearRatio));
   }
 
   public void setElbowStopped( )
@@ -310,11 +308,12 @@ public class Elbow extends SubsystemBase
         m_moveIsFinished = false;
         m_withinTolerance.calculate(false); // Reset the debounce filter
 
-        m_motor.setControl(m_requestMMVolts.withPosition(Conversions.degreesToRotations(m_targetDegrees, ELConsts.kGearRatio)));
-        // .withFeedForward((m_totalArbFeedForward))); // TODO
+        m_motor
+            .setControl(m_requestMMVolts.withPosition(Conversions.degreesToInputRotations(m_targetDegrees, ELConsts.kGearRatio)));
+        // .withFeedForward((m_totalArbFeedForward)));  // TODO - once extension is fixed and Tuner X is used
         DataLogManager.log(String.format("%s: Position move %s: %.1f -> %.1f degrees (%.1f -> %.1f)", getSubsystem( ), m_position,
-            m_currentDegrees, m_targetDegrees, Conversions.degreesToRotations(m_currentDegrees, ELConsts.kGearRatio),
-            Conversions.degreesToRotations(m_targetDegrees, ELConsts.kGearRatio)));
+            m_currentDegrees, m_targetDegrees, Conversions.degreesToInputRotations(m_currentDegrees, ELConsts.kGearRatio),
+            Conversions.degreesToInputRotations(m_targetDegrees, ELConsts.kGearRatio)));
       }
       else
         DataLogManager.log(String.format("%s: Position move %.1f degrees is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
@@ -330,8 +329,9 @@ public class Elbow extends SubsystemBase
   public void moveElbowToPositionExecute( )
   {
     if (ELConsts.kCalibrated)
-      m_motor.setControl(m_requestMMVolts.withPosition(Conversions.degreesToRotations(m_targetDegrees, ELConsts.kGearRatio)));
-    // .withFeedForward(m_totalArbFeedForward)); // TODO
+      m_motor
+          .setControl(m_requestMMVolts.withPosition(Conversions.degreesToInputRotations(m_targetDegrees, ELConsts.kGearRatio)));
+    // .withFeedForward(m_totalArbFeedForward)); // TODO - once extension is fixed and Tuner X is used
   }
 
   public boolean moveElbowToPositionIsFinished( )
@@ -356,7 +356,7 @@ public class Elbow extends SubsystemBase
   public void moveElbowToPositionEnd( )
   {
     m_safetyTimer.stop( );
-    // m_motor.setControl(m_requestVolts.withOutput(0.0)); // TODO: Is this needed
+    // m_motor.setControl(m_requestVolts.withOutput(0.0)); // TODO: Is this needed? It fixed a bug in Motion Magic in v5 that should be fixed in v6
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////

@@ -174,9 +174,9 @@ public class Constants
     public static final double               kNeutralDeadband          = 0.001; // Elbow motor output deadband
 
     // CANCoder elbow absolute offset
-    public static final boolean              kCalibrated               = true;     // TODO: Indicates whether the elbow has been calibrated by CANCoder
-    public static final double               kCompOffset               = -0.6965; // CANCoder offset angle for comp bot
-    public static final double               kBetaOffset               = 0.000;    // (TODO: Beta requires an offset) CANCoder offset angle for beta bot
+    public static final boolean              kCalibrated               = true;    // TODO: Indicates whether the elbow has been calibrated by CANCoder
+    public static final double               kCompOffset               = -0.6965; // CANCoder offset rotations for comp bot
+    public static final double               kBetaOffset               = 0.000;   // TODO: CANCoder offset rotations for beta bot
     public static final SensorDirectionValue kSensorDirection          = SensorDirectionValue.Clockwise_Positive;
 
     // Manual mode config parameters
@@ -204,6 +204,7 @@ public class Constants
       ELBOW_SHELF      // Move elbow to substation loading shelf angle
     }
 
+    // TODO - all should be re-tuned using Tuner X
     public static final double kMMVelocity       = 81.28 / 2;          // Elbow motion magic velocity (75% of max motor RPM)
     public static final double kMMAcceleration   = 121.9 / 2;          // Elbow motion magic acceleration (target velocity in 2/3s)
     public static final double kMMJerk           = kMMAcceleration * 10; // Elbow motion magic jerk limit
