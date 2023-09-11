@@ -6,7 +6,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Constants.ELConsts.ElbowPosition;
+import frc.robot.Constants.ELConsts;
 import frc.robot.Constants.EXConsts.ExtensionLength;
 import frc.robot.Constants.WRConsts.WristAngle;
 import frc.robot.subsystems.Elbow;
@@ -35,7 +35,7 @@ public class ArmSetHeightScoreMid extends SequentialCommandGroup
             new WristMoveToAngle(wrist, WristAngle.WRIST_MID).asProxy(),
 
             new PrintCommand(getName() + ": Move Elbow"),
-            new ElbowMoveToPosition(elbow,  ElbowPosition.ELBOW_MID).asProxy()
+            new ElbowMoveToPosition(elbow,  ELConsts.kAngleScoreMid).asProxy()
           ),
 
           new SequentialCommandGroup(
@@ -43,7 +43,7 @@ public class ArmSetHeightScoreMid extends SequentialCommandGroup
             new WristMoveToAngle(wrist, WristAngle.WRIST_MID).asProxy(),
            
             new PrintCommand(getName() + ": Move Elbow"),
-            new ElbowMoveToPosition(elbow,  ElbowPosition.ELBOW_MID).asProxy()
+            new ElbowMoveToPosition(elbow,  ELConsts.kAngleScoreMid).asProxy()
           ),
           elbow::isElbowBelowMid
         ),

@@ -193,17 +193,6 @@ public class Constants
 
     // Motion Magic config parameters
 
-    public enum ElbowPosition
-    {
-      ELBOW_NOCHANGE,  // No change in elbow angle--maintain current position
-      ELBOW_STOW,      // Move elbow to stow angle
-      ELBOW_IDLE,      // Move elbow to idle andgle
-      ELBOW_LOW,       // Move elbow to low-scoring angle
-      ELBOW_MID,       // Move elbow to shelf angle; slightly higher than mid-scoring angle so this is used for both
-      ELBOW_HIGH,      // Move elbow to high-scoring angle
-      ELBOW_SHELF      // Move elbow to substation loading shelf angle
-    }
-
     // TODO - all should be re-tuned using Tuner X
     public static final double kMMVelocity       = 81.28 / 2;          // Elbow motion magic velocity (75% of max motor RPM)
     public static final double kMMAcceleration   = 121.9 / 2;          // Elbow motion magic acceleration (target velocity in 2/3s)

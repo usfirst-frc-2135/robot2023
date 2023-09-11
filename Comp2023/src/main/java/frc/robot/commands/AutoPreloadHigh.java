@@ -6,7 +6,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.Constants.ELConsts.ElbowPosition;
+import frc.robot.Constants.ELConsts;
 import frc.robot.Constants.EXConsts.ExtensionLength;
 import frc.robot.Constants.GRConsts;
 import frc.robot.Constants.GRConsts.GRMode;
@@ -39,7 +39,7 @@ public class AutoPreloadHigh extends SequentialCommandGroup
         new GripperRun(gripper, GRMode.GR_HOLD),  
 
         new PrintCommand(getName() + ": Move Elbow for Preload"),   
-        new ElbowMoveToPosition(elbow, ElbowPosition.ELBOW_HIGH).asProxy(),
+        new ElbowMoveToPosition(elbow, ELConsts.kAngleScoreHigh).asProxy(),
 
         new PrintCommand(getName() + ": Move Extension for Preload"),   
         new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_HIGH).asProxy(),

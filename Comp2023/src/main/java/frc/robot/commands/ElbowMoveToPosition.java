@@ -4,7 +4,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.ELConsts.ElbowPosition;
 import frc.robot.subsystems.Elbow;
 
 /**
@@ -12,14 +11,28 @@ import frc.robot.subsystems.Elbow;
  */
 public class ElbowMoveToPosition extends CommandBase
 {
-  private final Elbow   m_elbow;
-  private ElbowPosition m_position;
+  private final Elbow m_elbow;
+  private boolean     m_holdPosition;
+  private double      m_newAngle;
 
-  public ElbowMoveToPosition(Elbow elbow, ElbowPosition position)
+  // Default command for holding current position
+  public ElbowMoveToPosition(Elbow elbow)
   {
     m_elbow = elbow;
-    m_position = position;
+    ElbowMoveToPositionCommon(true);
+  }
 
+  // Motion Magic movement to a new position
+  public ElbowMoveToPosition(Elbow elbow, double position)
+  {
+    m_elbow = elbow;
+    m_newAngle = position;
+    ElbowMoveToPositionCommon(false);
+  }
+
+  private void ElbowMoveToPositionCommon(boolean holdCurrentAngle)
+  {
+    m_holdPosition = holdCurrentAngle;
     setName("ElbowMoveToPosition");
     addRequirements(m_elbow);
   }
@@ -28,7 +41,7 @@ public class ElbowMoveToPosition extends CommandBase
   @Override
   public void initialize( )
   {
-    m_elbow.moveElbowToPositionInit(m_position);
+    m_elbow.moveElbowToPositionInit(m_newAngle, m_holdPosition);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -49,7 +62,7 @@ public class ElbowMoveToPosition extends CommandBase
   @Override
   public boolean isFinished( )
   {
-    return m_elbow.moveElbowToPositionIsFinished( );
+    return (m_holdPosition) ? false : m_elbow.moveElbowToPositionIsFinished( ); // Command exits if not holding a position
   }
 
   @Override

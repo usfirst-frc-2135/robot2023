@@ -5,7 +5,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.Constants.ELConsts.ElbowPosition;
+import frc.robot.Constants.ELConsts;
 import frc.robot.Constants.EXConsts.ExtensionLength;
 import frc.robot.Constants.WRConsts.WristAngle;
 import frc.robot.subsystems.Elbow;
@@ -26,7 +26,7 @@ public class ArmSetHeightShelf extends SequentialCommandGroup
 
         // @formatter:off
         new PrintCommand(getName() + ": Moving Elbow"),
-        new ElbowMoveToPosition(elbow,  ElbowPosition.ELBOW_SHELF).asProxy(),
+        new ElbowMoveToPosition(elbow,  ELConsts.kAngleSubstation).asProxy(),
 
         new PrintCommand(getName() + ": Moving Wrist"),
         new WristMoveToAngle(wrist, WristAngle.WRIST_SHELF).asProxy(),
