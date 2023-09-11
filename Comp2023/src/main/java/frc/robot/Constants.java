@@ -194,8 +194,8 @@ public class Constants
     // Motion Magic config parameters
 
     // TODO - all should be re-tuned using Tuner X
-    public static final double kMMVelocity       = 81.28 / 2;          // Elbow motion magic velocity (75% of max motor RPM)
-    public static final double kMMAcceleration   = 121.9 / 2;          // Elbow motion magic acceleration (target velocity in 2/3s)
+    public static final double kMMVelocity       = 81.28 / 2;          // TODO: (temporary slowdown for testing!) Elbow motion magic velocity (75% of max motor RPM)
+    public static final double kMMAcceleration   = 121.9 / 2;          // TODO: (temporary slowdown for testing!) Elbow motion magic acceleration (target velocity in 2/3s)
     public static final double kMMJerk           = kMMAcceleration * 10; // Elbow motion magic jerk limit
     public static final double kS                = 0.20;           // kS - voltage constant to overcome friction
     public static final double kV                = 0.1107;         // kV - voltage constant per desired RPM
