@@ -33,7 +33,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.WRConsts;
 import frc.robot.Constants.WRConsts.WristMode;
-import frc.robot.Constants.EXConsts;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.lib.math.Conversions;
@@ -161,7 +160,7 @@ public class Wrist2 extends SubsystemBase
 
   private double calculateTotalArbFF( )
   {
-    double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
+    double elbowDegrees = RobotContainer.getInstance( ).m_wrist.getAngle( );
     double wristDegrees = RobotContainer.getInstance( ).m_wrist.getAngle( );
 
     return WRConsts.kArbitraryFF * Math.cos(Math.toRadians(elbowDegrees - wristDegrees));
