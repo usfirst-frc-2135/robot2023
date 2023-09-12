@@ -187,7 +187,7 @@ public final class CTREConfigs
     CANCoderConfiguration config = new CANCoderConfiguration( );
     config.absoluteSensorRange = AbsoluteSensorRange.Signed_PlusMinus180;
     config.magnetOffsetDegrees = (Constants.isComp) ? WRConsts.kCompOffset : WRConsts.kBetaOffset;
-    config.sensorDirection = Constants.WRConsts.kInvertCANCoder;
+    config.sensorDirection = true;
     config.initializationStrategy = SensorInitializationStrategy.BootToAbsolutePosition;
     config.sensorTimeBase = SensorTimeBase.PerSecond;
     return config;

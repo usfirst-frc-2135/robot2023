@@ -292,35 +292,35 @@ public class Constants
   {
     // Global settings
 
-    public static final double  kGearRatio            = 213.9;   // Gear reduction for wrist
-    public static final double  kDegreesPerCount      = 360 / Falcon500.kEncoderCPR / kGearRatio;
-    public static final double  kGripperLengthMeters  = 0.3;   // Sim value: 11.8 in
-    public static final double  kGripperMassKg        = 3.0;   // Sim value: 6.6 lbs
-    public static final boolean kInvertMotor          = false; // Motor direction for positive input
+    public static final double               kGearRatio            = 213.9;   // Gear reduction for wrist
+    public static final double               kDegreesPerCount      = 360 / Falcon500.kEncoderCPR / kGearRatio;
+    public static final double               kGripperLengthMeters  = 0.3;   // Sim value: 11.8 in
+    public static final double               kGripperMassKg        = 3.0;   // Sim value: 6.6 lbs
+    public static final boolean              kInvertMotor          = false; // Motor direction for positive input
 
-    public static final double  kAngleMin             = -2.0;  // Wrist minimum allowable angle (a few degrees less than stowed)
-    public static final double  kAngleStow            = 0.0;   // By definition - wrist is 90 degrees perpendicular to arm
-    public static final double  kAngleIdle            = 2.0;   // Slightly off stowed value
-    public static final double  kAngleScoreLow        = 33.0;  // From Mech Design (floor, feet art 5" high), empirically checked
-    public static final double  kAngleScoreMid        = kAngleIdle;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), ready to score
-    public static final double  kAngleScoreHigh       = kAngleIdle;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
-    public static final double  kAngleScore           = 90;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
-    public static final double  kAngleSubstation      = 100.0; // From Mech Design (3'1-38" above floor)
-    public static final double  kAngleMax             = 110.0; // Wrist maximum allowable angle (a few degrees more than substation/horizontal)
+    public static final double               kAngleMin             = -2.0;  // Wrist minimum allowable angle (a few degrees less than stowed)
+    public static final double               kAngleStow            = 0.0;   // By definition - wrist is 90 degrees perpendicular to arm
+    public static final double               kAngleIdle            = 2.0;   // Slightly off stowed value
+    public static final double               kAngleScoreLow        = 33.0;  // From Mech Design (floor, feet art 5" high), empirically checked
+    public static final double               kAngleScoreMid        = kAngleIdle;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), ready to score
+    public static final double               kAngleScoreHigh       = kAngleIdle;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
+    public static final double               kAngleScore           = 90;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
+    public static final double               kAngleSubstation      = 100.0; // From Mech Design (3'1-38" above floor)
+    public static final double               kAngleMax             = 110.0; // Wrist maximum allowable angle (a few degrees more than substation/horizontal)
 
     // Current limit settings - wrist
-    public static final double  kSupplyCurrentLimit   = 10.0;   // Supply current limit (after trigger)
-    public static final double  kSupplyTriggerCurrent = 10.0;   // Supply trigger current that will cause limiting
-    public static final double  kSupplyTriggerTime    = 0.001; // Supply time duration of trigger that will causing limiting
-    public static final double  kStatorCurrentLimit   = 10.0;   // Stator current limit (after trigger)
-    public static final double  kStatorTriggerCurrent = 10.0;   // Stator trigger current that will cause limiting
-    public static final double  kStatorTriggerTime    = 0.001; // Stator time duration of trigger that will causing limiting
+    public static final double               kSupplyCurrentLimit   = 10.0;   // Supply current limit (after trigger)
+    public static final double               kSupplyTriggerCurrent = 10.0;   // Supply trigger current that will cause limiting
+    public static final double               kSupplyTriggerTime    = 0.001; // Supply time duration of trigger that will causing limiting
+    public static final double               kStatorCurrentLimit   = 10.0;   // Stator current limit (after trigger)
+    public static final double               kStatorTriggerCurrent = 10.0;   // Stator trigger current that will cause limiting
+    public static final double               kStatorTriggerTime    = 0.001; // Stator time duration of trigger that will causing limiting
 
     // CANCoder wrist absolute offset
-    public static final boolean kInvertCANCoder       = true;  // CANCoder direction for positive angle in relative mode
-    public static final boolean kCalibrated           = true;  // Indicates whether the wrist has been calibrated by CANCoder
-    public static final double  kCompOffset           = 133.418; // CANCoder offset angle for comp bot
-    public static final double  kBetaOffset           = 0.000; // CANCoder offset angle for beta bot
+    public static final SensorDirectionValue kInvertCANCoder       = SensorDirectionValue.Clockwise_Positive;  // TODO: CANCoder direction for positive angle in relative mode
+    public static final boolean              kCalibrated           = true;  // Indicates whether the wrist has been calibrated by CANCoder
+    public static final double               kCompOffset           = 133.418; // CANCoder offset angle for comp bot
+    public static final double               kBetaOffset           = 0.000; // CANCoder offset angle for beta bot
 
     // Manual config parameters
 

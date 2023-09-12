@@ -8,6 +8,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import frc.robot.Constants;
 import frc.robot.Constants.ELConsts;
 import frc.robot.Constants.EXConsts;
+import frc.robot.Constants.WRConsts;
 import frc.robot.lib.math.Conversions;
 
 public final class CTREConfigs6
@@ -104,6 +105,46 @@ public final class CTREConfigs6
     extensionConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     return extensionConfig;
+  }
+
+  //wrist 
+
+  public static TalonFXConfiguration wristAngleFXConfig( )
+  {
+    TalonFXConfiguration wristConfig = new TalonFXConfiguration( );
+
+    wristConfig.Slot0.kP = Constants.WRConsts.kPidKp;
+    wristConfig.Slot0.kI = Constants.WRConsts.kPidKi;
+    wristConfig.Slot0.kD = Constants.WRConsts.kPidKd;
+    wristConfig.Slot0.kV = Constants.WRConsts.kPidKf;
+
+    wristConfig.CurrentLimits.SupplyCurrentLimit = Constants.WRConsts.kSupplyCurrentLimit;
+    wristConfig.CurrentLimits.StatorCurrentLimit = WRConsts.kStatorCurrentLimit;
+
+    // Motion Magic settings
+    wristConfig.MotionMagic.MotionMagicCruiseVelocity = WRConsts.kMMVelocity;
+    wristConfig.MotionMagic.MotionMagicAcceleration = WRConsts.kMMAcceleration;
+    wristConfig.MotionMagic.MotionMagicJerk = WRConsts.kMMSCurveStrength;
+
+    wristConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
+        Conversions.degreesToInputRotations(WRConsts.kAngleMax, WRConsts.kGearRatio);
+    wristConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    wristConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
+        Conversions.degreesToInputRotations(WRConsts.kAngleMax, WRConsts.kGearRatio);
+    wristConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+
+    wristConfig.MotorOutput.DutyCycleNeutralDeadband = WRConsts.kNeutralDeadband;
+
+    return wristConfig;
+  }
+
+  public static CANcoderConfiguration wristCancoderConfig( )
+  {
+    CANcoderConfiguration config = new CANcoderConfiguration( );
+    config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+    config.MagnetSensor.MagnetOffset = (Constants.isComp) ? WRConsts.kCompOffset : WRConsts.kBetaOffset;
+    config.MagnetSensor.SensorDirection = Constants.WRConsts.kInvertCANCoder;
+    return config;
   }
 
 }
