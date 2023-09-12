@@ -3,10 +3,9 @@
 //
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -24,20 +23,20 @@ import frc.robot.Constants.EXConsts;
 import frc.robot.Constants.EXConsts.ExtensionLength;
 import frc.robot.Constants.EXConsts.ExtensionMode;
 import frc.robot.RobotContainer;
-import frc.robot.lib.util.CTREConfigs;
-import frc.robot.team2135.PhoenixUtil;
+import frc.robot.lib.util.CTREConfigs6;
+import frc.robot.team2135.PhoenixUtil6;
 
 //
 // Extension subsystem class
 //
-public class Extension extends SubsystemBase
+public class Extension2 extends SubsystemBase
 {
   // Constants
   private static final int      PIDINDEX                = 0;   // PID in use (0-primary, 1-aux)
   private static final int      SLOTINDEX               = 0;   // Use first PID slot
 
   // Member objects
-  private final WPI_TalonFX     m_extension             = new WPI_TalonFX(Constants.Ports.kCANID_Extension);  //extension
+  private final TalonFX         m_extension             = new TalonFX(Constants.Ports.kCANID_Extension);  //extension
   // private final TalonFXSimCollection      m_extensionMotorSim     = new TalonFXSimCollection(m_extension);
   // private final SingleJointedArmSim       m_extensionSim          = new SingleJointedArmSim(DCMotor.getFalcon500(1),
   //     EXConsts.kExtensionGearRatio, 2.0, EXConsts.kForearmLengthMeters, 0.0, Math.PI, false);
@@ -53,6 +52,9 @@ public class Extension extends SubsystemBase
 
   // Declare module variables
   private ExtensionMode         m_extensionMode         = ExtensionMode.EXTENSION_INIT;          // Mode active with joysticks
+  private VoltageOut            m_requestVolts          = new VoltageOut(0).withEnableFOC(false);
+  private MotionMagicVoltage    m_requestMMVolts        = new MotionMagicVoltage(0).withSlot(0).withEnableFOC(false);
+  private double                m_extensionCurRotations = 0.0;
 
   private ExtensionLength       m_extensionLength;                // Desired extension length
   private boolean               m_moveIsFinished;
@@ -66,15 +68,13 @@ public class Extension extends SubsystemBase
   private double                m_extensionDistTravelled;
 
   // Constructor
-  public Extension( )
+  public Extension2( )
   {
     setName("Extension");
     setSubsystem("Extension");
 
-    m_extensionValid = PhoenixUtil.getInstance( ).talonFXInitializeWPI(m_extension, "extension");
-
-    if (m_extensionValid)
-      extensionTalonInitialize(m_extension, true);
+    m_extensionValid =
+        PhoenixUtil6.getInstance( ).talonFXInitialize6(m_extension, "extension", CTREConfigs6.extensionLengthFXConfig( ));
 
     initSmartDashboard( );
 
@@ -88,17 +88,17 @@ public class Extension extends SubsystemBase
 
     if (m_extensionValid)
     {
-      int curCounts = (int) m_extension.getSelectedSensorPosition(0);
+      m_extensionCurRotations = getTalonFXRotations( );
 
-      if (curCounts < 0)
+      if (m_extensionCurRotations < 0)
       {
-        m_extension.setNeutralMode(NeutralMode.Coast);
-        curCounts = 0;
-        m_extension.setSelectedSensorPosition(curCounts, PIDINDEX, Constants.kCANTimeoutMs);
-        m_extensionTargetInches = extensionCountsToInches(curCounts);
+        //m_extension.setNeutralMode(NeutralMode.Coast);
+        m_extensionCurRotations = 0;
+        m_extension.setRotorPosition(m_extensionCurRotations, Constants.kCANTimeoutMs);
+        m_extensionTargetInches = extensionRotationsToInches(m_extensionCurRotations);
       }
 
-      m_extensionCurInches = extensionCountsToInches(curCounts);
+      m_extensionCurInches = extensionRotationsToInches(m_extensionCurRotations);
       SmartDashboard.putNumber("EX_curInches", m_extensionCurInches);
       SmartDashboard.putNumber("EX_targetInches", m_extensionTargetInches);
       m_extensionLigament.setLength(m_extensionCurInches);
@@ -106,7 +106,7 @@ public class Extension extends SubsystemBase
       m_extensionTotalFF = calculateTotalFF( );
       SmartDashboard.putNumber("EX_totalFF", m_extensionTotalFF);
 
-      double currentDraw = m_extension.getStatorCurrent( );
+      double currentDraw = m_extension.getStatorCurrent( ).getValue( );
       SmartDashboard.putNumber("EX_currentDraw", currentDraw);
     }
   }
@@ -148,22 +148,35 @@ public class Extension extends SubsystemBase
 
   public void initialize( )
   {
-    double curEXCounts = 0.0;
-
     DataLogManager.log(getSubsystem( ) + ": Subsystem initialized!");
 
     setExtensionStopped( );
 
     if (m_extensionValid)
-      curEXCounts = m_extension.getSelectedSensorPosition(0);
-    m_extensionCurInches = extensionCountsToInches((int) curEXCounts);
+      m_extensionCurRotations = getTalonFXRotations( );
+    m_extensionCurInches = extensionRotationsToInches((int) m_extensionCurRotations);
     m_extensionTargetInches = m_extensionCurInches;
     DataLogManager.log(String.format("%s: Init Target Inches: %.1f", getSubsystem( ), m_extensionTargetInches));
+  }
+
+  public double getTalonFXRotations( )
+  {
+    return extensionRotationsToInches(m_extension.getRotorPosition( ).refresh( ).getValue( ));
   }
 
   private int extensionInchesToCounts(double inches)
   {
     return (int) (inches / EXConsts.kInchesPerCount);
+  }
+
+  private int extensionInchesToRotations(double inches)
+  {
+    return (int) (inches / EXConsts.kRolloutRatio); //TODO: Check if valid
+  }
+
+  private int extensionRotationsToInches(double rotations)
+  {
+    return (int) (rotations * EXConsts.kRolloutRatio); //TODO: Check if valid
   }
 
   private double extensionCountsToInches(int counts)
@@ -181,32 +194,9 @@ public class Extension extends SubsystemBase
     return m_extensionCurInches;
   }
 
-  private void extensionTalonInitialize(WPI_TalonFX motor, boolean inverted)
+  public double getTalonFXInches( )
   {
-    //motor.configFactoryDefault( ); - TODO Clean up later
-    motor.configAllSettings(CTREConfigs.extensionLengthFXConfig( ));
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllSettings");
-
-    motor.setInverted(inverted);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "setInverted");
-    motor.setSensorPhase(true);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "setSensorPhase");
-    motor.setNeutralMode(NeutralMode.Brake);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
-    motor.setSafetyEnabled(false);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "setSafetyEnabled");
-    motor.enableVoltageCompensation(true);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "enableVoltageCompensation");
-
-    // Configure sensor settings
-    motor.setSelectedSensorPosition(0.0);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "setSelectedSensorPosition");
-
-    // Configure Magic Motion settings
-    motor.selectProfileSlot(SLOTINDEX, PIDINDEX);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "selectProfileSlot");
-
-    motor.set(ControlMode.PercentOutput, 0.0);
+    return extensionRotationsToInches(m_extension.getRotorPosition( ).refresh( ).getValue( ));
   }
 
   public void moveExtensionWithJoystick(XboxController joystick)
@@ -244,7 +234,7 @@ public class Extension extends SubsystemBase
     m_extensionTargetInches = m_extensionCurInches;
 
     if (m_extensionValid)
-      m_extension.set(ControlMode.PercentOutput, axisValue * EXConsts.kExtensionSpeedMaxManual + EXConsts.kArbitraryFF);
+      m_extension.setControl(m_requestVolts.withOutput(axisValue * EXConsts.kExtensionSpeedMaxManual + EXConsts.kArbitraryFF));
   }
 
   public void setExtensionStopped( )
@@ -252,19 +242,19 @@ public class Extension extends SubsystemBase
     DataLogManager.log(getSubsystem( ) + ": now STOPPED");
 
     if (m_extensionValid)
-      m_extension.set(ControlMode.PercentOutput, 0.0);
+      m_extension.setControl(m_requestVolts.withOutput(0.0));
   }
 
   public void moveToCalibrate( )
   {
     if (m_extensionValid)
-      m_extension.set(ControlMode.PercentOutput, EXConsts.kSpeedCalibrate);
+      m_extension.setControl(m_requestVolts.withOutput(EXConsts.kSpeedCalibrate));
   }
 
   public void calibrate( )
   {
     if (m_extensionValid)
-      m_extension.setSelectedSensorPosition(0.0);
+      m_extension.setRotorPosition(0.0);
 
     m_extensionTargetInches = 0;
     m_extensionCurInches = 0;
@@ -332,8 +322,8 @@ public class Extension extends SubsystemBase
       m_safetyTimer.restart( );
 
       if (m_extensionValid && EXConsts.kCalibrated)
-        m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches),
-            DemandType.ArbitraryFeedForward, m_extensionTotalFF);
+        m_extension.setControl(m_requestMMVolts.withPosition(extensionInchesToRotations(m_extensionTargetInches)));
+      //DemandType.ArbitraryFeedForward, m_extensionTotalFF); TODO: implement FF
 
       m_extensionDistTravelled = Math.abs(m_extensionTargetInches - m_extensionCurInches);
       DataLogManager.log(String.format("%s: moving: %.1f -> %.1f inches | counts %.1f -> %.1f", getSubsystem( ),
@@ -343,15 +333,15 @@ public class Extension extends SubsystemBase
     {
       DataLogManager.log(getSubsystem( ) + ": not calibrated");
       if (m_extensionValid)
-        m_extension.set(ControlMode.PercentOutput, 0.0);
+        m_extension.setControl(m_requestVolts.withOutput(0.0));
     }
   }
 
   public void moveExtensionLengthExecute( )
   {
     if (m_extensionValid && EXConsts.kCalibrated)
-      m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches), DemandType.ArbitraryFeedForward,
-          m_extensionTotalFF);
+      m_extension.setControl(m_requestMMVolts.withPosition(extensionInchesToRotations(m_extensionTargetInches)));
+    //DemandType.ArbitraryFeedForward, m_extensionTotalFF); TODO: implement FF
   }
 
   public boolean moveExtensionLengthIsFinished( )
