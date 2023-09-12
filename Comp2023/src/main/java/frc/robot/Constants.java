@@ -215,39 +215,39 @@ public class Constants
   {
     // Global settings
 
-    public static final double        kGearRatio            = 18.23; // Gear reduction for extension
-    public static final double        kDrumDiameterInches   = 1.375; // Drum diameter in inches
-    public static final double        kDrumCircumInches     = kDrumDiameterInches * Math.PI;            // Drum diameter in inches
-    public static final double        kRolloutRatio         = kDrumCircumInches / kGearRatio;  // inches per shaft rotation
-    public static final double        kInchesPerCount       = kRolloutRatio / Falcon500.kEncoderCPR;
+    public static final double  kGearRatio            = 18.23; // Gear reduction for extension
+    public static final double  kDrumDiameterInches   = 1.375; // Drum diameter in inches
+    public static final double  kDrumCircumInches     = kDrumDiameterInches * Math.PI;            // Drum diameter in inches
+    public static final double  kRolloutRatio         = kDrumCircumInches / kGearRatio;  // inches per shaft rotation
+    public static final double  kInchesPerCount       = kRolloutRatio / Falcon500.kEncoderCPR;
     // public static final double  kForearmLengthMeters        = 1.22;   // Sim value: 48 inches (no sim for extension)
     // public static final double  kForearmMassKg              = 6.0;    // Sim value: 13.2 lbs 
-    public static final InvertedValue kInvertMotor          = InvertedValue.Clockwise_Positive; //TODO: see which diection is correct  // Motor direction for positive input
-    public static final double        kSpeedCalibrate       = -0.15; // Motor percent output during calibration
+    public static final boolean kInvertMotor          = true;  // Motor direction for positive input
+    public static final double  kSpeedCalibrate       = -0.15; // Motor percent output during calibration
 
     // Extension lengths increase by 0.95" per 90 degrees of elbow rotation (lengths manually adjusted below)
-    public static final double        kLengthMin            = -0.5;  // Extension minimum allowable length (half inch less than stowed)
-    public static final double        kLengthStow           = 0.0;   // By definition - extension fully retracted
-    public static final double        kLengthIdle           = 0.25;  // Slightly off mechanical hard stop
-    public static final double        kLengthScoreLow       = 8.0;   // From Mech Design (floor, feet art 5" high), empirically checked
-    public static final double        kLengthScoreMid       = 1.25;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), empirically checked
-    public static final double        kLengthScoreHigh      = 17.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked
-    public static final double        kLengthSubstation     = 1.25;  // From Mech Design (3'1-38" above floor)
-    public static final double        kLengthMax            = 18.0;  // Extension maximum allowable length (2" beyond high length)
+    public static final double  kLengthMin            = -0.5;  // Extension minimum allowable length (half inch less than stowed)
+    public static final double  kLengthStow           = 0.0;   // By definition - extension fully retracted
+    public static final double  kLengthIdle           = 0.25;  // Slightly off mechanical hard stop
+    public static final double  kLengthScoreLow       = 8.0;   // From Mech Design (floor, feet art 5" high), empirically checked
+    public static final double  kLengthScoreMid       = 1.25;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), empirically checked
+    public static final double  kLengthScoreHigh      = 17.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked
+    public static final double  kLengthSubstation     = 1.25;  // From Mech Design (3'1-38" above floor)
+    public static final double  kLengthMax            = 18.0;  // Extension maximum allowable length (2" beyond high length)
 
     // Current limit settings - extension
-    public static final double        kSupplyCurrentLimit   = 15.0;  // Supply current limit (after trigger)
-    public static final double        kSupplyTriggerCurrent = 15.0;  // Supply trigger current that will cause limiting
-    public static final double        kSupplyTriggerTime    = 0.001; // Supply time duration of trigger that will causing limiting
-    public static final double        kStatorCurrentLimit   = 15.0;  // Stator current limit (after trigger)
-    public static final double        kStatorTriggerCurrent = 15.0;  // Stator trigger current that will cause limiting
-    public static final double        kStatorTriggerTime    = 0.001; // Stator time duration of trigger that will causing limiting
+    public static final double  kSupplyCurrentLimit   = 15.0;  // Supply current limit (after trigger)
+    public static final double  kSupplyTriggerCurrent = 15.0;  // Supply trigger current that will cause limiting
+    public static final double  kSupplyTriggerTime    = 0.001; // Supply time duration of trigger that will causing limiting
+    public static final double  kStatorCurrentLimit   = 15.0;  // Stator current limit (after trigger)
+    public static final double  kStatorTriggerCurrent = 15.0;  // Stator trigger current that will cause limiting
+    public static final double  kStatorTriggerTime    = 0.001; // Stator time duration of trigger that will causing limiting
 
     // CANCoder extension absolute offset
-    public static final boolean       kInvertCANCoder       = false; // CANCoder direction for positive angle in relative mode
-    public static final boolean       kCalibrated           = true;  // Indicates whether the extension has been calibrated by CANCoder
-    public static final double        kCompOffset           = 0.000; // CANCoder offset for comp bot
-    public static final double        kBetaOffset           = 0.000; // CANCoder offset for beta bot
+    public static final boolean kInvertCANCoder       = false; // CANCoder direction for positive angle in relative mode
+    public static final boolean kCalibrated           = true;  // Indicates whether the extension has been calibrated by CANCoder
+    public static final double  kCompOffset           = 0.000; // CANCoder offset for comp bot
+    public static final double  kBetaOffset           = 0.000; // CANCoder offset for beta bot
 
     // Manual config parameters
 

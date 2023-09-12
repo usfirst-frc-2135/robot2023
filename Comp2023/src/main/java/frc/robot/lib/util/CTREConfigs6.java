@@ -7,7 +7,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import frc.robot.Constants;
 import frc.robot.Constants.ELConsts;
-import frc.robot.Constants.EXConsts;
 import frc.robot.lib.math.Conversions;
 
 public final class CTREConfigs6
@@ -80,30 +79,4 @@ public final class CTREConfigs6
     config.MagnetSensor.MagnetOffset = (Constants.isComp) ? ELConsts.kCompOffset : ELConsts.kBetaOffset;
     return config;
   }
-
-  // Extension
-
-  public static TalonFXConfiguration extensionLengthFXConfig( )
-  {
-    TalonFXConfiguration extensionConfig = new TalonFXConfiguration( );
-
-    extensionConfig.Slot0.kP = Constants.EXConsts.kPidKp;
-    extensionConfig.Slot0.kI = Constants.EXConsts.kPidKi;
-    extensionConfig.Slot0.kD = Constants.EXConsts.kPidKd;
-    extensionConfig.Slot0.kV = Constants.EXConsts.kPidKf;
-
-    extensionConfig.CurrentLimits.SupplyCurrentLimit = EXConsts.kSupplyCurrentLimit;
-    extensionConfig.CurrentLimits.StatorCurrentLimit = EXConsts.kStatorCurrentLimit;
-
-    extensionConfig.MotionMagic.MotionMagicCruiseVelocity = EXConsts.kMMVelocity;
-    extensionConfig.MotionMagic.MotionMagicAcceleration = EXConsts.kMMAcceleration;
-    extensionConfig.MotionMagic.MotionMagicJerk = EXConsts.kMMSCurveStrength;
-
-    extensionConfig.MotorOutput.DutyCycleNeutralDeadband = EXConsts.kNeutralDeadband;
-    extensionConfig.MotorOutput.Inverted = EXConsts.kInvertMotor;
-    extensionConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-
-    return extensionConfig;
-  }
-
 }

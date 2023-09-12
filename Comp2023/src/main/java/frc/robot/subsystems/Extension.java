@@ -74,7 +74,7 @@ public class Extension extends SubsystemBase
     m_extensionValid = PhoenixUtil.getInstance( ).talonFXInitializeWPI(m_extension, "extension");
 
     if (m_extensionValid)
-      extensionTalonInitialize(m_extension, true);
+      extensionTalonInitialize(m_extension, EXConsts.kInvertMotor);
 
     initSmartDashboard( );
 
