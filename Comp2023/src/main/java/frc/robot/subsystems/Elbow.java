@@ -33,7 +33,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ELConsts;
 import frc.robot.Constants.ELConsts.ElbowMode;
-import frc.robot.Constants.ELConsts.ElbowPosition;
 import frc.robot.Constants.EXConsts;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
@@ -68,11 +67,10 @@ public class Elbow extends SubsystemBase
   private boolean                   m_ccValid;         // Health indicator for CANCoder 
 
   private ElbowMode                 m_mode            = ElbowMode.ELBOW_INIT;     // Manual movement mode with joysticks
-  private ElbowPosition             m_position        = ElbowPosition.ELBOW_STOW; // Desired position (stow, idle, low, mid, high, etc.)
 
   private double                    m_currentDegrees  = 0.0; // Current angle in degrees
   private double                    m_targetDegrees   = 0.0; // Target angle in degrees
-  private Debouncer                 m_withinTolerance = new Debouncer(0.60, DebounceType.kRising);
+  private Debouncer                 m_withinTolerance = new Debouncer(0.060, DebounceType.kRising);
   private boolean                   m_moveIsFinished;        // Movement has completed (within tolerance)
 
   private VoltageOut                m_requestVolts    = new VoltageOut(0).withEnableFOC(false);
@@ -263,55 +261,27 @@ public class Elbow extends SubsystemBase
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
-  public void moveElbowToPositionInit(ElbowPosition position)
+  public void moveElbowToPositionInit(double newAngle, boolean holdPosition)
   {
-    double targetDegrees = 0.0;
-
-    // Decode the position request
-    switch (position)
-    {
-      default : // Fall through to NOCHANGE if invalid
-        DataLogManager.log(String.format("%s: Position move request is invalid - %s", getSubsystem( ), position));
-      case ELBOW_NOCHANGE : // Do not change from current level!
-        targetDegrees = m_currentDegrees;
-        break;
-      case ELBOW_STOW :
-        targetDegrees = ELConsts.kAngleStow;
-        break;
-      case ELBOW_IDLE :
-        targetDegrees = ELConsts.kAngleScoreLow;
-        break;
-      case ELBOW_LOW :
-        targetDegrees = ELConsts.kAngleScoreLow;
-        break;
-      case ELBOW_MID :
-        targetDegrees = ELConsts.kAngleScoreMid;
-        break;
-      case ELBOW_HIGH :
-        targetDegrees = ELConsts.kAngleScoreHigh;
-        break;
-      case ELBOW_SHELF :
-        targetDegrees = ELConsts.kAngleSubstation;
-        break;
-    }
-
     m_safetyTimer.restart( );
 
+    if (holdPosition)
+      newAngle = getAngle( );
+
     // Decide if a new position request
-    if (position != m_position || !isWithinTolerance(targetDegrees))
+    if (holdPosition || newAngle != m_targetDegrees || !isWithinTolerance(newAngle))
     {
       // Validate the position request
-      if (isMoveValid(targetDegrees))
+      if (isMoveValid(newAngle))
       {
-        m_position = position;
-        m_targetDegrees = targetDegrees;
+        m_targetDegrees = newAngle;
         m_moveIsFinished = false;
         m_withinTolerance.calculate(false); // Reset the debounce filter
 
         m_motor
             .setControl(m_requestMMVolts.withPosition(Conversions.degreesToInputRotations(m_targetDegrees, ELConsts.kGearRatio)));
         // .withFeedForward((m_totalArbFeedForward)));  // TODO - once extension is fixed and Tuner X is used
-        DataLogManager.log(String.format("%s: Position move %s: %.1f -> %.1f degrees (%.1f -> %.1f)", getSubsystem( ), m_position,
+        DataLogManager.log(String.format("%s: Position move: %.1f -> %.1f degrees (%.1f -> %.1f)", getSubsystem( ),
             m_currentDegrees, m_targetDegrees, Conversions.degreesToInputRotations(m_currentDegrees, ELConsts.kGearRatio),
             Conversions.degreesToInputRotations(m_targetDegrees, ELConsts.kGearRatio)));
       }
@@ -322,7 +292,7 @@ public class Elbow extends SubsystemBase
     else
     {
       m_moveIsFinished = true;
-      DataLogManager.log(String.format("%s: Position already achieved - %s", getSubsystem( ), m_position));
+      DataLogManager.log(String.format("%s: Position already achieved - %s", getSubsystem( ), m_targetDegrees));
     }
   }
 
@@ -336,21 +306,19 @@ public class Elbow extends SubsystemBase
 
   public boolean moveElbowToPositionIsFinished( )
   {
+    boolean timedOut = m_safetyTimer.hasElapsed(ELConsts.kMMSafetyTimeout);
+    double error = m_targetDegrees - m_currentDegrees;
 
-    if (m_withinTolerance.calculate((Math.abs(m_targetDegrees - m_currentDegrees) < ELConsts.kToleranceDegrees)))
+    if (m_withinTolerance.calculate(Math.abs(error) < ELConsts.kToleranceDegrees) || timedOut)
     {
+      if (!m_moveIsFinished)
+        DataLogManager.log(String.format("%s: Position move finished - Current degrees: %.1f (error %.1f) - Time: %.3f %s",
+            getSubsystem( ), m_currentDegrees, error, m_safetyTimer.get( ), (timedOut) ? "- TIMED OUT!" : ""));
+
       m_moveIsFinished = true;
-      DataLogManager.log(String.format("%s: Position move finished - Time: %.3f  |  Cur degrees: %.1f", getSubsystem( ),
-          m_safetyTimer.get( ), m_currentDegrees));
     }
 
-    if (m_safetyTimer.hasElapsed(ELConsts.kMMSafetyTimeout))
-    {
-      m_moveIsFinished = true;
-      DataLogManager.log(String.format("%s: Position move safety timer timed out! %.1f", getSubsystem( ), m_safetyTimer.get( )));
-    }
-
-    return (m_position == ElbowPosition.ELBOW_NOCHANGE) ? false : m_moveIsFinished;
+    return m_moveIsFinished;
   }
 
   public void moveElbowToPositionEnd( )
