@@ -10,7 +10,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
-import frc.robot.Constants.SWConsts;
+import frc.robot.Constants.LLConsts;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Swerve;
@@ -146,8 +146,8 @@ public class DriveTeleop extends CommandBase
 
       double scaled_x = tAxes.getX( ) - (deadband_vector.getX( )) / (1 - deadband_vector.getX( ));
       double scaled_y = tAxes.getY( ) - (deadband_vector.getY( )) / (1 - deadband_vector.getY( ));
-      double maxSpeed =
-          (elbow.getAngle( ) > SWConsts.kElbowDriveSlowAngle) ? SwerveConstants.maxSpeedSlowMode : SwerveConstants.maxSpeed;
+      double maxSpeed = (elbow.getAngle( ) > SwerveConstants.kElbowDriveSlowAngle) ? SwerveConstants.maxSpeedSlowMode
+          : SwerveConstants.maxSpeed;
 
       swerveTranslation = new Translation2d(scaled_x, scaled_y).times(maxSpeed);
     }
@@ -161,7 +161,7 @@ public class DriveTeleop extends CommandBase
     }
     else
     {
-      double maxAngVel = (elbow.getAngle( ) > SWConsts.kElbowDriveSlowAngle) ? SwerveConstants.maxAngularVelocitySlowMode
+      double maxAngVel = (elbow.getAngle( ) > SwerveConstants.kElbowDriveSlowAngle) ? SwerveConstants.maxAngularVelocitySlowMode
           : SwerveConstants.maxAngularVelocity;
 
       rot = maxAngVel * (rotAxis - (Math.signum(rotAxis) * Constants.kStickDeadband)) / (1 - Constants.kStickDeadband);

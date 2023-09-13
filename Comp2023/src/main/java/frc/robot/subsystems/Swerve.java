@@ -31,7 +31,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Ports;
-import frc.robot.Constants.SWConsts;
+import frc.robot.Constants.LLConsts;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.RobotContainer;
 import frc.robot.team1678.frc2022.drivers.Pigeon;
@@ -84,21 +84,21 @@ public class Swerve extends SubsystemBase
   private boolean                  m_swerveDebug       = false; // Debug flag to disable extra ramsete logging calls
 
   // Limelight drive
-  private double                   m_turnConstant      = SWConsts.kTurnConstant;
-  private double                   m_turnPidKp         = SWConsts.kTurnPidKp;
-  private double                   m_turnPidKi         = SWConsts.kTurnPidKi;
-  private double                   m_turnPidKd         = SWConsts.kTurnPidKd;
-  private double                   m_turnMax           = SWConsts.kTurnMax;
-  private double                   m_throttlePidKp     = SWConsts.kThrottlePidKp;
-  private double                   m_throttlePidKi     = SWConsts.kThrottlePidKi;
-  private double                   m_throttlePidKd     = SWConsts.kThrottlePidKd;
-  private double                   m_throttleMax       = SWConsts.kThrottleMax;
-  private double                   m_throttleShape     = SWConsts.kThrottleShape;
+  private double                   m_turnConstant      = LLConsts.kTurnConstant;
+  private double                   m_turnPidKp         = LLConsts.kTurnPidKp;
+  private double                   m_turnPidKi         = LLConsts.kTurnPidKi;
+  private double                   m_turnPidKd         = LLConsts.kTurnPidKd;
+  private double                   m_turnMax           = LLConsts.kTurnMax;
+  private double                   m_throttlePidKp     = LLConsts.kThrottlePidKp;
+  private double                   m_throttlePidKi     = LLConsts.kThrottlePidKi;
+  private double                   m_throttlePidKd     = LLConsts.kThrottlePidKd;
+  private double                   m_throttleMax       = LLConsts.kThrottleMax;
+  private double                   m_throttleShape     = LLConsts.kThrottleShape;
 
-  private double                   m_targetAngle       = SWConsts.kTargetAngle;      // Optimal shooting angle
-  private double                   m_setPointDistance  = SWConsts.kSetPointDistance; // Optimal shooting distance
-  private double                   m_angleThreshold    = SWConsts.kAngleThreshold;   // Tolerance around optimal
-  private double                   m_distThreshold     = SWConsts.kDistThreshold;    // Tolerance around optimal
+  private double                   m_targetAngle       = LLConsts.kTargetAngle;      // Optimal shooting angle
+  private double                   m_setPointDistance  = LLConsts.kSetPointDistance; // Optimal shooting distance
+  private double                   m_angleThreshold    = LLConsts.kAngleThreshold;   // Tolerance around optimal
+  private double                   m_distThreshold     = LLConsts.kDistThreshold;    // Tolerance around optimal
 
   // DriveWithLimelight pid controller objects
   private int                      m_limelightDebug    = 0; // Debug flag to disable extra limelight logging calls
@@ -623,9 +623,9 @@ public class Swerve extends SubsystemBase
     double motorOutput;
 
     pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
-    if (Math.abs(pitch) > SWConsts.kDriveBalancedAngle)
+    if (Math.abs(pitch) > SwerveConstants.kDriveBalancedAngle)
     {
-      motorOutput = SWConsts.kDriveBalanceKp * pitch;
+      motorOutput = SwerveConstants.kDriveBalanceKp * pitch;
       drive(new Translation2d(motorOutput, 0), 0, false, true);
     }
     else

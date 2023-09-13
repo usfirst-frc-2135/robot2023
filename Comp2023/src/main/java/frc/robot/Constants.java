@@ -117,30 +117,24 @@ public class Constants
     // public static final double kStatorTriggerTime    = 0.001; // Default time duration of trigger that will causing limiting
   }
 
-  public static final class SWConsts
+  public static final class LLConsts
   {
-    // Constants for balance
-    public static final double kDriveBalancedAngle  = 5.0;    // Pitch values less than this stop driving
-    public static final double kDriveBalanceKp      = -0.040;  // Amount of power to apply per degree
-
     // Limelight PID driving controls
-    public static final double kTurnConstant        = 0.0;
-    public static final double kTurnPidKp           = 0.005;
-    public static final double kTurnPidKi           = 0.0;
-    public static final double kTurnPidKd           = 0.0;
-    public static final double kTurnMax             = 0.4;
-    public static final double kThrottlePidKp       = 0.011;
-    public static final double kThrottlePidKi       = 0.0;
-    public static final double kThrottlePidKd       = 0.0;
-    public static final double kThrottleMax         = 0.2;
-    public static final double kThrottleShape       = 10.0;
+    public static final double kTurnConstant     = 0.0;
+    public static final double kTurnPidKp        = 0.005;
+    public static final double kTurnPidKi        = 0.0;
+    public static final double kTurnPidKd        = 0.0;
+    public static final double kTurnMax          = 0.4;
+    public static final double kThrottlePidKp    = 0.011;
+    public static final double kThrottlePidKi    = 0.0;
+    public static final double kThrottlePidKd    = 0.0;
+    public static final double kThrottleMax      = 0.2;
+    public static final double kThrottleShape    = 10.0;
 
-    public static final double kTargetAngle         = 0.0;      // Optimal shooting angle
-    public static final double kSetPointDistance    = 60.0;     // Optimal shooting distance
-    public static final double kAngleThreshold      = 3.5;      // Degrees tolerance around optimal
-    public static final double kDistThreshold       = 6.0;      // Inches tolerance around optimal
-
-    public static final double kElbowDriveSlowAngle = 34.0;     // When arm is out beyond this angle - drive is slowed down
+    public static final double kTargetAngle      = 0.0;      // Optimal shooting angle
+    public static final double kSetPointDistance = 60.0;     // Optimal shooting distance
+    public static final double kAngleThreshold   = 3.5;      // Degrees tolerance around optimal
+    public static final double kDistThreshold    = 6.0;      // Inches tolerance around optimal
   }
 
   public static final class ELConsts
@@ -466,9 +460,6 @@ public class Constants
     public static final double                                       wheelDiameter               = Units.inchesToMeters(4.0);
     public static final double                                       wheelCircumference          = wheelDiameter * Math.PI;
 
-    public static final double                                       openLoopRamp                = 0.25;
-    public static final double                                       closedLoopRamp              = 0.0;
-
     public static final double                                       driveGearRatio              = 6.75;
     public static final double                                       angleGearRatio              = 21.43;
 
@@ -520,6 +511,9 @@ public class Constants
     /* Neutral Modes */
     public static final NeutralMode                                  angleNeutralMode            = NeutralMode.Coast;
     public static final NeutralMode                                  driveNeutralMode            = NeutralMode.Brake;
+
+    public static final double                                       openLoopRamp                = 0.25;
+    public static final double                                       closedLoopRamp              = 0.0;
 
     /* Motor Inverts */
     public static final boolean                                      driveMotorInvert            = true;
@@ -586,6 +580,12 @@ public class Constants
             isComp ? compAngleOffset : epsilonAngleOffset);
       }
     }
+
+    // Constants for balance
+    public static final double kDriveBalancedAngle  = 5.0;    // Pitch values less than this stop driving
+    public static final double kDriveBalanceKp      = -0.040;  // Amount of power to apply per degree
+
+    public static final double kElbowDriveSlowAngle = 34.0;     // When arm is out beyond this angle - drive is slowed down
   }
 
   public static final class SnapConstants
