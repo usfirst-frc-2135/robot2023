@@ -4,9 +4,11 @@ import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.hardware.Pigeon2;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
@@ -65,9 +67,10 @@ public class PhoenixUtil6
 
     talonValid = (fwvMajor >= Constants.kPhoenixMajorVersion);
 
-    if ((status = motor.getConfigurator( ).apply(config, m_timeout)) != StatusCode.OK)
-      DataLogManager.log(String.format("%s: ID %d - %s motor: getConfigurator.apply - %s!", m_className, deviceID, name,
-          status.getDescription( )));
+    if (config != null)
+      if ((status = motor.getConfigurator( ).apply(config, m_timeout)) != StatusCode.OK)
+        DataLogManager.log(String.format("%s: ID %d - %s motor: getConfigurator.apply - %s!", m_className, deviceID, name,
+            status.getDescription( )));
 
     if ((status = motor.setControl(new VoltageOut(0).withEnableFOC(false))) != StatusCode.OK)
       DataLogManager
@@ -119,9 +122,10 @@ public class PhoenixUtil6
 
     canCoderValid = (fwvMajor >= Constants.kPhoenixMajorVersion);
 
-    if ((status = canCoder.getConfigurator( ).apply(config, m_timeout)) != StatusCode.OK)
-      DataLogManager.log(String.format("%s: ID %d - %s CANCoder: getConfigurator.apply - %s!", m_className, deviceID, name,
-          status.getDescription( )));
+    if (config != null)
+      if ((status = canCoder.getConfigurator( ).apply(config, m_timeout)) != StatusCode.OK)
+        DataLogManager.log(String.format("%s: ID %d - %s CANCoder: getConfigurator.apply - %s!", m_className, deviceID, name,
+            status.getDescription( )));
 
     DataLogManager.log(String.format("%s: ID %d - %s CANCoder: ver: %d.%d.%d.%d is %s!", m_className, deviceID, name, fwvMajor,
         fwvMinor, fwvBugfix, fwvBuild, (canCoderValid) ? "VALID" : "URESPONSIVE"));
@@ -131,4 +135,51 @@ public class PhoenixUtil6
 
   //   // Pigeon IMU handler
 
+  public boolean pigeon2Initialize6(Pigeon2 pigeon2, Pigeon2Configuration config)
+  {
+    StatusCode status = StatusCode.StatusCodeNotInitialized;
+    int deviceID = 0;
+    int fwvMajor = 0;
+    int fwvMinor = 0;
+    int fwvBugfix = 0;
+    int fwvBuild = 0;
+    boolean pigeon2Valid = false;
+
+    // Display Talon firmware versions
+    deviceID = pigeon2.getDeviceID( );
+
+    Timer.delay(0.25);
+
+    // This can take multiple attempts before ready
+    for (int i = 0; i < m_retries && fwvMajor == 0; i++)
+    {
+      StatusSignal<Integer> statusSignal = pigeon2.getVersion( );
+      status = statusSignal.getError( );
+      if (status.isOK( ))
+      {
+        fwvMajor = (statusSignal.getValue( ) >> 24) & 0xff;
+        fwvMinor = (statusSignal.getValue( ) >> 16) & 0xff;
+        fwvBugfix = (statusSignal.getValue( ) >> 8) & 0xff;
+        fwvBuild = (statusSignal.getValue( ) >> 0) & 0xff;
+      }
+      else
+        Timer.delay(0.1);
+    }
+
+    pigeon2Valid = (fwvMajor >= Constants.kPhoenixMajorVersion);
+
+    if (config != null)
+      if ((status = pigeon2.getConfigurator( ).apply(config, m_timeout)) != StatusCode.OK)
+        DataLogManager.log(
+            String.format("%s: ID %d - pigeon2: getConfigurator.apply - %s!", m_className, deviceID, status.getDescription( )));
+
+    // Configure sensor settings
+    if ((status = pigeon2.setYaw(0.0)) != StatusCode.OK)
+      DataLogManager.log(String.format("%s: ID %d - pigeon2: setYaw - %s!", m_className, deviceID, status.getDescription( )));
+
+    DataLogManager.log(String.format("%s: ID %d - pigeon2:    ver: %d.%d.%d.%d is %s!", m_className, deviceID, fwvMajor, fwvMinor,
+        fwvBugfix, fwvBuild, (pigeon2Valid) ? "VALID" : "URESPONSIVE"));
+
+    return pigeon2Valid;
+  }
 }
