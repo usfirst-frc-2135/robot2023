@@ -277,8 +277,8 @@ public class Constants
     public static final double kNeutralDeadband      = 0.001;  // Extension motor output deadband
     public static final int    kMMVelocity           = 18728;  // Extension motion magic velocity (0.625 of max motor RPM)
     public static final int    kMMAcceleration       = 12485;  // Extension motion magic acceleration (target velocity in 4/3s)
-    public static final int    kMMSCurveStrength     = 1;      // Extension motion magic S curve smoothing strength
-    public static final double kPidKf                = 0.0461; // Extension PID force constant
+    public static final int    kMMJerk               = 1;      // Extension motion magic S curve smoothing strength
+    public static final double kV                    = 0.0461; // Extension PID force constant
     public static final double kPidKp                = 0.0246; // Extension PID proportional constant
     public static final double kPidKi                = 0.0;    // Extension PID integral constant
     public static final double kPidKd                = 0.0;    // Extension PID derivative constant
@@ -296,7 +296,7 @@ public class Constants
     public static final double               kDegreesPerCount      = 360 / Falcon500.kEncoderCPR / kGearRatio;
     public static final double               kGripperLengthMeters  = 0.3;   // Sim value: 11.8 in
     public static final double               kGripperMassKg        = 3.0;   // Sim value: 6.6 lbs
-    public static final boolean              kInvertMotor          = false; // Motor direction for positive input
+    public static final InvertedValue        kInvertMotor          = InvertedValue.Clockwise_Positive; // Motor direction for positive input
 
     public static final double               kAngleMin             = -2.0;  // Wrist minimum allowable angle (a few degrees less than stowed)
     public static final double               kAngleStow            = 0.0;   // By definition - wrist is 90 degrees perpendicular to arm
@@ -321,6 +321,7 @@ public class Constants
     public static final boolean              kCalibrated           = true;  // Indicates whether the wrist has been calibrated by CANCoder
     public static final double               kCompOffset           = 133.418; // CANCoder offset angle for comp bot
     public static final double               kBetaOffset           = 0.000; // CANCoder offset angle for beta bot
+    public static final SensorDirectionValue kSensorDirection      = SensorDirectionValue.Clockwise_Positive;
 
     // Manual config parameters
 
@@ -352,7 +353,7 @@ public class Constants
     public static final int    kMMVelocity       = 12075;  // Wrist motion magic velocity (75% of max motor RPM)
     public static final int    kMMAcceleration   = 16100;  // Wrist motion magic acceleration (target velocity in 1/2s)
     public static final int    kMMSCurveStrength = 1;      // Wrist motion magic S curve smoothing strength
-    public static final double kPidKf            = 0.0466; // Wrist PID force constant
+    public static final double kV                = 0.0466; // Wrist PID force constant
     public static final double kPidKp            = 0.01968; // Wrist PID proportional constant
     public static final double kPidKi            = 0.0;    // Wrist PID integral constant
     public static final double kPidKd            = 0.0;    // Wrist PID derivative constant

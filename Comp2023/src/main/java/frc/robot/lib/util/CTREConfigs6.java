@@ -17,60 +17,60 @@ public final class CTREConfigs6
 
   public static TalonFXConfiguration elbowMotorFXConfig( )
   {
-    TalonFXConfiguration elbowConfig = new TalonFXConfiguration( );
+    TalonFXConfiguration elConfig = new TalonFXConfiguration( );
 
     // Closed Loop settings
-    // elbowConfig.ClosedLoopGeneral.*
-    // elbowConfig.ClosedLoopRamps.*
+    // elConfig.ClosedLoopGeneral.*
+    // elConfig.ClosedLoopRamps.*
 
     // Current limit settings
-    elbowConfig.CurrentLimits.SupplyCurrentLimit = Constants.ELConsts.kSupplyCurrentLimit;
-    elbowConfig.CurrentLimits.SupplyCurrentThreshold = Constants.ELConsts.kSupplyTriggerCurrent;
-    elbowConfig.CurrentLimits.SupplyTimeThreshold = Constants.ELConsts.kSupplyTriggerTime;
-    elbowConfig.CurrentLimits.SupplyCurrentLimitEnable = Constants.ELConsts.kSupplyCurrentLimitEnable;
+    elConfig.CurrentLimits.SupplyCurrentLimit = Constants.ELConsts.kSupplyCurrentLimit;
+    elConfig.CurrentLimits.SupplyCurrentThreshold = Constants.ELConsts.kSupplyTriggerCurrent;
+    elConfig.CurrentLimits.SupplyTimeThreshold = Constants.ELConsts.kSupplyTriggerTime;
+    elConfig.CurrentLimits.SupplyCurrentLimitEnable = Constants.ELConsts.kSupplyCurrentLimitEnable;
 
-    elbowConfig.CurrentLimits.StatorCurrentLimit = ELConsts.kStatorCurrentLimit;
-    elbowConfig.CurrentLimits.StatorCurrentLimitEnable = Constants.ELConsts.kStatorCurrentLimitEnable;
+    elConfig.CurrentLimits.StatorCurrentLimit = ELConsts.kStatorCurrentLimit;
+    elConfig.CurrentLimits.StatorCurrentLimitEnable = Constants.ELConsts.kStatorCurrentLimitEnable;
 
     // Feedback settings
-    // elbowConfig.Feedback.*
+    // elConfig.Feedback.*
 
     // Hardware limit switches
-    // elbowConfig.HardwareLimitSwitch.*
+    // elConfig.HardwareLimitSwitch.*
 
     // Motion Magic settings
-    elbowConfig.MotionMagic.MotionMagicCruiseVelocity = ELConsts.kMMVelocity;
-    elbowConfig.MotionMagic.MotionMagicAcceleration = ELConsts.kMMAcceleration;
-    elbowConfig.MotionMagic.MotionMagicJerk = ELConsts.kMMJerk;
+    elConfig.MotionMagic.MotionMagicCruiseVelocity = ELConsts.kMMVelocity;
+    elConfig.MotionMagic.MotionMagicAcceleration = ELConsts.kMMAcceleration;
+    elConfig.MotionMagic.MotionMagicJerk = ELConsts.kMMJerk;
 
     // Motor output settings
-    elbowConfig.MotorOutput.DutyCycleNeutralDeadband = ELConsts.kNeutralDeadband;
-    elbowConfig.MotorOutput.Inverted = ELConsts.kInvertMotor;
-    elbowConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    elConfig.MotorOutput.DutyCycleNeutralDeadband = ELConsts.kNeutralDeadband;
+    elConfig.MotorOutput.Inverted = ELConsts.kInvertMotor;
+    elConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
     // Closed loop settings
 
     // Open Loop settings
-    elbowConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0;
-    // elbowConfig.OpenLoopRamps.TorqueOpenLoopRampPeriod
-    elbowConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0;
+    elConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0;
+    // elConfig.OpenLoopRamps.TorqueOpenLoopRampPeriod
+    elConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0;
 
     // Slot settings
-    elbowConfig.Slot0.kS = Constants.ELConsts.kS;
-    elbowConfig.Slot0.kV = Constants.ELConsts.kV;
-    elbowConfig.Slot0.kP = Constants.ELConsts.kPidKp;
-    elbowConfig.Slot0.kI = Constants.ELConsts.kPidKi;
-    elbowConfig.Slot0.kD = Constants.ELConsts.kPidKd;
+    elConfig.Slot0.kS = Constants.ELConsts.kS;
+    elConfig.Slot0.kV = Constants.ELConsts.kV;
+    elConfig.Slot0.kP = Constants.ELConsts.kPidKp;
+    elConfig.Slot0.kI = Constants.ELConsts.kPidKi;
+    elConfig.Slot0.kD = Constants.ELConsts.kPidKd;
 
     // Software limit switches
-    elbowConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
+    elConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
         Conversions.degreesToInputRotations(ELConsts.kAngleMin, ELConsts.kGearRatio);
-    elbowConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    elbowConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
+    elConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    elConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
         Conversions.degreesToInputRotations(ELConsts.kAngleMax, ELConsts.kGearRatio);
-    elbowConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    elConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
 
-    return elbowConfig;
+    return elConfig;
   }
 
   public static CANcoderConfiguration elbowCancoderConfig( )
@@ -82,69 +82,132 @@ public final class CTREConfigs6
     return config;
   }
 
-  // Extension
-
-  public static TalonFXConfiguration extensionLengthFXConfig( )
-  {
-    TalonFXConfiguration extensionConfig = new TalonFXConfiguration( );
-
-    extensionConfig.Slot0.kP = Constants.EXConsts.kPidKp;
-    extensionConfig.Slot0.kI = Constants.EXConsts.kPidKi;
-    extensionConfig.Slot0.kD = Constants.EXConsts.kPidKd;
-    extensionConfig.Slot0.kV = Constants.EXConsts.kPidKf;
-
-    extensionConfig.CurrentLimits.SupplyCurrentLimit = EXConsts.kSupplyCurrentLimit;
-    extensionConfig.CurrentLimits.StatorCurrentLimit = EXConsts.kStatorCurrentLimit;
-
-    extensionConfig.MotionMagic.MotionMagicCruiseVelocity = EXConsts.kMMVelocity;
-    extensionConfig.MotionMagic.MotionMagicAcceleration = EXConsts.kMMAcceleration;
-    extensionConfig.MotionMagic.MotionMagicJerk = EXConsts.kMMSCurveStrength;
-
-    extensionConfig.MotorOutput.DutyCycleNeutralDeadband = EXConsts.kNeutralDeadband;
-    extensionConfig.MotorOutput.Inverted = EXConsts.kInvertMotor;
-    extensionConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-
-    return extensionConfig;
-  }
-
   //wrist 
 
   public static TalonFXConfiguration wristAngleFXConfig( )
   {
-    TalonFXConfiguration wristConfig = new TalonFXConfiguration( );
+    TalonFXConfiguration wrConfig = new TalonFXConfiguration( );
 
-    wristConfig.Slot0.kP = Constants.WRConsts.kPidKp;
-    wristConfig.Slot0.kI = Constants.WRConsts.kPidKi;
-    wristConfig.Slot0.kD = Constants.WRConsts.kPidKd;
-    wristConfig.Slot0.kV = Constants.WRConsts.kPidKf;
+    // Closed Loop settings
+    // wrConfig.ClosedLoopGeneral.*
+    // wrConfig.ClosedLoopRamps.*
 
-    wristConfig.CurrentLimits.SupplyCurrentLimit = Constants.WRConsts.kSupplyCurrentLimit;
-    wristConfig.CurrentLimits.StatorCurrentLimit = WRConsts.kStatorCurrentLimit;
+    // Current limit settings
+    wrConfig.CurrentLimits.SupplyCurrentLimit = Constants.WRConsts.kSupplyCurrentLimit;
+    wrConfig.CurrentLimits.SupplyCurrentThreshold = Constants.WRConsts.kSupplyTriggerCurrent;
+    wrConfig.CurrentLimits.SupplyTimeThreshold = Constants.WRConsts.kSupplyTriggerTime;
+    // wrConfig.CurrentLimits.SupplyCurrentLimitEnable = Constants.WRConsts.kSupplyCurrentLimitEnable;
+
+    wrConfig.CurrentLimits.StatorCurrentLimit = WRConsts.kStatorCurrentLimit;
+    // wrConfig.CurrentLimits.StatorCurrentLimitEnable = Constants.WRConsts.kStatorCurrentLimitEnable;
+
+    // Feedback settings
+    // wrConfig.Feedback.*
+
+    // Hardware limit switches
+    // wrConfig.HardwareLimitSwitch.*
 
     // Motion Magic settings
-    wristConfig.MotionMagic.MotionMagicCruiseVelocity = WRConsts.kMMVelocity;
-    wristConfig.MotionMagic.MotionMagicAcceleration = WRConsts.kMMAcceleration;
-    wristConfig.MotionMagic.MotionMagicJerk = WRConsts.kMMSCurveStrength;
+    wrConfig.MotionMagic.MotionMagicCruiseVelocity = WRConsts.kMMVelocity;
+    wrConfig.MotionMagic.MotionMagicAcceleration = WRConsts.kMMAcceleration;
+    wrConfig.MotionMagic.MotionMagicJerk = WRConsts.kMMSCurveStrength;
 
-    wristConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
+    // Motor output settings
+    wrConfig.MotorOutput.DutyCycleNeutralDeadband = WRConsts.kNeutralDeadband;
+    wrConfig.MotorOutput.Inverted = WRConsts.kInvertMotor;
+    wrConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+    // Closed loop settings
+
+    // Open Loop settings
+    wrConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0;
+    // wrConfig.OpenLoopRamps.TorqueOpenLoopRampPeriod
+    wrConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0;
+
+    // Slot settings
+    //TODO - implement a kS ?
+    wrConfig.Slot0.kV = Constants.WRConsts.kV;
+    wrConfig.Slot0.kP = Constants.WRConsts.kPidKp;
+    wrConfig.Slot0.kI = Constants.WRConsts.kPidKi;
+    wrConfig.Slot0.kD = Constants.WRConsts.kPidKd;
+
+    // Software limit switches
+    wrConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
+        Conversions.degreesToInputRotations(WRConsts.kAngleMin, WRConsts.kGearRatio);
+    wrConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    wrConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
         Conversions.degreesToInputRotations(WRConsts.kAngleMax, WRConsts.kGearRatio);
-    wristConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    wristConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
-        Conversions.degreesToInputRotations(WRConsts.kAngleMax, WRConsts.kGearRatio);
-    wristConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    wrConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
 
-    wristConfig.MotorOutput.DutyCycleNeutralDeadband = WRConsts.kNeutralDeadband;
-
-    return wristConfig;
+    return wrConfig;
   }
 
   public static CANcoderConfiguration wristCancoderConfig( )
   {
     CANcoderConfiguration config = new CANcoderConfiguration( );
     config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+    config.MagnetSensor.SensorDirection = WRConsts.kSensorDirection;
     config.MagnetSensor.MagnetOffset = (Constants.isComp) ? WRConsts.kCompOffset : WRConsts.kBetaOffset;
-    config.MagnetSensor.SensorDirection = Constants.WRConsts.kInvertCANCoder;
     return config;
   }
 
+  // Extension
+
+  public static TalonFXConfiguration extensionLengthFXConfig( )
+  {
+    TalonFXConfiguration exConfig = new TalonFXConfiguration( );
+
+    // Closed Loop settings
+    // exConfig.ClosedLoopGeneral.*
+    // exConfig.ClosedLoopRamps.*
+
+    // Current limit settings
+    exConfig.CurrentLimits.SupplyCurrentLimit = Constants.EXConsts.kSupplyCurrentLimit;
+    exConfig.CurrentLimits.SupplyCurrentThreshold = Constants.EXConsts.kSupplyTriggerCurrent;
+    exConfig.CurrentLimits.SupplyTimeThreshold = Constants.EXConsts.kSupplyTriggerTime;
+    // exConfig.CurrentLimits.SupplyCurrentLimitEnable = Constants.EXConsts.kSupplyCurrentLimitEnable;
+
+    exConfig.CurrentLimits.StatorCurrentLimit = EXConsts.kStatorCurrentLimit;
+    // exConfig.CurrentLimits.StatorCurrentLimitEnable = Constants.EXConsts.kStatorCurrentLimitEnable;
+
+    // Feedback settings
+    // exConfig.Feedback.*
+
+    // Hardware limit switches
+    // exConfig.HardwareLimitSwitch.*
+
+    // Motion Magic settings
+    exConfig.MotionMagic.MotionMagicCruiseVelocity = EXConsts.kMMVelocity;
+    exConfig.MotionMagic.MotionMagicAcceleration = EXConsts.kMMAcceleration;
+    exConfig.MotionMagic.MotionMagicJerk = EXConsts.kMMJerk;
+
+    // Motor output settings
+    exConfig.MotorOutput.DutyCycleNeutralDeadband = EXConsts.kNeutralDeadband;
+    exConfig.MotorOutput.Inverted = EXConsts.kInvertMotor;
+    exConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+    // Closed loop settings
+
+    // Open Loop settings
+    exConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0;
+    // exConfig.OpenLoopRamps.TorqueOpenLoopRampPeriod
+    exConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0;
+
+    // Slot settings
+    // exConfig.Slot0.kS = Constants.EXConsts.kS;
+    exConfig.Slot0.kV = Constants.EXConsts.kV;
+    exConfig.Slot0.kP = Constants.EXConsts.kPidKp;
+    exConfig.Slot0.kI = Constants.EXConsts.kPidKi;
+    exConfig.Slot0.kD = Constants.EXConsts.kPidKd;
+
+    // Software limit switches
+    exConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
+        Conversions.degreesToInputRotations(ELConsts.kAngleMin, ELConsts.kGearRatio);
+    exConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    exConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
+        Conversions.degreesToInputRotations(ELConsts.kAngleMax, ELConsts.kGearRatio);
+    exConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+
+    return exConfig;
+  }
 }
