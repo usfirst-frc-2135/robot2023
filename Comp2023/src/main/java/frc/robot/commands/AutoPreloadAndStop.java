@@ -9,14 +9,14 @@ import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
 import frc.robot.subsystems.Gripper;
 import frc.robot.subsystems.Swerve;
-import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.Wrist2;
 
 /**
  *
  */
 public class AutoPreloadAndStop extends SequentialCommandGroup
 {
-  public AutoPreloadAndStop(Swerve swerve, Elbow elbow, Extension extension, Wrist wrist, Gripper gripper)
+  public AutoPreloadAndStop(Swerve swerve, Elbow elbow, Extension extension, Wrist2 wrist, Gripper gripper)
   {
     setName("AutoPreloadAndStop");
 

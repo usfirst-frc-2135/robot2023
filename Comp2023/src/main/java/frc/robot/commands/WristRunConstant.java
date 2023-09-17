@@ -1,7 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.Wrist2;
 
 /**
  *
@@ -9,10 +9,10 @@ import frc.robot.subsystems.Wrist;
 public class WristRunConstant extends CommandBase
 {
 
-  private final Wrist   m_wrist;
+  private final Wrist2  m_wrist;
   private final boolean m_moveUp;
 
-  public WristRunConstant(Wrist wrist, boolean moveUp)
+  public WristRunConstant(Wrist2 wrist, boolean moveUp)
   {
     m_wrist = wrist;
     m_moveUp = moveUp;

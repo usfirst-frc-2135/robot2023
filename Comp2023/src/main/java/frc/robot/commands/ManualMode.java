@@ -9,14 +9,14 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
-import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.Wrist2;
 
 /**
  *
  */
 public class ManualMode extends SequentialCommandGroup
 {
-  public ManualMode(Elbow elbow, Extension extension, Wrist wrist, XboxController operPad)
+  public ManualMode(Elbow elbow, Extension extension, Wrist2 wrist, XboxController operPad)
   {
     setName("Manual Mode");
 

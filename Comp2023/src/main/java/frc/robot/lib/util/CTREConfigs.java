@@ -125,7 +125,7 @@ public final class CTREConfigs
     extensionConfig.slot0.kP = Constants.EXConsts.kPidKp;
     extensionConfig.slot0.kI = Constants.EXConsts.kPidKi;
     extensionConfig.slot0.kD = Constants.EXConsts.kPidKd;
-    extensionConfig.slot0.kF = Constants.EXConsts.kPidKf;
+    extensionConfig.slot0.kF = Constants.EXConsts.kV;
 
     extensionConfig.supplyCurrLimit = new SupplyCurrentLimitConfiguration(true, EXConsts.kSupplyCurrentLimit,
         EXConsts.kSupplyTriggerCurrent, EXConsts.kSupplyTriggerTime);
@@ -137,7 +137,7 @@ public final class CTREConfigs
 
     extensionConfig.motionCruiseVelocity = EXConsts.kMMVelocity;
     extensionConfig.motionAcceleration = EXConsts.kMMAcceleration;
-    extensionConfig.motionCurveStrength = EXConsts.kMMSCurveStrength;
+    extensionConfig.motionCurveStrength = 1;
 
     extensionConfig.neutralDeadband = EXConsts.kNeutralDeadband;
 
@@ -155,7 +155,7 @@ public final class CTREConfigs
     wristConfig.slot0.kP = Constants.WRConsts.kPidKp;
     wristConfig.slot0.kI = Constants.WRConsts.kPidKi;
     wristConfig.slot0.kD = Constants.WRConsts.kPidKd;
-    wristConfig.slot0.kF = Constants.WRConsts.kPidKf;
+    wristConfig.slot0.kF = Constants.WRConsts.kV;
 
     wristConfig.supplyCurrLimit = new SupplyCurrentLimitConfiguration(true, Constants.WRConsts.kSupplyCurrentLimit,
         Constants.WRConsts.kSupplyTriggerCurrent, Constants.WRConsts.kSupplyTriggerTime);
@@ -168,7 +168,7 @@ public final class CTREConfigs
 
     wristConfig.motionCruiseVelocity = WRConsts.kMMVelocity;
     wristConfig.motionAcceleration = WRConsts.kMMAcceleration;
-    wristConfig.motionCurveStrength = WRConsts.kMMSCurveStrength;
+    wristConfig.motionCurveStrength = 1;
 
     wristConfig.reverseSoftLimitThreshold = Conversions.degreesToFalcon(WRConsts.kAngleMin, WRConsts.kGearRatio);
     wristConfig.reverseSoftLimitEnable = true;

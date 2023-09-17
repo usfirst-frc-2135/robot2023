@@ -7,18 +7,19 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.ELConsts;
+import frc.robot.Constants.WRConsts;
 import frc.robot.Constants.EXConsts.ExtensionLength;
 import frc.robot.Constants.WRConsts.WristAngle;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
-import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.Wrist2;
 
 /**
  *
  */
 public class ArmSetHeightScoreLow extends SequentialCommandGroup
 {
-  public ArmSetHeightScoreLow(Elbow elbow, Extension extension, Wrist wrist)
+  public ArmSetHeightScoreLow(Elbow elbow, Extension extension, Wrist2 wrist)
   {
     setName("ArmSetHeightScoreLow");
 
@@ -35,12 +36,12 @@ public class ArmSetHeightScoreLow extends SequentialCommandGroup
             new ElbowMoveToPosition(elbow,  ELConsts.kAngleScoreLow).asProxy(),
 
             new PrintCommand(getName() + ": Move Wrist"),
-            new WristMoveToAngle(wrist, WristAngle.WRIST_LOW).asProxy()
+            new WristMoveToPosition(wrist, WRConsts.kAngleScoreLow).asProxy()
           ),
 
           new SequentialCommandGroup(
             new PrintCommand(getName() + ": Move Wrist"),
-            new WristMoveToAngle(wrist, WristAngle.WRIST_LOW).asProxy(),
+            new WristMoveToPosition(wrist, WRConsts.kAngleScoreLow).asProxy(),
 
             new PrintCommand(getName() + ": Move Elbow"),
             new ElbowMoveToPosition(elbow,  ELConsts.kAngleScoreLow).asProxy()

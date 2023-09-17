@@ -3,6 +3,7 @@
 //
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -81,8 +82,8 @@ public class Wrist2 extends SubsystemBase
   // Constructor
   public Wrist2( )
   {
-    setName("Wrist");
-    setSubsystem("Wrist");
+    setName("Wrist2");
+    setSubsystem("Wrist2");
 
     m_motorValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_motor, "wrist", CTREConfigs6.wristAngleFXConfig( ));
     m_ccValid = PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANCoder, "wrist", CTREConfigs6.wristCancoderConfig( ));
@@ -324,6 +325,53 @@ public class Wrist2 extends SubsystemBase
   {
     m_safetyTimer.stop( );
     // m_motor.setControl(m_requestVolts.withOutput(0.0)); // TODO: Is this needed? It fixed a bug in Motion Magic in v5 that should be fixed in v6
+  }
+
+  public void setMotorOutput(double brake)
+  {
+    m_motor.setControl(m_requestVolts.withOutput(brake));
+  }
+
+  public void moveWristConstantSpeed(double speed)
+  {
+    moveWristInput(speed);
+  }
+
+  public void moveWristInput(double axisValue)
+  {
+    boolean outOfRange = false;
+    WristMode newMode = WristMode.WRIST_STOPPED;
+
+    axisValue = MathUtil.applyDeadband(axisValue, Constants.kStickDeadband);
+
+    if (axisValue < 0.0)
+    {
+      if (m_currentDegrees > WRConsts.kAngleMin)
+        newMode = WristMode.WRIST_UP;
+      else
+        outOfRange = true;
+    }
+    else if (axisValue > 0.0)
+    {
+      if (m_currentDegrees < WRConsts.kAngleMax)
+        newMode = WristMode.WRIST_DOWN;
+      else
+        outOfRange = true;
+    }
+
+    if (outOfRange)
+      axisValue = 0.0;
+
+    if (newMode != m_mode)
+    {
+      m_mode = newMode;
+      DataLogManager.log(getSubsystem( ) + ": move " + m_mode + ((outOfRange) ? " - OUT OF RANGE" : ""));
+    }
+
+    m_targetDegrees = m_currentDegrees;
+
+    if (m_motorValid)
+      m_motor.setControl(m_requestVolts.withOutput(axisValue * WRConsts.kSpeedMaxManual));
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
