@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.Ports;
 import frc.robot.Constants.WRConsts;
 import frc.robot.Constants.WRConsts.WristAngle;
 import frc.robot.Constants.WRConsts.WristMode;
@@ -49,8 +50,8 @@ public class Wrist extends SubsystemBase
   private static final int           SLOTINDEX            = 0;   // Use first PID slot
 
   // Member objects
-  private final WPI_TalonFX          m_wrist              = new WPI_TalonFX(Constants.Ports.kCANID_Wrist);  //wrist
-  private final CANCoder             m_wristCANCoder      = new CANCoder(Constants.Ports.kCANID_WRCANCoder);
+  private final WPI_TalonFX          m_wrist              = new WPI_TalonFX(Ports.kCANID_Wrist);        //wrist
+  private final CANCoder             m_wristCANCoder      = new CANCoder(Ports.kCANID_WRCANCoder);
   private final TalonFXSimCollection m_wristMotorSim      = new TalonFXSimCollection(m_wrist);
   private final SingleJointedArmSim  m_wristSim           = new SingleJointedArmSim(DCMotor.getFalcon500(1), WRConsts.kGearRatio,
       2.0, WRConsts.kGripperLengthMeters, -Math.PI, Math.PI, false);

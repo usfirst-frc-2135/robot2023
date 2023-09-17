@@ -24,13 +24,13 @@ public final class CTREConfigs6
     // elConfig.ClosedLoopRamps.*
 
     // Current limit settings
-    elConfig.CurrentLimits.SupplyCurrentLimit = Constants.ELConsts.kSupplyCurrentLimit;
-    elConfig.CurrentLimits.SupplyCurrentThreshold = Constants.ELConsts.kSupplyTriggerCurrent;
-    elConfig.CurrentLimits.SupplyTimeThreshold = Constants.ELConsts.kSupplyTriggerTime;
-    elConfig.CurrentLimits.SupplyCurrentLimitEnable = Constants.ELConsts.kSupplyCurrentLimitEnable;
+    elConfig.CurrentLimits.SupplyCurrentLimit = ELConsts.kSupplyCurrentLimit;
+    elConfig.CurrentLimits.SupplyCurrentThreshold = ELConsts.kSupplyTriggerCurrent;
+    elConfig.CurrentLimits.SupplyTimeThreshold = ELConsts.kSupplyTriggerTime;
+    elConfig.CurrentLimits.SupplyCurrentLimitEnable = ELConsts.kSupplyCurrentLimitEnable;
 
     elConfig.CurrentLimits.StatorCurrentLimit = ELConsts.kStatorCurrentLimit;
-    elConfig.CurrentLimits.StatorCurrentLimitEnable = Constants.ELConsts.kStatorCurrentLimitEnable;
+    elConfig.CurrentLimits.StatorCurrentLimitEnable = ELConsts.kStatorCurrentLimitEnable;
 
     // Feedback settings
     // elConfig.Feedback.*
@@ -56,11 +56,11 @@ public final class CTREConfigs6
     elConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0;
 
     // Slot settings
-    elConfig.Slot0.kS = Constants.ELConsts.kS;
-    elConfig.Slot0.kV = Constants.ELConsts.kV;
-    elConfig.Slot0.kP = Constants.ELConsts.kPidKp;
-    elConfig.Slot0.kI = Constants.ELConsts.kPidKi;
-    elConfig.Slot0.kD = Constants.ELConsts.kPidKd;
+    elConfig.Slot0.kS = ELConsts.kS;
+    elConfig.Slot0.kV = ELConsts.kV;
+    elConfig.Slot0.kP = ELConsts.kPidKp;
+    elConfig.Slot0.kI = ELConsts.kPidKi;
+    elConfig.Slot0.kD = ELConsts.kPidKd;
 
     // Software limit switches
     elConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
@@ -93,13 +93,13 @@ public final class CTREConfigs6
     // wrConfig.ClosedLoopRamps.*
 
     // Current limit settings
-    wrConfig.CurrentLimits.SupplyCurrentLimit = Constants.WRConsts.kSupplyCurrentLimit;
-    wrConfig.CurrentLimits.SupplyCurrentThreshold = Constants.WRConsts.kSupplyTriggerCurrent;
-    wrConfig.CurrentLimits.SupplyTimeThreshold = Constants.WRConsts.kSupplyTriggerTime;
-    // wrConfig.CurrentLimits.SupplyCurrentLimitEnable = Constants.WRConsts.kSupplyCurrentLimitEnable;
+    wrConfig.CurrentLimits.SupplyCurrentLimit = WRConsts.kSupplyCurrentLimit;
+    wrConfig.CurrentLimits.SupplyCurrentThreshold = WRConsts.kSupplyTriggerCurrent;
+    wrConfig.CurrentLimits.SupplyTimeThreshold = WRConsts.kSupplyTriggerTime;
+    // wrConfig.CurrentLimits.SupplyCurrentLimitEnable = WRConsts.kSupplyCurrentLimitEnable;
 
     wrConfig.CurrentLimits.StatorCurrentLimit = WRConsts.kStatorCurrentLimit;
-    // wrConfig.CurrentLimits.StatorCurrentLimitEnable = Constants.WRConsts.kStatorCurrentLimitEnable;
+    // wrConfig.CurrentLimits.StatorCurrentLimitEnable = WRConsts.kStatorCurrentLimitEnable;
 
     // Feedback settings
     // wrConfig.Feedback.*
@@ -126,10 +126,10 @@ public final class CTREConfigs6
 
     // Slot settings
     //TODO - implement a kS ?
-    wrConfig.Slot0.kV = Constants.WRConsts.kV;
-    wrConfig.Slot0.kP = Constants.WRConsts.kPidKp;
-    wrConfig.Slot0.kI = Constants.WRConsts.kPidKi;
-    wrConfig.Slot0.kD = Constants.WRConsts.kPidKd;
+    wrConfig.Slot0.kV = WRConsts.kV;
+    wrConfig.Slot0.kP = WRConsts.kPidKp;
+    wrConfig.Slot0.kI = WRConsts.kPidKi;
+    wrConfig.Slot0.kD = WRConsts.kPidKd;
 
     // Software limit switches
     wrConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
@@ -162,13 +162,13 @@ public final class CTREConfigs6
     // exConfig.ClosedLoopRamps.*
 
     // Current limit settings
-    exConfig.CurrentLimits.SupplyCurrentLimit = Constants.EXConsts.kSupplyCurrentLimit;
-    exConfig.CurrentLimits.SupplyCurrentThreshold = Constants.EXConsts.kSupplyTriggerCurrent;
-    exConfig.CurrentLimits.SupplyTimeThreshold = Constants.EXConsts.kSupplyTriggerTime;
-    // exConfig.CurrentLimits.SupplyCurrentLimitEnable = Constants.EXConsts.kSupplyCurrentLimitEnable;
+    exConfig.CurrentLimits.SupplyCurrentLimit = EXConsts.kSupplyCurrentLimit;
+    exConfig.CurrentLimits.SupplyCurrentThreshold = EXConsts.kSupplyTriggerCurrent;
+    exConfig.CurrentLimits.SupplyTimeThreshold = EXConsts.kSupplyTriggerTime;
+    // exConfig.CurrentLimits.SupplyCurrentLimitEnable = EXConsts.kSupplyCurrentLimitEnable;
 
     exConfig.CurrentLimits.StatorCurrentLimit = EXConsts.kStatorCurrentLimit;
-    // exConfig.CurrentLimits.StatorCurrentLimitEnable = Constants.EXConsts.kStatorCurrentLimitEnable;
+    // exConfig.CurrentLimits.StatorCurrentLimitEnable = EXConsts.kStatorCurrentLimitEnable;
 
     // Feedback settings
     // exConfig.Feedback.*
@@ -194,11 +194,11 @@ public final class CTREConfigs6
     exConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0;
 
     // Slot settings
-    // exConfig.Slot0.kS = Constants.EXConsts.kS;
-    exConfig.Slot0.kV = Constants.EXConsts.kV;
-    exConfig.Slot0.kP = Constants.EXConsts.kPidKp;
-    exConfig.Slot0.kI = Constants.EXConsts.kPidKi;
-    exConfig.Slot0.kD = Constants.EXConsts.kPidKd;
+    // exConfig.Slot0.kS = EXConsts.kS;
+    exConfig.Slot0.kV = EXConsts.kV;
+    exConfig.Slot0.kP = EXConsts.kPidKp;
+    exConfig.Slot0.kI = EXConsts.kPidKi;
+    exConfig.Slot0.kD = EXConsts.kPidKd;
 
     // Software limit switches
     exConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =

@@ -3,7 +3,7 @@ package frc.robot.team2135;
 import com.ctre.phoenix6.hardware.Pigeon2;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import frc.robot.Constants;
+import frc.robot.Constants.SWConsts;
 
 public class PigeonIMU
 {
@@ -73,7 +73,7 @@ public class PigeonIMU
   {
     Rotation2d rot2d = getUnadjustedYaw( ).rotateBy(m_yawAdjustment.unaryMinus( ));
 
-    return (Constants.SwerveConstants.invertGyro) ? rot2d.unaryMinus( ) : rot2d;
+    return (SWConsts.invertGyro) ? rot2d.unaryMinus( ) : rot2d;
   }
 
   /**

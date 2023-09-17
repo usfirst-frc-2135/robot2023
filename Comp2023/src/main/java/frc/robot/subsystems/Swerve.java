@@ -30,9 +30,10 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.Ports;
 import frc.robot.Constants.LLConsts;
-import frc.robot.Constants.SwerveConstants;
+import frc.robot.Constants.Ports;
+import frc.robot.Constants.SnapConstants;
+import frc.robot.Constants.SWConsts;
 import frc.robot.RobotContainer;
 import frc.robot.team1678.frc2022.drivers.Pigeon;
 import frc.robot.team1678.frc2022.drivers.SwerveModule;
@@ -45,24 +46,22 @@ public class Swerve extends SubsystemBase
   // Member objects
   private SwerveModule[ ]          m_swerveMods        = new SwerveModule[ ]
   {
-      new SwerveModule(0, Constants.SwerveConstants.Mod0.SwerveModuleConstants( )),
-      new SwerveModule(1, Constants.SwerveConstants.Mod1.SwerveModuleConstants( )),
-      new SwerveModule(2, Constants.SwerveConstants.Mod2.SwerveModuleConstants( )),
-      new SwerveModule(3, Constants.SwerveConstants.Mod3.SwerveModuleConstants( ))
+      new SwerveModule(0, SWConsts.Mod0.SwerveModuleConstants( )), new SwerveModule(1, SWConsts.Mod1.SwerveModuleConstants( )),
+      new SwerveModule(2, SWConsts.Mod2.SwerveModuleConstants( )), new SwerveModule(3, SWConsts.Mod3.SwerveModuleConstants( ))
   };
 
   // Odometery and telemetry
   private Pigeon                   m_pigeon            = new Pigeon(Ports.kCANID_Pigeon2);
-  private SwerveDrivePoseEstimator m_poseEstimator     = new SwerveDrivePoseEstimator(SwerveConstants.swerveKinematics,
+  private SwerveDrivePoseEstimator m_poseEstimator     = new SwerveDrivePoseEstimator(SWConsts.swerveKinematics,
       m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), new Pose2d( ));
   private Field2d                  m_field             = new Field2d( );
 
   // PID objects
   private ProfiledPIDController    m_snapPIDController = new ProfiledPIDController( // 
-      Constants.SnapConstants.kP, //
-      Constants.SnapConstants.kI, //
-      Constants.SnapConstants.kD, //
-      Constants.SnapConstants.kThetaControllerConstraints);
+      SnapConstants.kP, //
+      SnapConstants.kI, //
+      SnapConstants.kD, //
+      SnapConstants.kThetaControllerConstraints);
 
   // Holonomic Drive Controller objects
   private HolonomicDriveController m_holonomicController;
@@ -458,7 +457,7 @@ public class Swerve extends SubsystemBase
         m_trajectory.getEndState( ).holonomicRotation/* trajState.poseMeters.getRotation( ) */); // TODO: find out what's wrong with getting desired rotation
 
     // Convert to module states
-    SwerveModuleState[ ] moduleStates = Constants.SwerveConstants.swerveKinematics.toSwerveModuleStates(targetChassisSpeeds);
+    SwerveModuleState[ ] moduleStates = SWConsts.swerveKinematics.toSwerveModuleStates(targetChassisSpeeds);
 
     double targetfrontLeft = (moduleStates[0].speedMetersPerSecond);
     double targetfrontRight = (moduleStates[1].speedMetersPerSecond);
@@ -599,13 +598,13 @@ public class Swerve extends SubsystemBase
     else
     {
       swerveModuleStates =
-          Constants.SwerveConstants.swerveKinematics.toSwerveModuleStates(fieldRelative
+          SWConsts.swerveKinematics.toSwerveModuleStates(fieldRelative
               ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX( ), translation.getY( ), rotation,
                   m_pigeon.getYaw( ).getWPIRotation2d( ))
               : new ChassisSpeeds(translation.getX( ), translation.getY( ), rotation));
     }
 
-    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.SwerveConstants.maxSpeed);
+    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SWConsts.maxSpeed);
 
     for (SwerveModule mod : m_swerveMods)
     {
@@ -623,9 +622,9 @@ public class Swerve extends SubsystemBase
     double motorOutput;
 
     pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
-    if (Math.abs(pitch) > SwerveConstants.kDriveBalancedAngle)
+    if (Math.abs(pitch) > SWConsts.kDriveBalancedAngle)
     {
-      motorOutput = SwerveConstants.kDriveBalanceKp * pitch;
+      motorOutput = SWConsts.kDriveBalanceKp * pitch;
       drive(new Translation2d(motorOutput, 0), 0, false, true);
     }
     else
@@ -653,7 +652,7 @@ public class Swerve extends SubsystemBase
   private boolean isSnapComplete( )
   {
     double error = m_snapPIDController.getGoal( ).position - m_pigeon.getYaw( ).getRadians( );
-    return (Math.abs(error) < Math.toRadians(Constants.SnapConstants.kEpsilon));
+    return (Math.abs(error) < Math.toRadians(SnapConstants.kEpsilon));
   }
 
   public boolean driveIsSnapFinished(boolean force)
@@ -670,7 +669,7 @@ public class Swerve extends SubsystemBase
   /* Used by SwerveControllerCommand in Auto */
   public void setModuleStates(SwerveModuleState[ ] desiredStates)
   {
-    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.SwerveConstants.maxSpeed);
+    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, SWConsts.maxSpeed);
 
     for (SwerveModule mod : m_swerveMods)
     {

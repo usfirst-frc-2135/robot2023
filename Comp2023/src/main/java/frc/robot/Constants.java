@@ -450,7 +450,7 @@ public class Constants
 
   //// 1678 Constants ///////////////////////////////////////////////////////////
 
-  public static final class SwerveConstants
+  public static final class SWConsts
   {
     public static final boolean                                      invertGyro                  = false; // Always ensure Gyro is CCW+ CW-
 
@@ -652,7 +652,7 @@ public class Constants
     public static TrajectoryConfig createConfig(double maxSpeed, double maxAccel, double startSpeed, double endSpeed)
     {
       TrajectoryConfig config = new TrajectoryConfig(maxSpeed, maxAccel);
-      config.setKinematics(Constants.SwerveConstants.swerveKinematics);
+      config.setKinematics(SWConsts.swerveKinematics);
       config.setStartVelocity(startSpeed);
       config.setEndVelocity(endSpeed);
       config.addConstraint(new CentripetalAccelerationConstraint(3.0));
@@ -662,11 +662,11 @@ public class Constants
     // Trajectory Speed Configs
     public static final TrajectoryConfig defaultSpeedConfig =
         new TrajectoryConfig(kMaxSpeedMetersPerSecond, kMaxAccelerationMetersPerSecondSquared)
-            .setKinematics(Constants.SwerveConstants.swerveKinematics);
+            .setKinematics(SWConsts.swerveKinematics);
 
     public static final TrajectoryConfig slowSpeedConfig    =
         new TrajectoryConfig(kSlowSpeedMetersPerSecond, kSlowAccelerationMetersPerSecondSquared)
-            .setKinematics(Constants.SwerveConstants.swerveKinematics).setStartVelocity(0).setEndVelocity(0);
+            .setKinematics(SWConsts.swerveKinematics).setStartVelocity(0).setEndVelocity(0);
 
     // Path following constraints
     public static final PathConstraints  defaultPathConfig  =

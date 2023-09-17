@@ -34,6 +34,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.ELConsts;
 import frc.robot.Constants.ELConsts.ElbowMode;
 import frc.robot.Constants.EXConsts;
+import frc.robot.Constants.Ports;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.lib.math.Conversions;
@@ -49,8 +50,8 @@ public class Elbow extends SubsystemBase
   private final double              kLigament2dOffset = -90.0; // Offset from mechanism root for elbow ligament
 
   // Member objects
-  private final TalonFX             m_motor           = new TalonFX(Constants.Ports.kCANID_Elbow);
-  private final CANcoder            m_CANCoder        = new CANcoder(Constants.Ports.kCANID_ELCANCoder);
+  private final TalonFX             m_motor           = new TalonFX(Ports.kCANID_Elbow);
+  private final CANcoder            m_CANCoder        = new CANcoder(Ports.kCANID_ELCANCoder);
   private final TalonFXSimState     m_motorSim        = m_motor.getSimState( );
   private final CANcoderSimState    m_CANCoderSim     = m_CANCoder.getSimState( );
   private final SingleJointedArmSim m_armSim          = new SingleJointedArmSim(DCMotor.getFalcon500(1), ELConsts.kGearRatio, 1.0,

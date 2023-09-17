@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants;
+import frc.robot.Constants.SWConsts;
 import frc.robot.lib.math.Conversions;
 import frc.robot.lib.util.CTREConfigs;
 import frc.robot.lib.util.CTREModuleState;
@@ -31,8 +32,7 @@ public class SwerveModule
   private double         anglekI;
   private double         anglekD;
 
-  SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.SwerveConstants.driveKS,
-      Constants.SwerveConstants.driveKV, Constants.SwerveConstants.driveKA);
+  SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(SWConsts.driveKS, SWConsts.driveKV, SWConsts.driveKA);
 
   public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants)
   {
@@ -68,27 +68,26 @@ public class SwerveModule
 
     if (isOpenLoop)
     {
-      double percentOutput = desiredState.speedMetersPerSecond / Constants.SwerveConstants.maxSpeed;
+      double percentOutput = desiredState.speedMetersPerSecond / SWConsts.maxSpeed;
       mDriveMotor.set(ControlMode.PercentOutput, percentOutput);
     }
     else
     {
-      double velocity = Conversions.MPSToFalcon(desiredState.speedMetersPerSecond, Constants.SwerveConstants.wheelCircumference,
-          Constants.SwerveConstants.driveGearRatio);
+      double velocity =
+          Conversions.MPSToFalcon(desiredState.speedMetersPerSecond, SWConsts.wheelCircumference, SWConsts.driveGearRatio);
       mDriveMotor.set(ControlMode.Velocity, velocity, DemandType.ArbitraryFeedForward,
           feedforward.calculate(desiredState.speedMetersPerSecond));
     }
 
-    double angle = (Math.abs(desiredState.speedMetersPerSecond) <= (Constants.SwerveConstants.maxSpeed * 0.01)) ? lastAngle
+    double angle = (Math.abs(desiredState.speedMetersPerSecond) <= (SWConsts.maxSpeed * 0.01)) ? lastAngle
         : desiredState.angle.getDegrees( ); // Prevent rotating module if speed is less then 1%. Prevents Jittering.
-    mAngleMotor.set(ControlMode.Position, Conversions.degreesToFalcon(angle, Constants.SwerveConstants.angleGearRatio));
+    mAngleMotor.set(ControlMode.Position, Conversions.degreesToFalcon(angle, SWConsts.angleGearRatio));
     lastAngle = angle;
   }
 
   public void resetToAbsolute( )
   {
-    double absolutePosition =
-        Conversions.degreesToFalcon(getCanCoder( ).getDegrees( ) - angleOffset, Constants.SwerveConstants.angleGearRatio);
+    double absolutePosition = Conversions.degreesToFalcon(getCanCoder( ).getDegrees( ) - angleOffset, SWConsts.angleGearRatio);
     mAngleMotor.setSelectedSensorPosition(absolutePosition);
   }
 
@@ -102,8 +101,8 @@ public class SwerveModule
   {
     // mAngleMotor.configFactoryDefault( ); - TODO Clean up later
     mAngleMotor.configAllSettings(CTREConfigs.swerveAngleFXConfig( ));
-    mAngleMotor.setInverted(Constants.SwerveConstants.angleMotorInvert);
-    mAngleMotor.setNeutralMode(Constants.SwerveConstants.angleNeutralMode);
+    mAngleMotor.setInverted(SWConsts.angleMotorInvert);
+    mAngleMotor.setNeutralMode(SWConsts.angleNeutralMode);
     resetToAbsolute( );
   }
 
@@ -111,8 +110,8 @@ public class SwerveModule
   {
     // mDriveMotor.configFactoryDefault( ); - TODO Clean up later
     mDriveMotor.configAllSettings(CTREConfigs.swerveDriveFXConfig( ));
-    mDriveMotor.setInverted(Constants.SwerveConstants.driveMotorInvert);
-    mDriveMotor.setNeutralMode(Constants.SwerveConstants.driveNeutralMode);
+    mDriveMotor.setInverted(SWConsts.driveMotorInvert);
+    mDriveMotor.setNeutralMode(SWConsts.driveNeutralMode);
     mDriveMotor.setSelectedSensorPosition(0);
   }
 
@@ -156,19 +155,19 @@ public class SwerveModule
 
   public SwerveModuleState getState( )
   {
-    double velocity = Conversions.falconToMPS(mDriveMotor.getSelectedSensorVelocity( ),
-        Constants.SwerveConstants.wheelCircumference, Constants.SwerveConstants.driveGearRatio);
-    Rotation2d angle = Rotation2d.fromDegrees(
-        Conversions.falconToDegrees(mAngleMotor.getSelectedSensorPosition( ), Constants.SwerveConstants.angleGearRatio));
+    double velocity =
+        Conversions.falconToMPS(mDriveMotor.getSelectedSensorVelocity( ), SWConsts.wheelCircumference, SWConsts.driveGearRatio);
+    Rotation2d angle =
+        Rotation2d.fromDegrees(Conversions.falconToDegrees(mAngleMotor.getSelectedSensorPosition( ), SWConsts.angleGearRatio));
     return new SwerveModuleState(velocity, angle);
   }
 
   public SwerveModulePosition getPosition( )
   {
-    double distance = Conversions.falconToMeters(mDriveMotor.getSelectedSensorPosition( ),
-        Constants.SwerveConstants.wheelCircumference, Constants.SwerveConstants.driveGearRatio);
-    Rotation2d angle = Rotation2d.fromDegrees(
-        Conversions.falconToDegrees(mAngleMotor.getSelectedSensorPosition( ), Constants.SwerveConstants.angleGearRatio));
+    double distance = Conversions.falconToMeters(mDriveMotor.getSelectedSensorPosition( ), SWConsts.wheelCircumference,
+        SWConsts.driveGearRatio);
+    Rotation2d angle =
+        Rotation2d.fromDegrees(Conversions.falconToDegrees(mAngleMotor.getSelectedSensorPosition( ), SWConsts.angleGearRatio));
     return new SwerveModulePosition(distance, angle);
   }
 

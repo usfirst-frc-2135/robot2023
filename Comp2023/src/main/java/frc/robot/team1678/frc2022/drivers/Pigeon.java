@@ -2,7 +2,7 @@ package frc.robot.team1678.frc2022.drivers;
 
 import com.ctre.phoenix.sensors.Pigeon2;
 
-import frc.robot.Constants;
+import frc.robot.Constants.SWConsts;
 import frc.robot.team254.lib.geometry.Rotation2d;
 
 public class Pigeon
@@ -11,7 +11,7 @@ public class Pigeon
   private final Pigeon2 mGyro;
 
   // Configs
-  private boolean       inverted            = Constants.SwerveConstants.invertGyro;
+  private boolean       inverted            = SWConsts.invertGyro;
   private Rotation2d    yawAdjustmentAngle  = Rotation2d.identity( );
   private Rotation2d    rollAdjustmentAngle = Rotation2d.identity( );
 

@@ -3,7 +3,6 @@
 //
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -32,6 +31,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.Ports;
 import frc.robot.Constants.WRConsts;
 import frc.robot.Constants.WRConsts.WristMode;
 import frc.robot.Robot;
@@ -49,8 +49,8 @@ public class Wrist2 extends SubsystemBase
   private final double              kLigament2dOffset = -90.0; // Offset from mechanism root for wrist ligament
 
   // Member objects
-  private final TalonFX             m_motor           = new TalonFX(Constants.Ports.kCANID_Wrist);
-  private final CANcoder            m_CANCoder        = new CANcoder(Constants.Ports.kCANID_WRCANCoder);
+  private final TalonFX             m_motor           = new TalonFX(Ports.kCANID_Wrist);
+  private final CANcoder            m_CANCoder        = new CANcoder(Ports.kCANID_WRCANCoder);
   private final TalonFXSimState     m_motorSim        = m_motor.getSimState( );
   private final CANcoderSimState    m_CANCoderSim     = m_CANCoder.getSimState( );
   private final SingleJointedArmSim m_armSim          = new SingleJointedArmSim(DCMotor.getFalcon500(1), WRConsts.kGearRatio, 1.0,

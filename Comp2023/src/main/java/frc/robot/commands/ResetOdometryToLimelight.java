@@ -9,7 +9,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
+import frc.robot.Constants.VIConsts;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
 
@@ -45,7 +45,7 @@ public class ResetOdometryToLimelight extends CommandBase
     else if ((m_id > 0) && (m_id < 9))
     {
       m_vision.setFixedTargetID(m_id);
-      Pose2d atp = Constants.VIConsts.kAprilTagPoses.get(m_id);
+      Pose2d atp = VIConsts.kAprilTagPoses.get(m_id);
       double rotation = (m_id <= 4) ? 0 : Math.PI;
       Pose2d robotPose =
           new Pose2d(new Translation2d(atp.getX( ) + ((m_id <= 4) ? -3.0 : 3.0), atp.getY( )), new Rotation2d(rotation));

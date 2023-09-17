@@ -5,9 +5,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
-import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.sim.CANcoderSimState;
 import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 
@@ -15,7 +13,6 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
@@ -31,11 +28,11 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.EXConsts.ExtensionMode;
 import frc.robot.Constants.EXConsts;
+import frc.robot.Constants.EXConsts.ExtensionMode;
+import frc.robot.Constants.Ports;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
-import frc.robot.lib.math.Conversions;
 import frc.robot.lib.util.CTREConfigs6;
 import frc.robot.team2135.PhoenixUtil6;
 
@@ -48,7 +45,7 @@ public class Extension2 extends SubsystemBase
   private final double              kLigament2dOffset = -90.0; // Offset from mechanism root for extension ligament
 
   // Member objects
-  private final TalonFX             m_motor           = new TalonFX(Constants.Ports.kCANID_Extension);
+  private final TalonFX             m_motor           = new TalonFX(Ports.kCANID_Extension);
   private final TalonFXSimState     m_motorSim        = m_motor.getSimState( );
   private final SingleJointedArmSim m_armSim          =
       new SingleJointedArmSim(DCMotor.getFalcon500(1), EXConsts.kGearRatio, 1.0, EXConsts.kLengthStow, -Math.PI, Math.PI, false);

@@ -23,6 +23,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.EXConsts;
 import frc.robot.Constants.EXConsts.ExtensionLength;
 import frc.robot.Constants.EXConsts.ExtensionMode;
+import frc.robot.Constants.Ports;
 import frc.robot.RobotContainer;
 import frc.robot.lib.util.CTREConfigs;
 import frc.robot.team2135.PhoenixUtil;
@@ -37,7 +38,7 @@ public class Extension extends SubsystemBase
   private static final int      SLOTINDEX               = 0;   // Use first PID slot
 
   // Member objects
-  private final WPI_TalonFX     m_extension             = new WPI_TalonFX(Constants.Ports.kCANID_Extension);  //extension
+  private final WPI_TalonFX     m_extension             = new WPI_TalonFX(Ports.kCANID_Extension);  //extension
   // private final TalonFXSimCollection      m_extensionMotorSim     = new TalonFXSimCollection(m_extension);
   // private final SingleJointedArmSim       m_extensionSim          = new SingleJointedArmSim(DCMotor.getFalcon500(1),
   //     EXConsts.kExtensionGearRatio, 2.0, EXConsts.kForearmLengthMeters, 0.0, Math.PI, false);
