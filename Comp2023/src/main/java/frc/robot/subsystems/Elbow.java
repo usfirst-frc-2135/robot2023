@@ -107,7 +107,7 @@ public class Elbow extends SubsystemBase
     // This method will be called once per scheduler run
 
     m_currentDegrees = getTalonFXDegrees( );
-    m_mechLigament.setAngle(m_currentDegrees + kLigament2dOffset);
+    m_mechLigament.setAngle(kLigament2dOffset + m_currentDegrees);
     SmartDashboard.putNumber("EL_curDegrees", m_currentDegrees);
     SmartDashboard.putNumber("EL_targetDegrees", m_targetDegrees);
     SmartDashboard.putNumber("EL_CCDegrees", getCANCoderDegrees( ));

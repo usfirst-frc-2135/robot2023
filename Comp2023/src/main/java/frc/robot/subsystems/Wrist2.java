@@ -46,7 +46,7 @@ import frc.robot.team2135.PhoenixUtil6;
 public class Wrist2 extends SubsystemBase
 {
   // Constants
-  private final double              kLigament2dOffset = -90.0; // Offset from mechanism root for wrist ligament
+  private final double              kLigament2dOffset = 0.0; // Offset from mechanism root for wrist ligament
 
   // Member objects
   private final TalonFX             m_motor           = new TalonFX(Ports.kCANID_Wrist);
@@ -60,7 +60,7 @@ public class Wrist2 extends SubsystemBase
   private final Mechanism2d         m_mech            = new Mechanism2d(3, 3);
   private final MechanismRoot2d     m_mechRoot        = m_mech.getRoot("wrist", 1.5, 2);
   private final MechanismLigament2d m_mechLigament    =
-      m_mechRoot.append(new MechanismLigament2d("wrist", 1, kLigament2dOffset, 6, new Color8Bit(Color.kBlue)));
+      m_mechRoot.append(new MechanismLigament2d("wrist", 0.5, kLigament2dOffset, 6, new Color8Bit(Color.kPurple)));
 
   // Declare module variables
   private boolean                   m_motorValid;      // Health indicator for Falcon 
@@ -106,7 +106,7 @@ public class Wrist2 extends SubsystemBase
     // This method will be called once per scheduler run
 
     m_currentDegrees = getTalonFXDegrees( );
-    m_mechLigament.setAngle(m_currentDegrees + kLigament2dOffset);
+    m_mechLigament.setAngle(kLigament2dOffset - m_currentDegrees);
     SmartDashboard.putNumber("WR_curDegrees", m_currentDegrees);
     SmartDashboard.putNumber("WR_targetDegrees", m_targetDegrees);
     SmartDashboard.putNumber("WR_CCDegrees", getCANCoderDegrees( ));
@@ -161,7 +161,7 @@ public class Wrist2 extends SubsystemBase
 
   private double calculateTotalArbFF( )
   {
-    double elbowDegrees = RobotContainer.getInstance( ).m_wrist.getAngle( );
+    double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
     double wristDegrees = RobotContainer.getInstance( ).m_wrist.getAngle( );
 
     return WRConsts.kArbitraryFF * Math.cos(Math.toRadians(elbowDegrees - wristDegrees));
@@ -224,7 +224,7 @@ public class Wrist2 extends SubsystemBase
 
   public void moveWristWithJoystick(XboxController joystick)
   {
-    double axisValue = -joystick.getLeftY( );
+    double axisValue = -joystick.getRightY( );
     boolean rangeLimited = false;
     WristMode newMode = WristMode.WRIST_STOPPED;
 
@@ -233,14 +233,14 @@ public class Wrist2 extends SubsystemBase
     if (axisValue < 0.0)
     {
       if (m_currentDegrees > WRConsts.kAngleMin)
-        newMode = WRConsts.WristMode.WRIST_DOWN;
+        newMode = WRConsts.WristMode.WRIST_UP;
       else
         rangeLimited = true;
     }
     else if (axisValue > 0.0)
     {
       if (m_currentDegrees < WRConsts.kAngleMax)
-        newMode = WRConsts.WristMode.WRIST_UP;
+        newMode = WRConsts.WristMode.WRIST_DOWN;
       else
         rangeLimited = true;
     }
@@ -256,7 +256,7 @@ public class Wrist2 extends SubsystemBase
 
     m_targetDegrees = m_currentDegrees;
 
-    m_motor.setControl(m_requestVolts.withOutput(axisValue * WRConsts.kSpeedMaxManual));
+    m_motor.setControl(m_requestVolts.withOutput(axisValue * WRConsts.kManualSpeedVolts));
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
@@ -327,6 +327,10 @@ public class Wrist2 extends SubsystemBase
     // m_motor.setControl(m_requestVolts.withOutput(0.0)); // TODO: Is this needed? It fixed a bug in Motion Magic in v5 that should be fixed in v6
   }
 
+  ///////////////////////// MOTION MAGIC ///////////////////////////////////
+
+  // TODO: These were added during competition to allow cone scoring--needs to be reworked
+
   public void setMotorOutput(double brake)
   {
     m_motor.setControl(m_requestVolts.withOutput(brake));
@@ -371,9 +375,7 @@ public class Wrist2 extends SubsystemBase
     m_targetDegrees = m_currentDegrees;
 
     if (m_motorValid)
-      m_motor.setControl(m_requestVolts.withOutput(axisValue * WRConsts.kSpeedMaxManual));
+      m_motor.setControl(m_requestVolts.withOutput(axisValue * WRConsts.kManualSpeedVolts));
   }
-
-  ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
 }

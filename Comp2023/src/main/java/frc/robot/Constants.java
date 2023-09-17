@@ -290,7 +290,7 @@ public class Constants
     public static final double               kDegreesPerCount      = 360 / Falcon500.kEncoderCPR / kGearRatio;
     public static final double               kGripperLengthMeters  = 0.3;   // Sim value: 11.8 in
     public static final double               kGripperMassKg        = 3.0;   // Sim value: 6.6 lbs
-    public static final InvertedValue        kInvertMotor          = InvertedValue.Clockwise_Positive; // Motor direction for positive input
+    public static final InvertedValue        kInvertMotor          = InvertedValue.CounterClockwise_Positive; // Motor direction for positive input
 
     public static final double               kAngleMin             = -2.0;  // Wrist minimum allowable angle (a few degrees less than stowed)
     public static final double               kAngleStow            = 0.0;   // By definition - wrist is 90 degrees perpendicular to arm
@@ -327,7 +327,7 @@ public class Constants
       WRIST_UP            // Wrist moving up
     }
 
-    public static final double kSpeedMaxManual = 0.5;    // Motor percent output during manual operation
+    public static final double kManualSpeedVolts = 2.0;    // Motor voltage during manual operation
 
     // Motion Magic config parameters
 
