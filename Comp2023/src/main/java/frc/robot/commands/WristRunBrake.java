@@ -2,7 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.Wrist2;
 
 /**
  *
@@ -10,11 +10,11 @@ import frc.robot.subsystems.Wrist;
 public class WristRunBrake extends CommandBase
 {
 
-  private final Wrist   m_wrist;
+  private final Wrist2  m_wrist;
   private final Boolean m_brake;
   private int           m_loopCounter;
 
-  public WristRunBrake(Wrist wrist, boolean brake)
+  public WristRunBrake(Wrist2 wrist, boolean brake)
   {
     m_wrist = wrist;
     m_brake = brake;

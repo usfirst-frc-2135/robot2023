@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.AutoConstants.AutoChooser;
 import frc.robot.Constants.ELConsts;
+import frc.robot.Constants.WRConsts;
 import frc.robot.Constants.EXConsts.ExtensionLength;
 import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.LEDConsts.LEDColor;
@@ -58,7 +59,7 @@ import frc.robot.commands.ResetGyro;
 import frc.robot.commands.ResetOdometryToLimelight;
 import frc.robot.commands.SetELAngleZero;
 import frc.robot.commands.SetWRAngleZero;
-import frc.robot.commands.WristMoveToAngle;
+import frc.robot.commands.WristMoveToPosition;
 import frc.robot.commands.WristRun;
 import frc.robot.commands.WristRunBrake;
 import frc.robot.commands.WristRunConstant;
@@ -69,7 +70,7 @@ import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Power;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
-import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.Wrist2;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -92,7 +93,7 @@ public class RobotContainer
   // These subsystems can use LED or vision and must be created afterward
   public final Elbow                   m_elbow              = new Elbow( );
   public final Extension               m_extension          = new Extension( );
-  public final Wrist                   m_wrist              = new Wrist( );
+  public final Wrist2                  m_wrist              = new Wrist2( );
   public final Gripper                 m_gripper            = new Gripper( );
   public final Power                   m_power              = new Power( );
   public final Swerve                  m_swerve             = new Swerve( );
@@ -160,12 +161,12 @@ public class RobotContainer
     SmartDashboard.putData("ExtensionShelf", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_SHELF));
 
     // Wrist subsytem tests
-    SmartDashboard.putData("WristStow", new WristMoveToAngle(m_wrist, WristAngle.WRIST_STOW));
-    SmartDashboard.putData("WristIdle", new WristMoveToAngle(m_wrist, WristAngle.WRIST_IDLE));
-    SmartDashboard.putData("WristLow", new WristMoveToAngle(m_wrist, WristAngle.WRIST_LOW));
-    SmartDashboard.putData("WristMid", new WristMoveToAngle(m_wrist, WristAngle.WRIST_MID));
-    SmartDashboard.putData("WristHigh", new WristMoveToAngle(m_wrist, WristAngle.WRIST_HIGH));
-    SmartDashboard.putData("WristShelf", new WristMoveToAngle(m_wrist, WristAngle.WRIST_SHELF));
+    SmartDashboard.putData("WristStow", new WristMoveToPosition(m_wrist, WRConsts.kAngleStow));
+    SmartDashboard.putData("WristIdle", new WristMoveToPosition(m_wrist, WRConsts.kAngleIdle));
+    SmartDashboard.putData("WristLow", new WristMoveToPosition(m_wrist, WRConsts.kAngleScoreLow));
+    SmartDashboard.putData("WristMid", new WristMoveToPosition(m_wrist, WRConsts.kAngleScoreMid));
+    SmartDashboard.putData("WristHigh", new WristMoveToPosition(m_wrist, WRConsts.kAngleScoreHigh));
+    SmartDashboard.putData("WristShelf", new WristMoveToPosition(m_wrist, WRConsts.kAngleSubstation));
     SmartDashboard.putData("WristSetAngleToZero", new SetWRAngleZero(m_wrist));
 
     // Gripper subsystem test

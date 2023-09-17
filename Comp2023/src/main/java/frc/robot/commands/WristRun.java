@@ -2,7 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.Wrist2;
 
 /**
  *
@@ -10,11 +10,11 @@ import frc.robot.subsystems.Wrist;
 public class WristRun extends CommandBase
 {
 
-  private final Wrist    m_wrist;
+  private final Wrist2   m_wrist;
 
   private XboxController m_gamePad;
 
-  public WristRun(Wrist wrist, XboxController gamePad)
+  public WristRun(Wrist2 wrist, XboxController gamePad)
   {
     m_wrist = wrist;
     m_gamePad = gamePad;

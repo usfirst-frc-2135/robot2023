@@ -9,19 +9,20 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.ELConsts;
 import frc.robot.Constants.EXConsts.ExtensionLength;
 import frc.robot.Constants.GRConsts;
+import frc.robot.Constants.WRConsts;
 import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.WRConsts.WristAngle;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
 import frc.robot.subsystems.Gripper;
-import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.Wrist2;
 
 /**
  *
  */
 public class AutoPreloadHigh extends SequentialCommandGroup
 {
-  public AutoPreloadHigh(Elbow elbow, Extension extension, Wrist wrist, Gripper gripper)
+  public AutoPreloadHigh(Elbow elbow, Extension extension, Wrist2 wrist, Gripper gripper)
   {
     setName("AutoPreloadHigh");
 
@@ -30,7 +31,7 @@ public class AutoPreloadHigh extends SequentialCommandGroup
 
         // @formatter:off
         new PrintCommand(getName() + ": Making Sure Wrist is Set at Stow"),
-        new WristMoveToAngle(wrist, WristAngle.WRIST_STOW).asProxy(),
+        new WristMoveToPosition(wrist, WRConsts.kAngleStow).asProxy(),
 
         new PrintCommand(getName() + ": Holding Game Piece"), 
         new GripperRun(gripper, GRMode.GR_ACQUIRE),
@@ -45,7 +46,7 @@ public class AutoPreloadHigh extends SequentialCommandGroup
         new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_HIGH).asProxy(),
 
         new PrintCommand(getName() + ": Move Wrist for Preload"),   
-        new WristMoveToAngle(wrist, WristAngle.WRIST_SCORE).asProxy(),
+        new WristMoveToPosition(wrist, WRConsts.kAngleScore).asProxy(),
 
         new PrintCommand(getName() + ": AUTO: Gripper Score"),
         new GripperRun(gripper, GRConsts.GRMode.GR_EXPEL),

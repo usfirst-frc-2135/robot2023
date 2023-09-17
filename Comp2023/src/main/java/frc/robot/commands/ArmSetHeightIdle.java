@@ -7,18 +7,19 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.ELConsts;
+import frc.robot.Constants.WRConsts;
 import frc.robot.Constants.EXConsts.ExtensionLength;
 import frc.robot.Constants.WRConsts.WristAngle;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
-import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.Wrist2;
 
 /**
  *
  */
 public class ArmSetHeightIdle extends SequentialCommandGroup
 {
-  public ArmSetHeightIdle(Elbow elbow, Extension extension, Wrist wrist)
+  public ArmSetHeightIdle(Elbow elbow, Extension extension, Wrist2 wrist)
   {
     setName("ArmSetHeightIdle");
 
@@ -34,12 +35,12 @@ public class ArmSetHeightIdle extends SequentialCommandGroup
             new ElbowMoveToPosition(elbow,  ELConsts.kAngleIdle).asProxy(),
 
             new PrintCommand(getName() + ": Move Wrist"),
-            new WristMoveToAngle(wrist, WristAngle.WRIST_IDLE).asProxy()
+            new WristMoveToPosition(wrist, WRConsts.kAngleIdle).asProxy()
           ),
 
           new SequentialCommandGroup(
             new PrintCommand(getName() + ": Move Wrist"),
-            new WristMoveToAngle(wrist, WristAngle.WRIST_IDLE).asProxy(),
+            new WristMoveToPosition(wrist, WRConsts.kAngleIdle).asProxy(),
 
             new PrintCommand(getName() + ": Move Elbow"),
             new ElbowMoveToPosition(elbow,  ELConsts.kAngleIdle).asProxy()
