@@ -137,7 +137,7 @@ public final class CTREConfigs
 
     extensionConfig.motionCruiseVelocity = EXConsts.kMMVelocity;
     extensionConfig.motionAcceleration = EXConsts.kMMAcceleration;
-    extensionConfig.motionCurveStrength = EXConsts.kMMJerk;
+    extensionConfig.motionCurveStrength = 1;
 
     extensionConfig.neutralDeadband = EXConsts.kNeutralDeadband;
 
@@ -168,7 +168,7 @@ public final class CTREConfigs
 
     wristConfig.motionCruiseVelocity = WRConsts.kMMVelocity;
     wristConfig.motionAcceleration = WRConsts.kMMAcceleration;
-    wristConfig.motionCurveStrength = WRConsts.kMMSCurveStrength;
+    wristConfig.motionCurveStrength = 1;
 
     wristConfig.reverseSoftLimitThreshold = Conversions.degreesToFalcon(WRConsts.kAngleMin, WRConsts.kGearRatio);
     wristConfig.reverseSoftLimitEnable = true;

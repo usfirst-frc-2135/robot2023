@@ -275,11 +275,11 @@ public class Constants
     }
 
     public static final double kNeutralDeadband      = 0.001;  // Extension motor output deadband
-    public static final int    kMMVelocity           = 18728;  // Extension motion magic velocity (0.625 of max motor RPM)
-    public static final int    kMMAcceleration       = 12485;  // Extension motion magic acceleration (target velocity in 4/3s)
-    public static final int    kMMJerk               = 1;      // Extension motion magic S curve smoothing strength
-    public static final double kV                    = 0.0461; // Extension PID force constant
-    public static final double kPidKp                = 0.0246; // Extension PID proportional constant
+    public static final double kMMVelocity           = 59.81 / 2;  // TODO: Made slower for testing! Extension motion magic velocity (0.625 of max motor RPM)
+    public static final double kMMAcceleration       = 59.81 / 2;  // TODO: Made slower for testing! Extension motion magic acceleration (target velocity in 4/3s)
+    public static final double kMMJerk               = kMMAcceleration * 10;      // Extension motion magic S curve smoothing strength
+    public static final double kV                    = 0.1129; // Extension PID force constant
+    public static final double kPidKp                = 0.0591 * 8; // Extension PID proportional constant
     public static final double kPidKi                = 0.0;    // Extension PID integral constant
     public static final double kPidKd                = 0.0;    // Extension PID derivative constant
     public static final int    kAllowedError         = 0;      // Extension PID allowable closed loop error in counts
@@ -350,11 +350,11 @@ public class Constants
     }
 
     public static final double kNeutralDeadband  = 0.001;  // Wrist motor output deadband
-    public static final int    kMMVelocity       = 12075;  // Wrist motion magic velocity (75% of max motor RPM)
-    public static final int    kMMAcceleration   = 16100;  // Wrist motion magic acceleration (target velocity in 1/2s)
-    public static final int    kMMSCurveStrength = 1;      // Wrist motion magic S curve smoothing strength
-    public static final double kV                = 0.0466; // Wrist PID force constant
-    public static final double kPidKp            = 0.01968; // Wrist PID proportional constant
+    public static final double kMMVelocity       = 58.96 / 2;  // TODO: Made slower for testing! Wrist motion magic velocity (75% of max motor RPM)
+    public static final double kMMAcceleration   = 117.92 / 2;  // TODO: Made slower for testing! Wrist motion magic acceleration (target velocity in 1/2s)
+    public static final double kMMSCurveStrength = kMMAcceleration * 10;      // Wrist motion magic S curve smoothing strength
+    public static final double kV                = 0.1119; // Wrist PID force constant
+    public static final double kPidKp            = 0.0473 * 8; // Wrist PID proportional constant
     public static final double kPidKi            = 0.0;    // Wrist PID integral constant
     public static final double kPidKd            = 0.0;    // Wrist PID derivative constant
     public static final int    kAllowedError     = 0;      // Wrist PID allowable closed loop error in counts
