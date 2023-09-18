@@ -3,26 +3,26 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Wrist2;
+import frc.robot.subsystems.Wrist;
 
 /**
  *
  */
 public class WristMoveToPosition extends CommandBase
 {
-  private final Wrist2 m_wrist;
-  private boolean      m_holdPosition;
-  private double       m_newAngle;
+  private final Wrist m_wrist;
+  private boolean     m_holdPosition;
+  private double      m_newAngle;
 
   // Default command for holding current position
-  public WristMoveToPosition(Wrist2 wrist)
+  public WristMoveToPosition(Wrist wrist)
   {
     m_wrist = wrist;
     WristMoveToPositionCommon(true);
   }
 
   // Motion Magic movement to a new position
-  public WristMoveToPosition(Wrist2 wrist, double position)
+  public WristMoveToPosition(Wrist wrist, double position)
   {
     m_wrist = wrist;
     m_newAngle = position;

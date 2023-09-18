@@ -12,14 +12,14 @@ import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
 import frc.robot.subsystems.Gripper;
 import frc.robot.subsystems.Swerve;
-import frc.robot.subsystems.Wrist2;
+import frc.robot.subsystems.Wrist;
 
 /**
  *
  */
 public class AutoPreloadAndLeaveCommunityShort extends SequentialCommandGroup
 {
-  public AutoPreloadAndLeaveCommunityShort(Swerve swerve, Elbow elbow, Extension extension, Wrist2 wrist, Gripper gripper,
+  public AutoPreloadAndLeaveCommunityShort(Swerve swerve, Elbow elbow, Extension extension, Wrist wrist, Gripper gripper,
       String pathName, PathPlannerTrajectory trajectory)
   {
     setName("AutoPreloadAndLeaveCommunityShort");

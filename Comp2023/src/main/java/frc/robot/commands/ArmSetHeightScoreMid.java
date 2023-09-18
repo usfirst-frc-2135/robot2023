@@ -7,19 +7,18 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.ELConsts;
+import frc.robot.Constants.EXConsts;
 import frc.robot.Constants.WRConsts;
-import frc.robot.Constants.EXConsts.ExtensionLength;
-import frc.robot.Constants.WRConsts.WristAngle;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
-import frc.robot.subsystems.Wrist2;
+import frc.robot.subsystems.Wrist;
 
 /**
  *
  */
 public class ArmSetHeightScoreMid extends SequentialCommandGroup
 {
-  public ArmSetHeightScoreMid(Elbow elbow, Extension extension, Wrist2 wrist)
+  public ArmSetHeightScoreMid(Elbow elbow, Extension extension, Wrist wrist)
   {
     setName("ArmSetHeightScoreMid");
 
@@ -28,7 +27,7 @@ public class ArmSetHeightScoreMid extends SequentialCommandGroup
 
         // @formatter:off
         new PrintCommand(getName()+": Retract Extension"),
-        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_IDLE).asProxy(),
+        new ExtensionMoveToLength(extension, EXConsts.kLengthIdle).asProxy(),
 
         new ConditionalCommand(
           new SequentialCommandGroup(
@@ -50,7 +49,7 @@ public class ArmSetHeightScoreMid extends SequentialCommandGroup
         ),
 
         new PrintCommand(getName() + ": Extend Extension"),
-        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_MID).asProxy()
+        new ExtensionMoveToLength(extension, EXConsts.kLengthScoreMid).asProxy()
         // @formatter:on
     );
   }

@@ -6,19 +6,18 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.ELConsts;
+import frc.robot.Constants.EXConsts;
 import frc.robot.Constants.WRConsts;
-import frc.robot.Constants.EXConsts.ExtensionLength;
-import frc.robot.Constants.WRConsts.WristAngle;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
-import frc.robot.subsystems.Wrist2;
+import frc.robot.subsystems.Wrist;
 
 /**
  *
  */
 public class ArmSetHeightShelf extends SequentialCommandGroup
 {
-  public ArmSetHeightShelf(Elbow elbow, Extension extension, Wrist2 wrist)
+  public ArmSetHeightShelf(Elbow elbow, Extension extension, Wrist wrist)
   {
     setName("ArmSetHeightShelf");
 
@@ -33,7 +32,7 @@ public class ArmSetHeightShelf extends SequentialCommandGroup
         new WristMoveToPosition(wrist, WRConsts.kAngleSubstation).asProxy(),
         
         new PrintCommand(getName() + ": Moving Extension"),
-        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_SHELF).asProxy()
+        new ExtensionMoveToLength(extension, EXConsts.kLengthSubstation).asProxy()
         // @formatter:on
     );
   }

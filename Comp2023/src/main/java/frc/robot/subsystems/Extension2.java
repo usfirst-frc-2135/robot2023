@@ -39,7 +39,7 @@ import frc.robot.team2135.PhoenixUtil6;
 //
 // Extension subsystem class
 //
-public class Extension2 extends SubsystemBase
+public class Extension extends SubsystemBase
 {
   // Constants
   private final double              kLigament2dOffset = -90.0; // Offset from mechanism root for extension ligament
@@ -58,7 +58,6 @@ public class Extension2 extends SubsystemBase
 
   // Declare module variables
   private boolean                   m_motorValid;      // Health indicator for Falcon 
-  private boolean                   m_ccValid;         // Health indicator for CANCoder 
 
   private ExtensionMode             m_mode            = ExtensionMode.EXTENSION_INIT;     // Manual movement mode with joysticks
 
@@ -72,9 +71,10 @@ public class Extension2 extends SubsystemBase
   private double                    m_totalArbFeedForward;   // Arbitrary feedforward added to counteract gravity
 
   private Timer                     m_safetyTimer     = new Timer( ); // Safety timer for movements
+  private boolean                   m_calibrated;  // Indicates whether the elbow has been calibrated
 
   // Constructor
-  public Extension2( )
+  public Extension( )
   {
     setName("Extension");
     setSubsystem("Extension");
@@ -98,6 +98,15 @@ public class Extension2 extends SubsystemBase
     // This method will be called once per scheduler run
 
     m_currentInches = getCurrInches( );
+
+    // if (curCounts < 0)
+    // {
+    //   m_.setNeutralMode(NeutralMode.Coast);
+    //   curCounts = 0;
+    //   m_.setSelectedSensorPosition(curCounts, PIDINDEX, Constants.kCANTimeoutMs);
+    //   m_TargetDegrees = elbowCountsToDegrees(curCounts);
+    // }
+
     m_mechLigament.setLength(m_currentInches + kLigament2dOffset);
     SmartDashboard.putNumber("EX_curInches", m_currentInches);
     SmartDashboard.putNumber("EX_targetInches", m_targetInches);
@@ -133,7 +142,6 @@ public class Extension2 extends SubsystemBase
   {
     // Initialize dashboard widgets
     SmartDashboard.putBoolean("HL_validEX", m_motorValid);
-    SmartDashboard.putBoolean("HL_validEXCC", m_ccValid);
     SmartDashboard.putData("ExtensionMech", m_mech);
   }
 
@@ -210,7 +218,7 @@ public class Extension2 extends SubsystemBase
 
   public void moveExtensionWithJoystick(XboxController joystick)
   {
-    double axisValue = -joystick.getLeftY( );
+    double axisValue = joystick.getRightX( );
     boolean rangeLimited = false;
     ExtensionMode newMode = ExtensionMode.EXTENSION_STOPPED;
 
@@ -219,14 +227,14 @@ public class Extension2 extends SubsystemBase
     if (axisValue < 0.0)
     {
       if (m_currentInches > EXConsts.kLengthMin)
-        newMode = ExtensionMode.EXTENSION_OUT; //TODO: Check
+        newMode = ExtensionMode.EXTENSION_IN; //TODO: Check
       else
         rangeLimited = true;
     }
     else if (axisValue > 0.0)
     {
       if (m_currentInches < EXConsts.kLengthMax) //TODO: Check
-        newMode = ExtensionMode.EXTENSION_IN;
+        newMode = ExtensionMode.EXTENSION_OUT;
       else
         rangeLimited = true;
     }
@@ -242,7 +250,7 @@ public class Extension2 extends SubsystemBase
 
     m_targetInches = m_currentInches;
 
-    m_motor.setControl(m_requestVolts.withOutput(axisValue * EXConsts.kExtensionSpeedMaxManual)); // TODO: Check
+    m_motor.setControl(m_requestVolts.withOutput(axisValue * EXConsts.kManualSpeedVolts)); // TODO: Check FF and volts
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
@@ -312,5 +320,30 @@ public class Extension2 extends SubsystemBase
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
+
+  // TODO: fix these
+  public void moveToCalibrate( )
+  {
+    if (m_motorValid)
+      m_motor.setControl(m_requestVolts.withOutput(EXConsts.kSpeedCalibrate));
+  }
+
+  public void calibrate( )
+  {
+    if (m_motorValid)
+      m_motor.setRotorPosition(0.0);
+
+    m_targetInches = 0.0;
+    m_currentInches = 0.0;
+    m_calibrated = true;
+    SmartDashboard.putBoolean("EL_calibrated", m_calibrated);
+  }
+
+  private double calculateTotalFF( )
+  {
+    double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
+
+    return EXConsts.kArbitraryFF * Math.cos(Math.toRadians(elbowDegrees));
+  }
 
 }

@@ -43,7 +43,7 @@ import frc.robot.team2135.PhoenixUtil6;
 //
 // Wrist subsystem class
 //
-public class Wrist2 extends SubsystemBase
+public class Wrist extends SubsystemBase
 {
   // Constants
   private final double              kLigament2dOffset = 0.0; // Offset from mechanism root for wrist ligament
@@ -80,7 +80,7 @@ public class Wrist2 extends SubsystemBase
   private Timer                     m_safetyTimer     = new Timer( ); // Safety timer for movements
 
   // Constructor
-  public Wrist2( )
+  public Wrist( )
   {
     setName("Wrist2");
     setSubsystem("Wrist2");

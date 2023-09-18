@@ -209,66 +209,55 @@ public class Constants
   {
     // Global settings
 
-    public static final double        kGearRatio            = 18.23; // Gear reduction for extension
-    public static final double        kDrumDiameterInches   = 1.375; // Drum diameter in inches
-    public static final double        kDrumCircumInches     = kDrumDiameterInches * Math.PI;            // Drum diameter in inches
-    public static final double        kRolloutRatio         = kDrumCircumInches / kGearRatio;  // inches per shaft rotation
-    public static final double        kInchesPerCount       = kRolloutRatio / Falcon500.kEncoderCPR;
+    public static final double        kGearRatio                = 18.23; // Gear reduction for extension
+    public static final double        kDrumDiameterInches       = 1.375; // Drum diameter in inches
+    public static final double        kDrumCircumInches         = kDrumDiameterInches * Math.PI;            // Drum diameter in inches
+    public static final double        kRolloutRatio             = kDrumCircumInches / kGearRatio;  // inches per shaft rotation
+    public static final double        kInchesPerCount           = kRolloutRatio / Falcon500.kEncoderCPR; // TODO: fix
     // public static final double  kForearmLengthMeters        = 1.22;   // Sim value: 48 inches (no sim for extension)
     // public static final double  kForearmMassKg              = 6.0;    // Sim value: 13.2 lbs 
-    public static final InvertedValue kInvertMotor          = InvertedValue.Clockwise_Positive; //TODO: see which diection is correct  // Motor direction for positive input
-    public static final double        kSpeedCalibrate       = -0.15; // Motor percent output during calibration
 
     // Extension lengths increase by 0.95" per 90 degrees of elbow rotation (lengths manually adjusted below)
-    public static final double        kLengthMin            = -0.5;  // Extension minimum allowable length (half inch less than stowed)
-    public static final double        kLengthStow           = 0.0;   // By definition - extension fully retracted
-    public static final double        kLengthIdle           = 0.25;  // Slightly off mechanical hard stop
-    public static final double        kLengthScoreLow       = 8.0;   // From Mech Design (floor, feet art 5" high), empirically checked
-    public static final double        kLengthScoreMid       = 1.25;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), empirically checked
-    public static final double        kLengthScoreHigh      = 17.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked
-    public static final double        kLengthSubstation     = 1.25;  // From Mech Design (3'1-38" above floor)
-    public static final double        kLengthMax            = 18.0;  // Extension maximum allowable length (2" beyond high length)
+    public static final double        kLengthMin                = -0.5;  // Extension minimum allowable length (half inch less than stowed)
+    public static final double        kLengthStow               = 0.0;   // By definition - extension fully retracted
+    public static final double        kLengthIdle               = 0.25;  // Slightly off mechanical hard stop
+    public static final double        kLengthScoreLow           = 8.0;   // From Mech Design (floor, feet art 5" high), empirically checked
+    public static final double        kLengthScoreMid           = 1.25;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), empirically checked
+    public static final double        kLengthScoreHigh          = 17.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked
+    public static final double        kLengthSubstation         = 1.25;  // From Mech Design (3'1-38" above floor)
+    public static final double        kLengthMax                = 18.0;  // Extension maximum allowable length (2" beyond high length)
+
+    public static final InvertedValue kInvertMotor              = InvertedValue.Clockwise_Positive; //TODO: see which direction is correct  // Motor direction for positive input
+    public static final double        kSpeedCalibrate           = -2.0; // Motor voltage during calibration
 
     // Current limit settings - extension
-    public static final double        kSupplyCurrentLimit   = 15.0;  // Supply current limit (after trigger)
-    public static final double        kSupplyTriggerCurrent = 15.0;  // Supply trigger current that will cause limiting
-    public static final double        kSupplyTriggerTime    = 0.001; // Supply time duration of trigger that will causing limiting
-    public static final double        kStatorCurrentLimit   = 15.0;  // Stator current limit (after trigger)
-    public static final double        kStatorTriggerCurrent = 15.0;  // Stator trigger current that will cause limiting
-    public static final double        kStatorTriggerTime    = 0.001; // Stator time duration of trigger that will causing limiting
+    public static final double        kSupplyCurrentLimit       = 15.0;  // Supply current limit (after trigger)
+    public static final double        kSupplyTriggerCurrent     = 15.0;  // Supply trigger current that will cause limiting
+    public static final double        kSupplyTriggerTime        = 0.001; // Supply time duration of trigger that will causing limiting
+    public static final boolean       kSupplyCurrentLimitEnable = true;  // Supply current enable
+
+    public static final double        kStatorCurrentLimit       = 15.0;  // Stator current limit (after trigger)
+    public static final boolean       kStatorCurrentLimitEnable = false; // Stator current enable
+
+    public static final double        kNeutralDeadband          = 0.001;  // Extension motor output deadband
 
     // CANCoder extension absolute offset
-    public static final boolean       kInvertCANCoder       = false; // CANCoder direction for positive angle in relative mode
-    public static final boolean       kCalibrated           = true;  // Indicates whether the extension has been calibrated by CANCoder
-    public static final double        kCompOffset           = 0.000; // CANCoder offset for comp bot
-    public static final double        kBetaOffset           = 0.000; // CANCoder offset for beta bot
+    public static final boolean       kCalibrated               = true;  // Indicates whether the extension has been calibrated by CANCoder
 
     // Manual config parameters
 
     public enum ExtensionMode
     {
       EXTENSION_INIT,         // Initialize extension
-      EXTENSION_OUT,         // Extension moving out
+      EXTENSION_OUT,          // Extension moving out
       EXTENSION_STOPPED,      // Extension stop and hold position
       EXTENSION_IN            // Extension moving in
     }
 
-    public static final double kExtensionSpeedMaxManual = 0.3;    // Motor percent output during manual operation
+    public static final double kManualSpeedVolts     = 3.0;    // Motor voltage during manual operation
 
     // Motion Magic config parameters
 
-    public enum ExtensionLength
-    {
-      EXTENSION_NOCHANGE,     // No change in extension length--maintain current position
-      EXTENSION_STOW,         // Move extension to stow length
-      EXTENSION_IDLE,         // Move extension to idle length
-      EXTENSION_LOW,          // Move extension to low-scoring length
-      EXTENSION_MID,          // Move extension to shelf length
-      EXTENSION_HIGH,         // Move extension to high-scoring length
-      EXTENSION_SHELF,        // Move extension to high-scoring length
-    }
-
-    public static final double kNeutralDeadband      = 0.001;  // Extension motor output deadband
     public static final double kMMVelocity           = 59.81 / 2;  // TODO: Made slower for testing! Extension motion magic velocity (0.625 of max motor RPM)
     public static final double kMMAcceleration       = 59.81 / 2;  // TODO: Made slower for testing! Extension motion magic acceleration (target velocity in 4/3s)
     public static final double kMMJerk               = kMMAcceleration * 10;      // Extension motion magic S curve smoothing strength
@@ -286,36 +275,38 @@ public class Constants
   {
     // Global settings
 
-    public static final double               kGearRatio            = 213.9;   // Gear reduction for wrist
-    public static final double               kDegreesPerCount      = 360 / Falcon500.kEncoderCPR / kGearRatio;
-    public static final double               kGripperLengthMeters  = 0.3;   // Sim value: 11.8 in
-    public static final double               kGripperMassKg        = 3.0;   // Sim value: 6.6 lbs
-    public static final InvertedValue        kInvertMotor          = InvertedValue.CounterClockwise_Positive; // Motor direction for positive input
+    public static final double               kGearRatio                = 213.9;   // Gear reduction for wrist
+    public static final double               kDegreesPerCount          = 360 / Falcon500.kEncoderCPR / kGearRatio;
+    public static final double               kGripperLengthMeters      = 0.3;   // Sim value: 11.8 in
+    public static final double               kGripperMassKg            = 3.0;   // Sim value: 6.6 lbs
 
-    public static final double               kAngleMin             = -2.0;  // Wrist minimum allowable angle (a few degrees less than stowed)
-    public static final double               kAngleStow            = 0.0;   // By definition - wrist is 90 degrees perpendicular to arm
-    public static final double               kAngleIdle            = 2.0;   // Slightly off stowed value
-    public static final double               kAngleScoreLow        = 33.0;  // From Mech Design (floor, feet art 5" high), empirically checked
-    public static final double               kAngleScoreMid        = kAngleIdle;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), ready to score
-    public static final double               kAngleScoreHigh       = kAngleIdle;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
-    public static final double               kAngleScore           = 90;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
-    public static final double               kAngleSubstation      = 100.0; // From Mech Design (3'1-38" above floor)
-    public static final double               kAngleMax             = 110.0; // Wrist maximum allowable angle (a few degrees more than substation/horizontal)
+    public static final double               kAngleMin                 = -2.0;  // Wrist minimum allowable angle (a few degrees less than stowed)
+    public static final double               kAngleStow                = 0.0;   // By definition - wrist is 90 degrees perpendicular to arm
+    public static final double               kAngleIdle                = 2.0;   // Slightly off stowed value
+    public static final double               kAngleScoreLow            = 33.0;  // From Mech Design (floor, feet art 5" high), empirically checked
+    public static final double               kAngleScoreMid            = kAngleIdle;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), ready to score
+    public static final double               kAngleScoreHigh           = kAngleIdle;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
+    public static final double               kAngleScore               = 90;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
+    public static final double               kAngleSubstation          = 100.0; // From Mech Design (3'1-38" above floor)
+    public static final double               kAngleMax                 = 110.0; // Wrist maximum allowable angle (a few degrees more than substation/horizontal)
+
+    public static final InvertedValue        kInvertMotor              = InvertedValue.CounterClockwise_Positive; // Motor direction for positive input
 
     // Current limit settings - wrist
-    public static final double               kSupplyCurrentLimit   = 10.0;   // Supply current limit (after trigger)
-    public static final double               kSupplyTriggerCurrent = 10.0;   // Supply trigger current that will cause limiting
-    public static final double               kSupplyTriggerTime    = 0.001; // Supply time duration of trigger that will causing limiting
-    public static final double               kStatorCurrentLimit   = 10.0;   // Stator current limit (after trigger)
-    public static final double               kStatorTriggerCurrent = 10.0;   // Stator trigger current that will cause limiting
-    public static final double               kStatorTriggerTime    = 0.001; // Stator time duration of trigger that will causing limiting
+    public static final double               kSupplyCurrentLimit       = 10.0;   // Supply current limit (after trigger)
+    public static final double               kSupplyTriggerCurrent     = 10.0;   // Supply trigger current that will cause limiting
+    public static final double               kSupplyTriggerTime        = 0.001; // Supply time duration of trigger that will causing limiting
+    public static final boolean              kSupplyCurrentLimitEnable = true;  // Supply current enable
+
+    public static final double               kStatorCurrentLimit       = 10.0;   // Stator current limit (after trigger)
+    public static final boolean              kStatorCurrentLimitEnable = false; // Stator current enable
 
     // CANCoder wrist absolute offset
-    public static final SensorDirectionValue kInvertCANCoder       = SensorDirectionValue.Clockwise_Positive;  // TODO: CANCoder direction for positive angle in relative mode
-    public static final boolean              kCalibrated           = true;  // Indicates whether the wrist has been calibrated by CANCoder
-    public static final double               kCompOffset           = 133.418; // CANCoder offset angle for comp bot
-    public static final double               kBetaOffset           = 0.000; // CANCoder offset angle for beta bot
-    public static final SensorDirectionValue kSensorDirection      = SensorDirectionValue.Clockwise_Positive;
+    public static final SensorDirectionValue kInvertCANCoder           = SensorDirectionValue.Clockwise_Positive;  // TODO: CANCoder direction for positive angle in relative mode
+    public static final boolean              kCalibrated               = true;  // Indicates whether the wrist has been calibrated by CANCoder
+    public static final double               kCompOffset               = 133.418; // CANCoder offset angle for comp bot
+    public static final double               kBetaOffset               = 0.000; // CANCoder offset angle for beta bot
+    public static final SensorDirectionValue kSensorDirection          = SensorDirectionValue.Clockwise_Positive;
 
     // Manual config parameters
 

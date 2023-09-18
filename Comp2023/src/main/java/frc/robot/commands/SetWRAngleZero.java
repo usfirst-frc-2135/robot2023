@@ -4,16 +4,16 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Wrist2;
+import frc.robot.subsystems.Wrist;
 
 /**
  *
  */
 public class SetWRAngleZero extends CommandBase
 {
-  private final Wrist2 m_wrist;
+  private final Wrist m_wrist;
 
-  public SetWRAngleZero(Wrist2 wrist)
+  public SetWRAngleZero(Wrist wrist)
   {
     m_wrist = wrist;
 

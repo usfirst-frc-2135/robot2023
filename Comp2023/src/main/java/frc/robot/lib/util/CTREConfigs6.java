@@ -96,10 +96,10 @@ public final class CTREConfigs6
     wrConfig.CurrentLimits.SupplyCurrentLimit = WRConsts.kSupplyCurrentLimit;
     wrConfig.CurrentLimits.SupplyCurrentThreshold = WRConsts.kSupplyTriggerCurrent;
     wrConfig.CurrentLimits.SupplyTimeThreshold = WRConsts.kSupplyTriggerTime;
-    // wrConfig.CurrentLimits.SupplyCurrentLimitEnable = WRConsts.kSupplyCurrentLimitEnable;
+    wrConfig.CurrentLimits.SupplyCurrentLimitEnable = WRConsts.kSupplyCurrentLimitEnable;
 
     wrConfig.CurrentLimits.StatorCurrentLimit = WRConsts.kStatorCurrentLimit;
-    // wrConfig.CurrentLimits.StatorCurrentLimitEnable = WRConsts.kStatorCurrentLimitEnable;
+    wrConfig.CurrentLimits.StatorCurrentLimitEnable = WRConsts.kStatorCurrentLimitEnable;
 
     // Feedback settings
     // wrConfig.Feedback.*
@@ -165,10 +165,10 @@ public final class CTREConfigs6
     exConfig.CurrentLimits.SupplyCurrentLimit = EXConsts.kSupplyCurrentLimit;
     exConfig.CurrentLimits.SupplyCurrentThreshold = EXConsts.kSupplyTriggerCurrent;
     exConfig.CurrentLimits.SupplyTimeThreshold = EXConsts.kSupplyTriggerTime;
-    // exConfig.CurrentLimits.SupplyCurrentLimitEnable = EXConsts.kSupplyCurrentLimitEnable;
+    exConfig.CurrentLimits.SupplyCurrentLimitEnable = EXConsts.kSupplyCurrentLimitEnable;
 
     exConfig.CurrentLimits.StatorCurrentLimit = EXConsts.kStatorCurrentLimit;
-    // exConfig.CurrentLimits.StatorCurrentLimitEnable = EXConsts.kStatorCurrentLimitEnable;
+    exConfig.CurrentLimits.StatorCurrentLimitEnable = EXConsts.kStatorCurrentLimitEnable;
 
     // Feedback settings
     // exConfig.Feedback.*

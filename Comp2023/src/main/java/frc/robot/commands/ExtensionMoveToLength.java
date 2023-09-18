@@ -4,7 +4,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.EXConsts.ExtensionLength;
 import frc.robot.subsystems.Extension;
 
 /**
@@ -13,9 +12,9 @@ import frc.robot.subsystems.Extension;
 public class ExtensionMoveToLength extends CommandBase
 {
   private final Extension m_extension;
-  private ExtensionLength m_length;
+  private double          m_length;
 
-  public ExtensionMoveToLength(Extension extension, ExtensionLength length)
+  public ExtensionMoveToLength(Extension extension, double length)
   {
     m_extension = extension;
     m_length = length;
@@ -28,28 +27,28 @@ public class ExtensionMoveToLength extends CommandBase
   @Override
   public void initialize( )
   {
-    m_extension.moveExtensionLengthInit(m_length);
+    m_extension.moveExtensionToPositionInit(m_length, false);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute( )
   {
-    m_extension.moveExtensionLengthExecute( );
+    m_extension.moveExtensionToPositionExecute( );
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted)
   {
-    m_extension.moveExtensionLengthEnd( );
+    m_extension.moveExtensionToPositionEnd( );
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished( )
   {
-    return m_extension.moveExtensionLengthIsFinished( );
+    return m_extension.moveExtensionToPositionIsFinished( );
   }
 
   @Override

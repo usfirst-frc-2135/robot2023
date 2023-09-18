@@ -7,22 +7,21 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.ELConsts;
-import frc.robot.Constants.EXConsts.ExtensionLength;
+import frc.robot.Constants.EXConsts;
 import frc.robot.Constants.GRConsts;
-import frc.robot.Constants.WRConsts;
 import frc.robot.Constants.GRConsts.GRMode;
-import frc.robot.Constants.WRConsts.WristAngle;
+import frc.robot.Constants.WRConsts;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
 import frc.robot.subsystems.Gripper;
-import frc.robot.subsystems.Wrist2;
+import frc.robot.subsystems.Wrist;
 
 /**
  *
  */
 public class AutoPreloadHigh extends SequentialCommandGroup
 {
-  public AutoPreloadHigh(Elbow elbow, Extension extension, Wrist2 wrist, Gripper gripper)
+  public AutoPreloadHigh(Elbow elbow, Extension extension, Wrist wrist, Gripper gripper)
   {
     setName("AutoPreloadHigh");
 
@@ -43,7 +42,7 @@ public class AutoPreloadHigh extends SequentialCommandGroup
         new ElbowMoveToPosition(elbow, ELConsts.kAngleScoreHigh).asProxy(),
 
         new PrintCommand(getName() + ": Move Extension for Preload"),   
-        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_HIGH).asProxy(),
+        new ExtensionMoveToLength(extension, EXConsts.kLengthScoreHigh).asProxy(),
 
         new PrintCommand(getName() + ": Move Wrist for Preload"),   
         new WristMoveToPosition(wrist, WRConsts.kAngleScore).asProxy(),
@@ -51,7 +50,7 @@ public class AutoPreloadHigh extends SequentialCommandGroup
         new PrintCommand(getName() + ": AUTO: Gripper Score"),
         new GripperRun(gripper, GRConsts.GRMode.GR_EXPEL),
 
-        new ExtensionMoveToLength(extension, ExtensionLength.EXTENSION_MID).asProxy(),
+        new ExtensionMoveToLength(extension, EXConsts.kLengthScoreMid).asProxy(),
         new GripperRun(gripper, GRConsts.GRMode.GR_STOP),
 
         new PrintCommand(getName() + ": AUTO: Move Arm Down"),

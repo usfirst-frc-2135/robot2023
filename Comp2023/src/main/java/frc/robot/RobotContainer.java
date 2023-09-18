@@ -24,12 +24,11 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.AutoConstants.AutoChooser;
 import frc.robot.Constants.ELConsts;
-import frc.robot.Constants.WRConsts;
-import frc.robot.Constants.EXConsts.ExtensionLength;
+import frc.robot.Constants.EXConsts;
 import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.VIConsts.VIGoalDirection;
-import frc.robot.Constants.WRConsts.WristAngle;
+import frc.robot.Constants.WRConsts;
 import frc.robot.commands.ArmSetHeightIdle;
 import frc.robot.commands.ArmSetHeightScoreHigh;
 import frc.robot.commands.ArmSetHeightScoreLow;
@@ -70,7 +69,7 @@ import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Power;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
-import frc.robot.subsystems.Wrist2;
+import frc.robot.subsystems.Wrist;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -93,7 +92,7 @@ public class RobotContainer
   // These subsystems can use LED or vision and must be created afterward
   public final Elbow                   m_elbow              = new Elbow( );
   public final Extension               m_extension          = new Extension( );
-  public final Wrist2                  m_wrist              = new Wrist2( );
+  public final Wrist                   m_wrist              = new Wrist( );
   public final Gripper                 m_gripper            = new Gripper( );
   public final Power                   m_power              = new Power( );
   public final Swerve                  m_swerve             = new Swerve( );
@@ -153,12 +152,12 @@ public class RobotContainer
     SmartDashboard.putData("ElbowSetAngleToZero", new SetELAngleZero(m_elbow));
 
     // Extension subsytem tests
-    SmartDashboard.putData("ExtensionStow", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_STOW));
-    SmartDashboard.putData("ExtensionIdle", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_IDLE));
-    SmartDashboard.putData("ExtensionLow", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_LOW));
-    SmartDashboard.putData("ExtensionMid", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_MID));
-    SmartDashboard.putData("ExtensionHigh", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_HIGH));
-    SmartDashboard.putData("ExtensionShelf", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_SHELF));
+    SmartDashboard.putData("ExtensionStow", new ExtensionMoveToLength(m_extension, EXConsts.kLengthStow));
+    SmartDashboard.putData("ExtensionIdle", new ExtensionMoveToLength(m_extension, EXConsts.kLengthIdle));
+    SmartDashboard.putData("ExtensionLow", new ExtensionMoveToLength(m_extension, EXConsts.kLengthScoreLow));
+    SmartDashboard.putData("ExtensionMid", new ExtensionMoveToLength(m_extension, EXConsts.kLengthScoreMid));
+    SmartDashboard.putData("ExtensionHigh", new ExtensionMoveToLength(m_extension, EXConsts.kLengthScoreHigh));
+    SmartDashboard.putData("ExtensionShelf", new ExtensionMoveToLength(m_extension, EXConsts.kLengthSubstation));
 
     // Wrist subsytem tests
     SmartDashboard.putData("WristStow", new WristMoveToPosition(m_wrist, WRConsts.kAngleStow));

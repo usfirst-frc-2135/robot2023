@@ -162,7 +162,7 @@ public class Elbow extends SubsystemBase
 
   private double calculateTotalArbFF( )
   {
-    double extensionLength = RobotContainer.getInstance( ).m_extension.getInches( );
+    double extensionLength = RobotContainer.getInstance( ).m_extension.getCurrentInches( );
 
     return Math.sin(Math.toRadians(m_currentDegrees))
         * (ELConsts.kArbitraryFF + ELConsts.kExtArbFF * ((extensionLength) / EXConsts.kLengthMax));
