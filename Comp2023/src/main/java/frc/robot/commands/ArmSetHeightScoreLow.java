@@ -46,7 +46,7 @@ public class ArmSetHeightScoreLow extends SequentialCommandGroup
             new ElbowMoveToPosition(elbow,  ELConsts.kAngleScoreLow).asProxy()
           ),
 
-          elbow::isElbowBelowLow
+          elbow::isBelowLow
         ),
 
         new PrintCommand(getName() + ": Extend Extension"),

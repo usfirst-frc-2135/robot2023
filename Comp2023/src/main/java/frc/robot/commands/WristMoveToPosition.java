@@ -40,28 +40,28 @@ public class WristMoveToPosition extends CommandBase
   @Override
   public void initialize( )
   {
-    m_wrist.moveWristToPositionInit(m_newAngle, m_holdPosition);
+    m_wrist.moveToPositionInit(m_newAngle, m_holdPosition);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute( )
   {
-    m_wrist.moveWristToPositionExecute( );
+    m_wrist.moveToPositionExecute( );
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted)
   {
-    m_wrist.moveWristToPositionEnd( );
+    m_wrist.moveToPositionEnd( );
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished( )
   {
-    return (m_holdPosition) ? false : m_wrist.moveWristToPositionIsFinished( ); // Command exits if not holding a position
+    return (m_holdPosition) ? false : m_wrist.moveToPositionIsFinished( ); // Command exits if not holding a position
   }
 
   @Override

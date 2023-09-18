@@ -9,11 +9,11 @@ import frc.robot.subsystems.Elbow;
 /**
  *
  */
-public class SetELAngleZero extends CommandBase
+public class ElbowSetAngleZero extends CommandBase
 {
   private final Elbow m_elbow;
 
-  public SetELAngleZero(Elbow elbow)
+  public ElbowSetAngleZero(Elbow elbow)
   {
     m_elbow = elbow;
 
@@ -24,7 +24,7 @@ public class SetELAngleZero extends CommandBase
   @Override
   public void initialize( )
   {
-    m_elbow.setElbowAngleToZero( );
+    m_elbow.setAngleToZero( );
   }
 
   // Called every time the scheduler runs while the command is scheduled.

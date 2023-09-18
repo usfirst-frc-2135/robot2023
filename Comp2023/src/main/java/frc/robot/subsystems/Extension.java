@@ -82,7 +82,7 @@ public class Extension extends SubsystemBase
     m_motorValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_motor, "extension", CTREConfigs6.extensionLengthFXConfig( ));
 
     if (Robot.isReal( ))
-      m_currentInches = getCurrInches( );
+      m_currentInches = getCurrentInches( );
     m_motor.setRotorPosition(inchesToOutputRotations(m_currentInches));
     DataLogManager.log(String.format("%s: CANCoder initial inches %.1f", getSubsystem( ), m_currentInches));
 
@@ -97,7 +97,7 @@ public class Extension extends SubsystemBase
   {
     // This method will be called once per scheduler run
 
-    m_currentInches = getCurrInches( );
+    m_currentInches = getCurrentInches( );
 
     // if (curCounts < 0)
     // {
@@ -147,9 +147,9 @@ public class Extension extends SubsystemBase
 
   public void initialize( )
   {
-    setExtensionStopped( );
+    setStopped( );
 
-    m_currentInches = getCurrInches( );
+    m_currentInches = getCurrentInches( );
     m_targetInches = m_currentInches;
     DataLogManager.log(String.format("%s: Subsystem initialized! Target Inches: %.1f", getSubsystem( ), m_targetInches));
   }
@@ -163,7 +163,7 @@ public class Extension extends SubsystemBase
 
   ///////////////////////// PUBLIC HELPERS ///////////////////////////////////
 
-  public double getCurrInches( )
+  public double getCurrentInches( )
   {
     return rotationsToOutputInches(m_motor.getRotorPosition( ).refresh( ).getValue( ));
   }
@@ -178,17 +178,17 @@ public class Extension extends SubsystemBase
     return inches * EXConsts.kRolloutRatio;
   }
 
-  public boolean isExtensionBelowIdle( )
+  public boolean isBelowIdle( )
   {
     return m_currentInches < EXConsts.kLengthIdle;
   }
 
-  public boolean isExtensionBelowLow( )
+  public boolean isBelowLow( )
   {
     return m_currentInches < EXConsts.kLengthScoreLow;
   }
 
-  public boolean isExtensionBelowMid( )
+  public boolean isBelowMid( )
   {
     return m_currentInches < EXConsts.kLengthScoreMid;
   }
@@ -203,12 +203,12 @@ public class Extension extends SubsystemBase
     return (Math.abs(targetInches - m_currentInches) < EXConsts.kToleranceInches);
   }
 
-  public void setExtensionLengthToZero( )
+  public void setLengthToZero( )
   {
     m_motor.setRotorPosition(inchesToOutputRotations(0));
   }
 
-  public void setExtensionStopped( )
+  public void setStopped( )
   {
     DataLogManager.log(String.format("%s: now STOPPED", getSubsystem( )));
     m_motor.setControl(m_requestVolts.withOutput(0.0));
@@ -216,7 +216,7 @@ public class Extension extends SubsystemBase
 
   ///////////////////////// MANUAL MOVEMENT ///////////////////////////////////
 
-  public void moveExtensionWithJoystick(XboxController joystick)
+  public void moveWithJoystick(XboxController joystick)
   {
     double axisValue = joystick.getRightX( );
     boolean rangeLimited = false;
@@ -255,12 +255,12 @@ public class Extension extends SubsystemBase
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
-  public void moveExtensionToPositionInit(double newLength, boolean holdPosition)
+  public void moveToPositionInit(double newLength, boolean holdPosition)
   {
     m_safetyTimer.restart( );
 
     if (holdPosition)
-      newLength = getCurrInches( );
+      newLength = getCurrentInches( );
 
     // Decide if a new position request
     if (holdPosition || newLength != m_targetInches || !isWithinTolerance(newLength))
@@ -289,14 +289,14 @@ public class Extension extends SubsystemBase
     }
   }
 
-  public void moveExtensionToPositionExecute( )
+  public void moveToPositionExecute( )
   {
     if (EXConsts.kCalibrated)
       m_motor.setControl(m_requestMMVolts.withPosition(inchesToOutputRotations(m_targetInches)));
     // .withFeedForward(m_totalArbFeedForward)); // TODO - once extension is fixed and Tuner X is used
   }
 
-  public boolean moveExtensionToPositionIsFinished( )
+  public boolean moveToPositionIsFinished( )
   { //TODO: check
     boolean timedOut = m_safetyTimer.hasElapsed(EXConsts.kMMSafetyTimeoutRatio); //TODO: check
     double error = m_targetInches - m_currentInches;
@@ -313,7 +313,7 @@ public class Extension extends SubsystemBase
     return m_moveIsFinished;
   }
 
-  public void moveExtensionToPositionEnd( )
+  public void moveToPositionEnd( )
   {
     m_safetyTimer.stop( );
     // m_motor.setControl(m_requestVolts.withOutput(0.0)); // TODO: Is this needed? It fixed a bug in Motion Magic in v5 that should be fixed in v6

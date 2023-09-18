@@ -153,7 +153,7 @@ public class Elbow extends SubsystemBase
 
   public void initialize( )
   {
-    setElbowStopped( );
+    setStopped( );
 
     m_currentDegrees = getTalonFXDegrees( );
     m_targetDegrees = m_currentDegrees;
@@ -185,17 +185,17 @@ public class Elbow extends SubsystemBase
     return Conversions.rotationsToOutputDegrees(m_motor.getRotorPosition( ).refresh( ).getValue( ), ELConsts.kGearRatio);
   }
 
-  public boolean isElbowBelowIdle( )
+  public boolean isBelowIdle( )
   {
     return m_currentDegrees < ELConsts.kAngleIdle;
   }
 
-  public boolean isElbowBelowLow( )
+  public boolean isBelowLow( )
   {
     return m_currentDegrees < ELConsts.kAngleScoreLow;
   }
 
-  public boolean isElbowBelowMid( )
+  public boolean isBelowMid( )
   {
     return m_currentDegrees < ELConsts.kAngleScoreMid;
   }
@@ -210,12 +210,12 @@ public class Elbow extends SubsystemBase
     return (Math.abs(targetDegrees - m_currentDegrees) < ELConsts.kToleranceDegrees);
   }
 
-  public void setElbowAngleToZero( )
+  public void setAngleToZero( )
   {
     m_motor.setRotorPosition(Conversions.degreesToInputRotations(0, ELConsts.kGearRatio));
   }
 
-  public void setElbowStopped( )
+  public void setStopped( )
   {
     DataLogManager.log(String.format("%s: now STOPPED", getSubsystem( )));
     m_motor.setControl(m_requestVolts.withOutput(0.0));
@@ -223,7 +223,7 @@ public class Elbow extends SubsystemBase
 
   ///////////////////////// MANUAL MOVEMENT ///////////////////////////////////
 
-  public void moveElbowWithJoystick(XboxController joystick)
+  public void moveWithJoystick(XboxController joystick)
   {
     double axisValue = -joystick.getLeftY( );
     boolean rangeLimited = false;
@@ -262,7 +262,7 @@ public class Elbow extends SubsystemBase
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
-  public void moveElbowToPositionInit(double newAngle, boolean holdPosition)
+  public void moveToPositionInit(double newAngle, boolean holdPosition)
   {
     m_safetyTimer.restart( );
 
@@ -297,7 +297,7 @@ public class Elbow extends SubsystemBase
     }
   }
 
-  public void moveElbowToPositionExecute( )
+  public void moveToPositionExecute( )
   {
     if (ELConsts.kCalibrated)
       m_motor
@@ -305,7 +305,7 @@ public class Elbow extends SubsystemBase
     // .withFeedForward(m_totalArbFeedForward)); // TODO - once extension is fixed and Tuner X is used
   }
 
-  public boolean moveElbowToPositionIsFinished( )
+  public boolean moveToPositionIsFinished( )
   {
     boolean timedOut = m_safetyTimer.hasElapsed(ELConsts.kMMSafetyTimeout);
     double error = m_targetDegrees - m_currentDegrees;
@@ -322,7 +322,7 @@ public class Elbow extends SubsystemBase
     return m_moveIsFinished;
   }
 
-  public void moveElbowToPositionEnd( )
+  public void moveToPositionEnd( )
   {
     m_safetyTimer.stop( );
     // m_motor.setControl(m_requestVolts.withOutput(0.0)); // TODO: Is this needed? It fixed a bug in Motion Magic in v5 that should be fixed in v6

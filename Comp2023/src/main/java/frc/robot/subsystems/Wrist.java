@@ -152,7 +152,7 @@ public class Wrist extends SubsystemBase
 
   public void initialize( )
   {
-    setWristStopped( );
+    setStopped( );
 
     m_currentDegrees = getTalonFXDegrees( );
     m_targetDegrees = m_currentDegrees;
@@ -184,17 +184,17 @@ public class Wrist extends SubsystemBase
     return Conversions.rotationsToOutputDegrees(m_motor.getRotorPosition( ).refresh( ).getValue( ), WRConsts.kGearRatio);
   }
 
-  public boolean isWristBelowIdle( )
+  public boolean isBelowIdle( )
   {
     return m_currentDegrees < WRConsts.kAngleIdle;
   }
 
-  public boolean isWristBelowLow( )
+  public boolean isBelowLow( )
   {
     return m_currentDegrees < WRConsts.kAngleScoreLow;
   }
 
-  public boolean isWristBelowMid( )
+  public boolean isBelowMid( )
   {
     return m_currentDegrees < WRConsts.kAngleScoreMid;
   }
@@ -209,12 +209,12 @@ public class Wrist extends SubsystemBase
     return (Math.abs(targetDegrees - m_currentDegrees) < WRConsts.kToleranceDegrees);
   }
 
-  public void setWristAngleToZero( )
+  public void setAngleToZero( )
   {
     m_motor.setRotorPosition(Conversions.degreesToInputRotations(0, WRConsts.kGearRatio));
   }
 
-  public void setWristStopped( )
+  public void setStopped( )
   {
     DataLogManager.log(String.format("%s: now STOPPED", getSubsystem( )));
     m_motor.setControl(m_requestVolts.withOutput(0.0));
@@ -222,7 +222,7 @@ public class Wrist extends SubsystemBase
 
   ///////////////////////// MANUAL MOVEMENT ///////////////////////////////////
 
-  public void moveWristWithJoystick(XboxController joystick)
+  public void moveWithJoystick(XboxController joystick)
   {
     double axisValue = -joystick.getRightY( );
     boolean rangeLimited = false;
@@ -261,7 +261,7 @@ public class Wrist extends SubsystemBase
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
-  public void moveWristToPositionInit(double newAngle, boolean holdPosition)
+  public void moveToPositionInit(double newAngle, boolean holdPosition)
   {
     m_safetyTimer.restart( );
 
@@ -296,7 +296,7 @@ public class Wrist extends SubsystemBase
     }
   }
 
-  public void moveWristToPositionExecute( )
+  public void moveToPositionExecute( )
   {
     if (WRConsts.kCalibrated)
       m_motor
@@ -304,7 +304,7 @@ public class Wrist extends SubsystemBase
     // .withFeedForward(m_totalArbFeedForward)); // TODO - once extension is fixed and Tuner X is used
   }
 
-  public boolean moveWristToPositionIsFinished( )
+  public boolean moveToPositionIsFinished( )
   {
     boolean timedOut = m_safetyTimer.hasElapsed(WRConsts.kMMSafetyTimeout);
     double error = m_targetDegrees - m_currentDegrees;
@@ -321,7 +321,7 @@ public class Wrist extends SubsystemBase
     return m_moveIsFinished;
   }
 
-  public void moveWristToPositionEnd( )
+  public void moveToPositionEnd( )
   {
     m_safetyTimer.stop( );
     // m_motor.setControl(m_requestVolts.withOutput(0.0)); // TODO: Is this needed? It fixed a bug in Motion Magic in v5 that should be fixed in v6
@@ -336,12 +336,12 @@ public class Wrist extends SubsystemBase
     m_motor.setControl(m_requestVolts.withOutput(brake));
   }
 
-  public void moveWristConstantSpeed(double speed)
+  public void moveConstantSpeed(double speed)
   {
-    moveWristInput(speed);
+    moveInput(speed);
   }
 
-  public void moveWristInput(double axisValue)
+  public void moveInput(double axisValue)
   {
     boolean outOfRange = false;
     WristMode newMode = WristMode.WRIST_STOPPED;

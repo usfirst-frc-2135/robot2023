@@ -45,7 +45,7 @@ public class ArmSetHeightIdle extends SequentialCommandGroup
             new ElbowMoveToPosition(elbow,  ELConsts.kAngleIdle).asProxy()
           ),
 
-          elbow::isElbowBelowIdle
+          elbow::isBelowIdle
         ),
 
         new PrintCommand(getName() + ": Extend Extension"),

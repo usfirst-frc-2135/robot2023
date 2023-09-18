@@ -9,11 +9,11 @@ import frc.robot.subsystems.Wrist;
 /**
  *
  */
-public class SetWRAngleZero extends CommandBase
+public class WristSetAngleZero extends CommandBase
 {
   private final Wrist m_wrist;
 
-  public SetWRAngleZero(Wrist wrist)
+  public WristSetAngleZero(Wrist wrist)
   {
     m_wrist = wrist;
 
@@ -24,7 +24,7 @@ public class SetWRAngleZero extends CommandBase
   @Override
   public void initialize( )
   {
-    m_wrist.setWristAngleToZero( );
+    m_wrist.setAngleToZero( );
   }
 
   // Called every time the scheduler runs while the command is scheduled.

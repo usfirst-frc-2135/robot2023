@@ -41,28 +41,28 @@ public class ElbowMoveToPosition extends CommandBase
   @Override
   public void initialize( )
   {
-    m_elbow.moveElbowToPositionInit(m_newAngle, m_holdPosition);
+    m_elbow.moveToPositionInit(m_newAngle, m_holdPosition);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute( )
   {
-    m_elbow.moveElbowToPositionExecute( );
+    m_elbow.moveToPositionExecute( );
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted)
   {
-    m_elbow.moveElbowToPositionEnd( );
+    m_elbow.moveToPositionEnd( );
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished( )
   {
-    return (m_holdPosition) ? false : m_elbow.moveElbowToPositionIsFinished( ); // Command exits if not holding a position
+    return (m_holdPosition) ? false : m_elbow.moveToPositionIsFinished( ); // Command exits if not holding a position
   }
 
   @Override

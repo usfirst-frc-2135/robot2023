@@ -45,7 +45,7 @@ public class ArmSetHeightScoreMid extends SequentialCommandGroup
             new PrintCommand(getName() + ": Move Elbow"),
             new ElbowMoveToPosition(elbow,  ELConsts.kAngleScoreMid).asProxy()
           ),
-          elbow::isElbowBelowMid
+          elbow::isBelowMid
         ),
 
         new PrintCommand(getName() + ": Extend Extension"),

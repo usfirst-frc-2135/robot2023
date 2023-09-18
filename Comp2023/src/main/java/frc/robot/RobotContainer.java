@@ -56,8 +56,8 @@ import frc.robot.commands.LEDSet;
 import frc.robot.commands.ManualMode;
 import frc.robot.commands.ResetGyro;
 import frc.robot.commands.ResetOdometryToLimelight;
-import frc.robot.commands.SetELAngleZero;
-import frc.robot.commands.SetWRAngleZero;
+import frc.robot.commands.ElbowSetAngleZero;
+import frc.robot.commands.WristSetAngleZero;
 import frc.robot.commands.WristMoveToPosition;
 import frc.robot.commands.WristRun;
 import frc.robot.commands.WristRunBrake;
@@ -149,7 +149,7 @@ public class RobotContainer
     SmartDashboard.putData("ElbowMid", new ElbowMoveToPosition(m_elbow, ELConsts.kAngleScoreMid));
     SmartDashboard.putData("ElbowHigh", new ElbowMoveToPosition(m_elbow, ELConsts.kAngleScoreHigh));
     SmartDashboard.putData("ElbowShelf", new ElbowMoveToPosition(m_elbow, ELConsts.kAngleSubstation));
-    SmartDashboard.putData("ElbowSetAngleToZero", new SetELAngleZero(m_elbow));
+    SmartDashboard.putData("ElbowSetAngleToZero", new ElbowSetAngleZero(m_elbow));
 
     // Extension subsytem tests
     SmartDashboard.putData("ExtensionStow", new ExtensionMoveToLength(m_extension, EXConsts.kLengthStow));
@@ -166,7 +166,7 @@ public class RobotContainer
     SmartDashboard.putData("WristMid", new WristMoveToPosition(m_wrist, WRConsts.kAngleScoreMid));
     SmartDashboard.putData("WristHigh", new WristMoveToPosition(m_wrist, WRConsts.kAngleScoreHigh));
     SmartDashboard.putData("WristShelf", new WristMoveToPosition(m_wrist, WRConsts.kAngleSubstation));
-    SmartDashboard.putData("WristSetAngleToZero", new SetWRAngleZero(m_wrist));
+    SmartDashboard.putData("WristSetAngleToZero", new WristSetAngleZero(m_wrist));
 
     // Gripper subsystem test
     SmartDashboard.putData("GripperStop", new GripperRun(m_gripper, GRMode.GR_STOP));
@@ -325,8 +325,8 @@ public class RobotContainer
     m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_elbow, m_driverPad));
 
     m_elbow.setDefaultCommand(new ElbowMoveToPosition(m_elbow));
-    // m_extension.setDefaultCommand(new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_NOCHANGE));
-    // m_wrist.setDefaultCommand(new WristMoveToAngle(m_wrist, WristAngle.WRIST_NOCHANGE));
+    // m_extension.setDefaultCommand(new ExtensionMoveToLength(m_extension));
+    // m_wrist.setDefaultCommand(new WristMoveToAngle(m_wrist));
 
     // m_elbow.setDefaultCommand(new ElbowRun(m_elbow, m_operatorPad));
     m_extension.setDefaultCommand(new ExtensionRun(m_extension, m_operatorPad));

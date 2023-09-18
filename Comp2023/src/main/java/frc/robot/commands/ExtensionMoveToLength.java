@@ -27,28 +27,28 @@ public class ExtensionMoveToLength extends CommandBase
   @Override
   public void initialize( )
   {
-    m_extension.moveExtensionToPositionInit(m_length, false);
+    m_extension.moveToPositionInit(m_length, false);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute( )
   {
-    m_extension.moveExtensionToPositionExecute( );
+    m_extension.moveToPositionExecute( );
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted)
   {
-    m_extension.moveExtensionToPositionEnd( );
+    m_extension.moveToPositionEnd( );
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished( )
   {
-    return m_extension.moveExtensionToPositionIsFinished( );
+    return m_extension.moveToPositionIsFinished( );
   }
 
   @Override
