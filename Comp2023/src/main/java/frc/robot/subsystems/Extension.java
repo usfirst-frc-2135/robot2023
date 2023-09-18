@@ -13,13 +13,14 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
-import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -33,6 +34,7 @@ import frc.robot.Constants.EXConsts.ExtensionMode;
 import frc.robot.Constants.Ports;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
+import frc.robot.lib.math.Conversions;
 import frc.robot.lib.util.CTREConfigs6;
 import frc.robot.team2135.PhoenixUtil6;
 
@@ -42,22 +44,24 @@ import frc.robot.team2135.PhoenixUtil6;
 public class Extension extends SubsystemBase
 {
   // Constants
-  private final double              kLigament2dOffset = -90.0; // Offset from mechanism root for extension ligament
+  private final double              kLigament2dOffset = 0.0; // Offset from mechanism root for extension ligament
 
   // Member objects
   private final TalonFX             m_motor           = new TalonFX(Ports.kCANID_Extension);
   private final TalonFXSimState     m_motorSim        = m_motor.getSimState( );
-  private final SingleJointedArmSim m_armSim          =
-      new SingleJointedArmSim(DCMotor.getFalcon500(1), EXConsts.kGearRatio, 1.0, EXConsts.kLengthStow, -Math.PI, Math.PI, false);
+  private final ElevatorSim         m_armSim          = new ElevatorSim(DCMotor.getFalcon500(1), EXConsts.kGearRatio,
+      EXConsts.kForearmMassKg, Units.inchesToMeters(EXConsts.kDrumDiameterInches / 2), EXConsts.kForearmLengthMeters,
+      EXConsts.kForearmLengthMeters + 0.5, false);
 
   // Mechanism2d
   private final Mechanism2d         m_mech            = new Mechanism2d(3, 3);
-  private final MechanismRoot2d     m_mechRoot        = m_mech.getRoot("extension", 1.5, 2);
+  private final MechanismRoot2d     m_mechRoot        = m_mech.getRoot("extension", 0.5, 1.5);
   private final MechanismLigament2d m_mechLigament    =
-      m_mechRoot.append(new MechanismLigament2d("extension", 1, kLigament2dOffset, 6, new Color8Bit(Color.kBlue)));
+      m_mechRoot.append(new MechanismLigament2d("extension", 1, kLigament2dOffset, 6, new Color8Bit(Color.kRed)));
 
   // Declare module variables
   private boolean                   m_motorValid;      // Health indicator for Falcon 
+  private boolean                   m_calibrated      = true;
 
   private ExtensionMode             m_mode            = ExtensionMode.EXTENSION_INIT;     // Manual movement mode with joysticks
 
@@ -71,7 +75,6 @@ public class Extension extends SubsystemBase
   private double                    m_totalArbFeedForward;   // Arbitrary feedforward added to counteract gravity
 
   private Timer                     m_safetyTimer     = new Timer( ); // Safety timer for movements
-  private boolean                   m_calibrated;  // Indicates whether the elbow has been calibrated
 
   // Constructor
   public Extension( )
@@ -107,7 +110,7 @@ public class Extension extends SubsystemBase
     //   m_TargetDegrees = elbowCountsToDegrees(curCounts);
     // }
 
-    m_mechLigament.setLength(m_currentInches + kLigament2dOffset);
+    m_mechLigament.setLength(Units.inchesToMeters(m_currentInches + kLigament2dOffset));
     SmartDashboard.putNumber("EX_curInches", m_currentInches);
     SmartDashboard.putNumber("EX_targetInches", m_targetInches);
 
@@ -131,8 +134,10 @@ public class Extension extends SubsystemBase
     m_armSim.update(0.020);
 
     // // Finally, we set our simulated encoder's readings and simulated battery voltage TODO: Match for extension
-    // m_motorSim.setRawRotorPosition(inchesToOutputRotations(m_armSim.( )));
-    // m_motorSim.setRotorVelocity(Conversions.radiansToInputRotations(m_armSim.getVelocityRadPerSec( ), EXConsts.kGearRatio));
+    m_motorSim.setRawRotorPosition(
+        Conversions.metersToInputRotations(m_armSim.getPositionMeters( ), Units.inchesToMeters(EXConsts.kRolloutRatio)));
+    m_motorSim.setRotorVelocity(
+        Conversions.metersToInputRotations(m_armSim.getVelocityMetersPerSecond( ), Units.inchesToMeters(EXConsts.kRolloutRatio)));
 
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps( )));
@@ -246,6 +251,8 @@ public class Extension extends SubsystemBase
     {
       m_mode = newMode;
       DataLogManager.log(String.format("%s: move %s %s", getSubsystem( ), m_mode, ((rangeLimited) ? " - RANGE LIMITED" : "")));
+      DataLogManager.log(String.format("%s: move %s %.1f in %s", getSubsystem( ), m_mode, getCurrentInches( ),
+          ((rangeLimited) ? " - RANGE LIMITED" : "")));
     }
 
     m_targetInches = m_currentInches;
@@ -291,13 +298,13 @@ public class Extension extends SubsystemBase
 
   public void moveToPositionExecute( )
   {
-    if (EXConsts.kCalibrated)
+    if (m_calibrated)
       m_motor.setControl(m_requestMMVolts.withPosition(inchesToOutputRotations(m_targetInches)));
     // .withFeedForward(m_totalArbFeedForward)); // TODO - once extension is fixed and Tuner X is used
   }
 
   public boolean moveToPositionIsFinished( )
-  { //TODO: check
+  {
     boolean timedOut = m_safetyTimer.hasElapsed(EXConsts.kMMSafetyTimeoutRatio); //TODO: check
     double error = m_targetInches - m_currentInches;
 
@@ -325,7 +332,7 @@ public class Extension extends SubsystemBase
   public void moveToCalibrate( )
   {
     if (m_motorValid)
-      m_motor.setControl(m_requestVolts.withOutput(EXConsts.kSpeedCalibrate));
+      m_motor.setControl(m_requestVolts.withOutput(EXConsts.kCalibrateSpeedVolts));
   }
 
   public void calibrate( )

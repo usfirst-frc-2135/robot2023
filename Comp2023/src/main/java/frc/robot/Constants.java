@@ -101,20 +101,9 @@ public class Constants
 
   public static final class Falcon500
   {
-    public static int          kMaxRPM           = 6380;             // free speed for Falcon 500 motor
-    public static final double kEncoderCPR       = 2048;             // CPR is 2048 from Falcon 500 Manual
-    public static final int    kTalonReqVersion  = ((22 * 256) + 0); // Talon version is 23.0
-    public static final int    kPigeonReqVersion = ((22 * 256) + 0); // Pigeon IMU version is 23.0
-
-    // // Input current limit settings - default
-    // public static final double kSupplyCurrentLimit   = 45.0;  // Default supply current limit (after trigger)
-    // public static final double kSupplyTriggerCurrent = 45.0;  // Trigger current that will cause limiting
-    // public static final double kSupplyTriggerTime    = 0.001; // Time duration of trigger that will causing limiting
-
-    // // Output current limit settings - default
-    // public static final double kStatorCurrentLimit   = 80.0;  // Default supply current limit (after trigger)
-    // public static final double kStatorTriggerCurrent = 80.0;  // Default trigger current that will cause limiting
-    // public static final double kStatorTriggerTime    = 0.001; // Default time duration of trigger that will causing limiting
+    public static int          kMaxRPM             = 6380;             // free speed for Falcon 500 motor
+    public static final double kEncoderCPR         = 2048;             // CPR is 2048 from Falcon 500 Manual
+    public static final int    kTalonSRXReqVersion = ((23 * 256) + 0); // Talon version is 23.0
   }
 
   public static final class LLConsts
@@ -168,7 +157,6 @@ public class Constants
     public static final double               kNeutralDeadband          = 0.001; // Elbow motor output deadband
 
     // CANCoder elbow absolute offset
-    public static final boolean              kCalibrated               = true;    // TODO: Indicates whether the elbow has been calibrated by CANCoder
     public static final double               kCompOffset               = -0.6965; // CANCoder offset rotations for comp bot
     public static final double               kBetaOffset               = 0.000;   // TODO: CANCoder offset rotations for beta bot
     public static final SensorDirectionValue kSensorDirection          = SensorDirectionValue.Clockwise_Positive;
@@ -188,8 +176,8 @@ public class Constants
     // Motion Magic config parameters
 
     // TODO - all should be re-tuned using Tuner X
-    public static final double kMMVelocity       = 81.28 / 2;          // TODO: (temporary slowdown for testing!) Elbow motion magic velocity (75% of max motor RPM)
-    public static final double kMMAcceleration   = 121.9 / 2;          // TODO: (temporary slowdown for testing!) Elbow motion magic acceleration (target velocity in 2/3s)
+    public static final double kMMVelocity       = 81.28 / 2;      // TODO: (temporary slowdown for testing!) Elbow motion magic velocity (75% of max motor RPM)
+    public static final double kMMAcceleration   = 121.9 / 2;      // TODO: (temporary slowdown for testing!) Elbow motion magic acceleration (target velocity in 2/3s)
     public static final double kMMJerk           = kMMAcceleration * 10; // Elbow motion magic jerk limit
     public static final double kS                = 0.20;           // kS - voltage constant to overcome friction
     public static final double kV                = 0.1107;         // kV - voltage constant per desired RPM
@@ -211,11 +199,10 @@ public class Constants
 
     public static final double        kGearRatio                = 18.23; // Gear reduction for extension
     public static final double        kDrumDiameterInches       = 1.375; // Drum diameter in inches
-    public static final double        kDrumCircumInches         = kDrumDiameterInches * Math.PI;            // Drum diameter in inches
+    public static final double        kDrumCircumInches         = kDrumDiameterInches * Math.PI;   // Drum diameter in inches
     public static final double        kRolloutRatio             = kDrumCircumInches / kGearRatio;  // inches per shaft rotation
-    public static final double        kInchesPerCount           = kRolloutRatio / Falcon500.kEncoderCPR; // TODO: fix
-    // public static final double  kForearmLengthMeters        = 1.22;   // Sim value: 48 inches (no sim for extension)
-    // public static final double  kForearmMassKg              = 6.0;    // Sim value: 13.2 lbs 
+    public static final double        kForearmLengthMeters      = 1.0;   // Sim value: 48 inches
+    public static final double        kForearmMassKg            = 6.0;    // Sim value: 13.2 lbs 
 
     // Extension lengths increase by 0.95" per 90 degrees of elbow rotation (lengths manually adjusted below)
     public static final double        kLengthMin                = -0.5;  // Extension minimum allowable length (half inch less than stowed)
@@ -227,8 +214,7 @@ public class Constants
     public static final double        kLengthSubstation         = 1.25;  // From Mech Design (3'1-38" above floor)
     public static final double        kLengthMax                = 18.0;  // Extension maximum allowable length (2" beyond high length)
 
-    public static final InvertedValue kInvertMotor              = InvertedValue.Clockwise_Positive; //TODO: see which direction is correct  // Motor direction for positive input
-    public static final double        kSpeedCalibrate           = -2.0; // Motor voltage during calibration
+    public static final InvertedValue kInvertMotor              = InvertedValue.CounterClockwise_Positive; // Motor direction for positive input
 
     // Current limit settings - extension
     public static final double        kSupplyCurrentLimit       = 15.0;  // Supply current limit (after trigger)
@@ -236,13 +222,13 @@ public class Constants
     public static final double        kSupplyTriggerTime        = 0.001; // Supply time duration of trigger that will causing limiting
     public static final boolean       kSupplyCurrentLimitEnable = true;  // Supply current enable
 
-    public static final double        kStatorCurrentLimit       = 15.0;  // Stator current limit (after trigger)
+    public static final double        kStatorCurrentLimit       = 40.0;  // Stator current limit (after trigger)
     public static final boolean       kStatorCurrentLimitEnable = false; // Stator current enable
 
     public static final double        kNeutralDeadband          = 0.001;  // Extension motor output deadband
 
-    // CANCoder extension absolute offset
-    public static final boolean       kCalibrated               = true;  // Indicates whether the extension has been calibrated by CANCoder
+    // Calibration
+    public static final double        kCalibrateSpeedVolts      = -2.0; // Motor voltage during calibration
 
     // Manual config parameters
 
@@ -258,17 +244,17 @@ public class Constants
 
     // Motion Magic config parameters
 
-    public static final double kMMVelocity           = 59.81 / 2;  // TODO: Made slower for testing! Extension motion magic velocity (0.625 of max motor RPM)
-    public static final double kMMAcceleration       = 59.81 / 2;  // TODO: Made slower for testing! Extension motion magic acceleration (target velocity in 4/3s)
-    public static final double kMMJerk               = kMMAcceleration * 10;      // Extension motion magic S curve smoothing strength
-    public static final double kV                    = 0.1129; // Extension PID force constant
-    public static final double kPidKp                = 0.0591 * 8; // Extension PID proportional constant
-    public static final double kPidKi                = 0.0;    // Extension PID integral constant
-    public static final double kPidKd                = 0.0;    // Extension PID derivative constant
-    public static final int    kAllowedError         = 0;      // Extension PID allowable closed loop error in counts
-    public static final double kToleranceInches      = 0.5;    // Extension PID tolerance in inches
-    public static final double kArbitraryFF          = -0.030; // Extension motor output for extension when fully retracted
-    public static final double kMMSafetyTimeoutRatio = 0.16;    // Seconds allowed for a Motion Magic movement
+    public static final double kMMVelocity           = 59.81 / 2;    // TODO: Made slower for testing! Extension motion magic velocity (0.625 of max motor RPM)
+    public static final double kMMAcceleration       = 59.81 / 2;    // TODO: Made slower for testing! Extension motion magic acceleration (target velocity in 4/3s)
+    public static final double kMMJerk               = kMMAcceleration * 10;  // Extension motion magic S curve smoothing strength
+    public static final double kV                    = 0.1129;       // Extension PID force constant
+    public static final double kPidKp                = 0.0591 * 8;   // Extension PID proportional constant
+    public static final double kPidKi                = 0.0;          // Extension PID integral constant
+    public static final double kPidKd                = 0.0;          // Extension PID derivative constant
+    public static final int    kAllowedError         = 0;            // Extension PID allowable closed loop error in counts
+    public static final double kToleranceInches      = 0.5;          // Extension PID tolerance in inches
+    public static final double kArbitraryFF          = -0.030;       // Extension motor output for extension when fully retracted
+    public static final double kMMSafetyTimeoutRatio = 0.16;         // Seconds allowed for a Motion Magic movement
   }
 
   public static final class WRConsts
@@ -276,7 +262,6 @@ public class Constants
     // Global settings
 
     public static final double               kGearRatio                = 213.9;   // Gear reduction for wrist
-    public static final double               kDegreesPerCount          = 360 / Falcon500.kEncoderCPR / kGearRatio;
     public static final double               kGripperLengthMeters      = 0.3;   // Sim value: 11.8 in
     public static final double               kGripperMassKg            = 3.0;   // Sim value: 6.6 lbs
 
@@ -298,12 +283,12 @@ public class Constants
     public static final double               kSupplyTriggerTime        = 0.001; // Supply time duration of trigger that will causing limiting
     public static final boolean              kSupplyCurrentLimitEnable = true;  // Supply current enable
 
-    public static final double               kStatorCurrentLimit       = 10.0;   // Stator current limit (after trigger)
+    public static final double               kStatorCurrentLimit       = 40.0;   // Stator current limit (after trigger)
     public static final boolean              kStatorCurrentLimitEnable = false; // Stator current enable
 
+    public static final double               kNeutralDeadband          = 0.001;          // Wrist motor output deadband
+
     // CANCoder wrist absolute offset
-    public static final SensorDirectionValue kInvertCANCoder           = SensorDirectionValue.Clockwise_Positive;  // TODO: CANCoder direction for positive angle in relative mode
-    public static final boolean              kCalibrated               = true;  // Indicates whether the wrist has been calibrated by CANCoder
     public static final double               kCompOffset               = 133.418; // CANCoder offset angle for comp bot
     public static final double               kBetaOffset               = 0.000; // CANCoder offset angle for beta bot
     public static final SensorDirectionValue kSensorDirection          = SensorDirectionValue.Clockwise_Positive;
@@ -322,30 +307,17 @@ public class Constants
 
     // Motion Magic config parameters
 
-    public enum WristAngle
-    {
-      WRIST_NOCHANGE,     // No change in wrist angle--maintain current position
-      WRIST_STOW,         // Move wrist to stow position
-      WRIST_IDLE,         // Move wrist to stow position
-      WRIST_LOW,          // Move wrist to low-scoring angle
-      WRIST_MID,          // Move wrist to shelf angle; slightly higher than mid-scoring angle so this is used for both
-      WRIST_HIGH,         // Move wrist to high-scoring angle
-      WRIST_SHELF,        // Move wrist to substation loading shelf angle
-      WRIST_SCORE         // Move wrist to scoring height 
-    }
-
-    public static final double kNeutralDeadband  = 0.001;  // Wrist motor output deadband
-    public static final double kMMVelocity       = 58.96 / 2;  // TODO: Made slower for testing! Wrist motion magic velocity (75% of max motor RPM)
-    public static final double kMMAcceleration   = 117.92 / 2;  // TODO: Made slower for testing! Wrist motion magic acceleration (target velocity in 1/2s)
-    public static final double kMMSCurveStrength = kMMAcceleration * 10;      // Wrist motion magic S curve smoothing strength
-    public static final double kV                = 0.1119; // Wrist PID force constant
-    public static final double kPidKp            = 0.0473 * 8; // Wrist PID proportional constant
-    public static final double kPidKi            = 0.0;    // Wrist PID integral constant
-    public static final double kPidKd            = 0.0;    // Wrist PID derivative constant
-    public static final int    kAllowedError     = 0;      // Wrist PID allowable closed loop error in counts
-    public static final double kToleranceDegrees = 2.0;    // Wrist PID tolerance in degrees (1 deg is 0.25" at 15" length)
-    public static final double kArbitraryFF      = -0.034; // Wrist motor output for 90 degrees
-    public static final double kMMSafetyTimeout  = 3;    // Seconds allowed for a Motion Magic movement
+    public static final double kMMVelocity       = 58.96 / 2;      // TODO: Made slower for testing! Wrist motion magic velocity (75% of max motor RPM)
+    public static final double kMMAcceleration   = 117.92 / 2;     // TODO: Made slower for testing! Wrist motion magic acceleration (target velocity in 1/2s)
+    public static final double kMMSCurveStrength = kMMAcceleration * 10; // Wrist motion magic S curve smoothing strength
+    public static final double kV                = 0.1119;         // Wrist PID force constant
+    public static final double kPidKp            = 0.0473 * 8;     // Wrist PID proportional constant
+    public static final double kPidKi            = 0.0;            // Wrist PID integral constant
+    public static final double kPidKd            = 0.0;            // Wrist PID derivative constant
+    public static final int    kAllowedError     = 0;              // Wrist PID allowable closed loop error in counts
+    public static final double kToleranceDegrees = 2.0;            // Wrist PID tolerance in degrees (1 deg is 0.25" at 15" length)
+    public static final double kArbitraryFF      = -0.034;         // Wrist motor output for 90 degrees
+    public static final double kMMSafetyTimeout  = 3;              // Seconds allowed for a Motion Magic movement
   }
 
   public static final class GRConsts

@@ -1,5 +1,6 @@
 package frc.robot.lib.math;
 
+import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.Falcon500;
 
 public class Conversions
@@ -82,6 +83,19 @@ public class Conversions
   public static double radiansToInputRotations(double radians, double gearRatio)
   {
     double rotations = radians / (2 * Math.PI / gearRatio);
+    return rotations;
+  }
+
+  /**
+   * @param meters
+   *          Linear winch distance
+   * @param rolloutRatio
+   *          Winch rollout ratio
+   * @return Input Shaft Rotations
+   */
+  public static double metersToInputRotations(double meters, double rolloutRatio)
+  {
+    double rotations = meters / Units.inchesToMeters(rolloutRatio);
     return rotations;
   }
 

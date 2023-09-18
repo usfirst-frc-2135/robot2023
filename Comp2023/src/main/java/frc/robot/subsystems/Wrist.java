@@ -65,6 +65,7 @@ public class Wrist extends SubsystemBase
   // Declare module variables
   private boolean                   m_motorValid;      // Health indicator for Falcon 
   private boolean                   m_ccValid;         // Health indicator for CANCoder 
+  private boolean                   m_calibrated      = true;
 
   private WristMode                 m_mode            = WristMode.WRIST_INIT;     // Manual movement mode with joysticks
 
@@ -251,7 +252,8 @@ public class Wrist extends SubsystemBase
     if (newMode != m_mode)
     {
       m_mode = newMode;
-      DataLogManager.log(String.format("%s: move %s %s", getSubsystem( ), m_mode, ((rangeLimited) ? " - RANGE LIMITED" : "")));
+      DataLogManager.log(String.format("%s: move %s %.1f deg %s", getSubsystem( ), m_mode, getAngle( ),
+          ((rangeLimited) ? " - RANGE LIMITED" : "")));
     }
 
     m_targetDegrees = m_currentDegrees;
@@ -298,7 +300,7 @@ public class Wrist extends SubsystemBase
 
   public void moveToPositionExecute( )
   {
-    if (WRConsts.kCalibrated)
+    if (m_calibrated)
       m_motor
           .setControl(m_requestMMVolts.withPosition(Conversions.degreesToInputRotations(m_targetDegrees, WRConsts.kGearRatio)));
     // .withFeedForward(m_totalArbFeedForward)); // TODO - once extension is fixed and Tuner X is used

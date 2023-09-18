@@ -10,13 +10,13 @@ import frc.robot.subsystems.Swerve;
 /**
  *
  */
-public class ResetGyro extends CommandBase
+public class DriveResetGyro extends CommandBase
 {
   private final Swerve         swerve;
   private final JoystickButton m_start;
   private final JoystickButton m_back;
 
-  public ResetGyro(Swerve drive, JoystickButton start, JoystickButton back)
+  public DriveResetGyro(Swerve drive, JoystickButton start, JoystickButton back)
   {
     swerve = drive;
     m_start = start;

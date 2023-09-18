@@ -71,19 +71,19 @@ public class Gripper extends SubsystemBase
   private void gripperTalonInitialize(WPI_TalonSRX motor, boolean inverted)
   {
     motor.setInverted(inverted);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "setInverted");
+    PhoenixUtil.getInstance( ).talonSRXCheckError(motor, "setInverted");
     motor.setNeutralMode(NeutralMode.Coast);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
+    PhoenixUtil.getInstance( ).talonSRXCheckError(motor, "setNeutralMode");
     motor.setSafetyEnabled(false);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "setSafetyEnabled");
+    PhoenixUtil.getInstance( ).talonSRXCheckError(motor, "setSafetyEnabled");
 
     motor.configVoltageCompSaturation(12.0); // TODO - config
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configVoltageCompSaturation");
+    PhoenixUtil.getInstance( ).talonSRXCheckError(motor, "configVoltageCompSaturation");
     motor.enableVoltageCompensation(true);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "enableVoltageCompensation");
+    PhoenixUtil.getInstance( ).talonSRXCheckError(motor, "enableVoltageCompensation");
 
     motor.configSupplyCurrentLimit(m_supplyCurrentLimits); // TODO - config
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configSupplyCurrentLimits");
+    PhoenixUtil.getInstance( ).talonSRXCheckError(motor, "configSupplyCurrentLimits");
 
     motor.set(ControlMode.PercentOutput, 0.0);
   }

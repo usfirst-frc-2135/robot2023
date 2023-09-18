@@ -16,13 +16,13 @@ import frc.robot.subsystems.Vision;
 /**
  *
  */
-public class ResetOdometryToLimelight extends CommandBase
+public class DriveResetOdometry extends CommandBase
 {
   private final Swerve m_swerve;
   private final Vision m_vision;
   private final int    m_id;
 
-  public ResetOdometryToLimelight(Swerve swerve, Vision vision, int id)
+  public DriveResetOdometry(Swerve swerve, Vision vision, int id)
   {
     m_swerve = swerve;
     m_vision = vision;

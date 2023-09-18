@@ -54,8 +54,8 @@ import frc.robot.commands.ExtensionRun;
 import frc.robot.commands.GripperRun;
 import frc.robot.commands.LEDSet;
 import frc.robot.commands.ManualMode;
-import frc.robot.commands.ResetGyro;
-import frc.robot.commands.ResetOdometryToLimelight;
+import frc.robot.commands.DriveResetGyro;
+import frc.robot.commands.DriveResetOdometry;
 import frc.robot.commands.ElbowSetAngleZero;
 import frc.robot.commands.WristSetAngleZero;
 import frc.robot.commands.WristMoveToPosition;
@@ -182,7 +182,7 @@ public class RobotContainer
     SmartDashboard.putData("ArmSetHeightScoreHigh", new ArmSetHeightScoreHigh(m_elbow, m_extension, m_wrist));
 
     // On-the-fly path generation helper tests
-    SmartDashboard.putData("ResetOdometryToLimelight", new ResetOdometryToLimelight(m_swerve, m_vision, 0));
+    SmartDashboard.putData("ResetOdometryToLimelight", new DriveResetOdometry(m_swerve, m_vision, 0));
     // SmartDashboard.putData("ResetOdo1", new ResetOdometryToLimelight(m_swerve, m_vision, 1));
     // SmartDashboard.putData("ResetOdo2", new ResetOdometryToLimelight(m_swerve, m_vision, 2));
     // SmartDashboard.putData("ResetOdo3", new ResetOdometryToLimelight(m_swerve, m_vision, 3));
@@ -248,8 +248,8 @@ public class RobotContainer
     driverLeftBumper.onTrue(new Dummy("left bumper"));
     driverRightBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
     driverRightBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
-    driverBack.onTrue(new ResetGyro(m_swerve, driverStart, driverBack)); // aka View
-    driverStart.onTrue(new ResetGyro(m_swerve, driverStart, driverBack)); // aka Menu
+    driverBack.onTrue(new DriveResetGyro(m_swerve, driverStart, driverBack)); // aka View
+    driverStart.onTrue(new DriveResetGyro(m_swerve, driverStart, driverBack)); // aka Menu
     //
     // Driver - POV buttons
     driverUp.onTrue(new DriveSnap(m_swerve, 0));
