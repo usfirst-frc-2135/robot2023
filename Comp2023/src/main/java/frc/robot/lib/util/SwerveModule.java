@@ -1,4 +1,4 @@
-package frc.robot.team1678.frc2022.drivers;
+package frc.robot.lib.util;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -15,10 +15,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants;
 import frc.robot.Constants.SWConsts;
 import frc.robot.lib.math.Conversions;
-import frc.robot.lib.util.CTREConfigs6;
-import frc.robot.lib.util.CTREModuleState;
-import frc.robot.lib.util.SwerveModuleConstants;
-import frc.robot.team2135.PhoenixUtil6;
 
 public class SwerveModule
 {

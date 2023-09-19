@@ -13,8 +13,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.GRConsts;
 import frc.robot.Constants.GRConsts.GRMode;
+import frc.robot.lib.util.PhoenixUtil5;
 import frc.robot.Constants.Ports;
-import frc.robot.team2135.PhoenixUtil5;
 
 //
 // Gripper subsystem class
@@ -25,7 +25,6 @@ public class Gripper extends SubsystemBase
   private final WPI_TalonSRX              m_gripper             = new WPI_TalonSRX(Ports.kCANID_Gripper);
 
   private boolean                         m_gripperValid;                // Health indicator for gripper Talon
-  // private boolean                         m_gripperDebug        = true; // Enable/disable dashboard and logging updates
 
   //Devices and simulation objs
   private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true,
@@ -77,12 +76,12 @@ public class Gripper extends SubsystemBase
     motor.setSafetyEnabled(false);
     PhoenixUtil5.getInstance( ).talonSRXCheckError(motor, "setSafetyEnabled");
 
-    motor.configVoltageCompSaturation(12.0); // TODO - config
+    motor.configVoltageCompSaturation(12.0);
     PhoenixUtil5.getInstance( ).talonSRXCheckError(motor, "configVoltageCompSaturation");
     motor.enableVoltageCompensation(true);
     PhoenixUtil5.getInstance( ).talonSRXCheckError(motor, "enableVoltageCompensation");
 
-    motor.configSupplyCurrentLimit(m_supplyCurrentLimits); // TODO - config
+    motor.configSupplyCurrentLimit(m_supplyCurrentLimits);
     PhoenixUtil5.getInstance( ).talonSRXCheckError(motor, "configSupplyCurrentLimits");
 
     motor.set(ControlMode.PercentOutput, 0.0);

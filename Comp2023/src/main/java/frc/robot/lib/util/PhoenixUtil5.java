@@ -1,4 +1,4 @@
-package frc.robot.team2135;
+package frc.robot.lib.util;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -11,7 +11,7 @@ public class PhoenixUtil5
 {
   private static PhoenixUtil5 instance    = null;
   private static final int    m_retries   = 3;    // Number of version check attempts
-  private static final String classString = "PhoenixUtil";
+  private static final String m_className = "PhoenixUtil5";
 
   PhoenixUtil5( )
   {}
@@ -29,9 +29,10 @@ public class PhoenixUtil5
   public ErrorCode talonSRXCheckError(WPI_TalonSRX motor, String message)
   {
     ErrorCode errorCode = motor.getLastError( );
+    int deviceID = motor.getDeviceID( );
 
     if (errorCode != ErrorCode.OK)
-      DataLogManager.log(classString + ": Talon ID " + motor.getDeviceID( ) + " error " + errorCode + " Message: " + message);
+      DataLogManager.log(String.format("%s: ID %2d - Msg: %s - error %d", m_className, deviceID, message, errorCode.value));
 
     return errorCode;
   }
@@ -41,7 +42,7 @@ public class PhoenixUtil5
     ErrorCode error = ErrorCode.OK;
     int deviceID = 0;
     int fwVersion = 0;
-    String baseStr = motorName + " ";
+    String baseStr = motorName + " motor: ";
     boolean talonValid = false;
     boolean initialized = false;
 
@@ -63,8 +64,8 @@ public class PhoenixUtil5
         {
           talonValid = true;
           if (fwVersion < Falcon500.kTalonSRXReqVersion)
-            DataLogManager
-                .log(classString + ": Talon ID " + deviceID + " " + baseStr + "Incorrect FW version - " + (fwVersion / 256.0));
+            DataLogManager.log(String.format("%s: ID %2d - %s - Incorrect FW version: %d - error %d", m_className, deviceID,
+                baseStr, (fwVersion / 256.0), error.value));
           break;
         }
 
@@ -74,19 +75,17 @@ public class PhoenixUtil5
 
     if (talonValid)
     {
-      baseStr += "ver " + (fwVersion / 256.0) + " ";
-      // error = talon.configFactoryDefault( ); TODO Clean up later
-      //   if (error != ErrorCode.OK)
-      //     DataLogManager.log(
-      //         classString + ": Talon ID " + deviceID + " error " + error + " " + baseStr + " Message: configFactoryDefault error");
-      //   else
-      //     initialized = true;
+      baseStr += "ver: " + (fwVersion / 256.0) + " ";
+      error = talon.configFactoryDefault( );
+      if (error != ErrorCode.OK)
+        DataLogManager
+            .log(String.format("%s: ID %2d - Msg: configFactoryDefault error - %d", m_className, deviceID, error.value));
+      else
+        initialized = true;
     }
 
-    if (talonValid && initialized)
-      DataLogManager.log(classString + ": Talon ID " + deviceID + " error " + error + " " + baseStr + "is INITIALIZED!");
-    else
-      DataLogManager.log(classString + ": Talon ID " + deviceID + " error " + error + " " + baseStr + "is UNRESPONSIVE!");
+    DataLogManager.log(String.format("%s: ID %2d - %s is %s - error %d", m_className, deviceID, baseStr,
+        (talonValid && initialized) ? "INITIALIZED!" : "UNRESPONSIVE!", error.value));
 
     return talonValid && initialized;
   }

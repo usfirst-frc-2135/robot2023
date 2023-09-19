@@ -103,27 +103,145 @@ public class Constants
   {
     public static int          kMaxRPM             = 6380;             // free speed for Falcon 500 motor
     public static final double kEncoderCPR         = 2048;             // CPR is 2048 from Falcon 500 Manual
-    public static final int    kTalonSRXReqVersion = ((23 * 256) + 0); // Talon version is 23.0
+    public static final int    kTalonSRXReqVersion = ((22 * 256) + 0); // Talon version is 23.0
   }
 
-  public static final class LLConsts
+  public static final class SWConsts
   {
-    // Limelight PID driving controls
-    public static final double kTurnConstant     = 0.0;
-    public static final double kTurnPidKp        = 0.005;
-    public static final double kTurnPidKi        = 0.0;
-    public static final double kTurnPidKd        = 0.0;
-    public static final double kTurnMax          = 0.4;
-    public static final double kThrottlePidKp    = 0.011;
-    public static final double kThrottlePidKi    = 0.0;
-    public static final double kThrottlePidKd    = 0.0;
-    public static final double kThrottleMax      = 0.2;
-    public static final double kThrottleShape    = 10.0;
+    /* Swerve Constants - 0.427 m (x, y) */
+    public static final double                trackWidth                    = Units.inchesToMeters(22.7);
+    public static final double                wheelBase                     = Units.inchesToMeters(22.7);
 
-    public static final double kTargetAngle      = 0.0;      // Optimal shooting angle
-    public static final double kSetPointDistance = 60.0;     // Optimal shooting distance
-    public static final double kAngleThreshold   = 3.5;      // Degrees tolerance around optimal
-    public static final double kDistThreshold    = 6.0;      // Inches tolerance around optimal
+    public static final double                wheelDiameter                 = Units.inchesToMeters(4.0);
+    public static final double                wheelCircumference            = wheelDiameter * Math.PI;
+
+    public static final double                driveGearRatio                = 6.75;
+    public static final double                angleGearRatio                = 21.43;
+
+    public static final Translation2d[ ]      swerveModuleLocations         =
+    {
+        new Translation2d(wheelBase / 2.0, trackWidth / 2.0), new Translation2d(wheelBase / 2.0, -trackWidth / 2.0),
+        new Translation2d(-wheelBase / 2.0, trackWidth / 2.0), new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0)
+    };
+
+    public static final SwerveDriveKinematics swerveKinematics              = new SwerveDriveKinematics(swerveModuleLocations);
+
+    /* Swerve Current Limiting */
+    public static final int                   driveSupplyCurrentLimit       = 35;
+    public static final int                   driveSupplyCurrentThreshold   = 60;
+    public static final double                driveSupplyTimeThreshold      = 0.1;
+    public static final boolean               driveSupplyCurrentLimitEnable = true;
+
+    public static final int                   angleSupplyCurrentLimit       = 25;
+    public static final int                   angleSupplyCurrentThreshold   = 40;
+    public static final double                angleSupplyTimeThreshold      = 0.1;
+    public static final boolean               angleSupplyCurrentLimitEnable = true;
+
+    /* Drive Motor PID Values */
+    public static final double                driveFFKS                     = 0.0;
+    public static final double                driveFFKV                     = 0.0;
+    public static final double                driveKP                       = 0.05; // TODO: adjust for v6
+    public static final double                driveKI                       = 0.0;
+    public static final double                driveKD                       = 0.0;
+    public static final double                driveKF                       = 0.0;  // TODO: remove
+
+    /* Angle Motor PID Values */
+    public static final double                angleFFKS                     = 0.0;
+    public static final double                angleFFKV                     = 0.0;
+    public static final double                angleKP                       = 0.3; // TODO: adjust for v6
+    public static final double                angleKI                       = 0.0;
+    public static final double                angleKD                       = 0.0;
+    public static final double                angleKF                       = 0.0; // TODO: remove
+
+    /* Neutral Modes */
+    public static final InvertedValue         driveMotorInvert              = InvertedValue.Clockwise_Positive;
+    public static final NeutralModeValue      driveNeutralMode              = NeutralModeValue.Brake;
+    public static final double                driveOpenLoopRamp             = 0.25;
+    public static final double                driveClosedLoopRamp           = 0.0;
+
+    public static final InvertedValue         angleMotorInvert              = InvertedValue.Clockwise_Positive;
+    public static final NeutralModeValue      angleNeutralMode              = NeutralModeValue.Coast;
+    public static final double                angleOpenLoopRamp             = 0.0;
+    public static final double                angleClosedLoopRamp           = 0.0;
+
+    public static final SensorDirectionValue  angleCanCoderInvert           = SensorDirectionValue.CounterClockwise_Positive;
+    public static final boolean               gyroInvert                    = false; // Always ensure Gyro is CCW+ CW-
+
+    /* Drive Motor Characterization Values */
+    public static final double                driveKS                       = (0.32 / 12);
+    public static final double                driveKV                       = (1.51 / 12);
+    public static final double                driveKA                       = (0.27 / 12);
+
+    /* Swerve Profiling Values */
+    public static final double                maxSpeed                      = 4.5; // meters per second
+    public static final double                maxAngularVelocity            = 6.0; //orginially 10.0
+    public static final double                maxSpeedSlowMode              = 2.25; // meters per second
+    public static final double                maxAngularVelocitySlowMode    = 4.0; //orginially 5.0
+
+    /* Controller Invert */
+    public static final boolean               invertXAxis                   = false;
+    public static final boolean               invertYAxis                   = false;
+    public static final boolean               invertRAxis                   = false;
+
+    /*** MODULE SPECIFIC CONSTANTS ***/
+
+    /* Front Left Module - Module 0 */
+    public static final class Mod0
+    {
+      public static final double betaAngleOffset = 0.0;
+      public static final double compAngleOffset = 0.0;
+
+      public static SwerveModuleConstants SwerveModuleConstants( )
+      {
+        return new SwerveModuleConstants(Ports.kCANID_DriveLF, Ports.kCANID_AngleLF, Ports.kCANID_CANCoderLF,
+            isComp ? compAngleOffset : betaAngleOffset);
+      }
+    }
+
+    /* Front Right Module - Module 1 */
+    public static final class Mod1
+    {
+      public static final double betaAngleOffset = 0.0;
+      public static final double compAngleOffset = 0.0;
+
+      public static SwerveModuleConstants SwerveModuleConstants( )
+      {
+        return new SwerveModuleConstants(Ports.kCANID_DriveRF, Ports.kCANID_AngleRF, Ports.kCANID_CANCoderRF,
+            isComp ? compAngleOffset : betaAngleOffset);
+      }
+    }
+
+    /* Back Left Module - Module 2 */
+    public static final class Mod2
+    {
+      public static final double betaAngleOffset = 0.0;
+      public static final double compAngleOffset = 0.0;
+
+      public static SwerveModuleConstants SwerveModuleConstants( )
+      {
+        return new SwerveModuleConstants(Ports.kCANID_DriveLR, Ports.kCANID_AngleLR, Ports.kCANID_CANCoderLR,
+            isComp ? compAngleOffset : betaAngleOffset);
+      }
+    }
+
+    /* Back Right Module - Module 3 */
+    public static final class Mod3
+    {
+      public static final double betaAngleOffset = 0.0;
+      public static final double compAngleOffset = 0.0;
+
+      public static SwerveModuleConstants SwerveModuleConstants( )
+      {
+        return new SwerveModuleConstants(Ports.kCANID_DriveRR, Ports.kCANID_AngleRR, Ports.kCANID_CANCoderRR,
+            isComp ? compAngleOffset : betaAngleOffset);
+      }
+    }
+
+    // Constants for balance
+    public static final double kDriveBalancedAngle  = 5.0;    // Pitch values less than this stop driving
+    public static final double kDriveBalanceKp      = -0.040;  // Amount of power to apply per degree
+
+    public static final double kElbowDriveSlowAngle = 34.0;     // When arm is out beyond this angle - drive is slowed down
   }
 
   public static final class ELConsts
@@ -346,22 +464,6 @@ public class Constants
     public static final double kGripperSpeedExpel   = -0.2; // Score game piece on cone node or cube shelf
   }
 
-  public static final class LEDConsts
-  {
-    public enum LEDColor
-    {
-      LEDCOLOR_OFF,     // CANdle off
-      LEDCOLOR_WHITE,   // CANdle white
-      LEDCOLOR_RED,     // CANdle red
-      LEDCOLOR_ORANGE,  // CANdle orange
-      LEDCOLOR_YELLOW,  // CANdle yellow
-      LEDCOLOR_GREEN,   // CANdle green
-      LEDCOLOR_BLUE,    // CANdle blue
-      LEDCOLOR_PURPLE,  // CANdle purple
-      LEDCOLOR_DASH     // CANdle color taken from dashboard
-    }
-  }
-
   public static final class VIConsts
   {
     // Limelight-defined streaming states
@@ -413,144 +515,20 @@ public class Constants
     ));
   }
 
-  //// 1678 Constants ///////////////////////////////////////////////////////////
-
-  public static final class SWConsts
+  public static final class LEDConsts
   {
-    /* Swerve Constants - 0.427 m (x, y) */
-    public static final double                trackWidth                    = Units.inchesToMeters(22.7);
-    public static final double                wheelBase                     = Units.inchesToMeters(22.7);
-
-    public static final double                wheelDiameter                 = Units.inchesToMeters(4.0);
-    public static final double                wheelCircumference            = wheelDiameter * Math.PI;
-
-    public static final double                driveGearRatio                = 6.75;
-    public static final double                angleGearRatio                = 21.43;
-
-    public static final Translation2d[ ]      swerveModuleLocations         =
+    public enum LEDColor
     {
-        new Translation2d(wheelBase / 2.0, trackWidth / 2.0), new Translation2d(wheelBase / 2.0, -trackWidth / 2.0),
-        new Translation2d(-wheelBase / 2.0, trackWidth / 2.0), new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0)
-    };
-
-    public static final SwerveDriveKinematics swerveKinematics              = new SwerveDriveKinematics(swerveModuleLocations);
-
-    /* Swerve Current Limiting */
-    public static final int                   driveSupplyCurrentLimit       = 35;
-    public static final int                   driveSupplyCurrentThreshold   = 60;
-    public static final double                driveSupplyTimeThreshold      = 0.1;
-    public static final boolean               driveSupplyCurrentLimitEnable = true;
-
-    public static final int                   angleSupplyCurrentLimit       = 25;
-    public static final int                   angleSupplyCurrentThreshold   = 40;
-    public static final double                angleSupplyTimeThreshold      = 0.1;
-    public static final boolean               angleSupplyCurrentLimitEnable = true;
-
-    /* Drive Motor PID Values */
-    public static final double                driveFFKS                     = 0.0;
-    public static final double                driveFFKV                     = 0.0;
-    public static final double                driveKP                       = 0.05; // TODO: adjust for v6
-    public static final double                driveKI                       = 0.0;
-    public static final double                driveKD                       = 0.0;
-    public static final double                driveKF                       = 0.0;  // TODO: remove
-
-    /* Angle Motor PID Values */
-    public static final double                angleFFKS                     = 0.0;
-    public static final double                angleFFKV                     = 0.0;
-    public static final double                angleKP                       = 0.3; // TODO: adjust for v6
-    public static final double                angleKI                       = 0.0;
-    public static final double                angleKD                       = 0.0;
-    public static final double                angleKF                       = 0.0; // TODO: remove
-
-    /* Neutral Modes */
-    public static final InvertedValue         driveMotorInvert              = InvertedValue.Clockwise_Positive;
-    public static final NeutralModeValue      driveNeutralMode              = NeutralModeValue.Brake;
-    public static final double                driveOpenLoopRamp             = 0.25;
-    public static final double                driveClosedLoopRamp           = 0.0;
-
-    public static final InvertedValue         angleMotorInvert              = InvertedValue.Clockwise_Positive;
-    public static final NeutralModeValue      angleNeutralMode              = NeutralModeValue.Coast;
-    public static final double                angleOpenLoopRamp             = 0.0;
-    public static final double                angleClosedLoopRamp           = 0.0;
-
-    public static final SensorDirectionValue  angleCanCoderInvert           = SensorDirectionValue.CounterClockwise_Positive;
-    public static final boolean               gyroInvert                    = false; // Always ensure Gyro is CCW+ CW-
-
-    /* Drive Motor Characterization Values */
-    public static final double                driveKS                       = (0.32 / 12);
-    public static final double                driveKV                       = (1.51 / 12);
-    public static final double                driveKA                       = (0.27 / 12);
-
-    /* Swerve Profiling Values */
-    public static final double                maxSpeed                      = 4.5; // meters per second
-    public static final double                maxAngularVelocity            = 6.0; //orginially 10.0
-    public static final double                maxSpeedSlowMode              = 2.25; // meters per second
-    public static final double                maxAngularVelocitySlowMode    = 4.0; //orginially 5.0
-
-    /* Controller Invert */
-    public static final boolean               invertXAxis                   = false;
-    public static final boolean               invertYAxis                   = false;
-    public static final boolean               invertRAxis                   = false;
-
-    /*** MODULE SPECIFIC CONSTANTS ***/
-
-    /* Front Left Module - Module 0 */
-    public static final class Mod0
-    {
-      public static final double betaAngleOffset = 0.0;
-      public static final double compAngleOffset = 0.0;
-
-      public static SwerveModuleConstants SwerveModuleConstants( )
-      {
-        return new SwerveModuleConstants(Ports.kCANID_DriveLF, Ports.kCANID_AngleLF, Ports.kCANID_CANCoderLF,
-            isComp ? compAngleOffset : betaAngleOffset);
-      }
+      LEDCOLOR_OFF,     // CANdle off
+      LEDCOLOR_WHITE,   // CANdle white
+      LEDCOLOR_RED,     // CANdle red
+      LEDCOLOR_ORANGE,  // CANdle orange
+      LEDCOLOR_YELLOW,  // CANdle yellow
+      LEDCOLOR_GREEN,   // CANdle green
+      LEDCOLOR_BLUE,    // CANdle blue
+      LEDCOLOR_PURPLE,  // CANdle purple
+      LEDCOLOR_DASH     // CANdle color taken from dashboard
     }
-
-    /* Front Right Module - Module 1 */
-    public static final class Mod1
-    {
-      public static final double betaAngleOffset = 0.0;
-      public static final double compAngleOffset = 0.0;
-
-      public static SwerveModuleConstants SwerveModuleConstants( )
-      {
-        return new SwerveModuleConstants(Ports.kCANID_DriveRF, Ports.kCANID_AngleRF, Ports.kCANID_CANCoderRF,
-            isComp ? compAngleOffset : betaAngleOffset);
-      }
-    }
-
-    /* Back Left Module - Module 2 */
-    public static final class Mod2
-    {
-      public static final double betaAngleOffset = 0.0;
-      public static final double compAngleOffset = 0.0;
-
-      public static SwerveModuleConstants SwerveModuleConstants( )
-      {
-        return new SwerveModuleConstants(Ports.kCANID_DriveLR, Ports.kCANID_AngleLR, Ports.kCANID_CANCoderLR,
-            isComp ? compAngleOffset : betaAngleOffset);
-      }
-    }
-
-    /* Back Right Module - Module 3 */
-    public static final class Mod3
-    {
-      public static final double betaAngleOffset = 0.0;
-      public static final double compAngleOffset = 0.0;
-
-      public static SwerveModuleConstants SwerveModuleConstants( )
-      {
-        return new SwerveModuleConstants(Ports.kCANID_DriveRR, Ports.kCANID_AngleRR, Ports.kCANID_CANCoderRR,
-            isComp ? compAngleOffset : betaAngleOffset);
-      }
-    }
-
-    // Constants for balance
-    public static final double kDriveBalancedAngle  = 5.0;    // Pitch values less than this stop driving
-    public static final double kDriveBalanceKp      = -0.040;  // Amount of power to apply per degree
-
-    public static final double kElbowDriveSlowAngle = 34.0;     // When arm is out beyond this angle - drive is slowed down
   }
 
   public static final class SnapConstants
@@ -568,6 +546,26 @@ public class Constants
 
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints             =
         new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+  }
+
+  public static final class LLConsts
+  {
+    // Limelight PID driving controls
+    public static final double kTurnConstant     = 0.0;
+    public static final double kTurnPidKp        = 0.005;
+    public static final double kTurnPidKi        = 0.0;
+    public static final double kTurnPidKd        = 0.0;
+    public static final double kTurnMax          = 0.4;
+    public static final double kThrottlePidKp    = 0.011;
+    public static final double kThrottlePidKi    = 0.0;
+    public static final double kThrottlePidKd    = 0.0;
+    public static final double kThrottleMax      = 0.2;
+    public static final double kThrottleShape    = 10.0;
+
+    public static final double kTargetAngle      = 0.0;      // Optimal shooting angle
+    public static final double kSetPointDistance = 60.0;     // Optimal shooting distance
+    public static final double kAngleThreshold   = 3.5;      // Degrees tolerance around optimal
+    public static final double kDistThreshold    = 6.0;      // Inches tolerance around optimal
   }
 
   public static final class AutoConstants
@@ -644,5 +642,4 @@ public class Constants
         new PathConstraints(kChargeSpeedMetersPerSecond, kChargeAccelerationMetersPerSecondSquared);
   }
 
-  //// 1678 Constants ///////////////////////////////////////////////////////////
 }
