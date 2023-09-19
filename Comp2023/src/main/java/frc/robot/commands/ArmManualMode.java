@@ -14,9 +14,9 @@ import frc.robot.subsystems.Wrist;
 /**
  *
  */
-public class ManualMode extends SequentialCommandGroup
+public class ArmManualMode extends SequentialCommandGroup
 {
-  public ManualMode(Elbow elbow, Extension extension, Wrist wrist, XboxController operPad)
+  public ArmManualMode(Elbow elbow, Extension extension, Wrist wrist, XboxController operPad)
   {
     setName("Manual Mode");
 

@@ -4,8 +4,8 @@ package frc.robot;
 import java.util.Collections;
 import java.util.List;
 
-import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.pathplanner.lib.PathConstraints;
 
@@ -65,19 +65,19 @@ public class Constants
 
     // CANivore CAN IDs - Swerve
     public static final int    kCANID_DriveLF    = 1;
-    public static final int    kCANID_TurnLF     = 2;
+    public static final int    kCANID_AngleLF    = 2;
     public static final int    kCANID_CANCoderLF = 3;
 
     public static final int    kCANID_DriveRF    = 4;
-    public static final int    kCANID_TurnRF     = 5;
+    public static final int    kCANID_AngleRF    = 5;
     public static final int    kCANID_CANCoderRF = 6;
 
     public static final int    kCANID_DriveLR    = 7;
-    public static final int    kCANID_TurnLR     = 8;
+    public static final int    kCANID_AngleLR    = 8;
     public static final int    kCANID_CANCoderLR = 9;
 
     public static final int    kCANID_DriveRR    = 10;
-    public static final int    kCANID_TurnRR     = 11;
+    public static final int    kCANID_AngleRR    = 11;
     public static final int    kCANID_CANCoderRR = 12;
 
     public static final int    kCANID_Pigeon2    = 13;
@@ -179,12 +179,12 @@ public class Constants
     public static final double kMMVelocity       = 81.28 / 2;      // TODO: (temporary slowdown for testing!) Elbow motion magic velocity (75% of max motor RPM)
     public static final double kMMAcceleration   = 121.9 / 2;      // TODO: (temporary slowdown for testing!) Elbow motion magic acceleration (target velocity in 2/3s)
     public static final double kMMJerk           = kMMAcceleration * 10; // Elbow motion magic jerk limit
-    public static final double kS                = 0.20;           // kS - voltage constant to overcome friction
-    public static final double kV                = 0.1107;         // kV - voltage constant per desired RPM
+    public static final double kS                = 0.0;            // Voltage constant to overcome friction
+    public static final double kV                = 0.1107;         // Voltage constant per desired RPM
     public static final double kPidKp            = 0.05908 * 8;    // Elbow PID proportional constant
     public static final double kPidKi            = 0.0;            // Elbow PID integral constant
     public static final double kPidKd            = 0.0;            // Elbow PID derivative constant
-    // public static final double kPidKd            = 0.5908;         // Elbow PID derivative constant
+    // public static final double kPidKd            = 0.5908;      // Elbow PID derivative constant
 
     public static final double kArbitraryFF      = 0.045;          // Elbow motor output (duty cycle) for arm at 90 degrees
     public static final double kExtArbFF         = 0.007;          // Elbow motor output (duty cycle) for arm at 90 degrees with full extension
@@ -247,7 +247,8 @@ public class Constants
     public static final double kMMVelocity           = 59.81 / 2;    // TODO: Made slower for testing! Extension motion magic velocity (0.625 of max motor RPM)
     public static final double kMMAcceleration       = 59.81 / 2;    // TODO: Made slower for testing! Extension motion magic acceleration (target velocity in 4/3s)
     public static final double kMMJerk               = kMMAcceleration * 10;  // Extension motion magic S curve smoothing strength
-    public static final double kV                    = 0.1129;       // Extension PID force constant
+    public static final double kS                    = 0.0;            // Voltage constant to overcome friction
+    public static final double kV                    = 0.1107;         // Voltage constant per desired RPM
     public static final double kPidKp                = 0.0591 * 8;   // Extension PID proportional constant
     public static final double kPidKi                = 0.0;          // Extension PID integral constant
     public static final double kPidKd                = 0.0;          // Extension PID derivative constant
@@ -310,7 +311,8 @@ public class Constants
     public static final double kMMVelocity       = 58.96 / 2;      // TODO: Made slower for testing! Wrist motion magic velocity (75% of max motor RPM)
     public static final double kMMAcceleration   = 117.92 / 2;     // TODO: Made slower for testing! Wrist motion magic acceleration (target velocity in 1/2s)
     public static final double kMMSCurveStrength = kMMAcceleration * 10; // Wrist motion magic S curve smoothing strength
-    public static final double kV                = 0.1119;         // Wrist PID force constant
+    public static final double kS                = 0.0;            // Voltage constant to overcome friction
+    public static final double kV                = 0.1107;         // Voltage constant per desired RPM
     public static final double kPidKp            = 0.0473 * 8;     // Wrist PID proportional constant
     public static final double kPidKi            = 0.0;            // Wrist PID integral constant
     public static final double kPidKd            = 0.0;            // Wrist PID derivative constant
@@ -415,133 +417,132 @@ public class Constants
 
   public static final class SWConsts
   {
-    public static final boolean                                      invertGyro                  = false; // Always ensure Gyro is CCW+ CW-
-
     /* Swerve Constants - 0.427 m (x, y) */
-    public static final double                                       trackWidth                  = Units.inchesToMeters(22.7);
-    public static final double                                       wheelBase                   = Units.inchesToMeters(22.7);
+    public static final double                trackWidth                    = Units.inchesToMeters(22.7);
+    public static final double                wheelBase                     = Units.inchesToMeters(22.7);
 
-    public static final double                                       wheelDiameter               = Units.inchesToMeters(4.0);
-    public static final double                                       wheelCircumference          = wheelDiameter * Math.PI;
+    public static final double                wheelDiameter                 = Units.inchesToMeters(4.0);
+    public static final double                wheelCircumference            = wheelDiameter * Math.PI;
 
-    public static final double                                       driveGearRatio              = 6.75;
-    public static final double                                       angleGearRatio              = 21.43;
+    public static final double                driveGearRatio                = 6.75;
+    public static final double                angleGearRatio                = 21.43;
 
-    public static final edu.wpi.first.math.geometry.Translation2d[ ] swerveModuleLocations       =
+    public static final Translation2d[ ]      swerveModuleLocations         =
     {
-        new edu.wpi.first.math.geometry.Translation2d(wheelBase / 2.0, trackWidth / 2.0),
-        new edu.wpi.first.math.geometry.Translation2d(wheelBase / 2.0, -trackWidth / 2.0),
-        new edu.wpi.first.math.geometry.Translation2d(-wheelBase / 2.0, trackWidth / 2.0),
-        new edu.wpi.first.math.geometry.Translation2d(-wheelBase / 2.0, -trackWidth / 2.0)
+        new Translation2d(wheelBase / 2.0, trackWidth / 2.0), new Translation2d(wheelBase / 2.0, -trackWidth / 2.0),
+        new Translation2d(-wheelBase / 2.0, trackWidth / 2.0), new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0)
     };
 
-    public static final SwerveDriveKinematics                        swerveKinematics            =
-        new SwerveDriveKinematics(swerveModuleLocations);
+    public static final SwerveDriveKinematics swerveKinematics              = new SwerveDriveKinematics(swerveModuleLocations);
 
     /* Swerve Current Limiting */
-    public static final int                                          angleContinuousCurrentLimit = 25;
-    public static final int                                          anglePeakCurrentLimit       = 40;
-    public static final double                                       anglePeakCurrentDuration    = 0.1;
-    public static final boolean                                      angleEnableCurrentLimit     = true;
+    public static final int                   driveSupplyCurrentLimit       = 35;
+    public static final int                   driveSupplyCurrentThreshold   = 60;
+    public static final double                driveSupplyTimeThreshold      = 0.1;
+    public static final boolean               driveSupplyCurrentLimitEnable = true;
 
-    public static final int                                          driveContinuousCurrentLimit = 35;
-    public static final int                                          drivePeakCurrentLimit       = 60;
-    public static final double                                       drivePeakCurrentDuration    = 0.1;
-    public static final boolean                                      driveEnableCurrentLimit     = true;
-
-    /* Angle Motor PID Values */
-    public static final double                                       angleKP                     = 0.3;
-    public static final double                                       angleKI                     = 0.0;
-    public static final double                                       angleKD                     = 0.0;
-    public static final double                                       angleKF                     = 0.0;
+    public static final int                   angleSupplyCurrentLimit       = 25;
+    public static final int                   angleSupplyCurrentThreshold   = 40;
+    public static final double                angleSupplyTimeThreshold      = 0.1;
+    public static final boolean               angleSupplyCurrentLimitEnable = true;
 
     /* Drive Motor PID Values */
-    public static final double                                       driveKP                     = 0.05;
-    public static final double                                       driveKI                     = 0.0;
-    public static final double                                       driveKD                     = 0.0;
-    public static final double                                       driveKF                     = 0.0;
+    public static final double                driveFFKS                     = 0.0;
+    public static final double                driveFFKV                     = 0.0;
+    public static final double                driveKP                       = 0.05; // TODO: adjust for v6
+    public static final double                driveKI                       = 0.0;
+    public static final double                driveKD                       = 0.0;
+    public static final double                driveKF                       = 0.0;  // TODO: remove
 
-    /* Drive Motor Characterization Values */
-    public static final double                                       driveKS                     = (0.32 / 12);
-    public static final double                                       driveKV                     = (1.51 / 12);
-    public static final double                                       driveKA                     = (0.27 / 12);
-
-    /* Swerve Profiling Values */
-    public static final double                                       maxSpeed                    = 4.5; // meters per second
-    public static final double                                       maxAngularVelocity          = 6.0; //orginially 10.0
-    public static final double                                       maxSpeedSlowMode            = 2.25; // meters per second
-    public static final double                                       maxAngularVelocitySlowMode  = 4.0; //orginially 5.0
+    /* Angle Motor PID Values */
+    public static final double                angleFFKS                     = 0.0;
+    public static final double                angleFFKV                     = 0.0;
+    public static final double                angleKP                       = 0.3; // TODO: adjust for v6
+    public static final double                angleKI                       = 0.0;
+    public static final double                angleKD                       = 0.0;
+    public static final double                angleKF                       = 0.0; // TODO: remove
 
     /* Neutral Modes */
-    public static final NeutralMode                                  angleNeutralMode            = NeutralMode.Coast;
-    public static final NeutralMode                                  driveNeutralMode            = NeutralMode.Brake;
+    public static final InvertedValue         driveMotorInvert              = InvertedValue.Clockwise_Positive;
+    public static final NeutralModeValue      driveNeutralMode              = NeutralModeValue.Brake;
+    public static final double                driveOpenLoopRamp             = 0.25;
+    public static final double                driveClosedLoopRamp           = 0.0;
 
-    public static final double                                       openLoopRamp                = 0.25;
-    public static final double                                       closedLoopRamp              = 0.0;
+    public static final InvertedValue         angleMotorInvert              = InvertedValue.Clockwise_Positive;
+    public static final NeutralModeValue      angleNeutralMode              = NeutralModeValue.Coast;
+    public static final double                angleOpenLoopRamp             = 0.0;
+    public static final double                angleClosedLoopRamp           = 0.0;
 
-    /* Motor Inverts */
-    public static final boolean                                      driveMotorInvert            = true;
-    public static final boolean                                      angleMotorInvert            = true;
+    public static final SensorDirectionValue  angleCanCoderInvert           = SensorDirectionValue.CounterClockwise_Positive;
+    public static final boolean               gyroInvert                    = false; // Always ensure Gyro is CCW+ CW-
 
-    /* Angle Encoder Invert */
-    public static final boolean                                      canCoderInvert              = false;
+    /* Drive Motor Characterization Values */
+    public static final double                driveKS                       = (0.32 / 12);
+    public static final double                driveKV                       = (1.51 / 12);
+    public static final double                driveKA                       = (0.27 / 12);
+
+    /* Swerve Profiling Values */
+    public static final double                maxSpeed                      = 4.5; // meters per second
+    public static final double                maxAngularVelocity            = 6.0; //orginially 10.0
+    public static final double                maxSpeedSlowMode              = 2.25; // meters per second
+    public static final double                maxAngularVelocitySlowMode    = 4.0; //orginially 5.0
 
     /* Controller Invert */
-    public static final boolean                                      invertXAxis                 = false;
-    public static final boolean                                      invertYAxis                 = false;
-    public static final boolean                                      invertRAxis                 = false;
+    public static final boolean               invertXAxis                   = false;
+    public static final boolean               invertYAxis                   = false;
+    public static final boolean               invertRAxis                   = false;
 
     /*** MODULE SPECIFIC CONSTANTS ***/
 
     /* Front Left Module - Module 0 */
     public static final class Mod0
     {
-      public static final double epsilonAngleOffset = 325.723;
-      public static final double compAngleOffset    = 15.732;
+      public static final double betaAngleOffset = 0.0;
+      public static final double compAngleOffset = 0.0;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
-        return new SwerveModuleConstants(Ports.kCANID_DriveLF, Ports.kCANID_TurnLF, Ports.kCANID_CANCoderLF,
-            isComp ? compAngleOffset : epsilonAngleOffset);
+        return new SwerveModuleConstants(Ports.kCANID_DriveLF, Ports.kCANID_AngleLF, Ports.kCANID_CANCoderLF,
+            isComp ? compAngleOffset : betaAngleOffset);
       }
     }
 
     /* Front Right Module - Module 1 */
     public static final class Mod1
     {
-      public static final double epsilonAngleOffset = 142.91;
-      public static final double compAngleOffset    = 239.766;
+      public static final double betaAngleOffset = 0.0;
+      public static final double compAngleOffset = 0.0;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
-        return new SwerveModuleConstants(Ports.kCANID_DriveRF, Ports.kCANID_TurnRF, Ports.kCANID_CANCoderRF,
-            isComp ? compAngleOffset : epsilonAngleOffset);
+        return new SwerveModuleConstants(Ports.kCANID_DriveRF, Ports.kCANID_AngleRF, Ports.kCANID_CANCoderRF,
+            isComp ? compAngleOffset : betaAngleOffset);
       }
     }
 
     /* Back Left Module - Module 2 */
     public static final class Mod2
     {
-      public static final double epsilonAngleOffset = 137.988;
-      public static final double compAngleOffset    = 98.174;
+      public static final double betaAngleOffset = 0.0;
+      public static final double compAngleOffset = 0.0;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
-        return new SwerveModuleConstants(Ports.kCANID_DriveLR, Ports.kCANID_TurnLR, Ports.kCANID_CANCoderLR,
-            isComp ? compAngleOffset : epsilonAngleOffset);
+        return new SwerveModuleConstants(Ports.kCANID_DriveLR, Ports.kCANID_AngleLR, Ports.kCANID_CANCoderLR,
+            isComp ? compAngleOffset : betaAngleOffset);
       }
     }
 
     /* Back Right Module - Module 3 */
     public static final class Mod3
     {
-      public static final double epsilonAngleOffset = 44.736;
-      public static final double compAngleOffset    = 93.076;
+      public static final double betaAngleOffset = 0.0;
+      public static final double compAngleOffset = 0.0;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
-        return new SwerveModuleConstants(Ports.kCANID_DriveRR, Ports.kCANID_TurnRR, Ports.kCANID_CANCoderRR,
-            isComp ? compAngleOffset : epsilonAngleOffset);
+        return new SwerveModuleConstants(Ports.kCANID_DriveRR, Ports.kCANID_AngleRR, Ports.kCANID_CANCoderRR,
+            isComp ? compAngleOffset : betaAngleOffset);
       }
     }
 
@@ -619,6 +620,7 @@ public class Constants
       config.setStartVelocity(startSpeed);
       config.setEndVelocity(endSpeed);
       config.addConstraint(new CentripetalAccelerationConstraint(3.0));
+
       return config;
     }
 

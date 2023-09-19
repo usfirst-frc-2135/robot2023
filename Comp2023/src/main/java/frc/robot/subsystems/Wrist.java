@@ -83,8 +83,8 @@ public class Wrist extends SubsystemBase
   // Constructor
   public Wrist( )
   {
-    setName("Wrist2");
-    setSubsystem("Wrist2");
+    setName("Wrist");
+    setSubsystem("Wrist");
 
     m_motorValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_motor, "wrist", CTREConfigs6.wristAngleFXConfig( ));
     m_ccValid = PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANCoder, "wrist", CTREConfigs6.wristCancoderConfig( ));

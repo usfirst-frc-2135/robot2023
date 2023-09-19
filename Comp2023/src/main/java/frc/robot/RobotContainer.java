@@ -44,24 +44,24 @@ import frc.robot.commands.AutoPreloadAndLeaveCommunityShort;
 import frc.robot.commands.AutoPreloadAndStop;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.DriveLimelightPath;
+import frc.robot.commands.DriveResetGyro;
+import frc.robot.commands.DriveResetOdometry;
 import frc.robot.commands.DriveSnap;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.ElbowMoveToPosition;
+import frc.robot.commands.ElbowSetAngleZero;
 import frc.robot.commands.ExtensionCalibrate;
 import frc.robot.commands.ExtensionMoveToLength;
 import frc.robot.commands.ExtensionRun;
 import frc.robot.commands.GripperRun;
 import frc.robot.commands.LEDSet;
-import frc.robot.commands.ManualMode;
-import frc.robot.commands.DriveResetGyro;
-import frc.robot.commands.DriveResetOdometry;
-import frc.robot.commands.ElbowSetAngleZero;
-import frc.robot.commands.WristSetAngleZero;
+import frc.robot.commands.ArmManualMode;
 import frc.robot.commands.WristMoveToPosition;
 import frc.robot.commands.WristRun;
 import frc.robot.commands.WristRunBrake;
 import frc.robot.commands.WristRunConstant;
+import frc.robot.commands.WristSetAngleZero;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
 import frc.robot.subsystems.Gripper;
@@ -299,7 +299,7 @@ public class RobotContainer
     operLeftBumper.onFalse(new WristRunBrake(m_wrist, true));
     operRightBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
     operRightBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
-    operBack.toggleOnTrue(new ManualMode(m_elbow, m_extension, m_wrist, m_operatorPad)); // aka View
+    operBack.toggleOnTrue(new ArmManualMode(m_elbow, m_extension, m_wrist, m_operatorPad)); // aka View
 
     operStart.onTrue(new Dummy("Start")); // aka Menu
     //

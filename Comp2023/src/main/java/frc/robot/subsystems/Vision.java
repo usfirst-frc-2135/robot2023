@@ -64,10 +64,6 @@ public class Vision extends SubsystemBase
     // Get the Network table reference once for all methods
     m_table = NetworkTableInstance.getDefault( ).getTable("limelight");
 
-    // Set camera and LED display
-    setLEDMode(VIConsts.LED_OFF);
-    setCameraDisplay(VIConsts.PIP_SECONDARY);
-
     // Put all the needed widgets on the dashboard
     SmartDashboard.putNumber("VI_distance1", m_distance1);
     SmartDashboard.putNumber("VI_distance2", m_distance2);

@@ -3,12 +3,12 @@ package frc.robot.team2135;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
@@ -69,21 +69,21 @@ public class PhoenixUtil6
 
     if (config != null)
       if ((status = motor.getConfigurator( ).apply(config, m_timeout)) != StatusCode.OK)
-        DataLogManager.log(String.format("%s: ID %d - %s motor: getConfigurator.apply - %s!", m_className, deviceID, name,
+        DataLogManager.log(String.format("%s: ID %2d - %s motor: getConfigurator.apply - %s!", m_className, deviceID, name,
             status.getDescription( )));
 
     if ((status = motor.setControl(new VoltageOut(0).withEnableFOC(false))) != StatusCode.OK)
       DataLogManager
-          .log(String.format("%s: ID %d - %s motor: setControl - %s!", m_className, deviceID, name, status.getDescription( )));
+          .log(String.format("%s: ID %2d - %s motor: setControl - %s!", m_className, deviceID, name, status.getDescription( )));
 
     // Configure sensor settings
     if ((status = motor.setRotorPosition(0.0)) != StatusCode.OK)
       DataLogManager.log(
-          String.format("%s: ID %d - %s motor: setRotorPosition - %s!", m_className, deviceID, name, status.getDescription( )));
+          String.format("%s: ID %2d - %s motor: setRotorPosition - %s!", m_className, deviceID, name, status.getDescription( )));
 
     motor.setSafetyEnabled(false);
 
-    DataLogManager.log(String.format("%s: ID %d - %s motor:    ver: %d.%d.%d.%d is %s!", m_className, deviceID, name, fwvMajor,
+    DataLogManager.log(String.format("%s: ID %2d - %s motor:    ver: %d.%d.%d.%d is %s!", m_className, deviceID, name, fwvMajor,
         fwvMinor, fwvBugfix, fwvBuild, (talonValid) ? "VALID" : "URESPONSIVE"));
 
     return talonValid;
@@ -124,10 +124,10 @@ public class PhoenixUtil6
 
     if (config != null)
       if ((status = canCoder.getConfigurator( ).apply(config, m_timeout)) != StatusCode.OK)
-        DataLogManager.log(String.format("%s: ID %d - %s CANCoder: getConfigurator.apply - %s!", m_className, deviceID, name,
+        DataLogManager.log(String.format("%s: ID %2d - %s CANCoder: getConfigurator.apply - %s!", m_className, deviceID, name,
             status.getDescription( )));
 
-    DataLogManager.log(String.format("%s: ID %d - %s CANCoder: ver: %d.%d.%d.%d is %s!", m_className, deviceID, name, fwvMajor,
+    DataLogManager.log(String.format("%s: ID %2d - %s CANCoder: ver: %d.%d.%d.%d is %s!", m_className, deviceID, name, fwvMajor,
         fwvMinor, fwvBugfix, fwvBuild, (canCoderValid) ? "VALID" : "URESPONSIVE"));
 
     return canCoderValid;
@@ -171,14 +171,14 @@ public class PhoenixUtil6
     if (config != null)
       if ((status = pigeon2.getConfigurator( ).apply(config, m_timeout)) != StatusCode.OK)
         DataLogManager.log(
-            String.format("%s: ID %d - pigeon2: getConfigurator.apply - %s!", m_className, deviceID, status.getDescription( )));
+            String.format("%s: ID %2d - pigeon2: getConfigurator.apply - %s!", m_className, deviceID, status.getDescription( )));
 
     // Configure sensor settings
     if ((status = pigeon2.setYaw(0.0)) != StatusCode.OK)
-      DataLogManager.log(String.format("%s: ID %d - pigeon2: setYaw - %s!", m_className, deviceID, status.getDescription( )));
+      DataLogManager.log(String.format("%s: ID %2d - pigeon2: setYaw - %s!", m_className, deviceID, status.getDescription( )));
 
-    DataLogManager.log(String.format("%s: ID %d - pigeon2:    ver: %d.%d.%d.%d is %s!", m_className, deviceID, fwvMajor, fwvMinor,
-        fwvBugfix, fwvBuild, (pigeon2Valid) ? "VALID" : "URESPONSIVE"));
+    DataLogManager.log(String.format("%s: ID %2d - pigeon2:    ver: %d.%d.%d.%d is %s!", m_className, deviceID, fwvMajor,
+        fwvMinor, fwvBugfix, fwvBuild, (pigeon2Valid) ? "VALID" : "URESPONSIVE"));
 
     return pigeon2Valid;
   }

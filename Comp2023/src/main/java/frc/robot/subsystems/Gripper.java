@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.GRConsts;
 import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.Ports;
-import frc.robot.team2135.PhoenixUtil;
+import frc.robot.team2135.PhoenixUtil5;
 
 //
 // Gripper subsystem class
@@ -37,7 +37,7 @@ public class Gripper extends SubsystemBase
     setName("Gripper");
     setSubsystem("Gripper");
 
-    m_gripperValid = PhoenixUtil.getInstance( ).talonSRXInitialize(m_gripper, "gripper");
+    m_gripperValid = PhoenixUtil5.getInstance( ).talonSRXInitialize(m_gripper, "gripper");
 
     SmartDashboard.putBoolean("HL_validGR", m_gripperValid);
 
@@ -71,19 +71,19 @@ public class Gripper extends SubsystemBase
   private void gripperTalonInitialize(WPI_TalonSRX motor, boolean inverted)
   {
     motor.setInverted(inverted);
-    PhoenixUtil.getInstance( ).talonSRXCheckError(motor, "setInverted");
+    PhoenixUtil5.getInstance( ).talonSRXCheckError(motor, "setInverted");
     motor.setNeutralMode(NeutralMode.Coast);
-    PhoenixUtil.getInstance( ).talonSRXCheckError(motor, "setNeutralMode");
+    PhoenixUtil5.getInstance( ).talonSRXCheckError(motor, "setNeutralMode");
     motor.setSafetyEnabled(false);
-    PhoenixUtil.getInstance( ).talonSRXCheckError(motor, "setSafetyEnabled");
+    PhoenixUtil5.getInstance( ).talonSRXCheckError(motor, "setSafetyEnabled");
 
     motor.configVoltageCompSaturation(12.0); // TODO - config
-    PhoenixUtil.getInstance( ).talonSRXCheckError(motor, "configVoltageCompSaturation");
+    PhoenixUtil5.getInstance( ).talonSRXCheckError(motor, "configVoltageCompSaturation");
     motor.enableVoltageCompensation(true);
-    PhoenixUtil.getInstance( ).talonSRXCheckError(motor, "enableVoltageCompensation");
+    PhoenixUtil5.getInstance( ).talonSRXCheckError(motor, "enableVoltageCompensation");
 
     motor.configSupplyCurrentLimit(m_supplyCurrentLimits); // TODO - config
-    PhoenixUtil.getInstance( ).talonSRXCheckError(motor, "configSupplyCurrentLimits");
+    PhoenixUtil5.getInstance( ).talonSRXCheckError(motor, "configSupplyCurrentLimits");
 
     motor.set(ControlMode.PercentOutput, 0.0);
   }

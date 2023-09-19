@@ -8,11 +8,95 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import frc.robot.Constants;
 import frc.robot.Constants.ELConsts;
 import frc.robot.Constants.EXConsts;
+import frc.robot.Constants.SWConsts;
 import frc.robot.Constants.WRConsts;
 import frc.robot.lib.math.Conversions;
 
 public final class CTREConfigs6
 {
+  // Swerve modules
+
+  public static TalonFXConfiguration swerveDriveFXConfig( )
+  {
+    TalonFXConfiguration driveConfig = new TalonFXConfiguration( );
+
+    driveConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = SWConsts.driveClosedLoopRamp;
+    driveConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = SWConsts.driveClosedLoopRamp;
+
+    driveConfig.CurrentLimits.SupplyCurrentLimit = SWConsts.driveSupplyCurrentLimit;
+    driveConfig.CurrentLimits.SupplyCurrentThreshold = SWConsts.driveSupplyCurrentThreshold;
+    driveConfig.CurrentLimits.SupplyTimeThreshold = SWConsts.driveSupplyTimeThreshold;
+    driveConfig.CurrentLimits.SupplyCurrentLimitEnable = SWConsts.driveSupplyCurrentLimitEnable;
+
+    // driveConfig.CurrentLimits.*
+    // driveConfig.Feedback.*
+    // driveConfig.HardwareLimitSwitch.*
+    // driveConfig.MotionMagic.*
+
+    // driveConfig.MotorOutput.DutyCycleNeutralDeadband
+    driveConfig.MotorOutput.Inverted = SWConsts.driveMotorInvert;
+    driveConfig.MotorOutput.NeutralMode = SWConsts.driveNeutralMode;
+
+    driveConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = SWConsts.driveOpenLoopRamp;
+    driveConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = SWConsts.driveOpenLoopRamp;
+
+    driveConfig.Slot0.kS = SWConsts.driveFFKS;
+    driveConfig.Slot0.kV = SWConsts.driveFFKV;
+    driveConfig.Slot0.kP = SWConsts.driveKP;
+    driveConfig.Slot0.kI = SWConsts.driveKI;
+    driveConfig.Slot0.kD = SWConsts.driveKD;
+
+    // driveConfig.SoftwareLimitSwitch.*
+
+    return driveConfig;
+  }
+
+  public static TalonFXConfiguration swerveAngleFXConfig( )
+  {
+    TalonFXConfiguration angleConfig = new TalonFXConfiguration( );
+
+    angleConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = SWConsts.angleClosedLoopRamp;
+    angleConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = SWConsts.angleClosedLoopRamp;
+
+    angleConfig.CurrentLimits.SupplyCurrentLimit = SWConsts.angleSupplyCurrentLimit;
+    angleConfig.CurrentLimits.SupplyCurrentThreshold = SWConsts.angleSupplyCurrentThreshold;
+    angleConfig.CurrentLimits.SupplyTimeThreshold = SWConsts.angleSupplyTimeThreshold;
+    angleConfig.CurrentLimits.SupplyCurrentLimitEnable = SWConsts.angleSupplyCurrentLimitEnable;
+
+    //  angleConfig.CurrentLimits.*
+    //  angleConfig.Feedback.*
+    //  angleConfig.HardwareLimitSwitch.*
+    //  angleConfig.MotionMagic.*
+
+    //  angleConfig.MotorOutput.DutyCycleNeutralDeadband
+    angleConfig.MotorOutput.Inverted = SWConsts.angleMotorInvert;
+    angleConfig.MotorOutput.NeutralMode = SWConsts.angleNeutralMode;
+
+    angleConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = SWConsts.angleOpenLoopRamp;
+    angleConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = SWConsts.angleOpenLoopRamp;
+
+    angleConfig.Slot0.kS = SWConsts.angleFFKS;
+    angleConfig.Slot0.kV = SWConsts.angleFFKV;
+    angleConfig.Slot0.kP = SWConsts.angleKP;
+    angleConfig.Slot0.kI = SWConsts.angleKI;
+    angleConfig.Slot0.kD = SWConsts.angleKD;
+
+    //  angleConfig.SoftwareLimitSwitch.*
+
+    return angleConfig;
+  }
+
+  public static CANcoderConfiguration swerveCancoderConfig( )
+  {
+    CANcoderConfiguration config = new CANcoderConfiguration( );
+
+    config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+    config.MagnetSensor.SensorDirection = SWConsts.angleCanCoderInvert;
+    // config.MagnetSensor.MagnetOffset 
+
+    return config;
+  }
+
   // Elbow
 
   public static TalonFXConfiguration elbowMotorFXConfig( )
@@ -125,7 +209,7 @@ public final class CTREConfigs6
     wrConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0;
 
     // Slot settings
-    //TODO - implement a kS ?
+    wrConfig.Slot0.kS = WRConsts.kS;
     wrConfig.Slot0.kV = WRConsts.kV;
     wrConfig.Slot0.kP = WRConsts.kPidKp;
     wrConfig.Slot0.kI = WRConsts.kPidKi;
@@ -194,7 +278,7 @@ public final class CTREConfigs6
     exConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0;
 
     // Slot settings
-    // exConfig.Slot0.kS = EXConsts.kS;
+    exConfig.Slot0.kS = EXConsts.kS;
     exConfig.Slot0.kV = EXConsts.kV;
     exConfig.Slot0.kP = EXConsts.kPidKp;
     exConfig.Slot0.kI = EXConsts.kPidKi;
@@ -202,10 +286,10 @@ public final class CTREConfigs6
 
     // Software limit switches
     exConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
-        Conversions.degreesToInputRotations(ELConsts.kAngleMin, ELConsts.kGearRatio);
+        Conversions.degreesToInputRotations(ELConsts.kAngleMin, EXConsts.kGearRatio);
     exConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
     exConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
-        Conversions.degreesToInputRotations(ELConsts.kAngleMax, ELConsts.kGearRatio);
+        Conversions.degreesToInputRotations(ELConsts.kAngleMax, EXConsts.kGearRatio);
     exConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
 
     return exConfig;

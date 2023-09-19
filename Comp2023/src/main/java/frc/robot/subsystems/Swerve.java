@@ -30,13 +30,14 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.LLConsts;
 import frc.robot.Constants.Ports;
-import frc.robot.Constants.SnapConstants;
 import frc.robot.Constants.SWConsts;
+import frc.robot.Constants.SnapConstants;
 import frc.robot.RobotContainer;
-import frc.robot.team1678.frc2022.drivers.Pigeon;
 import frc.robot.team1678.frc2022.drivers.SwerveModule;
+import frc.robot.team2135.PigeonIMU;
 
 //
 // Swerve subsystem class
@@ -51,9 +52,10 @@ public class Swerve extends SubsystemBase
   };
 
   // Odometery and telemetry
-  private Pigeon                   m_pigeon            = new Pigeon(Ports.kCANID_Pigeon2);
-  private SwerveDrivePoseEstimator m_poseEstimator     = new SwerveDrivePoseEstimator(SWConsts.swerveKinematics,
-      m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), new Pose2d( ));
+  private final PigeonIMU          m_pigeon            = new PigeonIMU(Ports.kCANID_Pigeon2, Ports.kCANCarnivore);
+
+  private SwerveDrivePoseEstimator m_poseEstimator     =
+      new SwerveDrivePoseEstimator(SWConsts.swerveKinematics, m_pigeon.getYaw( ), getPositions( ), new Pose2d( ));
   private Field2d                  m_field             = new Field2d( );
 
   // PID objects
@@ -73,7 +75,7 @@ public class Swerve extends SubsystemBase
   private PeriodicIO               m_periodicIO        = new PeriodicIO( );
   private boolean                  m_isSnapping;
   // private double                   m_limelightVisionAlignGoal;
-  private double                   pitch;
+  private double                   m_pitch;
 
   // Lock Swerve wheels
   private boolean                  m_locked            = false;
@@ -106,10 +108,10 @@ public class Swerve extends SubsystemBase
   private double                   m_limelightDistance;
 
   // define theta controller for robot heading
-  PIDController                    xController         = new PIDController(1, 0, 0);
-  PIDController                    yController         = new PIDController(1, 0, 0);
-  ProfiledPIDController            thetaController     = new ProfiledPIDController(Constants.AutoConstants.kPThetaController, 0,
-      0, Constants.AutoConstants.kThetaControllerConstraints);
+  PIDController                    m_xController       = new PIDController(1, 0, 0);
+  PIDController                    m_yController       = new PIDController(1, 0, 0);
+  ProfiledPIDController            m_thetaController   =
+      new ProfiledPIDController(AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
 
   public Swerve( )
   {
@@ -119,8 +121,7 @@ public class Swerve extends SubsystemBase
     zeroGyro( );
 
     m_snapPIDController.enableContinuousInput(-Math.PI, Math.PI);
-
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+    m_thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
     resetOdometry(new Pose2d( ));
     resetAnglesToAbsolute( );
@@ -191,7 +192,7 @@ public class Swerve extends SubsystemBase
     m_periodicIO.odometry_pose_rot = position.getRotation( ).getDegrees( );
 
     m_periodicIO.swerve_heading = MathUtil.inputModulus(m_pigeon.getYaw( ).getDegrees( ), 0, 360);
-    m_periodicIO.robot_pitch = m_pigeon.getUnadjustedPitch( ).getDegrees( );
+    m_periodicIO.robot_pitch = m_pigeon.getPitch( ).getDegrees( );
     m_periodicIO.robot_roll = m_pigeon.getRoll( ).getDegrees( );
 
     // m_periodicIO.vision_align_target_angle = Math.toDegrees(m_limelightVisionAlignGoal);
@@ -232,7 +233,7 @@ public class Swerve extends SubsystemBase
 
   public void updateSwerveOdometry( )
   {
-    m_poseEstimator.updateWithTime(Timer.getFPGATimestamp( ), m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ));
+    m_poseEstimator.updateWithTime(Timer.getFPGATimestamp( ), m_pigeon.getYaw( ), getPositions( ));
 
     {
       Pose2d botLLPose = RobotContainer.getInstance( ).m_vision.getLimelightValidPose(getPose( ));
@@ -403,7 +404,7 @@ public class Swerve extends SubsystemBase
   //
   public void driveWithPathFollowerInit(PathPlannerTrajectory trajectory, boolean useInitialPose)
   {
-    m_holonomicController = new HolonomicDriveController(xController, yController, thetaController);
+    m_holonomicController = new HolonomicDriveController(m_xController, m_yController, m_thetaController);
 
     m_trajectory = trajectory;
 
@@ -427,7 +428,7 @@ public class Swerve extends SubsystemBase
 
   public void driveWithPathFollowerLimelightInit(PathPlannerTrajectory trajectory, boolean useInitialPose)
   {
-    m_holonomicController = new HolonomicDriveController(xController, yController, thetaController);
+    m_holonomicController = new HolonomicDriveController(m_xController, m_yController, m_thetaController);
 
     m_trajectory = trajectory;
 
@@ -567,6 +568,7 @@ public class Swerve extends SubsystemBase
   {
     m_isTeleported = isTeleported;
   }
+
   //// 1678 Swerve //////////////////////////////////////////////////////////////
 
   public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop)
@@ -597,18 +599,16 @@ public class Swerve extends SubsystemBase
     }
     else
     {
-      swerveModuleStates =
-          SWConsts.swerveKinematics.toSwerveModuleStates(fieldRelative
-              ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX( ), translation.getY( ), rotation,
-                  m_pigeon.getYaw( ).getWPIRotation2d( ))
-              : new ChassisSpeeds(translation.getX( ), translation.getY( ), rotation));
+      swerveModuleStates = SWConsts.swerveKinematics.toSwerveModuleStates(fieldRelative
+          ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX( ), translation.getY( ), rotation, m_pigeon.getYaw( ))
+          : new ChassisSpeeds(translation.getX( ), translation.getY( ), rotation));
     }
 
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SWConsts.maxSpeed);
 
     for (SwerveModule mod : m_swerveMods)
     {
-      mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
+      mod.setDesiredState(swerveModuleStates[mod.m_moduleNumber], isOpenLoop);
     }
   }
 
@@ -621,17 +621,17 @@ public class Swerve extends SubsystemBase
   {
     double motorOutput;
 
-    pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
-    if (Math.abs(pitch) > SWConsts.kDriveBalancedAngle)
+    m_pitch = m_pigeon.getPitch( ).getDegrees( );
+    if (Math.abs(m_pitch) > SWConsts.kDriveBalancedAngle)
     {
-      motorOutput = SWConsts.kDriveBalanceKp * pitch;
+      motorOutput = SWConsts.kDriveBalanceKp * m_pitch;
       drive(new Translation2d(motorOutput, 0), 0, false, true);
     }
     else
     {
       driveStop(true);
     }
-    //DataLogManager.log(String.format(getSubsystem() + ": Robot pitch: %.1f degrees - Robot power applied to motors: %.1f m/s", pitch, drivevalue));
+    //DataLogManager.log(String.format(getSubsystem() + ": Robot pitch: %.1f degrees - Robot power applied to motors: %.1f m/s", m_pitch, drivevalue));
   }
 
   //
@@ -673,11 +673,11 @@ public class Swerve extends SubsystemBase
 
     for (SwerveModule mod : m_swerveMods)
     {
-      mod.setDesiredState(desiredStates[mod.moduleNumber], false);
-      SmartDashboard.putNumber("mod " + mod.moduleNumber + " desired speed",
-          desiredStates[mod.moduleNumber].speedMetersPerSecond);
-      SmartDashboard.putNumber("mod " + mod.moduleNumber + " desired angle",
-          MathUtil.inputModulus(desiredStates[mod.moduleNumber].angle.getDegrees( ), 0, 180));
+      mod.setDesiredState(desiredStates[mod.m_moduleNumber], false);
+      SmartDashboard.putNumber(String.format("mod%d desired speed", mod.m_moduleNumber),
+          desiredStates[mod.m_moduleNumber].speedMetersPerSecond);
+      SmartDashboard.putNumber(String.format("mod%d desired angle", mod.m_moduleNumber),
+          MathUtil.inputModulus(desiredStates[mod.m_moduleNumber].angle.getDegrees( ), 0, 180));
     }
   }
 
@@ -702,13 +702,13 @@ public class Swerve extends SubsystemBase
   public void resetOdometry(Pose2d pose)
   {
     DataLogManager.log("Position Before : " + m_poseEstimator.getEstimatedPosition( ) + " Gyro : " + m_pigeon.getYaw( ));
-    m_poseEstimator.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
+    m_poseEstimator.resetPosition(m_pigeon.getYaw( ), getPositions( ), pose);
     DataLogManager.log("Position After : " + m_poseEstimator.getEstimatedPosition( ) + " Gyro : " + m_pigeon.getYaw( ));
   }
 
   public void resetLimelightOdometry(Pose2d pose)
   {
-    m_poseEstimator.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
+    m_poseEstimator.resetPosition(m_pigeon.getYaw( ), getPositions( ), pose);
   }
 
   public void resetOdometryToLimelight( )
@@ -729,28 +729,33 @@ public class Swerve extends SubsystemBase
     }
   }
 
-  public SwerveModuleState[ ] getStates( )
-  {
-    SwerveModuleState[ ] states = new SwerveModuleState[4];
-    for (SwerveModule mod : m_swerveMods)
-    {
-      states[mod.moduleNumber] = mod.getState( );
-      SmartDashboard.putNumber("mod " + mod.moduleNumber + " current speed", states[mod.moduleNumber].speedMetersPerSecond);
-      SmartDashboard.putNumber("mod " + mod.moduleNumber + " current angle",
-          MathUtil.inputModulus(states[mod.moduleNumber].angle.getDegrees( ), 0, 180));
-    }
-    return states;
-  }
+  //
+  // Used by WPILib in 2022 - switched to getPositions in 2023
+  //
+  // public SwerveModuleState[ ] getStates( )
+  // {
+  //   SwerveModuleState[ ] states = new SwerveModuleState[4];
+  //   for (SwerveModule mod : m_swerveMods)
+  //   {
+  //     states[mod.m_moduleNumber] = mod.getState( );
+  //     SmartDashboard.putNumber(String.format("mod%d current speed", mod.m_moduleNumber, "mod "),
+  //         states[mod.m_moduleNumber].speedMetersPerSecond);
+  //     SmartDashboard.putNumber(String.format("mod%d current angle", mod.m_moduleNumber, "mod "),
+  //         MathUtil.inputModulus(states[mod.m_moduleNumber].angle.getDegrees( ), 0, 180));
+  //   }
+  //   return states;
+  // }
 
   public SwerveModulePosition[ ] getPositions( )
   {
     SwerveModulePosition[ ] positions = new SwerveModulePosition[4];
     for (SwerveModule mod : m_swerveMods)
     {
-      positions[mod.moduleNumber] = mod.getPosition( );
-      SmartDashboard.putNumber("mod " + mod.moduleNumber + " current distance", positions[mod.moduleNumber].distanceMeters);
-      SmartDashboard.putNumber("mod " + mod.moduleNumber + " current angle",
-          MathUtil.inputModulus(positions[mod.moduleNumber].angle.getDegrees( ), 0, 180));
+      positions[mod.m_moduleNumber] = mod.getPosition( );
+      SmartDashboard.putNumber(String.format("mod%d current distance", mod.m_moduleNumber, "mod "),
+          positions[mod.m_moduleNumber].distanceMeters);
+      SmartDashboard.putNumber(String.format("mod%d current angle", mod.m_moduleNumber, "mod "),
+          MathUtil.inputModulus(positions[mod.m_moduleNumber].angle.getDegrees( ), 0, 180));
     }
     return positions;
   }
@@ -784,5 +789,4 @@ public class Swerve extends SubsystemBase
   }
 
   //// 1678 Swerve //////////////////////////////////////////////////////////////
-
 }

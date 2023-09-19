@@ -7,19 +7,19 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.Falcon500;
 
-public class PhoenixUtil
+public class PhoenixUtil5
 {
-  private static PhoenixUtil  instance    = null;
+  private static PhoenixUtil5 instance    = null;
   private static final int    m_retries   = 3;    // Number of version check attempts
   private static final String classString = "PhoenixUtil";
 
-  PhoenixUtil( )
+  PhoenixUtil5( )
   {}
 
-  public static PhoenixUtil getInstance( )
+  public static PhoenixUtil5 getInstance( )
   {
     if (instance == null)
-      instance = new PhoenixUtil( );
+      instance = new PhoenixUtil5( );
 
     return instance;
   }

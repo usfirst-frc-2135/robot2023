@@ -73,7 +73,7 @@ public class PigeonIMU
   {
     Rotation2d rot2d = getUnadjustedYaw( ).rotateBy(m_yawAdjustment.unaryMinus( ));
 
-    return (SWConsts.invertGyro) ? rot2d.unaryMinus( ) : rot2d;
+    return (SWConsts.gyroInvert) ? rot2d.unaryMinus( ) : rot2d;
   }
 
   /**

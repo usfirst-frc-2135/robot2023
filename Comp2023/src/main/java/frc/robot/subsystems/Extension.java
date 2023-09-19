@@ -135,9 +135,9 @@ public class Extension extends SubsystemBase
 
     // // Finally, we set our simulated encoder's readings and simulated battery voltage TODO: Match for extension
     m_motorSim.setRawRotorPosition(
-        Conversions.metersToInputRotations(m_armSim.getPositionMeters( ), Units.inchesToMeters(EXConsts.kRolloutRatio)));
+        Conversions.metersToWinchRotations(m_armSim.getPositionMeters( ), Units.inchesToMeters(EXConsts.kRolloutRatio)));
     m_motorSim.setRotorVelocity(
-        Conversions.metersToInputRotations(m_armSim.getVelocityMetersPerSecond( ), Units.inchesToMeters(EXConsts.kRolloutRatio)));
+        Conversions.metersToWinchRotations(m_armSim.getVelocityMetersPerSecond( ), Units.inchesToMeters(EXConsts.kRolloutRatio)));
 
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps( )));

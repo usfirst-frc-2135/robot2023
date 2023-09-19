@@ -13,7 +13,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.lib.util.CTREConfigs;
+import frc.robot.lib.util.CTREConfigs5;
+import frc.robot.lib.util.CTREConfigs6;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -23,12 +24,13 @@ import frc.robot.lib.util.CTREConfigs;
  */
 public class Robot extends TimedRobot
 {
-  private RobotContainer    m_robotContainer;
-  private Command           m_autonomousCommand;
+  private RobotContainer     m_robotContainer;
+  private Command            m_autonomousCommand;
 
-  private boolean           m_faultsCleared = false;
+  private boolean            m_faultsCleared = false;
 
-  public static CTREConfigs ctreConfigs;
+  public static CTREConfigs5 ctreConfigs5;
+  public static CTREConfigs6 ctreConfigs6;
 
   /**
    * This function is run when the robot is first started up and should be used for any initialization
@@ -61,7 +63,8 @@ public class Robot extends TimedRobot
     DataLogManager.log(String.format("robotInit: Detected the %s robot! ", robotName));
 
     // Instantiate CTRE configurations
-    ctreConfigs = new CTREConfigs( );
+    ctreConfigs5 = new CTREConfigs5( );
+    ctreConfigs6 = new CTREConfigs6( );
 
     // Instantiate RobotContainer. Performs button bindings, builds autonomous chooser on the dashboard.
     m_robotContainer = RobotContainer.getInstance( );
@@ -257,8 +260,8 @@ public class Robot extends TimedRobot
     // Print out talon faults and clear sticky ones
     DataLogManager.log("robotFaultDump:  ----- DUMP FAULTS --------------");
 
+    m_robotContainer.m_swerve.faultDump( );
     m_robotContainer.m_led.faultDump( );
     m_robotContainer.m_power.faultDump( );
-    m_robotContainer.m_swerve.faultDump( );
   }
 }
