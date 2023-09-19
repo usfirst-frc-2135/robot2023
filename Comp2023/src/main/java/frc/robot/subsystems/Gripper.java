@@ -13,8 +13,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.GRConsts;
 import frc.robot.Constants.GRConsts.GRMode;
-import frc.robot.lib.util.PhoenixUtil5;
 import frc.robot.Constants.Ports;
+import frc.robot.lib.util.PhoenixUtil5;
 
 //
 // Gripper subsystem class

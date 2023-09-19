@@ -65,7 +65,7 @@ public class PhoenixUtil6
         Timer.delay(0.1);
     }
 
-    talonValid = (fwvMajor >= Constants.kPhoenixMajorVersion);
+    talonValid = (fwvMajor >= Constants.kPhoenix6MajorVersion);
 
     if (config != null)
       if ((status = motor.getConfigurator( ).apply(config, m_timeout)) != StatusCode.OK)
@@ -120,7 +120,7 @@ public class PhoenixUtil6
         Timer.delay(0.1);
     }
 
-    canCoderValid = (fwvMajor >= Constants.kPhoenixMajorVersion);
+    canCoderValid = (fwvMajor >= Constants.kPhoenix6MajorVersion);
 
     if (config != null)
       if ((status = canCoder.getConfigurator( ).apply(config, m_timeout)) != StatusCode.OK)
@@ -166,7 +166,7 @@ public class PhoenixUtil6
         Timer.delay(0.1);
     }
 
-    pigeon2Valid = (fwvMajor >= Constants.kPhoenixMajorVersion);
+    pigeon2Valid = (fwvMajor >= Constants.kPhoenix6MajorVersion);
 
     if (config != null)
       if ((status = pigeon2.getConfigurator( ).apply(config, m_timeout)) != StatusCode.OK)

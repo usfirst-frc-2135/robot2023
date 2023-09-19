@@ -34,27 +34,28 @@ public class Constants
   public static boolean      isComp;
 
   // bot serial nums
-  public static final String kCompSN              = "03238074";
-  public static final String kBetaSN              = "03260A3A";
+  public static final String kCompSN               = "03238074";
+  public static final String kBetaSN               = "03260A3A";
 
   // Game controller definitions
-  public static final int    kDriverPadPort       = 0;
-  public static final int    kOperatorPadPort     = 1;
+  public static final int    kDriverPadPort        = 0;
+  public static final int    kOperatorPadPort      = 1;
 
-  public static final double kStickDeadband       = 0.15;
-  public static final double kTriggerThreshold    = 0.25;
+  public static final double kStickDeadband        = 0.15;
+  public static final double kTriggerThreshold     = 0.25;
 
   // Timeout constants
-  public static final int    kLongCANTimeoutMs    = 100;
-  public static final int    kCANTimeoutMs        = 10;
+  public static final int    kLongCANTimeoutMs     = 100;
+  public static final int    kCANTimeoutMs         = 10;
 
   // PDH constatns
-  public static final double kMinCurrent          = 0.125;  // Minimum detectable current from PDH
+  public static final double kMinCurrent           = 0.125;  // Minimum detectable current from PDH
 
   // Field constants
-  public static final double kGridNodeSpacing     = 0.4667; // 18.375 inches between cube node and peg nodes
+  public static final double kGridNodeSpacing      = 0.4667; // 18.375 inches between cube node and peg nodes
 
-  public static final int    kPhoenixMajorVersion = 23;
+  public static final int    kPhoenix5MajorVersion = ((22 * 256) + 0);
+  public static final int    kPhoenix6MajorVersion = 23;
 
   // CAN IDs and PWM IDs
 
@@ -101,9 +102,8 @@ public class Constants
 
   public static final class Falcon500
   {
-    public static int          kMaxRPM             = 6380;             // free speed for Falcon 500 motor
-    public static final double kEncoderCPR         = 2048;             // CPR is 2048 from Falcon 500 Manual
-    public static final int    kTalonSRXReqVersion = ((22 * 256) + 0); // Talon version is 23.0
+    public static int          kMaxRPM     = 6380;             // free speed for Falcon 500 motor
+    public static final double kEncoderCPR = 2048;             // CPR is 2048 from Falcon 500 Manual
   }
 
   public static final class SWConsts

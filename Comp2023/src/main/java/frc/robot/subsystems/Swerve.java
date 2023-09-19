@@ -35,9 +35,9 @@ import frc.robot.Constants.LLConsts;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SWConsts;
 import frc.robot.Constants.SnapConstants;
+import frc.robot.RobotContainer;
 import frc.robot.lib.util.PigeonIMU;
 import frc.robot.lib.util.SwerveModule;
-import frc.robot.RobotContainer;
 
 //
 // Swerve subsystem class

@@ -5,12 +5,12 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.Constants.Falcon500;
+import frc.robot.Constants;
 
 public class PhoenixUtil5
 {
   private static PhoenixUtil5 instance    = null;
-  private static final int    m_retries   = 3;    // Number of version check attempts
+  private static final int    m_retries   = 5;    // Number of version check attempts
   private static final String m_className = "PhoenixUtil5";
 
   PhoenixUtil5( )
@@ -37,12 +37,12 @@ public class PhoenixUtil5
     return errorCode;
   }
 
-  public boolean talonSRXInitialize(WPI_TalonSRX talon, String motorName)
+  public boolean talonSRXInitialize(WPI_TalonSRX talon, String name)
   {
     ErrorCode error = ErrorCode.OK;
     int deviceID = 0;
     int fwVersion = 0;
-    String baseStr = motorName + " motor: ";
+    String baseStr = name + " motor: ";
     boolean talonValid = false;
     boolean initialized = false;
 
@@ -63,7 +63,7 @@ public class PhoenixUtil5
         if (error == ErrorCode.OK)
         {
           talonValid = true;
-          if (fwVersion < Falcon500.kTalonSRXReqVersion)
+          if (fwVersion < Constants.kPhoenix5MajorVersion)
             DataLogManager.log(String.format("%s: ID %2d - %s - Incorrect FW version: %d - error %d", m_className, deviceID,
                 baseStr, (fwVersion / 256.0), error.value));
           break;
@@ -75,7 +75,7 @@ public class PhoenixUtil5
 
     if (talonValid)
     {
-      baseStr += "ver: " + (fwVersion / 256.0) + " ";
+      baseStr += "ver: " + (fwVersion / 256.0);
       error = talon.configFactoryDefault( );
       if (error != ErrorCode.OK)
         DataLogManager
@@ -85,7 +85,7 @@ public class PhoenixUtil5
     }
 
     DataLogManager.log(String.format("%s: ID %2d - %s is %s - error %d", m_className, deviceID, baseStr,
-        (talonValid && initialized) ? "INITIALIZED!" : "UNRESPONSIVE!", error.value));
+        (talonValid && initialized) ? "VALID!" : "UNRESPONSIVE!", error.value));
 
     return talonValid && initialized;
   }
