@@ -29,6 +29,7 @@ import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.VIConsts.VIGoalDirection;
 import frc.robot.Constants.WRConsts;
+import frc.robot.commands.ArmManualMode;
 import frc.robot.commands.ArmSetHeightIdle;
 import frc.robot.commands.ArmSetHeightScoreHigh;
 import frc.robot.commands.ArmSetHeightScoreLow;
@@ -50,13 +51,13 @@ import frc.robot.commands.DriveSnap;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.ElbowMoveToPosition;
+import frc.robot.commands.ElbowRun;
 import frc.robot.commands.ElbowSetAngleZero;
 import frc.robot.commands.ExtensionCalibrate;
 import frc.robot.commands.ExtensionMoveToLength;
 import frc.robot.commands.ExtensionRun;
 import frc.robot.commands.GripperRun;
 import frc.robot.commands.LEDSet;
-import frc.robot.commands.ArmManualMode;
 import frc.robot.commands.WristMoveToPosition;
 import frc.robot.commands.WristRun;
 import frc.robot.commands.WristRunBrake;
@@ -158,6 +159,7 @@ public class RobotContainer
     SmartDashboard.putData("ExtensionMid", new ExtensionMoveToLength(m_extension, EXConsts.kLengthScoreMid));
     SmartDashboard.putData("ExtensionHigh", new ExtensionMoveToLength(m_extension, EXConsts.kLengthScoreHigh));
     SmartDashboard.putData("ExtensionShelf", new ExtensionMoveToLength(m_extension, EXConsts.kLengthSubstation));
+    SmartDashboard.putData("ExtensionCalibrate", new ExtensionCalibrate(m_extension));
 
     // Wrist subsytem tests
     SmartDashboard.putData("WristStow", new WristMoveToPosition(m_wrist, WRConsts.kAngleStow));
@@ -324,11 +326,11 @@ public class RobotContainer
   {
     m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_elbow, m_driverPad));
 
-    m_elbow.setDefaultCommand(new ElbowMoveToPosition(m_elbow));
+    // m_elbow.setDefaultCommand(new ElbowMoveToPosition(m_elbow));
     // m_extension.setDefaultCommand(new ExtensionMoveToLength(m_extension));
     // m_wrist.setDefaultCommand(new WristMoveToAngle(m_wrist));
 
-    // m_elbow.setDefaultCommand(new ElbowRun(m_elbow, m_operatorPad));
+    m_elbow.setDefaultCommand(new ElbowRun(m_elbow, m_operatorPad));
     m_extension.setDefaultCommand(new ExtensionRun(m_extension, m_operatorPad));
     m_wrist.setDefaultCommand(new WristRun(m_wrist, m_operatorPad));
   }
