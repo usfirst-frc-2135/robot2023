@@ -1,6 +1,7 @@
 package frc.robot.lib.math;
 
 import edu.wpi.first.math.util.Units;
+import frc.robot.Constants.EXConsts;
 
 public class Conversions
 {
@@ -131,6 +132,11 @@ public class Conversions
   public static double metersToWinchRotations(double meters, double rolloutRatio)
   {
     return meters / Units.inchesToMeters(rolloutRatio);
+  }
+
+  public static double inchesToOutputRotations(double inches)
+  {
+    return inches / EXConsts.kRolloutRatio;
   }
 
 }

@@ -112,6 +112,7 @@ public class Extension extends SubsystemBase
 
     m_mechLigament.setLength(Units.inchesToMeters(m_currentInches + kLigament2dOffset));
     SmartDashboard.putNumber("EX_curInches", m_currentInches);
+    SmartDashboard.putNumber("EX_curRotations", inchesToOutputRotations(m_currentInches));
     SmartDashboard.putNumber("EX_targetInches", m_targetInches);
 
     m_totalArbFeedForward = calculateTotalArbFF( );
@@ -175,12 +176,12 @@ public class Extension extends SubsystemBase
 
   public double rotationsToOutputInches(double rotations)
   {
-    return rotations / EXConsts.kRolloutRatio;
+    return rotations * EXConsts.kRolloutRatio;
   }
 
   public double inchesToOutputRotations(double inches)
   {
-    return inches * EXConsts.kRolloutRatio;
+    return inches / EXConsts.kRolloutRatio;
   }
 
   public boolean isBelowIdle( )
