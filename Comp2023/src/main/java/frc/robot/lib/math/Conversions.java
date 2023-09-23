@@ -134,9 +134,13 @@ public class Conversions
     return meters / Units.inchesToMeters(rolloutRatio);
   }
 
-  public static double inchesToOutputRotations(double inches)
+  public static double inchesToRotations(double inches)
   {
     return inches / EXConsts.kRolloutRatio;
   }
 
+  public static double rotationsToInches(double rotations)
+  {
+    return rotations * EXConsts.kRolloutRatio;
+  }
 }

@@ -86,7 +86,7 @@ public class Extension extends SubsystemBase
 
     if (Robot.isReal( ))
       m_currentInches = getCurrentInches( );
-    m_motor.setRotorPosition(inchesToOutputRotations(m_currentInches));
+    m_motor.setRotorPosition(Conversions.inchesToRotations(m_currentInches));
     DataLogManager.log(String.format("%s: CANCoder initial inches %.1f", getSubsystem( ), m_currentInches));
 
     m_motorSim.Orientation = ChassisReference.CounterClockwise_Positive;
@@ -112,7 +112,7 @@ public class Extension extends SubsystemBase
 
     m_mechLigament.setLength(Units.inchesToMeters(m_currentInches + kLigament2dOffset));
     SmartDashboard.putNumber("EX_curInches", m_currentInches);
-    SmartDashboard.putNumber("EX_curRotations", inchesToOutputRotations(m_currentInches));
+    SmartDashboard.putNumber("EX_curRotations", Conversions.inchesToRotations(m_currentInches));
     SmartDashboard.putNumber("EX_targetInches", m_targetInches);
 
     m_totalArbFeedForward = calculateTotalArbFF( );
@@ -171,17 +171,7 @@ public class Extension extends SubsystemBase
 
   public double getCurrentInches( )
   {
-    return rotationsToOutputInches(m_motor.getRotorPosition( ).refresh( ).getValue( ));
-  }
-
-  public double rotationsToOutputInches(double rotations)
-  {
-    return rotations * EXConsts.kRolloutRatio;
-  }
-
-  public double inchesToOutputRotations(double inches)
-  {
-    return inches / EXConsts.kRolloutRatio;
+    return Conversions.rotationsToInches(m_motor.getRotorPosition( ).refresh( ).getValue( ));
   }
 
   public boolean isBelowIdle( )
@@ -211,7 +201,7 @@ public class Extension extends SubsystemBase
 
   public void setLengthToZero( )
   {
-    m_motor.setRotorPosition(inchesToOutputRotations(0));
+    m_motor.setRotorPosition(Conversions.inchesToRotations(0));
   }
 
   public void setStopped( )
@@ -280,10 +270,11 @@ public class Extension extends SubsystemBase
         m_moveIsFinished = false;
         m_withinTolerance.calculate(false); // Reset the debounce filter
 
-        m_motor.setControl(m_requestMMVolts.withPosition(inchesToOutputRotations(m_targetInches)));
+        m_motor.setControl(m_requestMMVolts.withPosition(Conversions.inchesToRotations(m_targetInches)));
         // .withFeedForward((m_totalArbFeedForward)));  // TODO - once extension is fixed and Tuner X is used
-        DataLogManager.log(String.format("%s: Position move: %.1f -> %.1f inches (%.1f -> %.1f)", getSubsystem( ),
-            m_currentInches, m_targetInches, inchesToOutputRotations(m_currentInches), inchesToOutputRotations(m_targetInches)));
+        DataLogManager
+            .log(String.format("%s: Position move: %.1f -> %.1f inches (%.1f -> %.1f)", getSubsystem( ), m_currentInches,
+                m_targetInches, Conversions.inchesToRotations(m_currentInches), Conversions.inchesToRotations(m_targetInches)));
       }
       else
         DataLogManager.log(String.format("%s: Position move %.1f inches is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
@@ -300,7 +291,7 @@ public class Extension extends SubsystemBase
   public void moveToPositionExecute( )
   {
     if (m_calibrated)
-      m_motor.setControl(m_requestMMVolts.withPosition(inchesToOutputRotations(m_targetInches)));
+      m_motor.setControl(m_requestMMVolts.withPosition(Conversions.inchesToRotations(m_targetInches)));
     // .withFeedForward(m_totalArbFeedForward)); // TODO - once extension is fixed and Tuner X is used
   }
 
