@@ -10,6 +10,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.VIConsts;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
 
@@ -20,15 +21,13 @@ public class DriveResetOdometry extends CommandBase
 {
   private final Swerve m_swerve;
   private final Vision m_vision;
-  private final int    m_id;
 
-  public DriveResetOdometry(Swerve swerve, Vision vision, int id)
+  public DriveResetOdometry(Swerve swerve, Vision vision)
   {
     m_swerve = swerve;
     m_vision = vision;
-    m_id = id;
 
-    setName("ResetOdometryToLimelight");
+    setName("DriveResetOdometry");
     addRequirements(m_swerve);
   }
 
@@ -36,24 +35,29 @@ public class DriveResetOdometry extends CommandBase
   @Override
   public void initialize( )
   {
+    Integer aprilTagId = RobotContainer.getInstance( ).getOdometryOption( );
+
     Pose2d llPose = m_vision.getLimelightRawPose( );
     if (llPose != null)
     {
-      //m_swerve.resetOdometry(new Pose2d(new Translation2d(llPose.getX( ) + 2, llPose.getY( )), llPose.getRotation( )));
+      //m_swerve.resetOdometry(new Pose2d(new Translation2d(llPose.getX( ) + 2, llPose.getY( )), llPose.getRotation( ))); // TODO: ?
       m_swerve.resetLimelightOdometry(llPose);
     }
-    else if ((m_id > 0) && (m_id < 9))
+    else
     {
-      m_vision.setFixedTargetID(m_id);
-      Pose2d atp = VIConsts.kAprilTagPoses.get(m_id);
-      double rotation = (m_id <= 4) ? 0 : Math.PI;
-      Pose2d robotPose =
-          new Pose2d(new Translation2d(atp.getX( ) + ((m_id <= 4) ? -3.0 : 3.0), atp.getY( )), new Rotation2d(rotation));
+      if ((aprilTagId >= 1) && (aprilTagId <= 8))
+      {
+        m_vision.setFixedTargetID(aprilTagId);
+        Pose2d atp = VIConsts.kAprilTagPoses.get(aprilTagId);
+        double rotation = (aprilTagId <= 4) ? 0 : Math.PI;
+        Pose2d robotPose =
+            new Pose2d(new Translation2d(atp.getX( ) + ((aprilTagId <= 4) ? -3.0 : 3.0), atp.getY( )), new Rotation2d(rotation));
 
-      DataLogManager.log(String.format("%s: Set Rotation: %.1f", getName( ), rotation));
+        DataLogManager.log(String.format("%s: Set Rotation: %.1f", getName( ), rotation));
 
-      m_swerve.zeroGyro(Units.radiansToDegrees(rotation));
-      m_swerve.resetOdometry(robotPose);
+        m_swerve.zeroGyro(Units.radiansToDegrees(rotation));
+        m_swerve.resetOdometry(robotPose);
+      }
     }
   }
 

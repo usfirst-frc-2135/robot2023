@@ -29,6 +29,7 @@ import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.VIConsts.VIGoalDirection;
 import frc.robot.Constants.WRConsts;
+import frc.robot.commands.ArmManualMode;
 import frc.robot.commands.ArmSetHeightIdle;
 import frc.robot.commands.ArmSetHeightScoreHigh;
 import frc.robot.commands.ArmSetHeightScoreLow;
@@ -50,13 +51,13 @@ import frc.robot.commands.DriveSnap;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.ElbowMoveToPosition;
+import frc.robot.commands.ElbowRun;
 import frc.robot.commands.ElbowSetAngleZero;
 import frc.robot.commands.ExtensionCalibrate;
 import frc.robot.commands.ExtensionMoveToLength;
 import frc.robot.commands.ExtensionRun;
 import frc.robot.commands.GripperRun;
 import frc.robot.commands.LEDSet;
-import frc.robot.commands.ArmManualMode;
 import frc.robot.commands.WristMoveToPosition;
 import frc.robot.commands.WristRun;
 import frc.robot.commands.WristRunBrake;
@@ -99,8 +100,10 @@ public class RobotContainer
 
   // A chooser for autonomous commands
   private SendableChooser<AutoChooser> m_autoChooser        = new SendableChooser<>( );
-  private Command                      autoCommand;
-  PathPlannerTrajectory                autoTrajectory;
+  private Command                      m_autoCommand;
+  PathPlannerTrajectory                m_autoTrajectory;
+
+  private SendableChooser<Integer>     m_odomChooser        = new SendableChooser<>( );
 
   // Command Scheduler
   public Command                       m_extensionCalibrate = new ExtensionCalibrate(m_extension);
@@ -117,6 +120,8 @@ public class RobotContainer
     initDefaultCommands( );
 
     initAutonomousChooser( );
+
+    initOdometryChooser( );
   }
 
   public static RobotContainer getInstance( )
@@ -182,18 +187,10 @@ public class RobotContainer
     SmartDashboard.putData("ArmSetHeightScoreHigh", new ArmSetHeightScoreHigh(m_elbow, m_extension, m_wrist));
 
     // On-the-fly path generation helper tests
-    SmartDashboard.putData("ResetOdometryToLimelight", new DriveResetOdometry(m_swerve, m_vision, 0));
-    // SmartDashboard.putData("ResetOdo1", new ResetOdometryToLimelight(m_swerve, m_vision, 1));
-    // SmartDashboard.putData("ResetOdo2", new ResetOdometryToLimelight(m_swerve, m_vision, 2));
-    // SmartDashboard.putData("ResetOdo3", new ResetOdometryToLimelight(m_swerve, m_vision, 3));
-    // SmartDashboard.putData("ResetOdo4", new ResetOdometryToLimelight(m_swerve, m_vision, 4));
-    // SmartDashboard.putData("ResetOdo5", new ResetOdometryToLimelight(m_swerve, m_vision, 5));
-    // SmartDashboard.putData("ResetOdo6", new ResetOdometryToLimelight(m_swerve, m_vision, 6));
-    // SmartDashboard.putData("ResetOdo7", new ResetOdometryToLimelight(m_swerve, m_vision, 7));
-    // SmartDashboard.putData("ResetOdo8", new ResetOdometryToLimelight(m_swerve, m_vision, 8));
-    // SmartDashboard.putData("DriveLLLeft", new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_LEFT));
-    // SmartDashboard.putData("DriveLLMiddle", new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_MIDDLE));
-    // SmartDashboard.putData("DriveLLRight", new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_RIGHT));
+    SmartDashboard.putData("DriveResetOdometry", new DriveResetOdometry(m_swerve, m_vision));
+    SmartDashboard.putData("DriveLLLeft", new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_LEFT));
+    SmartDashboard.putData("DriveLLMiddle", new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_MIDDLE));
+    SmartDashboard.putData("DriveLLRight", new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_RIGHT));
 
     // LED (CANdle) test
     SmartDashboard.putData("LEDSet", new LEDSet(m_led, LEDColor.LEDCOLOR_DASH));
@@ -341,30 +338,18 @@ public class RobotContainer
   {
     // Autonomous Chooser
     m_autoChooser.setDefaultOption("0 - AutoStop", AutoChooser.AUTOSTOP);
-
     m_autoChooser.addOption("1 - AutoDriveOffCommunityShort", AutoChooser.AUTOCOMSHORT);
     m_autoChooser.addOption("2 - AutoDriveOffCommunityLong", AutoChooser.AUTOCOMLONG);
     m_autoChooser.addOption("3 - AutoEngageChargeStation", AutoChooser.AUTOCHARGE);
-
     m_autoChooser.addOption("4 - AutoPreloadAndStop", AutoChooser.AUTOPRESTOP);
     m_autoChooser.addOption("5 - AutoPreloadAndLeaveCommunityShort", AutoChooser.AUTOPRECOMSHORT);
     m_autoChooser.addOption("6 - AutoPreloadAndLeaveCommunityLong", AutoChooser.AUTOPRECOMLONG);
     m_autoChooser.addOption("7 - AutoPreloadAndEngageChargeStation", AutoChooser.AUTOPRECHARGE);
 
-    //m_chooser.addOption("7 - AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve));
+    //m_chooser.addOption("8 - AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve));
 
     // Configure autonomous sendable chooser
     SmartDashboard.putData("Auto Mode", m_autoChooser);
-  }
-
-  public XboxController getDriver( )
-  {
-    return m_driverPad;
-  }
-
-  public XboxController getOperator( )
-  {
-    return m_operatorPad;
   }
 
   /**
@@ -376,6 +361,8 @@ public class RobotContainer
   {
     String pathName = null;
     AutoChooser mode = m_autoChooser.getSelected( );
+    Alliance alliance = DriverStation.getAlliance( );
+
     // The selected command will be run in autonomous
     switch (mode)
     {
@@ -385,63 +372,97 @@ public class RobotContainer
         break;
       case AUTOCOMSHORT :
       case AUTOPRECOMSHORT :
-        pathName =
-            (DriverStation.getAlliance( ) == Alliance.Red) ? "driveOutOfCommunityShortRed" : "driveOutOfCommunityShortBlue";
+        pathName = (alliance == Alliance.Red) ? "driveOutOfCommunityShortRed" : "driveOutOfCommunityShortBlue";
         break;
       case AUTOCOMLONG :
       case AUTOPRECOMLONG :
-        pathName = (DriverStation.getAlliance( ) == Alliance.Red) ? "driveOutOfCommunityLongRed" : "driveOutOfCommunityLongBlue";
+        pathName = (alliance == Alliance.Red) ? "driveOutOfCommunityLongRed" : "driveOutOfCommunityLongBlue";
         break;
       case AUTOCHARGE :
       case AUTOPRECHARGE :
-        pathName = (DriverStation.getAlliance( ) == Alliance.Red) ? "driveOntoChargeStationRed" : "driveOntoChargeStationBlue";
+        pathName = (alliance == Alliance.Red) ? "driveOntoChargeStationRed" : "driveOntoChargeStationBlue";
         break;
     }
 
     if (pathName != null)
-      autoTrajectory = PathPlanner.loadPath(pathName, AutoConstants.defaultPathConfig);
+      m_autoTrajectory = PathPlanner.loadPath(pathName, AutoConstants.defaultPathConfig);
 
     switch (mode)
     {
       default :
       case AUTOSTOP :
-        autoCommand = new AutoStop(m_swerve);
+        m_autoCommand = new AutoStop(m_swerve);
         break;
       case AUTOCOMSHORT :
-        autoCommand = new AutoDrivePath(m_swerve, "driveOutOfCommunityShort", autoTrajectory, true);
+        m_autoCommand = new AutoDrivePath(m_swerve, "driveOutOfCommunityShort", m_autoTrajectory, true);
         break;
       case AUTOCOMLONG :
-        autoCommand = new AutoDrivePath(m_swerve, "driveOutOfCommunityLong", autoTrajectory, true);
+        m_autoCommand = new AutoDrivePath(m_swerve, "driveOutOfCommunityLong", m_autoTrajectory, true);
         break;
       case AUTOCHARGE :
-        autoCommand = new AutoEngageChargeStation(m_swerve, "driveOntoChargeStation", autoTrajectory);
+        m_autoCommand = new AutoEngageChargeStation(m_swerve, "driveOntoChargeStation", m_autoTrajectory);
         break;
       case AUTOPRESTOP :
-        autoCommand = new AutoPreloadAndStop(m_swerve, m_elbow, m_extension, m_wrist, m_gripper);
+        m_autoCommand = new AutoPreloadAndStop(m_swerve, m_elbow, m_extension, m_wrist, m_gripper);
         break;
       case AUTOPRECOMSHORT :
-        autoCommand = new AutoPreloadAndLeaveCommunityShort(m_swerve, m_elbow, m_extension, m_wrist, m_gripper,
-            "AutoPreloadAndLeaveCommunityShort", autoTrajectory);
+        m_autoCommand = new AutoPreloadAndLeaveCommunityShort(m_swerve, m_elbow, m_extension, m_wrist, m_gripper,
+            "AutoPreloadAndLeaveCommunityShort", m_autoTrajectory);
         break;
       case AUTOPRECOMLONG :
-        autoCommand = new AutoPreloadAndLeaveCommunityLong(m_swerve, m_elbow, m_extension, m_wrist, m_gripper,
-            "AutoPreloadAndLeaveCommunityLong", autoTrajectory);
+        m_autoCommand = new AutoPreloadAndLeaveCommunityLong(m_swerve, m_elbow, m_extension, m_wrist, m_gripper,
+            "AutoPreloadAndLeaveCommunityLong", m_autoTrajectory);
         break;
       case AUTOPRECHARGE :
-        autoCommand = new AutoPreloadAndEngageChargeStation(m_swerve, m_elbow, m_extension, m_wrist, m_gripper,
-            "AutoPreloadAndEngageChargeStation", autoTrajectory);
+        m_autoCommand = new AutoPreloadAndEngageChargeStation(m_swerve, m_elbow, m_extension, m_wrist, m_gripper,
+            "AutoPreloadAndEngageChargeStation", m_autoTrajectory);
         break;
     }
 
     DataLogManager.log("getAutonomousCommand: mode is " + mode + " path is " + pathName);
 
-    return autoCommand;
+    return m_autoCommand;
   }
 
   public void runAutonomousCommand( )
   {
     Command autoCmd = getAutonomousCommand( );
     autoCmd.schedule( );
+  }
+
+  /****************************************************************************
+   * 
+   * Set up odometry chooser
+   */
+  private void initOdometryChooser( )
+  {
+    // Autonomous Chooser
+    m_odomChooser.setDefaultOption("ID1 - AprilTag", 1);
+    m_odomChooser.addOption("ID2 - AprilTag", 2);
+    m_odomChooser.addOption("ID3 - AprilTag", 3);
+    m_odomChooser.addOption("ID4 - AprilTag", 4);
+    m_odomChooser.addOption("ID5 - AprilTag", 5);
+    m_odomChooser.addOption("ID6 - AprilTag", 6);
+    m_odomChooser.addOption("ID7 - AprilTag", 7);
+    m_odomChooser.addOption("ID8 - AprilTag", 8);
+
+    // Configure odometry sendable chooser
+    SmartDashboard.putData("Reset Odometry Mode", m_odomChooser);
+  }
+
+  public Integer getOdometryOption( )
+  {
+    return m_odomChooser.getSelected( );
+  }
+
+  public XboxController getDriver( )
+  {
+    return m_driverPad;
+  }
+
+  public XboxController getOperator( )
+  {
+    return m_operatorPad;
   }
 
 }
