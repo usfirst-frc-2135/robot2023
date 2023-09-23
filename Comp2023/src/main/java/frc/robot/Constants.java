@@ -332,7 +332,7 @@ public class Constants
     public static final double        kLengthSubstation         = 1.25;  // From Mech Design (3'1-38" above floor)
     public static final double        kLengthMax                = 18.0;  // Extension maximum allowable length (2" beyond high length)
 
-    public static final InvertedValue kInvertMotor              = InvertedValue.CounterClockwise_Positive; // Motor direction for positive input
+    public static final InvertedValue kInvertMotor              = InvertedValue.Clockwise_Positive; // Motor direction for positive input
 
     // Current limit settings - extension
     public static final double        kSupplyCurrentLimit       = 15.0;  // Supply current limit (after trigger)
