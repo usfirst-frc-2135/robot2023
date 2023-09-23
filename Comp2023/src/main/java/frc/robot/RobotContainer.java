@@ -163,6 +163,7 @@ public class RobotContainer
     SmartDashboard.putData("ExtensionMid", new ExtensionMoveToLength(m_extension, EXConsts.kLengthScoreMid));
     SmartDashboard.putData("ExtensionHigh", new ExtensionMoveToLength(m_extension, EXConsts.kLengthScoreHigh));
     SmartDashboard.putData("ExtensionShelf", new ExtensionMoveToLength(m_extension, EXConsts.kLengthSubstation));
+    SmartDashboard.putData("ExtensionCalibrate", new ExtensionCalibrate(m_extension));
 
     // Wrist subsytem tests
     SmartDashboard.putData("WristStow", new WristMoveToPosition(m_wrist, WRConsts.kAngleStow));
@@ -321,11 +322,11 @@ public class RobotContainer
   {
     m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_elbow, m_driverPad));
 
-    m_elbow.setDefaultCommand(new ElbowMoveToPosition(m_elbow));
+    // m_elbow.setDefaultCommand(new ElbowMoveToPosition(m_elbow));
     // m_extension.setDefaultCommand(new ExtensionMoveToLength(m_extension));
     // m_wrist.setDefaultCommand(new WristMoveToAngle(m_wrist));
 
-    // m_elbow.setDefaultCommand(new ElbowRun(m_elbow, m_operatorPad));
+    m_elbow.setDefaultCommand(new ElbowRun(m_elbow, m_operatorPad));
     m_extension.setDefaultCommand(new ExtensionRun(m_extension, m_operatorPad));
     m_wrist.setDefaultCommand(new WristRun(m_wrist, m_operatorPad));
   }

@@ -408,7 +408,7 @@ public class Constants
     public static final double               kNeutralDeadband          = 0.001;          // Wrist motor output deadband
 
     // CANCoder wrist absolute offset
-    public static final double               kCompOffset               = 133.418; // CANCoder offset angle for comp bot
+    public static final double               kCompOffset               = -0.384766; // CANCoder offset angle for comp bot
     public static final double               kBetaOffset               = 0.000; // CANCoder offset angle for beta bot
     public static final SensorDirectionValue kSensorDirection          = SensorDirectionValue.Clockwise_Positive;
 
