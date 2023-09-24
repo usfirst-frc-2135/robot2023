@@ -24,7 +24,7 @@ public class WristSetAngleZero extends CommandBase
   @Override
   public void initialize( )
   {
-    m_wrist.setAngleToZero( );
+    m_wrist.resetPositionToZero( );
   }
 
   // Called every time the scheduler runs while the command is scheduled.

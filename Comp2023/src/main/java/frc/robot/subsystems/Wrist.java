@@ -210,9 +210,10 @@ public class Wrist extends SubsystemBase
     return (Math.abs(targetDegrees - m_currentDegrees) < WRConsts.kToleranceDegrees);
   }
 
-  public void setAngleToZero( )
+  public void resetPositionToZero( )
   {
-    m_motor.setRotorPosition(Conversions.degreesToInputRotations(0, WRConsts.kGearRatio));
+    if (m_motorValid)
+      m_motor.setRotorPosition(Conversions.degreesToInputRotations(0, WRConsts.kGearRatio));
   }
 
   public void setStopped( )

@@ -24,7 +24,7 @@ public class ElbowSetAngleZero extends CommandBase
   @Override
   public void initialize( )
   {
-    m_elbow.setAngleToZero( );
+    m_elbow.resetPositionToZero( );
   }
 
   // Called every time the scheduler runs while the command is scheduled.

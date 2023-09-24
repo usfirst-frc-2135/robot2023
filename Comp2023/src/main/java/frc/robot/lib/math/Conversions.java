@@ -1,12 +1,10 @@
 package frc.robot.lib.math;
 
-import edu.wpi.first.math.util.Units;
-import frc.robot.Constants.EXConsts;
-
 public class Conversions
 {
-
+  //
   // Gearbox degrees
+  //
 
   /**
    * @param rotations
@@ -32,7 +30,9 @@ public class Conversions
     return degrees / (360.0 / gearRatio);
   }
 
+  //
   // Gearbox radians
+  //
 
   /**
    * @param rotations
@@ -58,7 +58,9 @@ public class Conversions
     return radians / (2 * Math.PI / gearRatio);
   }
 
+  //
   // Gearbox velocity
+  //
 
   /**
    * @param rotationsPerSecond
@@ -90,7 +92,9 @@ public class Conversions
     return wheelRPM * gearRatio;
   }
 
+  //
   // Gearbox distance
+  //
 
   /**
    * @param rotations
@@ -120,27 +124,31 @@ public class Conversions
     return distance / (circumference / gearRatio);
   }
 
+  //
   // Winch distance
+  //
 
   /**
    * @param meters
    *          Linear winch distance
    * @param rolloutRatio
    *          Winch rollout ratio
-   * @return Input Shaft Rotations
+   * @return Winch shaft rotations
    */
-  public static double metersToWinchRotations(double meters, double rolloutRatio)
+  public static double inchesToWinchRotations(double inches, double rolloutRatio)
   {
-    return meters / Units.inchesToMeters(rolloutRatio);
+    return inches / rolloutRatio;
   }
 
-  public static double inchesToRotations(double inches)
+  /**
+   * @param rotations
+   *          Winch shaft rotations
+   * @param rolloutRatio
+   *          Winch rollout ratio
+   * @return Linear winch distance
+   */
+  public static double rotationsToWinchInches(double rotations, double rolloutRatio)
   {
-    return inches / EXConsts.kRolloutRatio;
-  }
-
-  public static double rotationsToInches(double rotations)
-  {
-    return rotations * EXConsts.kRolloutRatio;
+    return rotations * rolloutRatio;
   }
 }

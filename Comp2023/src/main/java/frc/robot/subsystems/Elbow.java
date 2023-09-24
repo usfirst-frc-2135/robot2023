@@ -211,9 +211,10 @@ public class Elbow extends SubsystemBase
     return (Math.abs(targetDegrees - m_currentDegrees) < ELConsts.kToleranceDegrees);
   }
 
-  public void setAngleToZero( )
+  public void resetPositionToZero( )
   {
-    m_motor.setRotorPosition(Conversions.degreesToInputRotations(0, ELConsts.kGearRatio));
+    if (m_motorValid)
+      m_motor.setRotorPosition(Conversions.degreesToInputRotations(0, ELConsts.kGearRatio));
   }
 
   public void setStopped( )

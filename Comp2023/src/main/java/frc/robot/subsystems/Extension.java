@@ -44,7 +44,8 @@ import frc.robot.lib.util.PhoenixUtil6;
 public class Extension extends SubsystemBase
 {
   // Constants
-  private final double              kLigament2dOffset = 0.0; // Offset from mechanism root for extension ligament
+  private final double              kLigament2dOffset = 0.0;                               // Offset from mechanism root for extension ligament
+  private final double              kLigament2dLength = Units.inchesToMeters(30.0); // Offset from mechanism root for extension ligament
 
   // Member objects
   private final TalonFX             m_motor           = new TalonFX(Ports.kCANID_Extension);
@@ -57,7 +58,7 @@ public class Extension extends SubsystemBase
   private final Mechanism2d         m_mech            = new Mechanism2d(3, 3);
   private final MechanismRoot2d     m_mechRoot        = m_mech.getRoot("extension", 0.5, 1.5);
   private final MechanismLigament2d m_mechLigament    =
-      m_mechRoot.append(new MechanismLigament2d("extension", 1, kLigament2dOffset, 6, new Color8Bit(Color.kRed)));
+      m_mechRoot.append(new MechanismLigament2d("extension", kLigament2dLength, kLigament2dOffset, 6, new Color8Bit(Color.kRed)));
 
   // Declare module variables
   private boolean                   m_motorValid;      // Health indicator for Falcon 
@@ -86,7 +87,7 @@ public class Extension extends SubsystemBase
 
     if (Robot.isReal( ))
       m_currentInches = getCurrentInches( );
-    m_motor.setRotorPosition(Conversions.inchesToRotations(m_currentInches));
+    m_motor.setRotorPosition(Conversions.inchesToWinchRotations(m_currentInches, EXConsts.kRolloutRatio));
     DataLogManager.log(String.format("%s: CANCoder initial inches %.1f", getSubsystem( ), m_currentInches));
 
     m_motorSim.Orientation = ChassisReference.CounterClockwise_Positive;
@@ -101,18 +102,12 @@ public class Extension extends SubsystemBase
     // This method will be called once per scheduler run
 
     m_currentInches = getCurrentInches( );
+    if (m_currentInches < 0)
+      setExtensionToZero( );
 
-    // if (curCounts < 0)
-    // {
-    //   m_.setNeutralMode(NeutralMode.Coast);
-    //   curCounts = 0;
-    //   m_.setSelectedSensorPosition(curCounts, PIDINDEX, Constants.kCANTimeoutMs);
-    //   m_TargetDegrees = elbowCountsToDegrees(curCounts);
-    // }
-
-    m_mechLigament.setLength(Units.inchesToMeters(m_currentInches + kLigament2dOffset));
+    m_mechLigament.setLength(kLigament2dLength + Units.inchesToMeters(m_currentInches));
     SmartDashboard.putNumber("EX_curInches", m_currentInches);
-    SmartDashboard.putNumber("EX_curRotations", Conversions.inchesToRotations(m_currentInches));
+    SmartDashboard.putNumber("EX_curRotations", Conversions.inchesToWinchRotations(m_currentInches, EXConsts.kRolloutRatio));
     SmartDashboard.putNumber("EX_targetInches", m_targetInches);
 
     m_totalArbFeedForward = calculateTotalArbFF( );
@@ -136,9 +131,9 @@ public class Extension extends SubsystemBase
 
     // // Finally, we set our simulated encoder's readings and simulated battery voltage TODO: Match for extension
     m_motorSim.setRawRotorPosition(
-        Conversions.metersToWinchRotations(m_armSim.getPositionMeters( ), Units.inchesToMeters(EXConsts.kRolloutRatio)));
+        Conversions.inchesToWinchRotations(Units.metersToInches(m_armSim.getPositionMeters( )), EXConsts.kRolloutRatio));
     m_motorSim.setRotorVelocity(
-        Conversions.metersToWinchRotations(m_armSim.getVelocityMetersPerSecond( ), Units.inchesToMeters(EXConsts.kRolloutRatio)));
+        Conversions.inchesToWinchRotations(Units.metersToInches(m_armSim.getVelocityMetersPerSecond( )), EXConsts.kRolloutRatio));
 
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps( )));
@@ -171,7 +166,7 @@ public class Extension extends SubsystemBase
 
   public double getCurrentInches( )
   {
-    return Conversions.rotationsToInches(m_motor.getRotorPosition( ).refresh( ).getValue( ));
+    return Conversions.rotationsToWinchInches(m_motor.getRotorPosition( ).refresh( ).getValue( ), EXConsts.kRolloutRatio);
   }
 
   public boolean isBelowIdle( )
@@ -199,9 +194,10 @@ public class Extension extends SubsystemBase
     return (Math.abs(targetInches - m_currentInches) < EXConsts.kToleranceInches);
   }
 
-  public void setLengthToZero( )
+  public void resetPositionToZero( )
   {
-    m_motor.setRotorPosition(Conversions.inchesToRotations(0));
+    if (m_motorValid)
+      m_motor.setRotorPosition(Conversions.inchesToWinchRotations(0, EXConsts.kRolloutRatio));
   }
 
   public void setStopped( )
@@ -270,11 +266,12 @@ public class Extension extends SubsystemBase
         m_moveIsFinished = false;
         m_withinTolerance.calculate(false); // Reset the debounce filter
 
-        m_motor.setControl(m_requestMMVolts.withPosition(Conversions.inchesToRotations(m_targetInches)));
+        m_motor.setControl(
+            m_requestMMVolts.withPosition(Conversions.inchesToWinchRotations(m_targetInches, EXConsts.kRolloutRatio)));
         // .withFeedForward((m_totalArbFeedForward)));  // TODO - once extension is fixed and Tuner X is used
-        DataLogManager
-            .log(String.format("%s: Position move: %.1f -> %.1f inches (%.1f -> %.1f)", getSubsystem( ), m_currentInches,
-                m_targetInches, Conversions.inchesToRotations(m_currentInches), Conversions.inchesToRotations(m_targetInches)));
+        DataLogManager.log(String.format("%s: Position move: %.1f -> %.1f inches (%.1f -> %.1f)", getSubsystem( ),
+            m_currentInches, m_targetInches, Conversions.inchesToWinchRotations(m_currentInches, EXConsts.kRolloutRatio),
+            Conversions.inchesToWinchRotations(m_targetInches, EXConsts.kRolloutRatio)));
       }
       else
         DataLogManager.log(String.format("%s: Position move %.1f inches is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
@@ -291,13 +288,14 @@ public class Extension extends SubsystemBase
   public void moveToPositionExecute( )
   {
     if (m_calibrated)
-      m_motor.setControl(m_requestMMVolts.withPosition(Conversions.inchesToRotations(m_targetInches)));
+      m_motor
+          .setControl(m_requestMMVolts.withPosition(Conversions.inchesToWinchRotations(m_targetInches, EXConsts.kRolloutRatio)));
     // .withFeedForward(m_totalArbFeedForward)); // TODO - once extension is fixed and Tuner X is used
   }
 
   public boolean moveToPositionIsFinished( )
   {
-    boolean timedOut = m_safetyTimer.hasElapsed(EXConsts.kMMSafetyTimeoutRatio); //TODO: check
+    boolean timedOut = m_safetyTimer.hasElapsed(2.5 + EXConsts.kMMSafetyTimeoutRatio); //TODO: check
     double error = m_targetInches - m_currentInches;
 
     if (m_withinTolerance.calculate(Math.abs(error) < EXConsts.kToleranceInches) || timedOut)
@@ -320,22 +318,24 @@ public class Extension extends SubsystemBase
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
-  // TODO: fix these
   public void moveToCalibrate( )
   {
     if (m_motorValid)
       m_motor.setControl(m_requestVolts.withOutput(EXConsts.kCalibrateSpeedVolts));
   }
 
-  public void calibrate( )
+  public void calibrateExtension( )
   {
-    if (m_motorValid)
-      m_motor.setRotorPosition(0.0);
-
-    m_targetInches = 0.0;
-    m_currentInches = 0.0;
+    setExtensionToZero( );
     m_calibrated = true;
     SmartDashboard.putBoolean("EL_calibrated", m_calibrated);
+  }
+
+  private void setExtensionToZero( )
+  {
+    m_targetInches = 0.0;
+    m_currentInches = 0.0;
+    resetPositionToZero( );
   }
 
   private double calculateTotalFF( )

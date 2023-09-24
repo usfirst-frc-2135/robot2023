@@ -285,9 +285,11 @@ public final class CTREConfigs6
     exConfig.Slot0.kD = EXConsts.kPidKd;
 
     // Software limit switches
-    exConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = Conversions.inchesToRotations(EXConsts.kLengthMin);
+    exConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold =
+        Conversions.inchesToWinchRotations(EXConsts.kLengthMin, EXConsts.kRolloutRatio);
     exConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
-    exConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Conversions.inchesToRotations(EXConsts.kLengthMax);
+    exConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold =
+        Conversions.inchesToWinchRotations(EXConsts.kLengthMax, EXConsts.kRolloutRatio);
     exConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
 
     return exConfig;
