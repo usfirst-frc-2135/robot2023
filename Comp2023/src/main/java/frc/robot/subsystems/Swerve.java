@@ -762,19 +762,6 @@ public class Swerve extends SubsystemBase
     return positions;
   }
 
-  public void setAnglePIDValues(double kP, double kI, double kD)
-  {
-    for (SwerveModule swerveModule : m_swerveMods)
-    {
-      swerveModule.updateAnglePID(kP, kI, kD);
-    }
-  }
-
-  public double[ ] getAnglePIDValues(int index)
-  {
-    return m_swerveMods[index].getAnglePIDValues( );
-  }
-
   public double getYaw( )
   {
     return m_pigeon.getYaw( ).getDegrees( );

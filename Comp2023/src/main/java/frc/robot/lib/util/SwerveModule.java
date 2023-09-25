@@ -1,7 +1,5 @@
 package frc.robot.lib.util;
 
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -30,7 +28,6 @@ public class SwerveModule
   private DutyCycleOut           m_dutyCycleRequest       = new DutyCycleOut(0.0);
   private VelocityVoltage        m_velocityVoltageRequest = new VelocityVoltage(0.0);
   private PositionVoltage        m_positionVoltageRequest = new PositionVoltage(0.0);
-  private Slot0Configs           m_slot0Config            = new Slot0Configs( );
 
   public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants)
   {
@@ -47,12 +44,6 @@ public class SwerveModule
     /* Angle Motor Config */
     m_angleMotor = new TalonFX(moduleConstants.angleMotorID, Constants.Ports.kCANCarnivore);
     PhoenixUtil6.getInstance( ).talonFXInitialize6(m_angleMotor, angleName.toString( ), CTREConfigs6.swerveAngleFXConfig( ));
-
-    TalonFXConfiguration angleConfig = CTREConfigs6.swerveAngleFXConfig( );
-    m_slot0Config.kP = angleConfig.Slot0.kP;
-    m_slot0Config.kI = angleConfig.Slot0.kI;
-    m_slot0Config.kD = angleConfig.Slot0.kD;
-    // TODO: Does the slot config need to be applied?
 
     /* Drive Motor Config */
     m_driveMotor = new TalonFX(moduleConstants.driveMotorID, Constants.Ports.kCANCarnivore);
@@ -91,27 +82,7 @@ public class SwerveModule
   {
     double absolutePosition =
         Conversions.degreesToInputRotations(getCanCoder( ).getDegrees( ) - m_angleOffset, SWConsts.angleGearRatio);
-    m_angleMotor.setRotorPosition(absolutePosition);
-  }
-
-  public void updateAnglePID(double kP, double kI, double kD)
-  {
-    if ((m_slot0Config.kP != kP) || (m_slot0Config.kI != kI) || (m_slot0Config.kD != kD))
-    {
-      m_slot0Config.kP = kP;
-      m_slot0Config.kI = kI;
-      m_slot0Config.kD = kD;
-      m_angleMotor.getConfigurator( ).apply(m_slot0Config);
-    }
-  }
-
-  public double[ ] getAnglePIDValues( )
-  {
-    double[ ] values =
-    {
-        m_slot0Config.kP, m_slot0Config.kI, m_slot0Config.kD
-    };
-    return values;
+    m_angleMotor.setPosition(absolutePosition);
   }
 
   public Rotation2d getCanCoder( )
