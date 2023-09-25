@@ -140,18 +140,16 @@ public class Constants
     /* Drive Motor PID Values */
     public static final double                driveFFKS                     = 0.0;
     public static final double                driveFFKV                     = 0.0;
-    public static final double                driveKP                       = 0.05; // TODO: adjust for v6
+    public static final double                driveKP                       = 0.120;
     public static final double                driveKI                       = 0.0;
     public static final double                driveKD                       = 0.0;
-    public static final double                driveKF                       = 0.0;  // TODO: remove
 
     /* Angle Motor PID Values */
     public static final double                angleFFKS                     = 0.0;
     public static final double                angleFFKV                     = 0.0;
-    public static final double                angleKP                       = 0.3; // TODO: adjust for v6
+    public static final double                angleKP                       = 7.21;
     public static final double                angleKI                       = 0.0;
     public static final double                angleKD                       = 0.0;
-    public static final double                angleKF                       = 0.0; // TODO: remove
 
     /* Neutral Modes */
     public static final InvertedValue         driveMotorInvert              = InvertedValue.Clockwise_Positive;
