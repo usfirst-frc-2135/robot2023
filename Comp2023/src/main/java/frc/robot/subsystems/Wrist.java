@@ -332,7 +332,7 @@ public class Wrist extends SubsystemBase
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
-  // TODO: These were added during competition to allow cone scoring--needs to be reworked
+  // TODO: These were added during competition to allow cone scoring--needs to be tested/reworked
 
   public void setMotorOutput(double brake)
   {
@@ -372,7 +372,7 @@ public class Wrist extends SubsystemBase
     if (newMode != m_mode)
     {
       m_mode = newMode;
-      DataLogManager.log(getSubsystem( ) + ": move " + m_mode + ((outOfRange) ? " - OUT OF RANGE" : ""));
+      DataLogManager.log(String.format("%s: move %s%s", getSubsystem( ), m_mode, ((outOfRange) ? " - OUT OF RANGE" : "")));
     }
 
     m_targetDegrees = m_currentDegrees;

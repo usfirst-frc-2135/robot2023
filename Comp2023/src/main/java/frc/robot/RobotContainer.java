@@ -420,7 +420,7 @@ public class RobotContainer
         break;
     }
 
-    DataLogManager.log("getAutonomousCommand: mode is " + mode + " path is " + pathName);
+    DataLogManager.log(String.format("getAutonomousCommand: mode is %s path is %s", mode, pathName));
 
     return m_autoCommand;
   }

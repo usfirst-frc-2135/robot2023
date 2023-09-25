@@ -129,7 +129,7 @@ public class Extension extends SubsystemBase
     // update for 20 msec loop
     m_armSim.update(0.020);
 
-    // // Finally, we set our simulated encoder's readings and simulated battery voltage TODO: Match for extension
+    // // Finally, we set our simulated encoder's readings and simulated battery voltage
     m_motorSim.setRawRotorPosition(
         Conversions.inchesToWinchRotations(Units.metersToInches(m_armSim.getPositionMeters( )), EXConsts.kRolloutRatio));
     m_motorSim.setRotorVelocity(
@@ -219,13 +219,13 @@ public class Extension extends SubsystemBase
     if (axisValue < 0.0)
     {
       if (m_currentInches > EXConsts.kLengthMin)
-        newMode = ExtensionMode.EXTENSION_IN; //TODO: Check
+        newMode = ExtensionMode.EXTENSION_IN;
       else
         rangeLimited = true;
     }
     else if (axisValue > 0.0)
     {
-      if (m_currentInches < EXConsts.kLengthMax) //TODO: Check
+      if (m_currentInches < EXConsts.kLengthMax)
         newMode = ExtensionMode.EXTENSION_OUT;
       else
         rangeLimited = true;
@@ -237,7 +237,6 @@ public class Extension extends SubsystemBase
     if (newMode != m_mode)
     {
       m_mode = newMode;
-      DataLogManager.log(String.format("%s: move %s %s", getSubsystem( ), m_mode, ((rangeLimited) ? " - RANGE LIMITED" : "")));
       DataLogManager.log(String.format("%s: move %s %.1f in %s", getSubsystem( ), m_mode, getCurrentInches( ),
           ((rangeLimited) ? " - RANGE LIMITED" : "")));
     }

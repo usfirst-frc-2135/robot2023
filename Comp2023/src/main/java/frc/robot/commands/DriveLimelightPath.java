@@ -43,10 +43,10 @@ public class DriveLimelightPath extends CommandBase
   public void initialize( )
   {
     Pose2d currentPose = m_swerve.getPose( );
-    DataLogManager.log(getName( ) + ": goalDirection " + m_goalDirection + " curPose " + currentPose);
+    DataLogManager.log(String.format("%s: goalDirection %s curPose %s", getName( ), m_goalDirection, currentPose));
 
     m_goalPose = getGoalPose(m_goalDirection);
-    DataLogManager.log(getName( ) + ": goalPose " + m_goalPose);
+    DataLogManager.log(String.format("%s: goalPose %s", getName( ), m_goalPose));
 
     if (m_goalPose != null)
     {

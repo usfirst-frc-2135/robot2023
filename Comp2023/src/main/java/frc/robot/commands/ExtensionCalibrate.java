@@ -30,7 +30,8 @@ public class ExtensionCalibrate extends CommandBase
   {
     m_calibrateTimer.restart( );
     m_extension.moveToCalibrate( );
-    DataLogManager.log(getSubsystem( ) + ": Starting calibrate " + m_calibrateTimer + " FPGAtime " + Timer.getFPGATimestamp( ));
+    DataLogManager.log(String.format("%s: Starting calibrate %.3f FPGATime %.3f", getSubsystem( ), m_calibrateTimer.get( ),
+        Timer.getFPGATimestamp( )));
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -42,7 +43,8 @@ public class ExtensionCalibrate extends CommandBase
   @Override
   public void end(boolean interrupted)
   {
-    DataLogManager.log(getSubsystem( ) + ": Ending calibrate " + m_calibrateTimer + " FPGAtime " + Timer.getFPGATimestamp( ));
+    DataLogManager.log(String.format("%s: Ending calibrate %.3f FPGATime %.3f", getSubsystem( ), m_calibrateTimer.get( ),
+        Timer.getFPGATimestamp( )));
     m_calibrateTimer.stop( );
     m_extension.calibrateExtension( );
     m_extension.setStopped( );

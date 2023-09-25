@@ -78,8 +78,8 @@ public class PhoenixUtil6
 
     // Configure sensor settings
     if ((status = motor.setRotorPosition(0.0)) != StatusCode.OK)
-      DataLogManager.log(
-          String.format("%s: ID %2d - %s motor: setRotorPosition - %s!", m_className, deviceID, name, status.getDescription( )));
+      DataLogManager
+          .log(String.format("%s: ID %2d - %s motor: setPosition - %s!", m_className, deviceID, name, status.getDescription( )));
 
     motor.setSafetyEnabled(false);
 

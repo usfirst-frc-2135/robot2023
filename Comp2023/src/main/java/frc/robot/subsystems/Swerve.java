@@ -148,7 +148,7 @@ public class Swerve extends SubsystemBase
 
   public void initialize( )
   {
-    DataLogManager.log(getSubsystem( ) + ": Subsystem initialized!");
+    DataLogManager.log(String.format("%s: Subsystem initialized!", getSubsystem( )));
   }
 
   public void faultDump( )
@@ -303,7 +303,7 @@ public class Swerve extends SubsystemBase
     {
       driveStop(false);
       if (m_limelightDebug >= 1)
-        DataLogManager.log(getSubsystem( ) + ": DLL TV-FALSE - SIT STILL");
+        DataLogManager.log(String.format("%s: DLL TV-FALSE - SIT STILL", getSubsystem( )));
 
       return;
     }
@@ -419,7 +419,7 @@ public class Swerve extends SubsystemBase
     if (useInitialPose)
     {
       resetOdometry(m_trajectory.getInitialHolonomicPose( ));
-      DataLogManager.log("GYRO : " + m_pigeon.getYaw( ));
+      DataLogManager.log(String.format("%s: GYRO : %1.f", getSubsystem( ), m_pigeon.getYaw( )));
     }
 
     m_trajTimer.reset( );
@@ -552,7 +552,7 @@ public class Swerve extends SubsystemBase
 
     if (m_trajTimer.get( ) >= 15.0)
     {
-      DataLogManager.log(getSubsystem( ) + ": PATH - path follower timeout!");
+      DataLogManager.log(String.format("%s: PATH - path follower timeout!", getSubsystem( )));
       return true;
     }
 
@@ -701,9 +701,11 @@ public class Swerve extends SubsystemBase
 
   public void resetOdometry(Pose2d pose)
   {
-    DataLogManager.log("Position Before : " + m_poseEstimator.getEstimatedPosition( ) + " Gyro : " + m_pigeon.getYaw( ));
+    DataLogManager.log(String.format("%s: Position Before : %s Gyro : %s", getSubsystem( ),
+        m_poseEstimator.getEstimatedPosition( ).toString( ), m_pigeon.getYaw( ).toString( )));
     m_poseEstimator.resetPosition(m_pigeon.getYaw( ), getPositions( ), pose);
-    DataLogManager.log("Position After : " + m_poseEstimator.getEstimatedPosition( ) + " Gyro : " + m_pigeon.getYaw( ));
+    DataLogManager.log(String.format("%s: Position After  : %s Gyro : %s", getSubsystem( ),
+        m_poseEstimator.getEstimatedPosition( ).toString( ), m_pigeon.getYaw( ).toString( )));
   }
 
   public void resetLimelightOdometry(Pose2d pose)

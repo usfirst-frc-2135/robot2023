@@ -36,7 +36,7 @@ public class WristRunBrake extends CommandBase
   {
     m_wrist.setMotorOutput(m_brake ? -0.25 : 0.25);
     m_loopCounter++;
-    DataLogManager.log("motor set to down-power: " + m_brake);
+    DataLogManager.log(String.format("%s: motor set to down-power: %s", getName( ), m_brake));
   }
 
   // Called once the command ends or is interrupted.

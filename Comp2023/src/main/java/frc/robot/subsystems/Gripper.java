@@ -63,7 +63,7 @@ public class Gripper extends SubsystemBase
 
   public void initialize( )
   {
-    DataLogManager.log(getSubsystem( ) + ": Subsystem initialized!");
+    DataLogManager.log(String.format("%s: Subsystem initialized!", getSubsystem( )));
     setGripperSpeed(GRMode.GR_STOP);
   }
 
@@ -113,7 +113,7 @@ public class Gripper extends SubsystemBase
         break;
     }
 
-    DataLogManager.log(getSubsystem( ) + ": Mode is now - " + strName);
+    DataLogManager.log(String.format("%s: Mode is now - %s", getSubsystem( ), strName));
     m_gripper.set(output);
   }
 }
