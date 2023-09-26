@@ -419,7 +419,7 @@ public class Swerve extends SubsystemBase
     if (useInitialPose)
     {
       resetOdometry(m_trajectory.getInitialHolonomicPose( ));
-      DataLogManager.log(String.format("%s: GYRO : %1.f", getSubsystem( ), m_pigeon.getYaw( )));
+      DataLogManager.log(String.format("%s: GYRO : %.1f", getSubsystem( ), m_pigeon.getYaw( ).getDegrees( )));
     }
 
     m_trajTimer.reset( );
@@ -514,33 +514,36 @@ public class Swerve extends SubsystemBase
     if (m_pathDebug >= 2)
     {
       // target velocity and its error
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_targetVelFrontLeft", targetfrontLeft);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_targetVelFrontRight", targetfrontRight);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_targetVelBackLeft", targetbackLeft);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_targetVelBackRight", targetbackRight);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_currentVelFrontLeft", currentfrontLeft);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_currentVelFrontRight", currentfrontRight);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_currentVelBackLeft", currentbackLeft);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_currentVelBackRight", currentbackRight);
+      SmartDashboard.putNumber(String.format("%s: PATH_targetVelFrontLeft", getSubsystem( )), targetfrontLeft);
+      SmartDashboard.putNumber(String.format("%s: PATH_targetVelFrontRight", getSubsystem( )), targetfrontRight);
+      SmartDashboard.putNumber(String.format("%s: PATH_targetVelBackLeft", getSubsystem( )), targetbackLeft);
+      SmartDashboard.putNumber(String.format("%s: PATH_targetVelBackRight", getSubsystem( )), targetbackRight);
+      SmartDashboard.putNumber(String.format("%s: PATH_currentVelFrontLeft", getSubsystem( )), currentfrontLeft);
+      SmartDashboard.putNumber(String.format("%s: PATH_currentVelFrontRight", getSubsystem( )), currentfrontRight);
+      SmartDashboard.putNumber(String.format("%s: PATH_currentVelBackLeft", getSubsystem( )), currentbackLeft);
+      SmartDashboard.putNumber(String.format("%s: PATH_currentVelBackRight", getSubsystem( )), currentbackRight);
 
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_velErrorFrontLeft", targetfrontLeft - currentfrontLeft);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_velErrorFrontRight", targetfrontRight - currentfrontRight);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_velErrorBackLeft", targetbackLeft - currentbackLeft);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_velErrorBackRight", targetbackRight - currentbackRight);
+      SmartDashboard.putNumber(String.format("%s: PATH_velErrorFrontLeft", getSubsystem( )), targetfrontLeft - currentfrontLeft);
+      SmartDashboard.putNumber(String.format("%s: PATH_velErrorFrontRight", getSubsystem( )),
+          targetfrontRight - currentfrontRight);
+      SmartDashboard.putNumber(String.format("%s: PATH_velErrorBackLeft", getSubsystem( )), targetbackLeft - currentbackLeft);
+      SmartDashboard.putNumber(String.format("%s: PATH_velErrorBackRight", getSubsystem( )), targetbackRight - currentbackRight);
 
       // target distance and its error
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_currentTrajX", targetTrajX);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_currentTrajY", targetTrajY);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_targetTrajX", currentTrajX);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_targetTrajY", currentTrajY);
+      SmartDashboard.putNumber(String.format("%s: PATH_currentTrajX", getSubsystem( )), targetTrajX);
+      SmartDashboard.putNumber(String.format("%s: PATH_currentTrajY", getSubsystem( )), targetTrajY);
+      SmartDashboard.putNumber(String.format("%s: PATH_targetTrajX", getSubsystem( )), currentTrajX);
+      SmartDashboard.putNumber(String.format("%s: PATH_targetTrajY", getSubsystem( )), currentTrajY);
 
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_trajErrorX", trajState.poseMeters.relativeTo(currentPose).getX( ));
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_trajErrorY", trajState.poseMeters.relativeTo(currentPose).getY( ));
+      SmartDashboard.putNumber(String.format("%s: PATH_trajErrorX", getSubsystem( )),
+          trajState.poseMeters.relativeTo(currentPose).getX( ));
+      SmartDashboard.putNumber(String.format("%s: PATH_trajErrorY", getSubsystem( )),
+          trajState.poseMeters.relativeTo(currentPose).getY( ));
 
       // target heading and its error
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_targetHeading", targetHeading);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_currentHeading", currentHeading);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_headingError",
+      SmartDashboard.putNumber(String.format("%s: PATH_targetHeading", getSubsystem( )), targetHeading);
+      SmartDashboard.putNumber(String.format("%s: PATH_currentHeading", getSubsystem( )), currentHeading);
+      SmartDashboard.putNumber(String.format("%s: PATH_headingError", getSubsystem( )),
           trajState.poseMeters.relativeTo(currentPose).getRotation( ).getDegrees( ));
     }
   }
