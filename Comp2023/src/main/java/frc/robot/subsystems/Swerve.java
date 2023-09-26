@@ -422,8 +422,7 @@ public class Swerve extends SubsystemBase
       DataLogManager.log(String.format("%s: GYRO : %.1f", getSubsystem( ), m_pigeon.getYaw( ).getDegrees( )));
     }
 
-    m_trajTimer.reset( );
-    m_trajTimer.start( );
+    m_trajTimer.restart( );
   }
 
   public void driveWithPathFollowerLimelightInit(PathPlannerTrajectory trajectory, boolean useInitialPose)
@@ -445,8 +444,7 @@ public class Swerve extends SubsystemBase
       resetLimelightOdometry(m_trajectory.getInitialHolonomicPose( ));
     }
 
-    m_trajTimer.reset( );
-    m_trajTimer.start( );
+    m_trajTimer.restart( );
   }
 
   public void driveWithPathFollowerExecute( )
@@ -550,10 +548,7 @@ public class Swerve extends SubsystemBase
 
   public boolean driveWithPathFollowerIsFinished( )
   {
-    if (m_trajTimer.get( ) == 0)
-      return false;
-
-    if (m_trajTimer.get( ) >= 15.0)
+    if (m_trajTimer.get( ) >= Constants.kAutonomousPeriodSecs)
     {
       DataLogManager.log(String.format("%s: PATH - path follower timeout!", getSubsystem( )));
       return true;

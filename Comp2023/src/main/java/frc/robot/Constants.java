@@ -57,6 +57,8 @@ public class Constants
   public static final int    kPhoenix5MajorVersion = ((22 * 256) + 0);
   public static final int    kPhoenix6MajorVersion = 23;
 
+  public static final double kAutonomousPeriodSecs = 15.0;
+
   // CAN IDs and PWM IDs
 
   public static final class Ports
