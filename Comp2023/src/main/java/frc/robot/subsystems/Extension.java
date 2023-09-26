@@ -294,7 +294,7 @@ public class Extension extends SubsystemBase
 
   public boolean moveToPositionIsFinished( )
   {
-    boolean timedOut = m_safetyTimer.hasElapsed(2.5 + EXConsts.kMMSafetyTimeoutRatio); //TODO: check
+    boolean timedOut = m_safetyTimer.hasElapsed(2);//EXConsts.kMMSafetyTimeoutRatio); //TODO: check
     double error = m_targetInches - m_currentInches;
 
     if (m_withinTolerance.calculate(Math.abs(error) < EXConsts.kToleranceInches) || timedOut)

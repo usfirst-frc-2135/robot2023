@@ -82,7 +82,7 @@ public class Swerve extends SubsystemBase
 
   // Path following
   private int                      m_pathDebug         = 1;     // Debug flag to disable extra ramsete logging calls
-  private boolean                  m_swerveDebug       = false; // Debug flag to disable extra ramsete logging calls
+  private boolean                  m_swerveDebug       = true; // Debug flag to disable extra ramsete logging calls
 
   // Limelight drive
   private double                   m_turnConstant      = LLConsts.kTurnConstant;

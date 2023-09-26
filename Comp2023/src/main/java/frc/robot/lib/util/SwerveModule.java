@@ -80,9 +80,8 @@ public class SwerveModule
 
   public void resetToAbsolute( )
   {
-    double absolutePosition =
-        Conversions.degreesToInputRotations(getCanCoder( ).getDegrees( ) - m_angleOffset, SWConsts.angleGearRatio);
-    m_angleMotor.setPosition(absolutePosition);
+    double absolutePosition = getCanCoder( ).getRotations( ) - m_angleOffset;
+    m_angleMotor.setRotorPosition(absolutePosition);
   }
 
   public Rotation2d getCanCoder( )

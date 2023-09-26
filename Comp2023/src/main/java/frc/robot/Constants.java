@@ -17,6 +17,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.constraint.CentripetalAccelerationConstraint;
 import edu.wpi.first.math.util.Units;
+import frc.robot.lib.math.Conversions;
 import frc.robot.lib.util.SwerveModuleConstants;
 
 /**
@@ -147,7 +148,7 @@ public class Constants
     /* Angle Motor PID Values */
     public static final double                angleFFKS                     = 0.0;
     public static final double                angleFFKV                     = 0.0;
-    public static final double                angleKP                       = 7.21;
+    public static final double                angleKP                       = 1.0; // 7.21;
     public static final double                angleKI                       = 0.0;
     public static final double                angleKD                       = 0.0;
 
@@ -187,7 +188,7 @@ public class Constants
     public static final class Mod0
     {
       public static final double betaAngleOffset = 0.0;
-      public static final double compAngleOffset = 0.0;
+      public static final double compAngleOffset = 0.043945;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -200,7 +201,7 @@ public class Constants
     public static final class Mod1
     {
       public static final double betaAngleOffset = 0.0;
-      public static final double compAngleOffset = 0.0;
+      public static final double compAngleOffset = -0.331787;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -213,7 +214,7 @@ public class Constants
     public static final class Mod2
     {
       public static final double betaAngleOffset = 0.0;
-      public static final double compAngleOffset = 0.0;
+      public static final double compAngleOffset = 0.272949;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
@@ -226,7 +227,7 @@ public class Constants
     public static final class Mod3
     {
       public static final double betaAngleOffset = 0.0;
-      public static final double compAngleOffset = 0.0;
+      public static final double compAngleOffset = 0.25836;
 
       public static SwerveModuleConstants SwerveModuleConstants( )
       {
