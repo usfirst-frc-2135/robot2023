@@ -55,13 +55,13 @@ public final class CTREConfigs6
   {
     TalonFXConfiguration angleConfig = new TalonFXConfiguration( );
 
-    angleConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = SWConsts.angleClosedLoopRamp;
-    angleConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = SWConsts.angleClosedLoopRamp;
+    angleConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = SWConsts.steerClosedLoopRamp;
+    angleConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = SWConsts.steerClosedLoopRamp;
 
-    angleConfig.CurrentLimits.SupplyCurrentLimit = SWConsts.angleSupplyCurrentLimit;
-    angleConfig.CurrentLimits.SupplyCurrentThreshold = SWConsts.angleSupplyCurrentThreshold;
-    angleConfig.CurrentLimits.SupplyTimeThreshold = SWConsts.angleSupplyTimeThreshold;
-    angleConfig.CurrentLimits.SupplyCurrentLimitEnable = SWConsts.angleSupplyCurrentLimitEnable;
+    angleConfig.CurrentLimits.SupplyCurrentLimit = SWConsts.steerSupplyCurrentLimit;
+    angleConfig.CurrentLimits.SupplyCurrentThreshold = SWConsts.steerSupplyCurrentThreshold;
+    angleConfig.CurrentLimits.SupplyTimeThreshold = SWConsts.steerSupplyTimeThreshold;
+    angleConfig.CurrentLimits.SupplyCurrentLimitEnable = SWConsts.steerSupplyCurrentLimitEnable;
 
     //  angleConfig.CurrentLimits.*
     //  angleConfig.Feedback.*
@@ -69,17 +69,17 @@ public final class CTREConfigs6
     //  angleConfig.MotionMagic.*
 
     //  angleConfig.MotorOutput.DutyCycleNeutralDeadband
-    angleConfig.MotorOutput.Inverted = SWConsts.angleMotorInvert;
-    angleConfig.MotorOutput.NeutralMode = SWConsts.angleNeutralMode;
+    angleConfig.MotorOutput.Inverted = SWConsts.steerMotorInvert;
+    angleConfig.MotorOutput.NeutralMode = SWConsts.steerNeutralMode;
 
-    angleConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = SWConsts.angleOpenLoopRamp;
-    angleConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = SWConsts.angleOpenLoopRamp;
+    angleConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = SWConsts.steerOpenLoopRamp;
+    angleConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = SWConsts.steerOpenLoopRamp;
 
-    angleConfig.Slot0.kS = SWConsts.angleFFKS;
-    angleConfig.Slot0.kV = SWConsts.angleFFKV;
-    angleConfig.Slot0.kP = SWConsts.angleKP;
-    angleConfig.Slot0.kI = SWConsts.angleKI;
-    angleConfig.Slot0.kD = SWConsts.angleKD;
+    angleConfig.Slot0.kS = SWConsts.steerFFKS;
+    angleConfig.Slot0.kV = SWConsts.steerFFKV;
+    angleConfig.Slot0.kP = SWConsts.steerKP;
+    angleConfig.Slot0.kI = SWConsts.steerKI;
+    angleConfig.Slot0.kD = SWConsts.steerKD;
 
     //  angleConfig.SoftwareLimitSwitch.*
 
@@ -91,7 +91,7 @@ public final class CTREConfigs6
     CANcoderConfiguration config = new CANcoderConfiguration( );
 
     config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
-    config.MagnetSensor.SensorDirection = SWConsts.angleCanCoderInvert;
+    config.MagnetSensor.SensorDirection = SWConsts.steerCanCoderInvert;
     // config.MagnetSensor.MagnetOffset 
 
     return config;

@@ -17,10 +17,10 @@ import frc.robot.lib.math.Conversions;
 public class SwerveModule
 {
   public int                     m_moduleNumber;
-  private double                 m_angleOffset;
-  private TalonFX                m_angleMotor;
   private TalonFX                m_driveMotor;
-  private CANcoder               m_angleEncoder;
+  private TalonFX                m_steerMotor;
+  private CANcoder               m_steerEncoder;
+  private double                 m_steerOffset;
   private double                 m_lastAngle;
 
   private SimpleMotorFeedforward m_feedforward            =
@@ -32,18 +32,18 @@ public class SwerveModule
   public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants)
   {
     StringBuilder driveName = new StringBuilder("drive" + moduleNumber);
-    StringBuilder angleName = new StringBuilder("angle" + moduleNumber);
+    StringBuilder steerName = new StringBuilder("steer" + moduleNumber);
 
     this.m_moduleNumber = moduleNumber;
-    m_angleOffset = moduleConstants.angleOffset;
+    m_steerOffset = moduleConstants.steerOffset;
 
     /* Angle Encoder Config */
-    m_angleEncoder = new CANcoder(moduleConstants.cancoderID, Constants.Ports.kCANCarnivore);
-    PhoenixUtil6.getInstance( ).canCoderInitialize6(m_angleEncoder, angleName.toString( ), CTREConfigs6.swerveCancoderConfig( ));
+    m_steerEncoder = new CANcoder(moduleConstants.cancoderID, Constants.Ports.kCANCarnivore);
+    PhoenixUtil6.getInstance( ).canCoderInitialize6(m_steerEncoder, steerName.toString( ), CTREConfigs6.swerveCancoderConfig( ));
 
     /* Angle Motor Config */
-    m_angleMotor = new TalonFX(moduleConstants.angleMotorID, Constants.Ports.kCANCarnivore);
-    PhoenixUtil6.getInstance( ).talonFXInitialize6(m_angleMotor, angleName.toString( ), CTREConfigs6.swerveAngleFXConfig( ));
+    m_steerMotor = new TalonFX(moduleConstants.steerMotorID, Constants.Ports.kCANCarnivore);
+    PhoenixUtil6.getInstance( ).talonFXInitialize6(m_steerMotor, steerName.toString( ), CTREConfigs6.swerveAngleFXConfig( ));
 
     /* Drive Motor Config */
     m_driveMotor = new TalonFX(moduleConstants.driveMotorID, Constants.Ports.kCANCarnivore);
@@ -73,20 +73,19 @@ public class SwerveModule
 
     double angle = (Math.abs(desiredState.speedMetersPerSecond) <= (SWConsts.maxSpeed * 0.01)) ? m_lastAngle
         : desiredState.angle.getDegrees( ); // Prevent rotating module if speed is less then 1%. Prevents Jittering.
-    m_angleMotor
-        .setControl(m_positionVoltageRequest.withPosition(Conversions.degreesToInputRotations(angle, SWConsts.angleGearRatio)));
+    m_steerMotor
+        .setControl(m_positionVoltageRequest.withPosition(Conversions.degreesToInputRotations(angle, SWConsts.steerGearRatio)));
     m_lastAngle = angle;
   }
 
   public void resetToAbsolute( )
   {
-    double absolutePosition = getCanCoder( ).getRotations( ) - m_angleOffset;
-    m_angleMotor.setRotorPosition(absolutePosition);
+    m_steerMotor.setRotorPosition(getCanCoderRotations( ) - m_steerOffset);
   }
 
-  public Rotation2d getCanCoder( )
+  public double getCanCoderRotations( )
   {
-    return Rotation2d.fromRotations(m_angleEncoder.getAbsolutePosition( ).getValue( ));
+    return m_steerEncoder.getAbsolutePosition( ).refresh( ).getValue( );
   }
 
   public double getTargetAngle( )
@@ -99,7 +98,7 @@ public class SwerveModule
     double velocity =
         Conversions.RPSToMPS(m_driveMotor.getVelocity( ).getValue( ), SWConsts.wheelCircumference, SWConsts.driveGearRatio);
     Rotation2d angle = Rotation2d
-        .fromDegrees(Conversions.rotationsToOutputDegrees(m_angleMotor.getPosition( ).getValue( ), SWConsts.angleGearRatio));
+        .fromDegrees(Conversions.rotationsToOutputDegrees(m_steerMotor.getPosition( ).getValue( ), SWConsts.steerGearRatio));
     return new SwerveModuleState(velocity, angle);
   }
 
@@ -108,7 +107,7 @@ public class SwerveModule
     double distance = Conversions.rotationsToMeters(m_driveMotor.getPosition( ).getValue( ), SWConsts.wheelCircumference,
         SWConsts.driveGearRatio);
     Rotation2d angle = Rotation2d
-        .fromDegrees(Conversions.rotationsToOutputDegrees(m_angleMotor.getPosition( ).getValue( ), SWConsts.angleGearRatio));
+        .fromDegrees(Conversions.rotationsToOutputDegrees(m_steerMotor.getPosition( ).getValue( ), SWConsts.steerGearRatio));
     return new SwerveModulePosition(distance, angle);
   }
 

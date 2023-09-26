@@ -17,7 +17,6 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.constraint.CentripetalAccelerationConstraint;
 import edu.wpi.first.math.util.Units;
-import frc.robot.lib.math.Conversions;
 import frc.robot.lib.util.SwerveModuleConstants;
 
 /**
@@ -117,7 +116,7 @@ public class Constants
     public static final double                wheelCircumference            = wheelDiameter * Math.PI;
 
     public static final double                driveGearRatio                = 6.75;
-    public static final double                angleGearRatio                = 21.43;
+    public static final double                steerGearRatio                = 21.43;
 
     public static final Translation2d[ ]      swerveModuleLocations         =
     {
@@ -133,10 +132,10 @@ public class Constants
     public static final double                driveSupplyTimeThreshold      = 0.1;
     public static final boolean               driveSupplyCurrentLimitEnable = true;
 
-    public static final int                   angleSupplyCurrentLimit       = 25;
-    public static final int                   angleSupplyCurrentThreshold   = 40;
-    public static final double                angleSupplyTimeThreshold      = 0.1;
-    public static final boolean               angleSupplyCurrentLimitEnable = true;
+    public static final int                   steerSupplyCurrentLimit       = 25;
+    public static final int                   steerSupplyCurrentThreshold   = 40;
+    public static final double                steerSupplyTimeThreshold      = 0.1;
+    public static final boolean               steerSupplyCurrentLimitEnable = true;
 
     /* Drive Motor PID Values */
     public static final double                driveFFKS                     = 0.0;
@@ -146,11 +145,11 @@ public class Constants
     public static final double                driveKD                       = 0.0;
 
     /* Angle Motor PID Values */
-    public static final double                angleFFKS                     = 0.0;
-    public static final double                angleFFKV                     = 0.0;
-    public static final double                angleKP                       = 1.0; // 7.21;
-    public static final double                angleKI                       = 0.0;
-    public static final double                angleKD                       = 0.0;
+    public static final double                steerFFKS                     = 0.0;
+    public static final double                steerFFKV                     = 0.0;
+    public static final double                steerKP                       = 1.0; // 7.21;
+    public static final double                steerKI                       = 0.0;
+    public static final double                steerKD                       = 0.0;
 
     /* Neutral Modes */
     public static final InvertedValue         driveMotorInvert              = InvertedValue.Clockwise_Positive;
@@ -158,12 +157,12 @@ public class Constants
     public static final double                driveOpenLoopRamp             = 0.25;
     public static final double                driveClosedLoopRamp           = 0.0;
 
-    public static final InvertedValue         angleMotorInvert              = InvertedValue.Clockwise_Positive;
-    public static final NeutralModeValue      angleNeutralMode              = NeutralModeValue.Coast;
-    public static final double                angleOpenLoopRamp             = 0.0;
-    public static final double                angleClosedLoopRamp           = 0.0;
+    public static final InvertedValue         steerMotorInvert              = InvertedValue.Clockwise_Positive;
+    public static final NeutralModeValue      steerNeutralMode              = NeutralModeValue.Coast;
+    public static final double                steerOpenLoopRamp             = 0.0;
+    public static final double                steerClosedLoopRamp           = 0.0;
 
-    public static final SensorDirectionValue  angleCanCoderInvert           = SensorDirectionValue.CounterClockwise_Positive;
+    public static final SensorDirectionValue  steerCanCoderInvert           = SensorDirectionValue.CounterClockwise_Positive;
     public static final boolean               gyroInvert                    = false; // Always ensure Gyro is CCW+ CW-
 
     /* Drive Motor Characterization Values */
