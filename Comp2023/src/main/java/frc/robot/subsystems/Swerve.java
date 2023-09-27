@@ -205,16 +205,16 @@ public class Swerve extends SubsystemBase
     {
       SmartDashboard.putNumber("SWMod: 0 - Speed", m_swerveMods[0].getState( ).speedMetersPerSecond);
       SmartDashboard.putNumber("SWMod: 0 - Angle", m_swerveMods[0].getState( ).angle.getDegrees( ));
-      SmartDashboard.putNumber("SWMod: 0 - Dist", m_swerveMods[0].getPosition( ).distanceMeters);
+      // SmartDashboard.putNumber("SWMod: 0 - Dist", m_swerveMods[0].getPosition( ).distanceMeters);
       SmartDashboard.putNumber("SWMod: 1 - Speed", m_swerveMods[1].getState( ).speedMetersPerSecond);
       SmartDashboard.putNumber("SWMod: 1 - Angle", m_swerveMods[1].getState( ).angle.getDegrees( ));
-      SmartDashboard.putNumber("SWMod: 1 - Dist", m_swerveMods[1].getPosition( ).distanceMeters);
+      // SmartDashboard.putNumber("SWMod: 1 - Dist", m_swerveMods[1].getPosition( ).distanceMeters);
       SmartDashboard.putNumber("SWMod: 2 - Speed", m_swerveMods[2].getState( ).speedMetersPerSecond);
       SmartDashboard.putNumber("SWMod: 2 - Angle", m_swerveMods[2].getState( ).angle.getDegrees( ));
-      SmartDashboard.putNumber("SWMod: 2 - Dist", m_swerveMods[2].getPosition( ).distanceMeters);
+      // SmartDashboard.putNumber("SWMod: 2 - Dist", m_swerveMods[2].getPosition( ).distanceMeters);
       SmartDashboard.putNumber("SWMod: 3 - Speed", m_swerveMods[3].getState( ).speedMetersPerSecond);
       SmartDashboard.putNumber("SWMod: 3 - Angle", m_swerveMods[3].getState( ).angle.getDegrees( ));
-      SmartDashboard.putNumber("SWMod: 3 - Dist", m_swerveMods[3].getPosition( ).distanceMeters);
+      // SmartDashboard.putNumber("SWMod: 3 - Dist", m_swerveMods[3].getPosition( ).distanceMeters);
     }
 
     SmartDashboard.putNumber("SW: pose_x", m_periodicIO.odometry_pose_x);
@@ -562,9 +562,63 @@ public class Swerve extends SubsystemBase
     m_trajTimer.stop( );
   }
 
+  ///////////////////////////////////////////////////////////////////////////////
+  //
+  // Helper functions
+  //
   public void setIsTeleported(boolean isTeleported)
   {
     m_isTeleported = isTeleported;
+  }
+
+  public Pose2d getPose( )
+  {
+    return m_poseEstimator.getEstimatedPosition( );
+  }
+
+  public void resetOdometry(Pose2d pose)
+  {
+    DataLogManager.log(String.format("%s: Position Before : %s Gyro : %s", getSubsystem( ),
+        m_poseEstimator.getEstimatedPosition( ).toString( ), m_pigeon.getYaw( ).toString( )));
+    m_poseEstimator.resetPosition(m_pigeon.getYaw( ), getPositions( ), pose);
+    DataLogManager.log(String.format("%s: Position After  : %s Gyro : %s", getSubsystem( ),
+        m_poseEstimator.getEstimatedPosition( ).toString( ), m_pigeon.getYaw( ).toString( )));
+  }
+
+  public void resetLimelightOdometry(Pose2d pose)
+  {
+    m_poseEstimator.resetPosition(m_pigeon.getYaw( ), getPositions( ), pose);
+  }
+
+  public void resetOdometryToLimelight( )
+  {
+    Pose2d llPose = RobotContainer.getInstance( ).m_vision.getLimelightRawPose( );
+
+    if (llPose != null)
+    {
+      resetLimelightOdometry(llPose);
+    }
+  }
+
+  public double getYaw( )
+  {
+    return m_pigeon.getYaw( ).getDegrees( );
+  }
+
+  public void zeroGyro( )
+  {
+    zeroGyro(0.0);
+  }
+
+  public void zeroGyro(double resetAngle)
+  {
+    m_pigeon.setYaw(resetAngle);
+  }
+
+  public void resetAnglesToAbsolute( )
+  {
+    for (SwerveModule mod : m_swerveMods)
+      mod.resetToAbsolute( );
   }
 
   //// 1678 Swerve //////////////////////////////////////////////////////////////
@@ -605,14 +659,7 @@ public class Swerve extends SubsystemBase
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SWConsts.maxSpeed);
 
     for (SwerveModule mod : m_swerveMods)
-    {
       mod.setDesiredState(swerveModuleStates[mod.m_moduleNumber], isOpenLoop);
-    }
-  }
-
-  public void driveStop(boolean fieldRelative)
-  {
-    drive(new Translation2d(0, 0), 0.0, fieldRelative, true);
   }
 
   public void driveBalanceExecute( )
@@ -630,6 +677,11 @@ public class Swerve extends SubsystemBase
       driveStop(true);
     }
     //DataLogManager.log(String.format(getSubsystem() + ": Robot pitch: %.1f degrees - Robot power applied to motors: %.1f m/s", m_pitch, drivevalue));
+  }
+
+  public void driveStop(boolean fieldRelative)
+  {
+    drive(new Translation2d(0, 0), 0.0, fieldRelative, true);
   }
 
   //
@@ -664,21 +716,6 @@ public class Swerve extends SubsystemBase
     return !m_isSnapping;
   }
 
-  /* Used by SwerveControllerCommand in Auto */
-  public void setModuleStates(SwerveModuleState[ ] desiredStates)
-  {
-    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, SWConsts.maxSpeed);
-
-    for (SwerveModule mod : m_swerveMods)
-    {
-      mod.setDesiredState(desiredStates[mod.m_moduleNumber], false);
-      SmartDashboard.putNumber(String.format("mod%d desired speed", mod.m_moduleNumber),
-          desiredStates[mod.m_moduleNumber].speedMetersPerSecond);
-      SmartDashboard.putNumber(String.format("mod%d desired angle", mod.m_moduleNumber),
-          MathUtil.inputModulus(desiredStates[mod.m_moduleNumber].angle.getDegrees( ), 0, 180));
-    }
-  }
-
   //
   // Getters and setters
   //
@@ -692,41 +729,13 @@ public class Swerve extends SubsystemBase
     m_locked = lock;
   }
 
-  public Pose2d getPose( )
+  /* Used by SwerveControllerCommand in Auto */
+  public void setModuleStates(SwerveModuleState[ ] desiredStates)
   {
-    return m_poseEstimator.getEstimatedPosition( );
-  }
+    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, SWConsts.maxSpeed);
 
-  public void resetOdometry(Pose2d pose)
-  {
-    DataLogManager.log(String.format("%s: Position Before : %s Gyro : %s", getSubsystem( ),
-        m_poseEstimator.getEstimatedPosition( ).toString( ), m_pigeon.getYaw( ).toString( )));
-    m_poseEstimator.resetPosition(m_pigeon.getYaw( ), getPositions( ), pose);
-    DataLogManager.log(String.format("%s: Position After  : %s Gyro : %s", getSubsystem( ),
-        m_poseEstimator.getEstimatedPosition( ).toString( ), m_pigeon.getYaw( ).toString( )));
-  }
-
-  public void resetLimelightOdometry(Pose2d pose)
-  {
-    m_poseEstimator.resetPosition(m_pigeon.getYaw( ), getPositions( ), pose);
-  }
-
-  public void resetOdometryToLimelight( )
-  {
-    Pose2d llPose = RobotContainer.getInstance( ).m_vision.getLimelightRawPose( );
-
-    if (llPose != null)
-    {
-      resetLimelightOdometry(llPose);
-    }
-  }
-
-  public void resetAnglesToAbsolute( )
-  {
     for (SwerveModule mod : m_swerveMods)
-    {
-      mod.resetToAbsolute( );
-    }
+      mod.setDesiredState(desiredStates[mod.m_moduleNumber], false);
   }
 
   //
@@ -758,21 +767,6 @@ public class Swerve extends SubsystemBase
           MathUtil.inputModulus(positions[mod.m_moduleNumber].angle.getDegrees( ), 0, 180));
     }
     return positions;
-  }
-
-  public double getYaw( )
-  {
-    return m_pigeon.getYaw( ).getDegrees( );
-  }
-
-  public void zeroGyro( )
-  {
-    zeroGyro(0.0);
-  }
-
-  public void zeroGyro(double reset)
-  {
-    m_pigeon.setYaw(reset);
   }
 
   //// 1678 Swerve //////////////////////////////////////////////////////////////

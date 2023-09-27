@@ -54,9 +54,8 @@ public class SwerveModule
 
   public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop)
   {
-    desiredState = CTREModuleState.optimize(desiredState, getState( ).angle); // Custom optimize command, since default
-                                                                             // WPILib optimize assumes continuous
-                                                                             // controller which CTRE is not
+    // Custom optimize command, since default WPILib optimize assumes continuous controller which CTRE is not
+    desiredState = CTREModuleState.optimize(desiredState, getState( ).angle);
 
     if (isOpenLoop)
     {
@@ -71,8 +70,9 @@ public class SwerveModule
           .withFeedForward(m_feedforward.calculate(desiredState.speedMetersPerSecond)));
     }
 
+    // Prevent rotating module if speed is less then 1%. Prevents Jittering
     double angle = (Math.abs(desiredState.speedMetersPerSecond) <= (SWConsts.maxSpeed * 0.01)) ? m_lastAngle
-        : desiredState.angle.getDegrees( ); // Prevent rotating module if speed is less then 1%. Prevents Jittering.
+        : desiredState.angle.getDegrees( );
     m_steerMotor
         .setControl(m_positionVoltageRequest.withPosition(Conversions.degreesToInputRotations(angle, SWConsts.steerGearRatio)));
     m_lastAngle = angle;
