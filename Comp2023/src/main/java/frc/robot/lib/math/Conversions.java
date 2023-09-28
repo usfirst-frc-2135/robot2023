@@ -30,6 +30,30 @@ public class Conversions
     return degrees / (360.0 / gearRatio);
   }
 
+  /**
+   * @param rotations
+   *          Input Shaft Rotations
+   * @param gearRatio
+   *          Gear Ratio between Motor and Mechanism
+   * @return Output Shaft Rotations of Mechanism
+   */
+  public static double rotationsToOutputRotations(double rotations, double gearRatio)
+  {
+    return rotations / gearRatio;
+  }
+
+  /**
+   * @param degrees
+   *          Output Shaft Rotations of Mechanism
+   * @param gearRatio
+   *          Gear Ratio between Motor and Mechanism
+   * @return Input Shaft Rotations
+   */
+  public static double rotationsToInputRotations(double rotations, double gearRatio)
+  {
+    return rotations * gearRatio;
+  }
+
   //
   // Gearbox radians
   //
