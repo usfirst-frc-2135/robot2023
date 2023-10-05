@@ -107,7 +107,6 @@ public class Wrist extends SubsystemBase
     // This method will be called once per scheduler run
 
     m_currentDegrees = getTalonFXDegrees( );
-    m_mechLigament.setAngle(kLigament2dOffset - m_currentDegrees);
     SmartDashboard.putNumber("WR_curDegrees", m_currentDegrees);
     SmartDashboard.putNumber("WR_targetDegrees", m_targetDegrees);
     SmartDashboard.putNumber("WR_CCDegrees", getCANCoderDegrees( ));
@@ -141,6 +140,8 @@ public class Wrist extends SubsystemBase
 
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps( )));
+
+    m_mechLigament.setAngle(kLigament2dOffset - m_currentDegrees);
   }
 
   private void initSmartDashboard( )

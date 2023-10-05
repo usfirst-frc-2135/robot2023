@@ -105,7 +105,6 @@ public class Extension extends SubsystemBase
     if (m_currentInches < 0)
       setExtensionToZero( );
 
-    m_mechLigament.setLength(kLigament2dLength + Units.inchesToMeters(m_currentInches));
     SmartDashboard.putNumber("EX_curInches", m_currentInches);
     SmartDashboard.putNumber("EX_curRotations", Conversions.inchesToWinchRotations(m_currentInches, EXConsts.kRolloutRatio));
     SmartDashboard.putNumber("EX_targetInches", m_targetInches);
@@ -137,6 +136,8 @@ public class Extension extends SubsystemBase
 
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps( )));
+
+    m_mechLigament.setLength(kLigament2dLength + Units.inchesToMeters(m_currentInches));
   }
 
   private void initSmartDashboard( )
