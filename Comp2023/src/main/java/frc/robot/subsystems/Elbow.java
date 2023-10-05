@@ -111,12 +111,12 @@ public class Elbow extends SubsystemBase
     SmartDashboard.putNumber("EL_curDegrees", m_currentDegrees);
     SmartDashboard.putNumber("EL_targetDegrees", m_targetDegrees);
     SmartDashboard.putNumber("EL_CCDegrees", getCANCoderDegrees( ));
+    SmartDashboard.putNumber("EL_curError", m_motor.getClosedLoopError( ).refresh( ).getValue( ));
 
     m_totalArbFeedForward = calculateTotalArbFF( );
     SmartDashboard.putNumber("EL_totalFF", m_totalArbFeedForward);
 
-    m_motor.getStatorCurrent( ).refresh( );
-    SmartDashboard.putNumber("EL_currentDraw", m_motor.getStatorCurrent( ).getValue( ));
+    SmartDashboard.putNumber("EL_currentDraw", m_motor.getStatorCurrent( ).refresh( ).getValue( ));
   }
 
   @Override

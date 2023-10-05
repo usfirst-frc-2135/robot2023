@@ -110,12 +110,12 @@ public class Wrist extends SubsystemBase
     SmartDashboard.putNumber("WR_curDegrees", m_currentDegrees);
     SmartDashboard.putNumber("WR_targetDegrees", m_targetDegrees);
     SmartDashboard.putNumber("WR_CCDegrees", getCANCoderDegrees( ));
+    SmartDashboard.putNumber("WR_curError", m_motor.getClosedLoopError( ).refresh( ).getValue( ));
 
     m_totalArbFeedForward = calculateTotalArbFF( );
     SmartDashboard.putNumber("WR_totalFF", m_totalArbFeedForward);
 
-    m_motor.getStatorCurrent( ).refresh( );
-    SmartDashboard.putNumber("WR_currentDraw", m_motor.getStatorCurrent( ).getValue( ));
+    SmartDashboard.putNumber("WR_currentDraw", m_motor.getStatorCurrent( ).refresh( ).getValue( ));
   }
 
   @Override

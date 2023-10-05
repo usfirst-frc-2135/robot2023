@@ -108,12 +108,12 @@ public class Extension extends SubsystemBase
     SmartDashboard.putNumber("EX_curInches", m_currentInches);
     SmartDashboard.putNumber("EX_curRotations", Conversions.inchesToWinchRotations(m_currentInches, EXConsts.kRolloutRatio));
     SmartDashboard.putNumber("EX_targetInches", m_targetInches);
+    SmartDashboard.putNumber("EX_curError", m_motor.getClosedLoopError( ).refresh( ).getValue( ));
 
     m_totalArbFeedForward = calculateTotalArbFF( );
     SmartDashboard.putNumber("EX_totalFF", m_totalArbFeedForward);
 
-    m_motor.getStatorCurrent( ).refresh( );
-    SmartDashboard.putNumber("EX_currentDraw", m_motor.getStatorCurrent( ).getValue( ));
+    SmartDashboard.putNumber("EX_currentDraw", m_motor.getStatorCurrent( ).refresh( ).getValue( ));
   }
 
   @Override

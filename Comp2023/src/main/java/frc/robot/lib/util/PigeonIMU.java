@@ -41,7 +41,7 @@ public class PigeonIMU
    */
   private Rotation2d getUnadjustedYaw( )
   {
-    return Rotation2d.fromDegrees(m_gyro.getYaw( ).getValue( ));
+    return Rotation2d.fromDegrees(m_gyro.getYaw( ).refresh( ).getValue( ));
   }
 
   /**
@@ -51,7 +51,7 @@ public class PigeonIMU
    */
   private Rotation2d getUnadjustedPitch( )
   {
-    return Rotation2d.fromDegrees(m_gyro.getPitch( ).getValue( ));
+    return Rotation2d.fromDegrees(m_gyro.getPitch( ).refresh( ).getValue( ));
   }
 
   /**
@@ -61,7 +61,7 @@ public class PigeonIMU
    */
   private Rotation2d getUnadjustedRoll( )
   {
-    return Rotation2d.fromDegrees(m_gyro.getRoll( ).getValue( ));
+    return Rotation2d.fromDegrees(m_gyro.getRoll( ).refresh( ).getValue( ));
   }
 
   /**

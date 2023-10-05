@@ -96,19 +96,19 @@ public class SwerveModule
 
   public SwerveModuleState getState( )
   {
-    double velocity =
-        Conversions.RPSToMPS(m_driveMotor.getVelocity( ).getValue( ), SWConsts.wheelCircumference, SWConsts.driveGearRatio);
-    Rotation2d angle = Rotation2d
-        .fromDegrees(Conversions.rotationsToOutputDegrees(m_steerMotor.getPosition( ).getValue( ), SWConsts.steerGearRatio));
+    double velocity = Conversions.RPSToMPS(m_driveMotor.getVelocity( ).refresh( ).getValue( ), SWConsts.wheelCircumference,
+        SWConsts.driveGearRatio);
+    Rotation2d angle = Rotation2d.fromDegrees(
+        Conversions.rotationsToOutputDegrees(m_steerMotor.getPosition( ).refresh( ).getValue( ), SWConsts.steerGearRatio));
     return new SwerveModuleState(velocity, angle);
   }
 
   public SwerveModulePosition getPosition( )
   {
-    double distance = Conversions.rotationsToMeters(m_driveMotor.getPosition( ).getValue( ), SWConsts.wheelCircumference,
-        SWConsts.driveGearRatio);
-    Rotation2d angle = Rotation2d
-        .fromDegrees(Conversions.rotationsToOutputDegrees(m_steerMotor.getPosition( ).getValue( ), SWConsts.steerGearRatio));
+    double distance = Conversions.rotationsToMeters(m_driveMotor.getPosition( ).refresh( ).getValue( ),
+        SWConsts.wheelCircumference, SWConsts.driveGearRatio);
+    Rotation2d angle = Rotation2d.fromDegrees(
+        Conversions.rotationsToOutputDegrees(m_steerMotor.getPosition( ).refresh( ).getValue( ), SWConsts.steerGearRatio));
     return new SwerveModulePosition(distance, angle);
   }
 
