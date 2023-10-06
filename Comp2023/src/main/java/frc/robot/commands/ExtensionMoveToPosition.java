@@ -9,16 +9,30 @@ import frc.robot.subsystems.Extension;
 /**
  *
  */
-public class ExtensionMoveToLength extends CommandBase
+public class ExtensionMoveToPosition extends CommandBase
 {
   private final Extension m_extension;
-  private double          m_length;
+  private boolean         m_holdPosition;
+  private double          m_newLength;
 
-  public ExtensionMoveToLength(Extension extension, double length)
+  // Default command for holding current position
+  public ExtensionMoveToPosition(Extension extension)
   {
     m_extension = extension;
-    m_length = length;
+    ExtensionMoveToPositionCommon(true);
+  }
 
+  // Motion Magic movement to a new position
+  public ExtensionMoveToPosition(Extension extension, double position)
+  {
+    m_extension = extension;
+    m_newLength = position;
+    ExtensionMoveToPositionCommon(false);
+  }
+
+  private void ExtensionMoveToPositionCommon(boolean holdCurrentLength)
+  {
+    m_holdPosition = holdCurrentLength;
     setName("ExtensionMoveToLength");
     addRequirements(m_extension);
   }
@@ -27,7 +41,7 @@ public class ExtensionMoveToLength extends CommandBase
   @Override
   public void initialize( )
   {
-    m_extension.moveToPositionInit(m_length, false);
+    m_extension.moveToPositionInit(m_newLength, m_holdPosition);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -48,7 +62,7 @@ public class ExtensionMoveToLength extends CommandBase
   @Override
   public boolean isFinished( )
   {
-    return m_extension.moveToPositionIsFinished( );
+    return (m_holdPosition) ? false : m_extension.moveToPositionIsFinished( ); // Command exits if not holding a position
   }
 
   @Override

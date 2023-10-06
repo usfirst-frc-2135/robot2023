@@ -51,15 +51,12 @@ import frc.robot.commands.DriveSnap;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.ElbowMoveToPosition;
-import frc.robot.commands.ElbowRun;
 import frc.robot.commands.ElbowSetAngleZero;
 import frc.robot.commands.ExtensionCalibrate;
-import frc.robot.commands.ExtensionMoveToLength;
-import frc.robot.commands.ExtensionRun;
+import frc.robot.commands.ExtensionMoveToPosition;
 import frc.robot.commands.GripperRun;
 import frc.robot.commands.LEDSet;
 import frc.robot.commands.WristMoveToPosition;
-import frc.robot.commands.WristRun;
 import frc.robot.commands.WristRunBrake;
 import frc.robot.commands.WristRunConstant;
 import frc.robot.commands.WristSetAngleZero;
@@ -157,12 +154,12 @@ public class RobotContainer
     SmartDashboard.putData("ElbowSetAngleToZero", new ElbowSetAngleZero(m_elbow));
 
     // Extension subsytem tests
-    SmartDashboard.putData("ExtensionStow", new ExtensionMoveToLength(m_extension, EXConsts.kLengthStow));
-    SmartDashboard.putData("ExtensionIdle", new ExtensionMoveToLength(m_extension, EXConsts.kLengthIdle));
-    SmartDashboard.putData("ExtensionLow", new ExtensionMoveToLength(m_extension, EXConsts.kLengthScoreLow));
-    SmartDashboard.putData("ExtensionMid", new ExtensionMoveToLength(m_extension, EXConsts.kLengthScoreMid));
-    SmartDashboard.putData("ExtensionHigh", new ExtensionMoveToLength(m_extension, EXConsts.kLengthScoreHigh));
-    SmartDashboard.putData("ExtensionShelf", new ExtensionMoveToLength(m_extension, EXConsts.kLengthSubstation));
+    SmartDashboard.putData("ExtensionStow", new ExtensionMoveToPosition(m_extension, EXConsts.kLengthStow));
+    SmartDashboard.putData("ExtensionIdle", new ExtensionMoveToPosition(m_extension, EXConsts.kLengthIdle));
+    SmartDashboard.putData("ExtensionLow", new ExtensionMoveToPosition(m_extension, EXConsts.kLengthScoreLow));
+    SmartDashboard.putData("ExtensionMid", new ExtensionMoveToPosition(m_extension, EXConsts.kLengthScoreMid));
+    SmartDashboard.putData("ExtensionHigh", new ExtensionMoveToPosition(m_extension, EXConsts.kLengthScoreHigh));
+    SmartDashboard.putData("ExtensionShelf", new ExtensionMoveToPosition(m_extension, EXConsts.kLengthSubstation));
     SmartDashboard.putData("ExtensionCalibrate", new ExtensionCalibrate(m_extension));
 
     // Wrist subsytem tests
@@ -173,6 +170,8 @@ public class RobotContainer
     SmartDashboard.putData("WristHigh", new WristMoveToPosition(m_wrist, WRConsts.kAngleScoreHigh));
     SmartDashboard.putData("WristShelf", new WristMoveToPosition(m_wrist, WRConsts.kAngleSubstation));
     SmartDashboard.putData("WristSetAngleToZero", new WristSetAngleZero(m_wrist));
+    SmartDashboard.putData("WristRunConstant", new WristRunConstant(m_wrist, true));
+    SmartDashboard.putData("WristRunBrake", new WristRunBrake(m_wrist, true));
 
     // Gripper subsystem test
     SmartDashboard.putData("GripperStop", new GripperRun(m_gripper, GRMode.GR_STOP));
@@ -322,13 +321,15 @@ public class RobotContainer
   {
     m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_elbow, m_driverPad));
 
-    // m_elbow.setDefaultCommand(new ElbowMoveToPosition(m_elbow));
-    // m_extension.setDefaultCommand(new ExtensionMoveToLength(m_extension));
-    // m_wrist.setDefaultCommand(new WristMoveToAngle(m_wrist));
+    // Default command - Motion Magic hold
+    m_elbow.setDefaultCommand(new ElbowMoveToPosition(m_elbow));
+    m_extension.setDefaultCommand(new ExtensionMoveToPosition(m_extension));
+    m_wrist.setDefaultCommand(new WristMoveToPosition(m_wrist));
 
-    m_elbow.setDefaultCommand(new ElbowRun(m_elbow, m_operatorPad));
-    m_extension.setDefaultCommand(new ExtensionRun(m_extension, m_operatorPad));
-    m_wrist.setDefaultCommand(new WristRun(m_wrist, m_operatorPad));
+    // Default command - manual mode
+    // m_elbow.setDefaultCommand(new ElbowRun(m_elbow, m_operatorPad));
+    // m_extension.setDefaultCommand(new ExtensionRun(m_extension, m_operatorPad));
+    // m_wrist.setDefaultCommand(new WristRun(m_wrist, m_operatorPad));
   }
 
   /****************************************************************************

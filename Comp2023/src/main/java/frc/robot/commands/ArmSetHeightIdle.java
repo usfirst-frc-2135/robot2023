@@ -27,7 +27,7 @@ public class ArmSetHeightIdle extends SequentialCommandGroup
 
         // @formatter:off
         new PrintCommand(getName()+": Retract Extension"),
-        new ExtensionMoveToLength(extension, EXConsts.kLengthIdle).asProxy(),
+        new ExtensionMoveToPosition(extension, EXConsts.kLengthIdle).asProxy(),
         new ConditionalCommand(
           new SequentialCommandGroup(
             new PrintCommand(getName() + ": Move Elbow"),
@@ -49,7 +49,7 @@ public class ArmSetHeightIdle extends SequentialCommandGroup
         ),
 
         new PrintCommand(getName() + ": Extend Extension"),
-        new ExtensionMoveToLength(extension, EXConsts.kLengthIdle).asProxy()
+        new ExtensionMoveToPosition(extension, EXConsts.kLengthIdle).asProxy()
         // @formatter:on
     );
   }

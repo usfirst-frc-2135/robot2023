@@ -32,7 +32,7 @@ public class ArmSetHeightScoreHigh extends SequentialCommandGroup
         new WristMoveToPosition(wrist, WRConsts.kAngleScoreHigh).asProxy(),
         
         new PrintCommand(getName() + ": Moving Extension"),
-        new ExtensionMoveToLength(extension, EXConsts.kLengthScoreHigh).asProxy()
+        new ExtensionMoveToPosition(extension, EXConsts.kLengthScoreHigh).asProxy()
         // @formatter:on
     );
   }
