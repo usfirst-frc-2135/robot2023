@@ -3,6 +3,7 @@
 //
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -80,6 +81,7 @@ public class Elbow extends SubsystemBase
   private double                    m_totalArbFeedForward;   // Arbitrary feedforward added to counteract gravity
 
   private Timer                     m_safetyTimer     = new Timer( ); // Safety timer for movements
+  private StatusSignal<Double>      m_motorVelocity   = m_motor.getRotorVelocity( );
 
   // Constructor
   public Elbow( )
@@ -98,6 +100,8 @@ public class Elbow extends SubsystemBase
     m_motorSim.Orientation = ChassisReference.CounterClockwise_Positive;
     m_CANCoderSim.Orientation = ChassisReference.Clockwise_Positive;
 
+    m_motorVelocity.setUpdateFrequency(50);
+
     initSmartDashboard( );
     initialize( );
   }
@@ -112,6 +116,7 @@ public class Elbow extends SubsystemBase
     SmartDashboard.putNumber("EL_targetDegrees", m_targetDegrees);
     SmartDashboard.putNumber("EL_CCDegrees", getCANCoderDegrees( ));
     SmartDashboard.putNumber("EL_curError", m_motor.getClosedLoopError( ).refresh( ).getValue( ));
+    SmartDashboard.putNumber("EL_rotorVelocity", m_motorVelocity.refresh( ).getValue( ));
 
     m_totalArbFeedForward = calculateTotalArbFF( );
     SmartDashboard.putNumber("EL_totalFF", m_totalArbFeedForward);

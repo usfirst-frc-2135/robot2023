@@ -3,6 +3,7 @@
 //
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -79,6 +80,7 @@ public class Wrist extends SubsystemBase
   private double                    m_totalArbFeedForward;   // Arbitrary feedforward added to counteract gravity
 
   private Timer                     m_safetyTimer     = new Timer( ); // Safety timer for movements
+  private StatusSignal<Double>      m_motorVelocity   = m_motor.getRotorVelocity( );
 
   // Constructor
   public Wrist( )
@@ -97,6 +99,8 @@ public class Wrist extends SubsystemBase
     m_motorSim.Orientation = ChassisReference.CounterClockwise_Positive;
     m_CANCoderSim.Orientation = ChassisReference.Clockwise_Positive;
 
+    m_motorVelocity.setUpdateFrequency(50);
+
     initSmartDashboard( );
     initialize( );
   }
@@ -111,6 +115,7 @@ public class Wrist extends SubsystemBase
     SmartDashboard.putNumber("WR_targetDegrees", m_targetDegrees);
     SmartDashboard.putNumber("WR_CCDegrees", getCANCoderDegrees( ));
     SmartDashboard.putNumber("WR_curError", m_motor.getClosedLoopError( ).refresh( ).getValue( ));
+    SmartDashboard.putNumber("WR_rotorVelocity", m_motorVelocity.refresh( ).getValue( ));
 
     m_totalArbFeedForward = calculateTotalArbFF( );
     SmartDashboard.putNumber("WR_totalFF", m_totalArbFeedForward);
