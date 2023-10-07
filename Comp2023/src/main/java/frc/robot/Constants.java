@@ -289,13 +289,13 @@ public class Constants
       ELBOW_UP         // Elbow moving up
     }
 
-    public static final double kManualSpeedVolts = 2.0;    // Motor voltage during manual operation
+    public static final double kManualSpeedVolts = 12.0;//2.0;    // Motor voltage during manual operation
 
     // Motion Magic config parameters
 
     // TODO - all should be re-tuned using Tuner X
-    public static final double kMMVelocity       = 81.28;      // TODO: (temporary slowdown for testing!) Elbow motion magic velocity (75% of max motor RPM)
-    public static final double kMMAcceleration   = 121.9;      // TODO: (temporary slowdown for testing!) Elbow motion magic acceleration (target velocity in 2/3s)
+    public static final double kMMVelocity       = 81.28;      // 10/7/23 Tuned! Elbow motion magic velocity (75% of max motor RPM)
+    public static final double kMMAcceleration   = 531.65;      // 10/7/23 Tuned! Elbow motion magic acceleration (target velocity in 2/3s)
     public static final double kMMJerk           = kMMAcceleration * 10; // Elbow motion magic jerk limit
     public static final double kS                = 0.0;            // Voltage constant to overcome friction
     public static final double kV                = 0.1107;         // Voltage constant per desired RPM
@@ -362,8 +362,8 @@ public class Constants
 
     // Motion Magic config parameters
 
-    public static final double kMMVelocity           = 59.81 * 3 / 2;    // TODO: Made slower for testing! Extension motion magic velocity (0.625 of max motor RPM)
-    public static final double kMMAcceleration       = 59.81 * 3 / 2;    // TODO: Made slower for testing! Extension motion magic acceleration (target velocity in 4/3s)
+    public static final double kMMVelocity           = 79.75;    // 10/7/23 Tuned! Extension motion magic velocity (0.625 of max motor RPM)
+    public static final double kMMAcceleration       = 708.87;    // 10/7/23 Tuned! Extension motion magic acceleration (target velocity in 4/3s)
     public static final double kMMJerk               = kMMAcceleration * 10;  // Extension motion magic S curve smoothing strength
     public static final double kS                    = 0.0;            // Voltage constant to overcome friction
     public static final double kV                    = 0.1107;         // Voltage constant per desired RPM
@@ -422,12 +422,12 @@ public class Constants
       WRIST_UP            // Wrist moving up
     }
 
-    public static final double kManualSpeedVolts = 2.0;    // Motor voltage during manual operation
+    public static final double kManualSpeedVolts = 12.0;//2.0;    // Motor voltage during manual operation
 
     // Motion Magic config parameters
 
-    public static final double kMMVelocity       = 58.96 * 3 / 2;      // TODO: Made slower for testing! Wrist motion magic velocity (75% of max motor RPM)
-    public static final double kMMAcceleration   = 117.92 * 3 / 2;     // TODO: Made slower for testing! Wrist motion magic acceleration (target velocity in 1/2s)
+    public static final double kMMVelocity       = 79.75;      // TODO: Made slower for testing! Wrist motion magic velocity (75% of max motor RPM)
+    public static final double kMMAcceleration   = 212.66;     // TODO: Made slower for testing! Wrist motion magic acceleration (target velocity in 1/2s)
     public static final double kMMSCurveStrength = kMMAcceleration * 10; // Wrist motion magic S curve smoothing strength
     public static final double kS                = 0.0;            // Voltage constant to overcome friction
     public static final double kV                = 0.1107;         // Voltage constant per desired RPM
