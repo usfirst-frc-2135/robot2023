@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.LLConsts;
 import frc.robot.Constants.VIConsts;
 
 /**
@@ -28,10 +29,10 @@ public class Vision extends SubsystemBase
   public MedianFilter           m_tvfilter      = new MedianFilter(5); // median filter v values to remove outliers (5 sample)
 
   // Declare module variables
-  private double                m_distance1     = VIConsts.kLLDistance1;   // x position in inches for first reference point
-  private double                m_vertOffset1   = VIConsts.kLLVertOffset1; // y reading in degrees for first reference point
-  private double                m_distance2     = VIConsts.kLLDistance2;   // x position in inches for second reference point
-  private double                m_vertOffset2   = VIConsts.kLLVertOffset2; // y reading in degrees for second reference point
+  private double                m_distance1     = LLConsts.kDistance1;   // x position in inches for first reference point
+  private double                m_vertOffset1   = LLConsts.kVertOffset1; // y reading in degrees for first reference point
+  private double                m_distance2     = LLConsts.kDistance2;   // x position in inches for second reference point
+  private double                m_vertOffset2   = LLConsts.kVertOffset2; // y reading in degrees for second reference point
   private double                m_slope;   // Linear regressions slope from calibration
   private double                m_offset;  // Linear regressions slope from calibration
 

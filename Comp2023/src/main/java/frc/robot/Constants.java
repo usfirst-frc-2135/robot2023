@@ -59,8 +59,9 @@ public class Constants
 
   public static final double kAutonomousPeriodSecs = 15.0;
 
+  /////////////////////////////////////////////////////////////////////////////
   // CAN IDs and PWM IDs
-
+  /////////////////////////////////////////////////////////////////////////////
   public static final class Ports
   {
     public static final String kCANCarnivore     = "canivore1";
@@ -102,12 +103,18 @@ public class Constants
     // public static final int    kDIO_ExampleDetect = 2;
   }
 
+  /////////////////////////////////////////////////////////////////////////////
+  // Falcon 500
+  /////////////////////////////////////////////////////////////////////////////
   public static final class Falcon500
   {
-    public static int          kMaxRPM     = 6380;             // free speed for Falcon 500 motor
-    public static final double kEncoderCPR = 2048;             // CPR is 2048 from Falcon 500 Manual
+    public static int          kMaxRPM     = 6380; // free speed for Falcon 500 motor
+    public static final double kEncoderCPR = 2048; // CPR is 2048 from Falcon 500 Manual
   }
 
+  /////////////////////////////////////////////////////////////////////////////
+  // Swerve drive
+  /////////////////////////////////////////////////////////////////////////////
   public static final class SWConsts
   {
     /* Swerve Constants - 0.427 m (x, y) */
@@ -173,10 +180,10 @@ public class Constants
     public static final double                driveKA                       = (0.27 / 12);
 
     /* Swerve Profiling Values */
-    public static final double                maxSpeed                      = 4.5; // meters per second
-    public static final double                maxAngularVelocity            = 6.0; //orginially 10.0
+    public static final double                maxSpeed                      = 4.5;  // meters per second
+    public static final double                maxAngularVelocity            = 6.0;  // orginially 10.0
     public static final double                maxSpeedSlowMode              = 2.25; // meters per second
-    public static final double                maxAngularVelocitySlowMode    = 4.0; //orginially 5.0
+    public static final double                maxAngularVelocitySlowMode    = 4.0;  // orginially 5.0
 
     /* Controller Invert */
     public static final boolean               invertXAxis                   = false;
@@ -239,15 +246,17 @@ public class Constants
 
     // Constants for balance
     public static final double kDriveBalancedAngle  = 5.0;    // Pitch values less than this stop driving
-    public static final double kDriveBalanceKp      = -0.040;  // Amount of power to apply per degree
+    public static final double kDriveBalanceKp      = -0.040; // Amount of power to apply per degree
 
-    public static final double kElbowDriveSlowAngle = 34.0;     // When arm is out beyond this angle - drive is slowed down
+    public static final double kElbowDriveSlowAngle = 34.0;   // When arm is out beyond this angle - drive is slowed down
   }
 
+  /////////////////////////////////////////////////////////////////////////////
+  // Elbow
+  /////////////////////////////////////////////////////////////////////////////
   public static final class ELConsts
   {
     // Global settings
-
     public static final double               kGearRatio                = 300;   // Gear reduction for elbow
     public static final double               kForearmLengthMeters      = 1.22;  // Sim value: 48 inches
     public static final double               kForearmMassKg            = 6.0;   // Sim value: 13.2 lbs 
@@ -280,20 +289,17 @@ public class Constants
     public static final SensorDirectionValue kSensorDirection          = SensorDirectionValue.Clockwise_Positive;
 
     // Manual mode config parameters
-
     public enum ElbowMode
     {
-      ELBOW_INIT,      // Initialize elbow
-      ELBOW_DOWN,      // Elbow moving down
-      ELBOW_STOPPED,   // Elbow stop and hold position
-      ELBOW_UP         // Elbow moving up
+      ELBOW_INIT,    // Initialize elbow
+      ELBOW_DOWN,    // Elbow moving down
+      ELBOW_STOPPED, // Elbow stop and hold position
+      ELBOW_UP       // Elbow moving up
     }
 
     public static final double kManualSpeedVolts = 12.0;//2.0;    // Motor voltage during manual operation
 
     // Motion Magic config parameters
-
-    // TODO - all should be re-tuned using Tuner X
     public static final double kMMVelocity       = 81.28;      // 10/7/23 Tuned! Elbow motion magic velocity (75% of max motor RPM)
     public static final double kMMAcceleration   = 531.65;      // 10/7/23 Tuned! Elbow motion magic acceleration (target velocity in 2/3s)
     public static final double kMMJerk           = kMMAcceleration * 10; // Elbow motion magic jerk limit
@@ -302,7 +308,6 @@ public class Constants
     public static final double kPidKp            = 0.05908 * 8;    // Elbow PID proportional constant
     public static final double kPidKi            = 0.0;            // Elbow PID integral constant
     public static final double kPidKd            = 0.0;            // Elbow PID derivative constant
-    // public static final double kPidKd            = 0.5908;      // Elbow PID derivative constant
 
     public static final double kArbitraryFF      = 0.045;          // Elbow motor output (duty cycle) for arm at 90 degrees
     public static final double kExtArbFF         = 0.007;          // Elbow motor output (duty cycle) for arm at 90 degrees with full extension
@@ -311,16 +316,18 @@ public class Constants
     public static final double kMMSafetyTimeout  = 2.5;            // Seconds allowed for a Motion Magic movement
   }
 
+  /////////////////////////////////////////////////////////////////////////////
+  // Extension
+  /////////////////////////////////////////////////////////////////////////////
   public static final class EXConsts
   {
     // Global settings
-
     public static final double        kGearRatio                = 18.23; // Gear reduction for extension
     public static final double        kDrumDiameterInches       = 1.375; // Drum diameter in inches
     public static final double        kDrumCircumInches         = kDrumDiameterInches * Math.PI;   // Drum diameter in inches
     public static final double        kRolloutRatio             = kDrumCircumInches / kGearRatio;  // inches per shaft rotation
     public static final double        kForearmLengthMeters      = 1.0;   // Sim value: 48 inches
-    public static final double        kForearmMassKg            = 2.0;    // Sim value: 13.2 lbs 
+    public static final double        kForearmMassKg            = 2.0;   // Sim value: 13.2 lbs 
 
     // Extension lengths increase by 0.95" per 90 degrees of elbow rotation (lengths manually adjusted below)
     public static final double        kLengthMin                = -0.5;  // Extension minimum allowable length (half inch less than stowed)
@@ -343,25 +350,23 @@ public class Constants
     public static final double        kStatorCurrentLimit       = 60.0;  // Stator current limit (after trigger)
     public static final boolean       kStatorCurrentLimitEnable = false; // Stator current enable
 
-    public static final double        kNeutralDeadband          = 0.001;  // Extension motor output deadband
+    public static final double        kNeutralDeadband          = 0.001; // Extension motor output deadband
 
     // Calibration
     public static final double        kCalibrateSpeedVolts      = -2.0; // Motor voltage during calibration
 
     // Manual config parameters
-
     public enum ExtensionMode
     {
-      EXTENSION_INIT,         // Initialize extension
-      EXTENSION_OUT,          // Extension moving out
-      EXTENSION_STOPPED,      // Extension stop and hold position
-      EXTENSION_IN            // Extension moving in
+      EXTENSION_INIT,    // Initialize extension
+      EXTENSION_OUT,     // Extension moving out
+      EXTENSION_STOPPED, // Extension stop and hold position
+      EXTENSION_IN       // Extension moving in
     }
 
-    public static final double kManualSpeedVolts     = 3.0;    // Motor voltage during manual operation
+    public static final double kManualSpeedVolts     = 3.0;            // Motor voltage during manual operation
 
     // Motion Magic config parameters
-
     public static final double kMMVelocity           = 79.75;    // 10/7/23 Tuned! Extension motion magic velocity (0.625 of max motor RPM)
     public static final double kMMAcceleration       = 708.87;    // 10/7/23 Tuned! Extension motion magic acceleration (target velocity in 4/3s)
     public static final double kMMJerk               = kMMAcceleration * 10;  // Extension motion magic S curve smoothing strength
@@ -370,17 +375,21 @@ public class Constants
     public static final double kPidKp                = 0.0591 * 8;   // Extension PID proportional constant
     public static final double kPidKi                = 0.0;          // Extension PID integral constant
     public static final double kPidKd                = 0.0;          // Extension PID derivative constant
-    public static final int    kAllowedError         = 0;            // Extension PID allowable closed loop error in counts
-    public static final double kToleranceInches      = 0.5;          // Extension PID tolerance in inches
-    public static final double kArbitraryFF          = -0.030;       // Extension motor output for extension when fully retracted
-    public static final double kMMSafetyTimeoutRatio = 0.16;         // Seconds allowed for a Motion Magic movement
+
+    public static final int    kAllowedError         = 0;              // Extension PID allowable closed loop error in counts
+    public static final double kToleranceInches      = 0.5;            // Extension PID tolerance in inches
+
+    public static final double kArbitraryFF          = -0.030;         // Extension motor output for extension when fully retracted
+    public static final double kMMSafetyTimeoutRatio = 0.16;           // Seconds allowed for a Motion Magic movement
   }
 
+  /////////////////////////////////////////////////////////////////////////////
+  // Wrist
+  /////////////////////////////////////////////////////////////////////////////
   public static final class WRConsts
   {
     // Global settings
-
-    public static final double               kGearRatio                = 213.9;   // Gear reduction for wrist
+    public static final double               kGearRatio                = 213.9; // Gear reduction for wrist
     public static final double               kGripperLengthMeters      = 0.3;   // Sim value: 11.8 in
     public static final double               kGripperMassKg            = 3.0;   // Sim value: 6.6 lbs
 
@@ -390,36 +399,35 @@ public class Constants
     public static final double               kAngleScoreLow            = 33.0;  // From Mech Design (floor, feet art 5" high), empirically checked
     public static final double               kAngleScoreMid            = kAngleIdle;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), ready to score
     public static final double               kAngleScoreHigh           = kAngleIdle;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
-    public static final double               kAngleScore               = 90;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
+    public static final double               kAngleScore               = 90;    // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
     public static final double               kAngleSubstation          = 100.0; // From Mech Design (3'1-38" above floor)
     public static final double               kAngleMax                 = 110.0; // Wrist maximum allowable angle (a few degrees more than substation/horizontal)
 
     public static final InvertedValue        kInvertMotor              = InvertedValue.CounterClockwise_Positive; // Motor direction for positive input
 
     // Current limit settings - wrist
-    public static final double               kSupplyCurrentLimit       = 10.0;   // Supply current limit (after trigger)
-    public static final double               kSupplyTriggerCurrent     = 10.0;   // Supply trigger current that will cause limiting
+    public static final double               kSupplyCurrentLimit       = 10.0;  // Supply current limit (after trigger)
+    public static final double               kSupplyTriggerCurrent     = 10.0;  // Supply trigger current that will cause limiting
     public static final double               kSupplyTriggerTime        = 0.001; // Supply time duration of trigger that will causing limiting
     public static final boolean              kSupplyCurrentLimitEnable = true;  // Supply current enable
 
-    public static final double               kStatorCurrentLimit       = 40.0;   // Stator current limit (after trigger)
+    public static final double               kStatorCurrentLimit       = 40.0;  // Stator current limit (after trigger)
     public static final boolean              kStatorCurrentLimitEnable = false; // Stator current enable
 
-    public static final double               kNeutralDeadband          = 0.001;          // Wrist motor output deadband
+    public static final double               kNeutralDeadband          = 0.001; // Wrist motor output deadband
 
     // CANCoder wrist absolute offset
-    public static final double               kCompOffset               = -0.384766; // CANCoder offset angle for comp bot
-    public static final double               kBetaOffset               = 0.000; // CANCoder offset angle for beta bot
+    public static final double               kCompOffset               = -0.3848; // CANCoder offset angle for comp bot
+    public static final double               kBetaOffset               = 0.000;   // TODO: CANCoder offset rotations for beta bot
     public static final SensorDirectionValue kSensorDirection          = SensorDirectionValue.Clockwise_Positive;
 
     // Manual config parameters
-
     public enum WristMode
     {
-      WRIST_INIT,         // Initialize wrist
-      WRIST_DOWN,         // Wrist moving down
-      WRIST_STOPPED,      // Wrist stop and hold position
-      WRIST_UP            // Wrist moving up
+      WRIST_INIT,    // Initialize wrist
+      WRIST_DOWN,    // Wrist moving down
+      WRIST_STOPPED, // Wrist stop and hold position
+      WRIST_UP       // Wrist moving up
     }
 
     public static final double kManualSpeedVolts = 12.0;//2.0;    // Motor voltage during manual operation
@@ -434,17 +442,21 @@ public class Constants
     public static final double kPidKp            = 0.0473 * 8;     // Wrist PID proportional constant
     public static final double kPidKi            = 0.0;            // Wrist PID integral constant
     public static final double kPidKd            = 0.0;            // Wrist PID derivative constant
+
     public static final int    kAllowedError     = 0;              // Wrist PID allowable closed loop error in counts
     public static final double kToleranceDegrees = 2.0;            // Wrist PID tolerance in degrees (1 deg is 0.25" at 15" length)
+
     public static final double kArbitraryFF      = -0.034;         // Wrist motor output for 90 degrees
     public static final double kMMSafetyTimeout  = 3;              // Seconds allowed for a Motion Magic movement
   }
 
+  /////////////////////////////////////////////////////////////////////////////
+  // Grippper
+  /////////////////////////////////////////////////////////////////////////////
   public static final class GRConsts
   {
     // Global settings
-
-    public static final boolean kInvertMotor          = false;  // Motor direction for positive input
+    public static final boolean kInvertMotor          = false; // Motor direction for positive input
 
     // Input current limit settings - gripper
     public static final double  kSupplyCurrentLimit   = 30.0;  // Default supply current limit (after trigger)
@@ -464,6 +476,9 @@ public class Constants
     public static final double kGripperSpeedExpel   = -0.2; // Score game piece on cone node or cube shelf
   }
 
+  /////////////////////////////////////////////////////////////////////////////
+  // Vision (Limelight settings)
+  /////////////////////////////////////////////////////////////////////////////
   public static final class VIConsts
   {
     // Limelight-defined streaming states
@@ -482,6 +497,18 @@ public class Constants
       VISION_TOGGLE // Toggle modes
     }
 
+    public static final List<Pose2d> kAprilTagPoses = Collections.unmodifiableList(List.of( //
+        new Pose2d(new Translation2d(0.0, 0.0), new Rotation2d(0)),        // AprilTag ID: 0 (invalid)
+        new Pose2d(new Translation2d(15.513558, 1.071626), new Rotation2d(Units.degreesToRadians(180))), // AprilTag ID: 1 
+        new Pose2d(new Translation2d(15.513558, 2.748026), new Rotation2d(Units.degreesToRadians(180))), // AprilTag ID: 2 
+        new Pose2d(new Translation2d(15.513558, 4.424426), new Rotation2d(Units.degreesToRadians(180))), // AprilTag ID: 3 
+        new Pose2d(new Translation2d(16.178784, 6.749796), new Rotation2d(Units.degreesToRadians(180))), // AprilTag ID: 4 
+        new Pose2d(new Translation2d(0.36195, 6.749796), new Rotation2d(0)),                               // AprilTag ID: 5 
+        new Pose2d(new Translation2d(1.0273, 4.424426), new Rotation2d(0)),                                // AprilTag ID: 6 
+        new Pose2d(new Translation2d(1.0273, 2.748026), new Rotation2d(0)),                                // AprilTag ID: 7
+        new Pose2d(new Translation2d(1.0273, 1.071626), new Rotation2d(0))                                 // AprilTag ID: 8
+    ));
+
     // Direction of goal relative to AprilTag 
     public enum VIGoalDirection
     {
@@ -490,31 +517,17 @@ public class Constants
       DIRECTION_RIGHT   // Right
     }
 
-    public static final double       kLLDistance1        = 48;    // distance from bumper in inches for first reference point
-    public static final double       kLLVertOffset1      = 0.42;  // LL y reading in degrees for first reference point
-    public static final double       kLLDistance2        = 60;    // distance from bumper in inches for second reference point
-    public static final double       kLLVertOffset2      = -4.85; // LL y reading in degrees for second reference point
-
-    public static final double       kATagDepthInGrid    = Units.inchesToMeters(14.25); // Depth from front of grid to AprilTag - 1'2-1/4"
-    public static final double       kRobotCenterToFront = Units.inchesToMeters((28.0 + 6.0) / 2); // Depth from limelight to front robot edge
-    public static final double       kAdjustPathX        = kATagDepthInGrid + kRobotCenterToFront;
-    public static final double       kAdjustPathY        = Units.inchesToMeters(18.25 / 2 + 18.5 / 2) + 0.06; // Addition of 6cm to adjust for empirical error 
-    public static final double       kAdjustSubPathX     = kRobotCenterToFront + Units.inchesToMeters(30); //Robot stop 30 inches from the substation loading zone
-    public static final double       kAdjustSubPathY     = Units.inchesToMeters(50.5 / 2);
-
-    public static final List<Pose2d> kAprilTagPoses      = Collections.unmodifiableList(List.of( //
-        new Pose2d(new Translation2d(0.0, 0.0), new Rotation2d(0)),        // AprilTag ID: 0 (invalid)
-        new Pose2d(new Translation2d(15.513558, 1.071626), new Rotation2d(Units.degreesToRadians(180))), // AprilTag ID: 1 
-        new Pose2d(new Translation2d(15.513558, 2.748026), new Rotation2d(Units.degreesToRadians(180))), // AprilTag ID: 2 
-        new Pose2d(new Translation2d(15.513558, 4.424426), new Rotation2d(Units.degreesToRadians(180))), // AprilTag ID: 3 
-        new Pose2d(new Translation2d(16.178784, 6.749796), new Rotation2d(Units.degreesToRadians(180))), // AprilTag ID: 4 
-        new Pose2d(new Translation2d(0.36195, 6.749796), new Rotation2d(0)),   // AprilTag ID: 5 
-        new Pose2d(new Translation2d(1.0273, 4.424426), new Rotation2d(0)),    // AprilTag ID: 6 
-        new Pose2d(new Translation2d(1.0273, 2.748026), new Rotation2d(0)),    // AprilTag ID: 7
-        new Pose2d(new Translation2d(1.0273, 1.071626), new Rotation2d(0))     // AprilTag ID: 8
-    ));
+    public static final double kATagDepthInGrid    = Units.inchesToMeters(14.25);    // Depth from front of grid to AprilTag - 1'2-1/4"
+    public static final double kRobotCenterToFront = Units.inchesToMeters((28.0 + 6.0) / 2); // Depth from limelight to front robot edge
+    public static final double kAdjustPathX        = kATagDepthInGrid + kRobotCenterToFront;
+    public static final double kAdjustPathY        = Units.inchesToMeters(18.25 / 2 + 18.5 / 2) + 0.06;     // Addition of 6cm to adjust for empirical error 
+    public static final double kAdjustSubPathX     = kRobotCenterToFront + Units.inchesToMeters(30); // Robot stop 30 inches from the substation loading zone
+    public static final double kAdjustSubPathY     = Units.inchesToMeters(50.5 / 2);
   }
 
+  /////////////////////////////////////////////////////////////////////////////
+  // CANdle
+  /////////////////////////////////////////////////////////////////////////////
   public static final class LEDConsts
   {
     public enum LEDColor
@@ -531,6 +544,9 @@ public class Constants
     }
   }
 
+  /////////////////////////////////////////////////////////////////////////////
+  // Swerve snap
+  /////////////////////////////////////////////////////////////////////////////
   public static final class SnapConstants
   {
     public static final double                       kP                                      = 5.0;
@@ -548,8 +564,17 @@ public class Constants
         new TrapezoidProfile.Constraints(kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
   }
 
+  /////////////////////////////////////////////////////////////////////////////
+  // Limelight driving alignment
+  /////////////////////////////////////////////////////////////////////////////
   public static final class LLConsts
   {
+    // Default calibration
+    public static final double kDistance1        = 48;    // distance from bumper in inches for first reference point
+    public static final double kVertOffset1      = 0.42;  // LL y reading in degrees for first reference point
+    public static final double kDistance2        = 60;    // distance from bumper in inches for second reference point
+    public static final double kVertOffset2      = -4.85; // LL y reading in degrees for second reference point
+
     // Limelight PID driving controls
     public static final double kTurnConstant     = 0.0;
     public static final double kTurnPidKp        = 0.005;
@@ -562,24 +587,27 @@ public class Constants
     public static final double kThrottleMax      = 0.2;
     public static final double kThrottleShape    = 10.0;
 
-    public static final double kTargetAngle      = 0.0;      // Optimal shooting angle
-    public static final double kSetPointDistance = 60.0;     // Optimal shooting distance
-    public static final double kAngleThreshold   = 3.5;      // Degrees tolerance around optimal
-    public static final double kDistThreshold    = 6.0;      // Inches tolerance around optimal
+    public static final double kTargetAngle      = 0.0;   // Optimal shooting angle
+    public static final double kSetPointDistance = 60.0;  // Optimal shooting distance
+    public static final double kAngleThreshold   = 3.5;   // Degrees tolerance around optimal
+    public static final double kDistThreshold    = 6.0;   // Inches tolerance around optimal
   }
 
+  /////////////////////////////////////////////////////////////////////////////
+  // Autonomous
+  /////////////////////////////////////////////////////////////////////////////
   public static final class AutoConstants
   {
     enum AutoChooser
     {
-      AUTOSTOP,             // AutoStop
-      AUTOCOMSHORT,         // AutoDriveOffCommunityShort
-      AUTOCOMLONG,          // AutoDriveOffCommunityLong
-      AUTOCHARGE,           // AutoEngageChargeStation
-      AUTOPRESTOP,          // AutoPreloadAndStop
-      AUTOPRECOMSHORT,      // AutoPreloadAndDriveOffCommunityShort
-      AUTOPRECOMLONG,       // AutoPreloadAndDriveOffCommunityLong
-      AUTOPRECHARGE         // AutoPreloadAndEngageChargeStation
+      AUTOSTOP,        // AutoStop
+      AUTOCOMSHORT,    // AutoDriveOffCommunityShort
+      AUTOCOMLONG,     // AutoDriveOffCommunityLong
+      AUTOCHARGE,      // AutoEngageChargeStation
+      AUTOPRESTOP,     // AutoPreloadAndStop
+      AUTOPRECOMSHORT, // AutoPreloadAndDriveOffCommunityShort
+      AUTOPRECOMLONG,  // AutoPreloadAndDriveOffCommunityLong
+      AUTOPRECHARGE    // AutoPreloadAndEngageChargeStation
     }
 
     public static final double                       kMaxSpeedMetersPerSecond                    = 2.2;
