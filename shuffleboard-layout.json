@@ -380,7 +380,7 @@
               "_showGlyph": false
             }
           },
-          "15,4": {
+          "14,2": {
             "size": [
               3,
               2
@@ -427,71 +427,6 @@
         "vgap": 16.0,
         "titleType": 0,
         "tiles": {
-          "0,0": {
-            "size": [
-              3,
-              2
-            ],
-            "content": {
-              "_type": "Command",
-              "_source0": "network_table:///SmartDashboard/ElbowStow",
-              "_title": "/SmartDashboard/ElbowStow",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "0,2": {
-            "size": [
-              3,
-              2
-            ],
-            "content": {
-              "_type": "Command",
-              "_source0": "network_table:///SmartDashboard/ElbowIdle",
-              "_title": "/SmartDashboard/ElbowIdle",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "0,4": {
-            "size": [
-              3,
-              2
-            ],
-            "content": {
-              "_type": "Command",
-              "_source0": "network_table:///SmartDashboard/ElbowLow",
-              "_title": "/SmartDashboard/ElbowLow",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "3,2": {
-            "size": [
-              3,
-              2
-            ],
-            "content": {
-              "_type": "Command",
-              "_source0": "network_table:///SmartDashboard/ElbowHigh",
-              "_title": "/SmartDashboard/ElbowHigh",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "3,4": {
-            "size": [
-              3,
-              2
-            ],
-            "content": {
-              "_type": "Command",
-              "_source0": "network_table:///SmartDashboard/ElbowShelf",
-              "_title": "/SmartDashboard/ElbowShelf",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
           "3,0": {
             "size": [
               3,
@@ -531,7 +466,7 @@
               "_showGlyph": false
             }
           },
-          "15,3": {
+          "14,2": {
             "size": [
               3,
               2
@@ -588,6 +523,71 @@
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/EX_currentDraw",
               "_title": "/SmartDashboard/EX_currentDraw",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "3,2": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ExtensionHigh",
+              "_title": "SmartDashboard/ExtensionHigh",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "0,2": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ExtensionIdle",
+              "_title": "SmartDashboard/ExtensionIdle",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "3,4": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ExtensionShelf",
+              "_title": "SmartDashboard/ExtensionShelf",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "0,0": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ExtensionStow",
+              "_title": "SmartDashboard/ExtensionStow",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "0,4": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ExtensionLow",
+              "_title": "SmartDashboard/ExtensionLow",
               "_glyph": 148,
               "_showGlyph": false
             }
