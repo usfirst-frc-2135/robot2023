@@ -300,12 +300,12 @@ public class Constants
     public static final double kManualSpeedVolts = 12.0;//2.0;    // Motor voltage during manual operation
 
     // Motion Magic config parameters
-    public static final double kMMVelocity       = 81.28;      // 10/7/23 Tuned! Elbow motion magic velocity (75% of max motor RPM)
-    public static final double kMMAcceleration   = 531.65;      // 10/7/23 Tuned! Elbow motion magic acceleration (target velocity in 2/3s)
-    public static final double kMMJerk           = kMMAcceleration * 10; // Elbow motion magic jerk limit
+    public static final double kMMVelocity       = 79.75;          // 10/7/23 Tuned! Elbow motion magic velocity (75% of max motor RPM)
+    public static final double kMMAcceleration   = 531.7;          // 10/7/23 Tuned! Elbow motion magic acceleration (target velocity in 200ms)
+    public static final double kMMJerk           = kMMAcceleration * 3.0; // Elbow motion magic jerk limit (1/4 of acceleration time)
     public static final double kS                = 0.0;            // Voltage constant to overcome friction
-    public static final double kV                = 0.1107;         // Voltage constant per desired RPM
-    public static final double kPidKp            = 0.05908 * 8;    // Elbow PID proportional constant
+    public static final double kV                = 0.1129;         // Voltage constant per desired RPM
+    public static final double kPidKp            = 4.32;           // Elbow PID proportional constant
     public static final double kPidKi            = 0.0;            // Elbow PID integral constant
     public static final double kPidKd            = 0.0;            // Elbow PID derivative constant
 
@@ -367,14 +367,14 @@ public class Constants
     public static final double kManualSpeedVolts     = 3.0;            // Motor voltage during manual operation
 
     // Motion Magic config parameters
-    public static final double kMMVelocity           = 79.75;    // 10/7/23 Tuned! Extension motion magic velocity (0.625 of max motor RPM)
-    public static final double kMMAcceleration       = 708.87;    // 10/7/23 Tuned! Extension motion magic acceleration (target velocity in 4/3s)
-    public static final double kMMJerk               = kMMAcceleration * 10;  // Extension motion magic S curve smoothing strength
+    public static final double kMMVelocity           = 79.75;          // 10/7/23 Tuned! Extension motion magic velocity (0.625 of max motor RPM)
+    public static final double kMMAcceleration       = 708.9;          // 10/7/23 Tuned! Extension motion magic acceleration (target velocity in 150ms)
+    public static final double kMMJerk               = kMMAcceleration * 4.0; // Elbow motion magic jerk limit (1/4 of acceleration time)
     public static final double kS                    = 0.0;            // Voltage constant to overcome friction
-    public static final double kV                    = 0.1107;         // Voltage constant per desired RPM
-    public static final double kPidKp                = 0.0591 * 8;   // Extension PID proportional constant
-    public static final double kPidKi                = 0.0;          // Extension PID integral constant
-    public static final double kPidKd                = 0.0;          // Extension PID derivative constant
+    public static final double kV                    = 0.1129;         // Voltage constant per desired RPM
+    public static final double kPidKp                = 1.443;          // Extension PID proportional constant
+    public static final double kPidKi                = 0.0;            // Extension PID integral constant
+    public static final double kPidKd                = 0.0;            // Extension PID derivative constant
 
     public static final int    kAllowedError         = 0;              // Extension PID allowable closed loop error in counts
     public static final double kToleranceInches      = 0.5;            // Extension PID tolerance in inches
@@ -433,13 +433,12 @@ public class Constants
     public static final double kManualSpeedVolts = 12.0;//2.0;    // Motor voltage during manual operation
 
     // Motion Magic config parameters
-
-    public static final double kMMVelocity       = 79.75;      // TODO: Made slower for testing! Wrist motion magic velocity (75% of max motor RPM)
-    public static final double kMMAcceleration   = 212.66;     // TODO: Made slower for testing! Wrist motion magic acceleration (target velocity in 1/2s)
-    public static final double kMMSCurveStrength = kMMAcceleration * 10; // Wrist motion magic S curve smoothing strength
+    public static final double kMMVelocity       = 79.75;          // 10/7/23 Tuned! Wrist motion magic velocity (75% of max motor RPM)
+    public static final double kMMAcceleration   = 472.6;          // 10/7/23 Tuned! Wrist motion magic acceleration (target velocity in 1/2s)
+    public static final double kMMSCurveStrength = kMMAcceleration * 4.0; // Elbow motion magic jerk limit (1/4 of acceleration time)
     public static final double kS                = 0.0;            // Voltage constant to overcome friction
-    public static final double kV                = 0.1107;         // Voltage constant per desired RPM
-    public static final double kPidKp            = 0.0473 * 8;     // Wrist PID proportional constant
+    public static final double kV                = 0.1129;         // Voltage constant per desired RPM
+    public static final double kPidKp            = 9.081;          // Wrist PID proportional constant
     public static final double kPidKi            = 0.0;            // Wrist PID integral constant
     public static final double kPidKd            = 0.0;            // Wrist PID derivative constant
 
