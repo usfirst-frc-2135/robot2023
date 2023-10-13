@@ -17,7 +17,7 @@ public class ElbowSetAngleZero extends CommandBase
   {
     m_elbow = elbow;
 
-    setName("SetELAngleZero");
+    setName("ElbowSetAngleZero");
   }
 
   // Called when the command is initially scheduled.

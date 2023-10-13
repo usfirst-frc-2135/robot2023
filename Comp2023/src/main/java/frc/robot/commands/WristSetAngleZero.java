@@ -17,7 +17,7 @@ public class WristSetAngleZero extends CommandBase
   {
     m_wrist = wrist;
 
-    setName("SetWRAngleZero");
+    setName("WristSetAngleZero");
   }
 
   // Called when the command is initially scheduled.

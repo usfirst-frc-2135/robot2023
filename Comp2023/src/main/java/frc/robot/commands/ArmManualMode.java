@@ -18,7 +18,7 @@ public class ArmManualMode extends SequentialCommandGroup
 {
   public ArmManualMode(Elbow elbow, Extension extension, Wrist wrist, XboxController operPad)
   {
-    setName("Manual Mode");
+    setName("ArmManualMode");
 
     addCommands(
         // Add Commands here:

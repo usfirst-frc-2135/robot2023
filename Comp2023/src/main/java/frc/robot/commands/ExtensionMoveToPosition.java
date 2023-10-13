@@ -37,7 +37,7 @@ public class ExtensionMoveToPosition extends CommandBase
   private void ExtensionMoveToPositionCommon(boolean holdCurrentLength)
   {
     m_holdPosition = holdCurrentLength;
-    setName("ExtensionMoveToLength");
+    setName("ExtensionMoveToPosition");
     addRequirements(m_extension);
   }
 

@@ -21,7 +21,7 @@ public class DriveResetGyro extends CommandBase
     swerve = drive;
     m_start = start;
     m_back = back;
-    setName("ResetGyro");
+    setName("DriveResetGyro");
   }
 
   // Called when the command is initially scheduled.
