@@ -212,11 +212,21 @@ public class Extension extends SubsystemBase
     m_motor.setControl(m_requestVolts.withOutput(0.0));
   }
 
+  //
+  // Elbow movements change the extension target value as it moves
+  // - Extension drum diameter is 1.375 inches or a circumference of pi * d = 4.32 inches
+  // - When the elbow rotates 90 degrees (one quarter turn), the extension tightens by the same amount
+  // - One quarter turn is 4.32 / 4 = 1.08 inches
+  // - So add 1.08 inches when elbow is at 90 degrees, 0.0 inches at 0 degrees
+  //
+  // TODO: ZARA - second parameter should be the elbow angle
   public void setMMPosition(double targetInches)
   {
-
+    // TODO: ZARA - given that 
+    //    elbow = 0 degrees should add 0.0 inches to targetInches
+    //    elbow = 90 degrees should add 1.0 (use the constant you created) to targetInches
+    // come up with an equation that does this continuous over the range 0 - 90 degrees
     m_motor.setControl(m_requestMMVolts.withPosition(Conversions.inchesToWinchRotations(targetInches, EXConsts.kRolloutRatio)));
-
   }
 
   ///////////////////////// MANUAL MOVEMENT ///////////////////////////////////
@@ -261,6 +271,7 @@ public class Extension extends SubsystemBase
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
+  // TODO: ZARA - pass elbowAngle into moveToPositionInit (instead of m_elbow)
   public void moveToPositionInit(double newLength, Elbow m_elbow, boolean holdPosition)
   {
     m_safetyTimer.restart( );
@@ -278,6 +289,7 @@ public class Extension extends SubsystemBase
         m_moveIsFinished = false;
         m_withinTolerance.calculate(false); // Reset the debounce filter
 
+        // TODO: ZARA - pass the elbow angle (passed into moveToPositionInit) into setMMPosition as second parameter
         setMMPosition(m_targetInches);
 
         // .withFeedForward((m_totalArbFeedForward)));  // TODO - once extension is fixed and Tuner X is used
@@ -297,9 +309,11 @@ public class Extension extends SubsystemBase
     }
   }
 
+  // TODO: ZARA - pass elbowAngle into moveToPositionExecute
   public void moveToPositionExecute( )
   {
     if (m_calibrated)
+      // TODO: ZARA - pass the elbow angle (passed into moveToPositionInit) into setMMPosition as second parameter
       setMMPosition(m_targetInches);
     // .withFeedForward(m_totalArbFeedForward)); // TODO - once extension is fixed and Tuner X is used
   }

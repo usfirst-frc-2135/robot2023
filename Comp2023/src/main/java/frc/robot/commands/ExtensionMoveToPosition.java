@@ -45,6 +45,8 @@ public class ExtensionMoveToPosition extends CommandBase
   @Override
   public void initialize( )
   {
+    // TODO: double elbowAngle = m_elbow.getAngle();
+    // TODO: pass elbowAngle into moveToPositionInit (instead of m_elbow)
     m_extension.moveToPositionInit(m_newLength, m_elbow, m_holdPosition);
   }
 
@@ -52,6 +54,8 @@ public class ExtensionMoveToPosition extends CommandBase
   @Override
   public void execute( )
   {
+    // TODO: double elbowAngle = m_elbow.getAngle();
+    // TODO: modify moveToPositionExecute (in Extension only) to accept the elbow angle
     m_extension.moveToPositionExecute( );
   }
 
