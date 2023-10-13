@@ -4,6 +4,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
 
 /**
@@ -12,20 +13,23 @@ import frc.robot.subsystems.Extension;
 public class ExtensionMoveToPosition extends CommandBase
 {
   private final Extension m_extension;
+  private final Elbow     m_elbow;
   private boolean         m_holdPosition;
   private double          m_newLength;
 
   // Default command for holding current position
-  public ExtensionMoveToPosition(Extension extension)
+  public ExtensionMoveToPosition(Extension extension, Elbow elbow)
   {
     m_extension = extension;
+    m_elbow = elbow;
     ExtensionMoveToPositionCommon(true);
   }
 
   // Motion Magic movement to a new position
-  public ExtensionMoveToPosition(Extension extension, double position)
+  public ExtensionMoveToPosition(Extension extension, Elbow elbow, double position)
   {
     m_extension = extension;
+    m_elbow = elbow;
     m_newLength = position;
     ExtensionMoveToPositionCommon(false);
   }
@@ -41,7 +45,7 @@ public class ExtensionMoveToPosition extends CommandBase
   @Override
   public void initialize( )
   {
-    m_extension.moveToPositionInit(m_newLength, m_holdPosition);
+    m_extension.moveToPositionInit(m_newLength, m_elbow, m_holdPosition);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

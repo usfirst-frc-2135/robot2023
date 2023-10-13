@@ -32,7 +32,7 @@ public class ArmSetHeightShelf extends SequentialCommandGroup
         new WristMoveToPosition(wrist, WRConsts.kAngleSubstation).asProxy(),
         
         new PrintCommand(getName() + ": Moving Extension"),
-        new ExtensionMoveToPosition(extension, EXConsts.kLengthSubstation).asProxy()
+        new ExtensionMoveToPosition(extension, elbow, EXConsts.kLengthSubstation).asProxy()
         // @formatter:on
     );
   }

@@ -29,7 +29,7 @@ public class ArmSetHeightStow extends SequentialCommandGroup
         new WristMoveToPosition(wrist, WRConsts.kAngleStow).asProxy(),
 
         new PrintCommand(getName() + ": Moving Extension"),
-        new ExtensionMoveToPosition(extension, EXConsts.kLengthStow).asProxy(),
+        new ExtensionMoveToPosition(extension, elbow, EXConsts.kLengthStow).asProxy(),
 
         new PrintCommand(getName() + ": Moving Elbow"),
         new ElbowMoveToPosition(elbow,  ELConsts.kAngleStow).asProxy()

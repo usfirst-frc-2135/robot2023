@@ -13,8 +13,9 @@ import frc.robot.subsystems.Extension;
  */
 public class ExtensionCalibrate extends CommandBase
 {
-  private Timer     m_calibrateTimer = new Timer( );
-  private Extension m_extension;
+  private Timer               m_calibrateTimer = new Timer( );
+  private Extension           m_extension;
+  private static final double kTimeout         = 0.5;
 
   public ExtensionCalibrate(Extension extension)
   {
@@ -54,7 +55,7 @@ public class ExtensionCalibrate extends CommandBase
   @Override
   public boolean isFinished( )
   {
-    return m_calibrateTimer.hasElapsed(1.0);
+    return m_calibrateTimer.hasElapsed(kTimeout);
   }
 
   @Override

@@ -154,12 +154,12 @@ public class RobotContainer
     SmartDashboard.putData("ElbowSetAngleToZero", new ElbowSetAngleZero(m_elbow));
 
     // Extension subsytem tests
-    SmartDashboard.putData("ExtensionStow", new ExtensionMoveToPosition(m_extension, EXConsts.kLengthStow));
-    SmartDashboard.putData("ExtensionIdle", new ExtensionMoveToPosition(m_extension, EXConsts.kLengthIdle));
-    SmartDashboard.putData("ExtensionLow", new ExtensionMoveToPosition(m_extension, EXConsts.kLengthScoreLow));
-    SmartDashboard.putData("ExtensionMid", new ExtensionMoveToPosition(m_extension, EXConsts.kLengthScoreMid));
-    SmartDashboard.putData("ExtensionHigh", new ExtensionMoveToPosition(m_extension, EXConsts.kLengthScoreHigh));
-    SmartDashboard.putData("ExtensionShelf", new ExtensionMoveToPosition(m_extension, EXConsts.kLengthSubstation));
+    SmartDashboard.putData("ExtensionStow", new ExtensionMoveToPosition(m_extension, m_elbow, EXConsts.kLengthStow));
+    SmartDashboard.putData("ExtensionIdle", new ExtensionMoveToPosition(m_extension, m_elbow, EXConsts.kLengthIdle));
+    SmartDashboard.putData("ExtensionLow", new ExtensionMoveToPosition(m_extension, m_elbow, EXConsts.kLengthScoreLow));
+    SmartDashboard.putData("ExtensionMid", new ExtensionMoveToPosition(m_extension, m_elbow, EXConsts.kLengthScoreMid));
+    SmartDashboard.putData("ExtensionHigh", new ExtensionMoveToPosition(m_extension, m_elbow, EXConsts.kLengthScoreHigh));
+    SmartDashboard.putData("ExtensionShelf", new ExtensionMoveToPosition(m_extension, m_elbow, EXConsts.kLengthSubstation));
     SmartDashboard.putData("ExtensionCalibrate", new ExtensionCalibrate(m_extension));
 
     // Wrist subsytem tests
@@ -323,7 +323,7 @@ public class RobotContainer
 
     // Default command - Motion Magic hold
     m_elbow.setDefaultCommand(new ElbowMoveToPosition(m_elbow));
-    m_extension.setDefaultCommand(new ExtensionMoveToPosition(m_extension));
+    m_extension.setDefaultCommand(new ExtensionMoveToPosition(m_extension, m_elbow));
     m_wrist.setDefaultCommand(new WristMoveToPosition(m_wrist));
 
     // Default command - manual mode

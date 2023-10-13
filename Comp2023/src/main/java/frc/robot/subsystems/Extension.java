@@ -212,6 +212,13 @@ public class Extension extends SubsystemBase
     m_motor.setControl(m_requestVolts.withOutput(0.0));
   }
 
+  public void setMMPosition(double targetInches)
+  {
+
+    m_motor.setControl(m_requestMMVolts.withPosition(Conversions.inchesToWinchRotations(targetInches, EXConsts.kRolloutRatio)));
+
+  }
+
   ///////////////////////// MANUAL MOVEMENT ///////////////////////////////////
 
   public void moveWithJoystick(XboxController joystick)
@@ -254,7 +261,7 @@ public class Extension extends SubsystemBase
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
-  public void moveToPositionInit(double newLength, boolean holdPosition)
+  public void moveToPositionInit(double newLength, Elbow m_elbow, boolean holdPosition)
   {
     m_safetyTimer.restart( );
 
@@ -271,8 +278,8 @@ public class Extension extends SubsystemBase
         m_moveIsFinished = false;
         m_withinTolerance.calculate(false); // Reset the debounce filter
 
-        m_motor.setControl(
-            m_requestMMVolts.withPosition(Conversions.inchesToWinchRotations(m_targetInches, EXConsts.kRolloutRatio)));
+        setMMPosition(m_targetInches);
+
         // .withFeedForward((m_totalArbFeedForward)));  // TODO - once extension is fixed and Tuner X is used
         DataLogManager.log(String.format("%s: Position move: %.1f -> %.1f inches (%.1f -> %.1f)", getSubsystem( ),
             m_currentInches, m_targetInches, Conversions.inchesToWinchRotations(m_currentInches, EXConsts.kRolloutRatio),
@@ -293,8 +300,7 @@ public class Extension extends SubsystemBase
   public void moveToPositionExecute( )
   {
     if (m_calibrated)
-      m_motor
-          .setControl(m_requestMMVolts.withPosition(Conversions.inchesToWinchRotations(m_targetInches, EXConsts.kRolloutRatio)));
+      setMMPosition(m_targetInches);
     // .withFeedForward(m_totalArbFeedForward)); // TODO - once extension is fixed and Tuner X is used
   }
 

@@ -27,7 +27,7 @@ public class ArmSetHeightScoreLow extends SequentialCommandGroup
 
         // @formatter:off
         new PrintCommand(getName() + ": Retract Extension"),
-        new ExtensionMoveToPosition(extension, EXConsts.kLengthIdle).asProxy(),
+        new ExtensionMoveToPosition(extension, elbow, EXConsts.kLengthIdle).asProxy(),
 
         new ConditionalCommand(
           new SequentialCommandGroup(
@@ -50,7 +50,7 @@ public class ArmSetHeightScoreLow extends SequentialCommandGroup
         ),
 
         new PrintCommand(getName() + ": Extend Extension"),
-        new ExtensionMoveToPosition(extension, EXConsts.kLengthScoreLow).asProxy()
+        new ExtensionMoveToPosition(extension, elbow, EXConsts.kLengthScoreLow).asProxy()
         // @formatter:on
     );
   }

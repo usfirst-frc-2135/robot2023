@@ -338,6 +338,7 @@ public class Constants
     public static final double        kLengthScoreHigh          = 17.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked
     public static final double        kLengthSubstation         = 1.25;  // From Mech Design (3'1-38" above floor)
     public static final double        kLengthMax                = 18.0;  // Extension maximum allowable length (2" beyond high length)
+    public static final double        kLengthExtension          = 1.0;
 
     public static final InvertedValue kInvertMotor              = InvertedValue.Clockwise_Positive; // Motor direction for positive input
 
@@ -353,7 +354,7 @@ public class Constants
     public static final double        kNeutralDeadband          = 0.001; // Extension motor output deadband
 
     // Calibration
-    public static final double        kCalibrateSpeedVolts      = -2.0; // Motor voltage during calibration
+    public static final double        kCalibrateSpeedVolts      = -1.6; // Motor voltage during calibration
 
     // Manual config parameters
     public enum ExtensionMode
@@ -372,7 +373,7 @@ public class Constants
     public static final double kMMJerk               = kMMAcceleration * 4.0; // Elbow motion magic jerk limit (1/4 of acceleration time)
     public static final double kS                    = 0.0;            // Voltage constant to overcome friction
     public static final double kV                    = 0.1129;         // Voltage constant per desired RPM
-    public static final double kPidKp                = 1.443;          // Extension PID proportional constant
+    public static final double kPidKp                = 5.864;          // Extension PID proportional constant
     public static final double kPidKi                = 0.0;            // Extension PID integral constant
     public static final double kPidKd                = 0.0;            // Extension PID derivative constant
 
@@ -438,7 +439,7 @@ public class Constants
     public static final double kMMSCurveStrength = kMMAcceleration * 4.0; // Elbow motion magic jerk limit (1/4 of acceleration time)
     public static final double kS                = 0.0;            // Voltage constant to overcome friction
     public static final double kV                = 0.1129;         // Voltage constant per desired RPM
-    public static final double kPidKp            = 9.081;          // Wrist PID proportional constant
+    public static final double kPidKp            = 1.350;          // Wrist PID proportional constant
     public static final double kPidKi            = 0.0;            // Wrist PID integral constant
     public static final double kPidKd            = 0.0;            // Wrist PID derivative constant
 
