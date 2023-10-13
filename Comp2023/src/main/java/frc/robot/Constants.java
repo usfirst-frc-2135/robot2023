@@ -297,7 +297,7 @@ public class Constants
       ELBOW_UP       // Elbow moving up
     }
 
-    public static final double kManualSpeedVolts = 12.0;//2.0;    // Motor voltage during manual operation
+    public static final double kManualSpeedVolts = 3.0;            // Motor voltage during manual operation
 
     // Motion Magic config parameters
     public static final double kMMVelocity       = 79.75;          // 10/7/23 Tuned! Elbow motion magic velocity (75% of max motor RPM)
@@ -331,7 +331,7 @@ public class Constants
 
     // Extension lengths increase by 0.95" per 90 degrees of elbow rotation (lengths manually adjusted below)
     public static final double        kLengthMin                = -0.5;  // Extension minimum allowable length (half inch less than stowed)
-    public static final double        kLengthStow               = 0.0;   // By definition - extension fully retracted
+    public static final double        kLengthStow               = 0.25;  // By definition - extension fully retracted
     public static final double        kLengthIdle               = 0.25;  // Slightly off mechanical hard stop
     public static final double        kLengthScoreLow           = 8.0;   // From Mech Design (floor, feet art 5" high), empirically checked
     public static final double        kLengthScoreMid           = 1.25;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), empirically checked
@@ -431,7 +431,7 @@ public class Constants
       WRIST_UP       // Wrist moving up
     }
 
-    public static final double kManualSpeedVolts = 12.0;//2.0;    // Motor voltage during manual operation
+    public static final double kManualSpeedVolts = 3.0;            // Motor voltage during manual operation
 
     // Motion Magic config parameters
     public static final double kMMVelocity       = 79.75;          // 10/7/23 Tuned! Wrist motion magic velocity (75% of max motor RPM)
@@ -471,9 +471,9 @@ public class Constants
       GR_HOLD,    // hold game pieces
     }
 
-    public static final double kGripperSpeedAcquire = 1.0;  // Acquire game piece from loading station or floor
-    public static final double kGripperSpeedHold    = 0.15;  // Hold game piece while traversing the field (must be < 2V equiv)
-    public static final double kGripperSpeedExpel   = -0.2; // Score game piece on cone node or cube shelf
+    public static final double kGripperSpeedAcquire = 1.0;        // Percent output - Acquire game piece from loading station or floor
+    public static final double kGripperSpeedHold    = 3.0 / 12.0; // Percent output - Hold game piece while traversing the field (must be <= 4V equiv)
+    public static final double kGripperSpeedExpel   = -0.2;       // Percent output - Score game piece on cone node or cube shelf
   }
 
   /////////////////////////////////////////////////////////////////////////////
