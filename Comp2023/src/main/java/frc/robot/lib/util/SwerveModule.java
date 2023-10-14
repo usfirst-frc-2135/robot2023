@@ -1,5 +1,6 @@
 package frc.robot.lib.util;
 
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -10,6 +11,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Constants.SWConsts;
 import frc.robot.lib.math.Conversions;
@@ -22,6 +24,7 @@ public class SwerveModule
   private CANcoder               m_steerEncoder;
   private double                 m_steerOffset;
   private double                 m_lastAngle;
+  private StatusSignal<Double>   m_closedlooperror        = m_driveMotor.getClosedLoopError( ).refresh( );
 
   private SimpleMotorFeedforward m_feedforward            =
       new SimpleMotorFeedforward(SWConsts.driveKS, SWConsts.driveKV, SWConsts.driveKA);
@@ -100,6 +103,9 @@ public class SwerveModule
         SWConsts.driveGearRatio);
     Rotation2d angle = Rotation2d.fromDegrees(
         Conversions.rotationsToOutputDegrees(m_steerMotor.getPosition( ).refresh( ).getValue( ), SWConsts.steerGearRatio));
+    double closedlooperror = m_closedlooperror.getValue( );
+    SmartDashboard.putNumber("SW Closed Loop Error", closedlooperror);
+
     return new SwerveModuleState(velocity, angle);
   }
 

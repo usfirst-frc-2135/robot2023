@@ -215,7 +215,8 @@ public class Extension extends SubsystemBase
   public void setMMPosition(double targetInches, double elbowAngle)
   {
     targetInches += (elbowAngle / 90.0) * EXConsts.kLengthExtension;
-    m_motor.setControl(m_requestMMVolts.withPosition(Conversions.inchesToWinchRotations(targetInches, EXConsts.kRolloutRatio)));
+    m_motor.setControl(m_requestMMVolts.withPosition(Conversions.inchesToWinchRotations(targetInches, EXConsts.kRolloutRatio))
+        .withFeedForward(m_totalArbFeedForward));
 
   }
 
@@ -280,7 +281,6 @@ public class Extension extends SubsystemBase
 
         setMMPosition(m_targetInches, elbowAngle);
 
-        // .withFeedForward((m_totalArbFeedForward)));  // TODO - once extension is fixed and Tuner X is used
         DataLogManager.log(String.format("%s: Position move: %.1f -> %.1f inches (%.1f -> %.1f)", getSubsystem( ),
             m_currentInches, m_targetInches, Conversions.inchesToWinchRotations(m_currentInches, EXConsts.kRolloutRatio),
             Conversions.inchesToWinchRotations(m_targetInches, EXConsts.kRolloutRatio)));
@@ -301,7 +301,6 @@ public class Extension extends SubsystemBase
   {
     if (m_calibrated)
       setMMPosition(m_targetInches, elbowAngle);
-    // .withFeedForward(m_totalArbFeedForward)); // TODO - once extension is fixed and Tuner X is used
   }
 
   public boolean moveToPositionIsFinished( )

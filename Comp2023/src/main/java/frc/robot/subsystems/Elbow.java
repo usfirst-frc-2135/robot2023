@@ -289,8 +289,8 @@ public class Elbow extends SubsystemBase
         m_withinTolerance.calculate(false); // Reset the debounce filter
 
         m_motor
-            .setControl(m_requestMMVolts.withPosition(Conversions.degreesToInputRotations(m_targetDegrees, ELConsts.kGearRatio)));
-        // .withFeedForward((m_totalArbFeedForward)));  // TODO - once extension is fixed and Tuner X is used
+            .setControl(m_requestMMVolts.withPosition(Conversions.degreesToInputRotations(m_targetDegrees, ELConsts.kGearRatio))
+                .withFeedForward(m_totalArbFeedForward));
         DataLogManager.log(String.format("%s: Position move: %.1f -> %.1f degrees (%.1f -> %.1f)", getSubsystem( ),
             m_currentDegrees, m_targetDegrees, Conversions.degreesToInputRotations(m_currentDegrees, ELConsts.kGearRatio),
             Conversions.degreesToInputRotations(m_targetDegrees, ELConsts.kGearRatio)));
@@ -309,9 +309,8 @@ public class Elbow extends SubsystemBase
   public void moveToPositionExecute( )
   {
     if (m_calibrated)
-      m_motor
-          .setControl(m_requestMMVolts.withPosition(Conversions.degreesToInputRotations(m_targetDegrees, ELConsts.kGearRatio)));
-    // .withFeedForward(m_totalArbFeedForward)); // TODO - once extension is fixed and Tuner X is used
+      m_motor.setControl(m_requestMMVolts.withPosition(Conversions.degreesToInputRotations(m_targetDegrees, ELConsts.kGearRatio))
+          .withFeedForward(m_totalArbFeedForward));
   }
 
   public boolean moveToPositionIsFinished( )
