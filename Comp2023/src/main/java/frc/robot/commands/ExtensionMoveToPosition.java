@@ -45,18 +45,18 @@ public class ExtensionMoveToPosition extends CommandBase
   @Override
   public void initialize( )
   {
-    // TODO: ZARA - double elbowAngle = m_elbow.getAngle();
-    // TODO: ZARA - pass elbowAngle into moveToPositionInit (instead of m_elbow)
-    m_extension.moveToPositionInit(m_newLength, m_elbow, m_holdPosition);
+    // TODO: ZARA - double elbowAngle = m_elbow.getAngle(); -- DONE
+    // TODO: ZARA - pass elbowAngle into moveToPositionInit (instead of m_elbow) -- DONE
+    m_extension.moveToPositionInit(m_newLength, m_elbow.getAngle( ), m_holdPosition);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute( )
   {
-    // TODO: ZARA - double elbowAngle = m_elbow.getAngle();
-    // TODO: ZARA - modify moveToPositionExecute (in Extension only) to accept the elbow angle
-    m_extension.moveToPositionExecute( );
+    // TODO: ZARA - double elbowAngle = m_elbow.getAngle(); -- DONE
+    // TODO: ZARA - modify moveToPositionExecute (in Extension only) to accept the elbow angle -- DONE
+    m_extension.moveToPositionExecute(m_elbow.getAngle( ));
   }
 
   // Called once the command ends or is interrupted.

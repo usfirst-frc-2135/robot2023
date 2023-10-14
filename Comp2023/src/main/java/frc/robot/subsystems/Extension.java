@@ -219,14 +219,16 @@ public class Extension extends SubsystemBase
   // - One quarter turn is 4.32 / 4 = 1.08 inches
   // - So add 1.08 inches when elbow is at 90 degrees, 0.0 inches at 0 degrees
   //
-  // TODO: ZARA - second parameter should be the elbow angle
-  public void setMMPosition(double targetInches)
+  // TODO: ZARA - second parameter should be the elbow angle -- DONE
+  public void setMMPosition(double targetInches, double elbowAngle)
   {
     // TODO: ZARA - given that 
     //    elbow = 0 degrees should add 0.0 inches to targetInches
     //    elbow = 90 degrees should add 1.0 (use the constant you created) to targetInches
     // come up with an equation that does this continuous over the range 0 - 90 degrees
+    targetInches = Math.sin(Math.toRadians(elbowAngle));
     m_motor.setControl(m_requestMMVolts.withPosition(Conversions.inchesToWinchRotations(targetInches, EXConsts.kRolloutRatio)));
+
   }
 
   ///////////////////////// MANUAL MOVEMENT ///////////////////////////////////
@@ -271,8 +273,8 @@ public class Extension extends SubsystemBase
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
-  // TODO: ZARA - pass elbowAngle into moveToPositionInit (instead of m_elbow)
-  public void moveToPositionInit(double newLength, Elbow m_elbow, boolean holdPosition)
+  // TODO: ZARA - pass elbowAngle into moveToPositionInit (instead of m_elbow) -- DONE
+  public void moveToPositionInit(double newLength, double elbowAngle, boolean holdPosition)
   {
     m_safetyTimer.restart( );
 
@@ -289,8 +291,8 @@ public class Extension extends SubsystemBase
         m_moveIsFinished = false;
         m_withinTolerance.calculate(false); // Reset the debounce filter
 
-        // TODO: ZARA - pass the elbow angle (passed into moveToPositionInit) into setMMPosition as second parameter
-        setMMPosition(m_targetInches);
+        // TODO: ZARA - pass the elbow angle (passed into moveToPositionInit) into setMMPosition as second parameter -- DONE
+        setMMPosition(m_targetInches, RobotContainer.getInstance( ).m_elbow.getAngle( ));
 
         // .withFeedForward((m_totalArbFeedForward)));  // TODO - once extension is fixed and Tuner X is used
         DataLogManager.log(String.format("%s: Position move: %.1f -> %.1f inches (%.1f -> %.1f)", getSubsystem( ),
@@ -309,12 +311,12 @@ public class Extension extends SubsystemBase
     }
   }
 
-  // TODO: ZARA - pass elbowAngle into moveToPositionExecute
-  public void moveToPositionExecute( )
+  // TODO: ZARA - pass elbowAngle into moveToPositionExecute -- DONE
+  public void moveToPositionExecute(double elbowAngle)
   {
     if (m_calibrated)
-      // TODO: ZARA - pass the elbow angle (passed into moveToPositionInit) into setMMPosition as second parameter
-      setMMPosition(m_targetInches);
+      // TODO: ZARA - pass the elbow angle (passed into moveToPositionInit) into setMMPosition as second parameter - DONE
+      setMMPosition(m_targetInches, RobotContainer.getInstance( ).m_elbow.getAngle( ));
     // .withFeedForward(m_totalArbFeedForward)); // TODO - once extension is fixed and Tuner X is used
   }
 
