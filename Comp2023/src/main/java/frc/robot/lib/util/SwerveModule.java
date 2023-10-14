@@ -24,7 +24,7 @@ public class SwerveModule
   private CANcoder               m_steerEncoder;
   private double                 m_steerOffset;
   private double                 m_lastAngle;
-  private StatusSignal<Double>   m_closedlooperror        = m_driveMotor.getClosedLoopError( ).refresh( );
+  private StatusSignal<Double>   m_closedlooperror;
 
   private SimpleMotorFeedforward m_feedforward            =
       new SimpleMotorFeedforward(SWConsts.driveKS, SWConsts.driveKV, SWConsts.driveKA);
@@ -103,7 +103,8 @@ public class SwerveModule
         SWConsts.driveGearRatio);
     Rotation2d angle = Rotation2d.fromDegrees(
         Conversions.rotationsToOutputDegrees(m_steerMotor.getPosition( ).refresh( ).getValue( ), SWConsts.steerGearRatio));
-    double closedlooperror = m_closedlooperror.getValue( );
+    m_closedlooperror = m_driveMotor.getClosedLoopError( );
+    double closedlooperror = m_closedlooperror.refresh( ).getValue( );
     SmartDashboard.putNumber("SW Closed Loop Error", closedlooperror);
 
     return new SwerveModuleState(velocity, angle);
