@@ -261,7 +261,6 @@ public class Extension extends SubsystemBase
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
-  // TODO: ZARA - pass elbowAngle into moveToPositionInit (instead of m_elbow) -- DONE
   public void moveToPositionInit(double newLength, double elbowAngle, boolean holdPosition)
   {
     m_safetyTimer.restart( );
@@ -279,7 +278,6 @@ public class Extension extends SubsystemBase
         m_moveIsFinished = false;
         m_withinTolerance.calculate(false); // Reset the debounce filter
 
-        // TODO: ZARA - pass the elbow angle (passed into moveToPositionInit) into setMMPosition as second parameter -- DONE
         setMMPosition(m_targetInches, elbowAngle);
 
         // .withFeedForward((m_totalArbFeedForward)));  // TODO - once extension is fixed and Tuner X is used
@@ -299,11 +297,9 @@ public class Extension extends SubsystemBase
     }
   }
 
-  // TODO: ZARA - pass elbowAngle into moveToPositionExecute -- DONE
   public void moveToPositionExecute(double elbowAngle)
   {
     if (m_calibrated)
-      // TODO: ZARA - pass the elbow angle (passed into moveToPositionInit) into setMMPosition as second parameter - DONE 2
       setMMPosition(m_targetInches, elbowAngle);
     // .withFeedForward(m_totalArbFeedForward)); // TODO - once extension is fixed and Tuner X is used
   }
