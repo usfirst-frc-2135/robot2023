@@ -152,7 +152,9 @@ public class Swerve extends SubsystemBase
   }
 
   public void faultDump( )
-  {}
+  {
+    DataLogManager.log(String.format("%s: faultDump  ----- DUMP FAULTS --------------", getSubsystem( )));
+  }
 
   private void initSmartDashboard( )
   {

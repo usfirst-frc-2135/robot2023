@@ -47,6 +47,7 @@ public class Power extends SubsystemBase
 
   public void faultDump( )
   {
+    DataLogManager.log(String.format("%s: faultDump  ----- DUMP FAULTS --------------", getSubsystem( )));
     DataLogManager.log(String.format("%s: Temperature is %.1f", getSubsystem( ), m_powerDistribution.getTemperature( )));
     DataLogManager.log(String.format("%s: Input Voltage is %.1f volts", getSubsystem( ), m_powerDistribution.getVoltage( )));
     for (int i = 0; i <= 15; i++)
