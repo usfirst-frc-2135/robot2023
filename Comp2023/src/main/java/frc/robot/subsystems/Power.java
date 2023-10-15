@@ -41,21 +41,22 @@ public class Power extends SubsystemBase
 
   public void initialize( )
   {
-    DataLogManager.log(getSubsystem( ) + ": Subsystem initialized!");
-    DataLogManager.log(getSubsystem( ) + ": Init Voltage is " + String.format("%.1f", m_powerDistribution.getVoltage( )));
+    DataLogManager.log(String.format("%s: Subsystem initialized!", getSubsystem( )));
+    DataLogManager.log(String.format("%s: Init Voltage is %.1f", getSubsystem( ), m_powerDistribution.getVoltage( )));
   }
 
   public void faultDump( )
   {
-    DataLogManager.log(getSubsystem( ) + ": Temperature is " + m_powerDistribution.getTemperature( ));
-    DataLogManager.log(getSubsystem( ) + ": Input Voltage is " + m_powerDistribution.getVoltage( ));
+    DataLogManager.log(String.format("%s: Temperature is %.1f", getSubsystem( ), m_powerDistribution.getTemperature( )));
+    DataLogManager.log(String.format("%s: Input Voltage is %.1f volts", getSubsystem( ), m_powerDistribution.getVoltage( )));
     for (int i = 0; i <= 15; i++)
     {
-      DataLogManager.log(getSubsystem( ) + ": Chan is " + i + " Current is " + m_powerDistribution.getCurrent(i));
+      DataLogManager
+          .log(String.format("%s: Chan is %d Current is %.1f amps", getSubsystem( ), i, m_powerDistribution.getCurrent(i)));
     }
-    DataLogManager.log(getSubsystem( ) + ": Total Current is " + m_powerDistribution.getTotalCurrent( ));
-    DataLogManager.log(getSubsystem( ) + ": Total Power is " + m_powerDistribution.getTotalPower( ));
-    DataLogManager.log(getSubsystem( ) + ": Total Energy is " + m_powerDistribution.getTotalEnergy( ));
+    DataLogManager.log(String.format("%s: Total Current is %.1f", getSubsystem( ), m_powerDistribution.getTotalCurrent( )));
+    DataLogManager.log(String.format("%s: Total Power is %.1f watts", getSubsystem( ), m_powerDistribution.getTotalPower( )));
+    DataLogManager.log(String.format("%s: Total Energy is %.1f joules", getSubsystem( ), m_powerDistribution.getTotalEnergy( )));
 
     m_powerDistribution.resetTotalEnergy( );
     m_powerDistribution.clearStickyFaults( );

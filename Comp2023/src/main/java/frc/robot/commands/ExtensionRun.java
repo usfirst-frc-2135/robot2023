@@ -31,7 +31,7 @@ public class ExtensionRun extends CommandBase
   @Override
   public void execute( )
   {
-    m_extension.moveExtensionWithJoystick(m_gamePad);
+    m_extension.moveWithJoystick(m_gamePad);
   }
 
   // Called once the command ends or is interrupted.

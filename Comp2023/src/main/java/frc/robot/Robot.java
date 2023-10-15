@@ -13,7 +13,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.lib.util.CTREConfigs;
+import frc.robot.lib.util.CTREConfigs5;
+import frc.robot.lib.util.CTREConfigs6;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -23,12 +24,13 @@ import frc.robot.lib.util.CTREConfigs;
  */
 public class Robot extends TimedRobot
 {
-  private RobotContainer    m_robotContainer;
-  private Command           m_autonomousCommand;
+  private RobotContainer     m_robotContainer;
+  private Command            m_autonomousCommand;
 
-  private boolean           m_faultsCleared = false;
+  private boolean            m_faultsCleared = false;
 
-  public static CTREConfigs ctreConfigs;
+  public static CTREConfigs5 ctreConfigs5;
+  public static CTREConfigs6 ctreConfigs6;
 
   /**
    * This function is run when the robot is first started up and should be used for any initialization
@@ -44,7 +46,7 @@ public class Robot extends TimedRobot
     String serialNum = System.getenv("serialnum");
     String robotName = "UNKNOWN";
 
-    DataLogManager.log("robotInit: RoboRIO SN: " + serialNum);
+    DataLogManager.log(String.format("robotInit: RoboRIO SN: %s", serialNum));
 
     if (serialNum == null)
       robotName = "SIMULATION";
@@ -61,16 +63,18 @@ public class Robot extends TimedRobot
     DataLogManager.log(String.format("robotInit: Detected the %s robot! ", robotName));
 
     // Instantiate CTRE configurations
-    ctreConfigs = new CTREConfigs( );
+    ctreConfigs5 = new CTREConfigs5( );
+    ctreConfigs6 = new CTREConfigs6( );
 
     // Instantiate RobotContainer. Performs button bindings, builds autonomous chooser on the dashboard.
     m_robotContainer = RobotContainer.getInstance( );
 
     LiveWindow.disableAllTelemetry( );
 
-    CommandScheduler.getInstance( ).onCommandInitialize(cmd -> DataLogManager.log(cmd.getName( ) + ": Init"));
-    CommandScheduler.getInstance( ).onCommandInterrupt(cmd -> DataLogManager.log(cmd.getName( ) + ": Interrupted"));
-    CommandScheduler.getInstance( ).onCommandFinish(cmd -> DataLogManager.log(cmd.getName( ) + ": End"));
+    CommandScheduler.getInstance( ).onCommandInitialize(cmd -> DataLogManager.log(String.format("%s: Init", cmd.getName( ))));
+    CommandScheduler.getInstance( )
+        .onCommandInterrupt(cmd -> DataLogManager.log(String.format("%s: Interrupted", cmd.getName( ))));
+    CommandScheduler.getInstance( ).onCommandFinish(cmd -> DataLogManager.log(String.format("%s: End", cmd.getName( ))));
 
     PortForwarder.add(5800, "limelight.local", 5800);
     PortForwarder.add(5801, "limelight.local", 5801);
@@ -104,8 +108,8 @@ public class Robot extends TimedRobot
   @Override
   public void disabledInit( )
   {
-    DataLogManager.log("disabledInit: Match " + matchTypeToString(DriverStation.getMatchType( )) + DriverStation.getMatchNumber( )
-        + ", " + allianceToString(DriverStation.getAlliance( )) + " Alliance");
+    DataLogManager.log(String.format("disabledInit: Match %s%s, %s Alliance", matchTypeToString(DriverStation.getMatchType( )),
+        DriverStation.getMatchNumber( ), allianceToString(DriverStation.getAlliance( ))));
 
     m_robotContainer.m_vision.initialize( );
     m_robotContainer.m_led.initialize( );
@@ -141,8 +145,8 @@ public class Robot extends TimedRobot
   @Override
   public void autonomousInit( )
   {
-    DataLogManager.log("autonomousInit: Match " + matchTypeToString(DriverStation.getMatchType( ))
-        + DriverStation.getMatchNumber( ) + ", " + allianceToString(DriverStation.getAlliance( )) + " Alliance");
+    DataLogManager.log(String.format("autonomousInit: Match %s%s, %s Alliance", matchTypeToString(DriverStation.getMatchType( )),
+        DriverStation.getMatchNumber( ), allianceToString(DriverStation.getAlliance( ))));
 
     m_autonomousCommand = m_robotContainer.getAutonomousCommand( );
 
@@ -163,14 +167,14 @@ public class Robot extends TimedRobot
   @Override
   public void teleopInit( )
   {
-    DataLogManager.log("teleopInit: Match " + matchTypeToString(DriverStation.getMatchType( )) + DriverStation.getMatchNumber( )
-        + ", " + allianceToString(DriverStation.getAlliance( )) + " Alliance");
+    DataLogManager.log(String.format("teleopInit: Match %s%s, %s Alliance", matchTypeToString(DriverStation.getMatchType( )),
+        DriverStation.getMatchNumber( ), allianceToString(DriverStation.getAlliance( ))));
 
     if (DriverStation.getAlliance( ) == Alliance.Red)
     {
-      DataLogManager.log("GRYO before - " + m_robotContainer.m_swerve.getYaw( ));
+      DataLogManager.log(String.format("GRYO before - %.1f", m_robotContainer.m_swerve.getYaw( )));
       m_robotContainer.m_swerve.zeroGyro(m_robotContainer.m_swerve.getYaw( ) + 180);
-      DataLogManager.log("GRYO after - " + m_robotContainer.m_swerve.getYaw( ));
+      DataLogManager.log(String.format("GRYO after  - %.1f", m_robotContainer.m_swerve.getYaw( )));
     }
 
     m_robotContainer.m_swerve.setIsTeleported(false);
@@ -255,10 +259,10 @@ public class Robot extends TimedRobot
   private void robotFaultDump( )
   {
     // Print out talon faults and clear sticky ones
-    DataLogManager.log("robotFaultDump:  ----- DUMP FAULTS --------------");
+    DataLogManager.log(String.format("robotFaultDump:  ----- DUMP FAULTS --------------"));
 
+    m_robotContainer.m_swerve.faultDump( );
     m_robotContainer.m_led.faultDump( );
     m_robotContainer.m_power.faultDump( );
-    m_robotContainer.m_swerve.faultDump( );
   }
 }

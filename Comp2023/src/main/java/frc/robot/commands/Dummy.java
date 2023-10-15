@@ -24,7 +24,7 @@ public class Dummy extends CommandBase
   @Override
   public void initialize( )
   {
-    DataLogManager.log(getName( ) + ": key pressed - " + m_string);
+    DataLogManager.log(String.format("%s: key pressed - %s", getName( ), m_string));
   }
 
   // Called every time the scheduler runs while the command is scheduled.

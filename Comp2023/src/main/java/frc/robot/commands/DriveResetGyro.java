@@ -4,52 +4,51 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.WRConsts.WristAngle;
-import frc.robot.subsystems.Wrist;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.subsystems.Swerve;
 
 /**
  *
  */
-public class WristMoveToAngle extends CommandBase
+public class DriveResetGyro extends CommandBase
 {
-  private final Wrist m_wrist;
-  private WristAngle  m_angle;
+  private final Swerve         swerve;
+  private final JoystickButton m_start;
+  private final JoystickButton m_back;
 
-  public WristMoveToAngle(Wrist wrist, WristAngle angle)
+  public DriveResetGyro(Swerve drive, JoystickButton start, JoystickButton back)
   {
-    m_wrist = wrist;
-    m_angle = angle;
-
-    setName("WristMoveToAngle");
-    addRequirements(m_wrist);
+    swerve = drive;
+    m_start = start;
+    m_back = back;
+    setName("DriveResetGyro");
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize( )
-  {
-    m_wrist.moveWristAngleInit(m_angle);
-  }
+  {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute( )
   {
-    m_wrist.moveWristAngleExecute( );
+    if (m_start.getAsBoolean( ) && m_back.getAsBoolean( ))
+      swerve.zeroGyro( );
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted)
   {
-    m_wrist.moveWristAngleEnd( );
+
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished( )
   {
-    return m_wrist.moveWristAngleIsFinished( );
+    return true;
   }
 
   @Override
