@@ -7,6 +7,7 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
@@ -30,7 +31,9 @@ public class AutoPreloadAndEngageChargeStation extends SequentialCommandGroup
         // @formatter:off
         new PrintCommand(getName() + ": Score Preload"),        
         new ExtensionCalibrate(extension).asProxy(), 
-        new AutoPreloadHigh(elbow, extension, wrist, gripper),
+        new ArmSetHeightIdle(elbow, extension, wrist),
+        new GripperRun(gripper, GRMode.GR_EXPEL),
+        new WaitCommand(0.25),
 
         new GripperRun(gripper, GRMode.GR_STOP),
         

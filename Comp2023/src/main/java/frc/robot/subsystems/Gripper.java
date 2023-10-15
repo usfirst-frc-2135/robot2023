@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.GRConsts;
 import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.Ports;
-import frc.robot.team2135.PhoenixUtil;
+import frc.robot.lib.util.PhoenixUtil5;
 
 //
 // Gripper subsystem class
@@ -25,7 +25,6 @@ public class Gripper extends SubsystemBase
   private final WPI_TalonSRX              m_gripper             = new WPI_TalonSRX(Ports.kCANID_Gripper);
 
   private boolean                         m_gripperValid;                // Health indicator for gripper Talon
-  // private boolean                         m_gripperDebug        = true; // Enable/disable dashboard and logging updates
 
   //Devices and simulation objs
   private SupplyCurrentLimitConfiguration m_supplyCurrentLimits = new SupplyCurrentLimitConfiguration(true,
@@ -37,7 +36,7 @@ public class Gripper extends SubsystemBase
     setName("Gripper");
     setSubsystem("Gripper");
 
-    m_gripperValid = PhoenixUtil.getInstance( ).talonSRXInitialize(m_gripper, "gripper");
+    m_gripperValid = PhoenixUtil5.getInstance( ).talonSRXInitialize(m_gripper, "gripper");
 
     SmartDashboard.putBoolean("HL_validGR", m_gripperValid);
 
@@ -64,26 +63,26 @@ public class Gripper extends SubsystemBase
 
   public void initialize( )
   {
-    DataLogManager.log(getSubsystem( ) + ": Subsystem initialized!");
+    DataLogManager.log(String.format("%s: Subsystem initialized!", getSubsystem( )));
     setGripperSpeed(GRMode.GR_STOP);
   }
 
   private void gripperTalonInitialize(WPI_TalonSRX motor, boolean inverted)
   {
     motor.setInverted(inverted);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "setInverted");
+    PhoenixUtil5.getInstance( ).talonSRXCheckError(motor, "setInverted");
     motor.setNeutralMode(NeutralMode.Coast);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
+    PhoenixUtil5.getInstance( ).talonSRXCheckError(motor, "setNeutralMode");
     motor.setSafetyEnabled(false);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "setSafetyEnabled");
+    PhoenixUtil5.getInstance( ).talonSRXCheckError(motor, "setSafetyEnabled");
 
     motor.configVoltageCompSaturation(12.0);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configVoltageCompSaturation");
+    PhoenixUtil5.getInstance( ).talonSRXCheckError(motor, "configVoltageCompSaturation");
     motor.enableVoltageCompensation(true);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "enableVoltageCompensation");
+    PhoenixUtil5.getInstance( ).talonSRXCheckError(motor, "enableVoltageCompensation");
 
     motor.configSupplyCurrentLimit(m_supplyCurrentLimits);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configSupplyCurrentLimits");
+    PhoenixUtil5.getInstance( ).talonSRXCheckError(motor, "configSupplyCurrentLimits");
 
     motor.set(ControlMode.PercentOutput, 0.0);
   }
@@ -114,7 +113,7 @@ public class Gripper extends SubsystemBase
         break;
     }
 
-    DataLogManager.log(getSubsystem( ) + ": Mode is now - " + strName);
+    DataLogManager.log(String.format("%s: Mode is now - %s", getSubsystem( ), strName));
     m_gripper.set(output);
   }
 }

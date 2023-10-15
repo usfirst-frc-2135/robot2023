@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.Constants.SWConsts;
-import frc.robot.Constants.SwerveConstants;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Swerve;
 
@@ -81,19 +80,18 @@ public class DriveTeleop extends CommandBase
   public void driveWithGamepad2(Swerve swerve, XboxController driverPad, boolean fieldRelative)
   {
     // Get x speed. Invert this because Xbox controllers return negative values when pushing forward.
-    final var xSpeed = -m_xSpeedLimiter.calculate(MathUtil.applyDeadband(driverPad.getLeftY( ), Constants.kStickDeadband))
-        * SwerveConstants.maxSpeed;
+    final var xSpeed =
+        -m_xSpeedLimiter.calculate(MathUtil.applyDeadband(driverPad.getLeftY( ), Constants.kStickDeadband)) * SWConsts.maxSpeed;
 
     // Get y speed or sideways/strafe speed. Invert this because a positive value is needed when
     // pulling left. Xbox controllers return positive values when pulling right by default.
-    final var ySpeed = -m_ySpeedLimiter.calculate(MathUtil.applyDeadband(driverPad.getLeftX( ), Constants.kStickDeadband))
-        * SwerveConstants.maxSpeed;
+    final var ySpeed =
+        -m_ySpeedLimiter.calculate(MathUtil.applyDeadband(driverPad.getLeftX( ), Constants.kStickDeadband)) * SWConsts.maxSpeed;
 
     // Get rate of angular rotation. Invert this because a positive value is needed when pulling to
     // the left (CCW is positive in mathematics). Xbox controllers return positive values when pulling
     // to the right by default.
-    final var rot =
-        -m_rotLimiter.calculate(MathUtil.applyDeadband(driverPad.getRightX( ), 0.02)) * SwerveConstants.maxAngularVelocity;
+    final var rot = -m_rotLimiter.calculate(MathUtil.applyDeadband(driverPad.getRightX( ), 0.02)) * SWConsts.maxAngularVelocity;
 
     Translation2d swerveTranslation = new Translation2d(xSpeed, ySpeed);
 
@@ -108,8 +106,8 @@ public class DriveTeleop extends CommandBase
     double forwardAxis = driverPad.getLeftY( );
     double strafeAxis = driverPad.getLeftX( );
 
-    forwardAxis = Constants.SwerveConstants.invertYAxis ? forwardAxis : -forwardAxis;
-    strafeAxis = Constants.SwerveConstants.invertXAxis ? strafeAxis : -strafeAxis;
+    forwardAxis = SWConsts.invertYAxis ? forwardAxis : -forwardAxis;
+    strafeAxis = SWConsts.invertXAxis ? strafeAxis : -strafeAxis;
 
     Translation2d tAxes = new Translation2d(forwardAxis, strafeAxis);
 
@@ -146,14 +144,13 @@ public class DriveTeleop extends CommandBase
 
       double scaled_x = tAxes.getX( ) - (deadband_vector.getX( )) / (1 - deadband_vector.getX( ));
       double scaled_y = tAxes.getY( ) - (deadband_vector.getY( )) / (1 - deadband_vector.getY( ));
-      double maxSpeed =
-          (elbow.getAngle( ) > SWConsts.kElbowDriveSlowAngle) ? SwerveConstants.maxSpeedSlowMode : SwerveConstants.maxSpeed;
+      double maxSpeed = (elbow.getAngle( ) > SWConsts.kElbowDriveSlowAngle) ? SWConsts.maxSpeedSlowMode : SWConsts.maxSpeed;
 
       swerveTranslation = new Translation2d(scaled_x, scaled_y).times(maxSpeed);
     }
 
     double rotAxis = driverPad.getRightX( );
-    rotAxis = Constants.SwerveConstants.invertRAxis ? rotAxis : -rotAxis;
+    rotAxis = SWConsts.invertRAxis ? rotAxis : -rotAxis;
 
     if (Math.abs(rotAxis) < Constants.kStickDeadband)
     {
@@ -161,8 +158,8 @@ public class DriveTeleop extends CommandBase
     }
     else
     {
-      double maxAngVel = (elbow.getAngle( ) > SWConsts.kElbowDriveSlowAngle) ? SwerveConstants.maxAngularVelocitySlowMode
-          : SwerveConstants.maxAngularVelocity;
+      double maxAngVel =
+          (elbow.getAngle( ) > SWConsts.kElbowDriveSlowAngle) ? SWConsts.maxAngularVelocitySlowMode : SWConsts.maxAngularVelocity;
 
       rot = maxAngVel * (rotAxis - (Math.signum(rotAxis) * Constants.kStickDeadband)) / (1 - Constants.kStickDeadband);
     }

@@ -64,7 +64,7 @@ public class LED extends SubsystemBase
 
   public void initialize( )
   {
-    DataLogManager.log(getSubsystem( ) + ": Subsystem initialized!");
+    DataLogManager.log(String.format("%s: Subsystem initialized!", getSubsystem( )));
     setColor(LEDColor.LEDCOLOR_OFF);
   }
 
@@ -117,7 +117,7 @@ public class LED extends SubsystemBase
           break;
       }
 
-      DataLogManager.log(getSubsystem( ) + ": color is now " + strName);
+      DataLogManager.log(String.format("%s: color is now %s", getSubsystem( ), strName));
       m_previousColor = color;
     }
   }

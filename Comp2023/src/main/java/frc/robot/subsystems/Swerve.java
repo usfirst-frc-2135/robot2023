@@ -30,12 +30,14 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.LLConsts;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SWConsts;
-import frc.robot.Constants.SwerveConstants;
+import frc.robot.Constants.SnapConstants;
 import frc.robot.RobotContainer;
-import frc.robot.team1678.frc2022.drivers.Pigeon;
-import frc.robot.team1678.frc2022.drivers.SwerveModule;
+import frc.robot.lib.util.PigeonIMU;
+import frc.robot.lib.util.SwerveModule;
 
 //
 // Swerve subsystem class
@@ -45,24 +47,23 @@ public class Swerve extends SubsystemBase
   // Member objects
   private SwerveModule[ ]          m_swerveMods        = new SwerveModule[ ]
   {
-      new SwerveModule(0, Constants.SwerveConstants.Mod0.SwerveModuleConstants( )),
-      new SwerveModule(1, Constants.SwerveConstants.Mod1.SwerveModuleConstants( )),
-      new SwerveModule(2, Constants.SwerveConstants.Mod2.SwerveModuleConstants( )),
-      new SwerveModule(3, Constants.SwerveConstants.Mod3.SwerveModuleConstants( ))
+      new SwerveModule(0, SWConsts.Mod0.SwerveModuleConstants( )), new SwerveModule(1, SWConsts.Mod1.SwerveModuleConstants( )),
+      new SwerveModule(2, SWConsts.Mod2.SwerveModuleConstants( )), new SwerveModule(3, SWConsts.Mod3.SwerveModuleConstants( ))
   };
 
   // Odometery and telemetry
-  private Pigeon                   m_pigeon            = new Pigeon(Ports.kCANID_Pigeon2);
-  private SwerveDrivePoseEstimator m_poseEstimator     = new SwerveDrivePoseEstimator(SwerveConstants.swerveKinematics,
-      m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), new Pose2d( ));
+  private final PigeonIMU          m_pigeon            = new PigeonIMU(Ports.kCANID_Pigeon2, Ports.kCANCarnivore);
+
+  private SwerveDrivePoseEstimator m_poseEstimator     =
+      new SwerveDrivePoseEstimator(SWConsts.swerveKinematics, m_pigeon.getYaw( ), getPositions( ), new Pose2d( ));
   private Field2d                  m_field             = new Field2d( );
 
   // PID objects
   private ProfiledPIDController    m_snapPIDController = new ProfiledPIDController( // 
-      Constants.SnapConstants.kP, //
-      Constants.SnapConstants.kI, //
-      Constants.SnapConstants.kD, //
-      Constants.SnapConstants.kThetaControllerConstraints);
+      SnapConstants.kP, //
+      SnapConstants.kI, //
+      SnapConstants.kD, //
+      SnapConstants.kThetaControllerConstraints);
 
   // Holonomic Drive Controller objects
   private HolonomicDriveController m_holonomicController;
@@ -74,31 +75,31 @@ public class Swerve extends SubsystemBase
   private PeriodicIO               m_periodicIO        = new PeriodicIO( );
   private boolean                  m_isSnapping;
   // private double                   m_limelightVisionAlignGoal;
-  private double                   pitch;
+  private double                   m_pitch;
 
   // Lock Swerve wheels
   private boolean                  m_locked            = false;
 
   // Path following
   private int                      m_pathDebug         = 1;     // Debug flag to disable extra ramsete logging calls
-  private boolean                  m_swerveDebug       = false; // Debug flag to disable extra ramsete logging calls
+  private boolean                  m_swerveDebug       = true; // Debug flag to disable extra ramsete logging calls
 
   // Limelight drive
-  private double                   m_turnConstant      = SWConsts.kTurnConstant;
-  private double                   m_turnPidKp         = SWConsts.kTurnPidKp;
-  private double                   m_turnPidKi         = SWConsts.kTurnPidKi;
-  private double                   m_turnPidKd         = SWConsts.kTurnPidKd;
-  private double                   m_turnMax           = SWConsts.kTurnMax;
-  private double                   m_throttlePidKp     = SWConsts.kThrottlePidKp;
-  private double                   m_throttlePidKi     = SWConsts.kThrottlePidKi;
-  private double                   m_throttlePidKd     = SWConsts.kThrottlePidKd;
-  private double                   m_throttleMax       = SWConsts.kThrottleMax;
-  private double                   m_throttleShape     = SWConsts.kThrottleShape;
+  private double                   m_turnConstant      = LLConsts.kTurnConstant;
+  private double                   m_turnPidKp         = LLConsts.kTurnPidKp;
+  private double                   m_turnPidKi         = LLConsts.kTurnPidKi;
+  private double                   m_turnPidKd         = LLConsts.kTurnPidKd;
+  private double                   m_turnMax           = LLConsts.kTurnMax;
+  private double                   m_throttlePidKp     = LLConsts.kThrottlePidKp;
+  private double                   m_throttlePidKi     = LLConsts.kThrottlePidKi;
+  private double                   m_throttlePidKd     = LLConsts.kThrottlePidKd;
+  private double                   m_throttleMax       = LLConsts.kThrottleMax;
+  private double                   m_throttleShape     = LLConsts.kThrottleShape;
 
-  private double                   m_targetAngle       = SWConsts.kTargetAngle;      // Optimal shooting angle
-  private double                   m_setPointDistance  = SWConsts.kSetPointDistance; // Optimal shooting distance
-  private double                   m_angleThreshold    = SWConsts.kAngleThreshold;   // Tolerance around optimal
-  private double                   m_distThreshold     = SWConsts.kDistThreshold;    // Tolerance around optimal
+  private double                   m_targetAngle       = LLConsts.kTargetAngle;      // Optimal shooting angle
+  private double                   m_setPointDistance  = LLConsts.kSetPointDistance; // Optimal shooting distance
+  private double                   m_angleThreshold    = LLConsts.kAngleThreshold;   // Tolerance around optimal
+  private double                   m_distThreshold     = LLConsts.kDistThreshold;    // Tolerance around optimal
 
   // DriveWithLimelight pid controller objects
   private int                      m_limelightDebug    = 0; // Debug flag to disable extra limelight logging calls
@@ -107,10 +108,10 @@ public class Swerve extends SubsystemBase
   private double                   m_limelightDistance;
 
   // define theta controller for robot heading
-  PIDController                    xController         = new PIDController(1, 0, 0);
-  PIDController                    yController         = new PIDController(1, 0, 0);
-  ProfiledPIDController            thetaController     = new ProfiledPIDController(Constants.AutoConstants.kPThetaController, 0,
-      0, Constants.AutoConstants.kThetaControllerConstraints);
+  PIDController                    m_xController       = new PIDController(1, 0, 0);
+  PIDController                    m_yController       = new PIDController(1, 0, 0);
+  ProfiledPIDController            m_thetaController   =
+      new ProfiledPIDController(AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
 
   public Swerve( )
   {
@@ -120,8 +121,7 @@ public class Swerve extends SubsystemBase
     zeroGyro( );
 
     m_snapPIDController.enableContinuousInput(-Math.PI, Math.PI);
-
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+    m_thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
     resetOdometry(new Pose2d( ));
     resetAnglesToAbsolute( );
@@ -148,7 +148,7 @@ public class Swerve extends SubsystemBase
 
   public void initialize( )
   {
-    DataLogManager.log(getSubsystem( ) + ": Subsystem initialized!");
+    DataLogManager.log(String.format("%s: Subsystem initialized!", getSubsystem( )));
   }
 
   public void faultDump( )
@@ -192,7 +192,7 @@ public class Swerve extends SubsystemBase
     m_periodicIO.odometry_pose_rot = position.getRotation( ).getDegrees( );
 
     m_periodicIO.swerve_heading = MathUtil.inputModulus(m_pigeon.getYaw( ).getDegrees( ), 0, 360);
-    m_periodicIO.robot_pitch = m_pigeon.getUnadjustedPitch( ).getDegrees( );
+    m_periodicIO.robot_pitch = m_pigeon.getPitch( ).getDegrees( );
     m_periodicIO.robot_roll = m_pigeon.getRoll( ).getDegrees( );
 
     // m_periodicIO.vision_align_target_angle = Math.toDegrees(m_limelightVisionAlignGoal);
@@ -205,16 +205,16 @@ public class Swerve extends SubsystemBase
     {
       SmartDashboard.putNumber("SWMod: 0 - Speed", m_swerveMods[0].getState( ).speedMetersPerSecond);
       SmartDashboard.putNumber("SWMod: 0 - Angle", m_swerveMods[0].getState( ).angle.getDegrees( ));
-      SmartDashboard.putNumber("SWMod: 0 - Dist", m_swerveMods[0].getPosition( ).distanceMeters);
+      // SmartDashboard.putNumber("SWMod: 0 - Dist", m_swerveMods[0].getPosition( ).distanceMeters);
       SmartDashboard.putNumber("SWMod: 1 - Speed", m_swerveMods[1].getState( ).speedMetersPerSecond);
       SmartDashboard.putNumber("SWMod: 1 - Angle", m_swerveMods[1].getState( ).angle.getDegrees( ));
-      SmartDashboard.putNumber("SWMod: 1 - Dist", m_swerveMods[1].getPosition( ).distanceMeters);
+      // SmartDashboard.putNumber("SWMod: 1 - Dist", m_swerveMods[1].getPosition( ).distanceMeters);
       SmartDashboard.putNumber("SWMod: 2 - Speed", m_swerveMods[2].getState( ).speedMetersPerSecond);
       SmartDashboard.putNumber("SWMod: 2 - Angle", m_swerveMods[2].getState( ).angle.getDegrees( ));
-      SmartDashboard.putNumber("SWMod: 2 - Dist", m_swerveMods[2].getPosition( ).distanceMeters);
+      // SmartDashboard.putNumber("SWMod: 2 - Dist", m_swerveMods[2].getPosition( ).distanceMeters);
       SmartDashboard.putNumber("SWMod: 3 - Speed", m_swerveMods[3].getState( ).speedMetersPerSecond);
       SmartDashboard.putNumber("SWMod: 3 - Angle", m_swerveMods[3].getState( ).angle.getDegrees( ));
-      SmartDashboard.putNumber("SWMod: 3 - Dist", m_swerveMods[3].getPosition( ).distanceMeters);
+      // SmartDashboard.putNumber("SWMod: 3 - Dist", m_swerveMods[3].getPosition( ).distanceMeters);
     }
 
     SmartDashboard.putNumber("SW: pose_x", m_periodicIO.odometry_pose_x);
@@ -233,7 +233,7 @@ public class Swerve extends SubsystemBase
 
   public void updateSwerveOdometry( )
   {
-    m_poseEstimator.updateWithTime(Timer.getFPGATimestamp( ), m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ));
+    m_poseEstimator.updateWithTime(Timer.getFPGATimestamp( ), m_pigeon.getYaw( ), getPositions( ));
 
     {
       Pose2d botLLPose = RobotContainer.getInstance( ).m_vision.getLimelightValidPose(getPose( ));
@@ -303,7 +303,7 @@ public class Swerve extends SubsystemBase
     {
       driveStop(false);
       if (m_limelightDebug >= 1)
-        DataLogManager.log(getSubsystem( ) + ": DLL TV-FALSE - SIT STILL");
+        DataLogManager.log(String.format("%s: DLL TV-FALSE - SIT STILL", getSubsystem( )));
 
       return;
     }
@@ -404,7 +404,7 @@ public class Swerve extends SubsystemBase
   //
   public void driveWithPathFollowerInit(PathPlannerTrajectory trajectory, boolean useInitialPose)
   {
-    m_holonomicController = new HolonomicDriveController(xController, yController, thetaController);
+    m_holonomicController = new HolonomicDriveController(m_xController, m_yController, m_thetaController);
 
     m_trajectory = trajectory;
 
@@ -419,17 +419,15 @@ public class Swerve extends SubsystemBase
     if (useInitialPose)
     {
       resetOdometry(m_trajectory.getInitialHolonomicPose( ));
-      resetOdometry(m_trajectory.getInitialHolonomicPose( ));
-      DataLogManager.log("GYRO : " + m_pigeon.getYaw( ));
+      DataLogManager.log(String.format("%s: GYRO : %.1f", getSubsystem( ), m_pigeon.getYaw( ).getDegrees( )));
     }
 
-    m_trajTimer.reset( );
-    m_trajTimer.start( );
+    m_trajTimer.restart( );
   }
 
   public void driveWithPathFollowerLimelightInit(PathPlannerTrajectory trajectory, boolean useInitialPose)
   {
-    m_holonomicController = new HolonomicDriveController(xController, yController, thetaController);
+    m_holonomicController = new HolonomicDriveController(m_xController, m_yController, m_thetaController);
 
     m_trajectory = trajectory;
 
@@ -446,8 +444,7 @@ public class Swerve extends SubsystemBase
       resetLimelightOdometry(m_trajectory.getInitialHolonomicPose( ));
     }
 
-    m_trajTimer.reset( );
-    m_trajTimer.start( );
+    m_trajTimer.restart( );
   }
 
   public void driveWithPathFollowerExecute( )
@@ -459,7 +456,7 @@ public class Swerve extends SubsystemBase
         m_trajectory.getEndState( ).holonomicRotation/* trajState.poseMeters.getRotation( ) */); // TODO: find out what's wrong with getting desired rotation
 
     // Convert to module states
-    SwerveModuleState[ ] moduleStates = Constants.SwerveConstants.swerveKinematics.toSwerveModuleStates(targetChassisSpeeds);
+    SwerveModuleState[ ] moduleStates = SWConsts.swerveKinematics.toSwerveModuleStates(targetChassisSpeeds);
 
     double targetfrontLeft = (moduleStates[0].speedMetersPerSecond);
     double targetfrontRight = (moduleStates[1].speedMetersPerSecond);
@@ -515,45 +512,45 @@ public class Swerve extends SubsystemBase
     if (m_pathDebug >= 2)
     {
       // target velocity and its error
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_targetVelFrontLeft", targetfrontLeft);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_targetVelFrontRight", targetfrontRight);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_targetVelBackLeft", targetbackLeft);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_targetVelBackRight", targetbackRight);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_currentVelFrontLeft", currentfrontLeft);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_currentVelFrontRight", currentfrontRight);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_currentVelBackLeft", currentbackLeft);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_currentVelBackRight", currentbackRight);
+      SmartDashboard.putNumber(String.format("%s: PATH_targetVelFrontLeft", getSubsystem( )), targetfrontLeft);
+      SmartDashboard.putNumber(String.format("%s: PATH_targetVelFrontRight", getSubsystem( )), targetfrontRight);
+      SmartDashboard.putNumber(String.format("%s: PATH_targetVelBackLeft", getSubsystem( )), targetbackLeft);
+      SmartDashboard.putNumber(String.format("%s: PATH_targetVelBackRight", getSubsystem( )), targetbackRight);
+      SmartDashboard.putNumber(String.format("%s: PATH_currentVelFrontLeft", getSubsystem( )), currentfrontLeft);
+      SmartDashboard.putNumber(String.format("%s: PATH_currentVelFrontRight", getSubsystem( )), currentfrontRight);
+      SmartDashboard.putNumber(String.format("%s: PATH_currentVelBackLeft", getSubsystem( )), currentbackLeft);
+      SmartDashboard.putNumber(String.format("%s: PATH_currentVelBackRight", getSubsystem( )), currentbackRight);
 
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_velErrorFrontLeft", targetfrontLeft - currentfrontLeft);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_velErrorFrontRight", targetfrontRight - currentfrontRight);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_velErrorBackLeft", targetbackLeft - currentbackLeft);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_velErrorBackRight", targetbackRight - currentbackRight);
+      SmartDashboard.putNumber(String.format("%s: PATH_velErrorFrontLeft", getSubsystem( )), targetfrontLeft - currentfrontLeft);
+      SmartDashboard.putNumber(String.format("%s: PATH_velErrorFrontRight", getSubsystem( )),
+          targetfrontRight - currentfrontRight);
+      SmartDashboard.putNumber(String.format("%s: PATH_velErrorBackLeft", getSubsystem( )), targetbackLeft - currentbackLeft);
+      SmartDashboard.putNumber(String.format("%s: PATH_velErrorBackRight", getSubsystem( )), targetbackRight - currentbackRight);
 
       // target distance and its error
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_currentTrajX", targetTrajX);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_currentTrajY", targetTrajY);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_targetTrajX", currentTrajX);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_targetTrajY", currentTrajY);
+      SmartDashboard.putNumber(String.format("%s: PATH_currentTrajX", getSubsystem( )), targetTrajX);
+      SmartDashboard.putNumber(String.format("%s: PATH_currentTrajY", getSubsystem( )), targetTrajY);
+      SmartDashboard.putNumber(String.format("%s: PATH_targetTrajX", getSubsystem( )), currentTrajX);
+      SmartDashboard.putNumber(String.format("%s: PATH_targetTrajY", getSubsystem( )), currentTrajY);
 
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_trajErrorX", trajState.poseMeters.relativeTo(currentPose).getX( ));
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_trajErrorY", trajState.poseMeters.relativeTo(currentPose).getY( ));
+      SmartDashboard.putNumber(String.format("%s: PATH_trajErrorX", getSubsystem( )),
+          trajState.poseMeters.relativeTo(currentPose).getX( ));
+      SmartDashboard.putNumber(String.format("%s: PATH_trajErrorY", getSubsystem( )),
+          trajState.poseMeters.relativeTo(currentPose).getY( ));
 
       // target heading and its error
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_targetHeading", targetHeading);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_currentHeading", currentHeading);
-      SmartDashboard.putNumber(getSubsystem( ) + ": PATH_headingError",
+      SmartDashboard.putNumber(String.format("%s: PATH_targetHeading", getSubsystem( )), targetHeading);
+      SmartDashboard.putNumber(String.format("%s: PATH_currentHeading", getSubsystem( )), currentHeading);
+      SmartDashboard.putNumber(String.format("%s: PATH_headingError", getSubsystem( )),
           trajState.poseMeters.relativeTo(currentPose).getRotation( ).getDegrees( ));
     }
   }
 
   public boolean driveWithPathFollowerIsFinished( )
   {
-    if (m_trajTimer.get( ) == 0)
-      return false;
-
-    if (m_trajTimer.get( ) >= 15.0)
+    if (m_trajTimer.get( ) >= Constants.kAutonomousPeriodSecs)
     {
-      DataLogManager.log(getSubsystem( ) + ": PATH - path follower timeout!");
+      DataLogManager.log(String.format("%s: PATH - path follower timeout!", getSubsystem( )));
       return true;
     }
 
@@ -565,10 +562,65 @@ public class Swerve extends SubsystemBase
     m_trajTimer.stop( );
   }
 
+  ///////////////////////////////////////////////////////////////////////////////
+  //
+  // Helper functions
+  //
   public void setIsTeleported(boolean isTeleported)
   {
     m_isTeleported = isTeleported;
   }
+
+  public Pose2d getPose( )
+  {
+    return m_poseEstimator.getEstimatedPosition( );
+  }
+
+  public void resetOdometry(Pose2d pose)
+  {
+    DataLogManager.log(String.format("%s: Position Before : %s Gyro : %s", getSubsystem( ),
+        m_poseEstimator.getEstimatedPosition( ).toString( ), m_pigeon.getYaw( ).toString( )));
+    m_poseEstimator.resetPosition(m_pigeon.getYaw( ), getPositions( ), pose);
+    DataLogManager.log(String.format("%s: Position After  : %s Gyro : %s", getSubsystem( ),
+        m_poseEstimator.getEstimatedPosition( ).toString( ), m_pigeon.getYaw( ).toString( )));
+  }
+
+  public void resetLimelightOdometry(Pose2d pose)
+  {
+    m_poseEstimator.resetPosition(m_pigeon.getYaw( ), getPositions( ), pose);
+  }
+
+  public void resetOdometryToLimelight( )
+  {
+    Pose2d llPose = RobotContainer.getInstance( ).m_vision.getLimelightRawPose( );
+
+    if (llPose != null)
+    {
+      resetLimelightOdometry(llPose);
+    }
+  }
+
+  public double getYaw( )
+  {
+    return m_pigeon.getYaw( ).getDegrees( );
+  }
+
+  public void zeroGyro( )
+  {
+    zeroGyro(0.0);
+  }
+
+  public void zeroGyro(double resetAngle)
+  {
+    m_pigeon.setYaw(resetAngle);
+  }
+
+  public void resetAnglesToAbsolute( )
+  {
+    for (SwerveModule mod : m_swerveMods)
+      mod.resetToAbsolute( );
+  }
+
   //// 1678 Swerve //////////////////////////////////////////////////////////////
 
   public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop)
@@ -599,41 +651,37 @@ public class Swerve extends SubsystemBase
     }
     else
     {
-      swerveModuleStates =
-          Constants.SwerveConstants.swerveKinematics.toSwerveModuleStates(fieldRelative
-              ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX( ), translation.getY( ), rotation,
-                  m_pigeon.getYaw( ).getWPIRotation2d( ))
-              : new ChassisSpeeds(translation.getX( ), translation.getY( ), rotation));
+      swerveModuleStates = SWConsts.swerveKinematics.toSwerveModuleStates(fieldRelative
+          ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX( ), translation.getY( ), rotation, m_pigeon.getYaw( ))
+          : new ChassisSpeeds(translation.getX( ), translation.getY( ), rotation));
     }
 
-    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.SwerveConstants.maxSpeed);
+    SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, SWConsts.maxSpeed);
 
     for (SwerveModule mod : m_swerveMods)
-    {
-      mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
-    }
-  }
-
-  public void driveStop(boolean fieldRelative)
-  {
-    drive(new Translation2d(0, 0), 0.0, fieldRelative, true);
+      mod.setDesiredState(swerveModuleStates[mod.m_moduleNumber], isOpenLoop);
   }
 
   public void driveBalanceExecute( )
   {
     double motorOutput;
 
-    pitch = m_pigeon.getUnadjustedPitch( ).getWPIRotation2d( ).getDegrees( );
-    if (Math.abs(pitch) > SWConsts.kDriveBalancedAngle)
+    m_pitch = m_pigeon.getPitch( ).getDegrees( );
+    if (Math.abs(m_pitch) > SWConsts.kDriveBalancedAngle)
     {
-      motorOutput = SWConsts.kDriveBalanceKp * pitch;
+      motorOutput = SWConsts.kDriveBalanceKp * m_pitch;
       drive(new Translation2d(motorOutput, 0), 0, false, true);
     }
     else
     {
       driveStop(true);
     }
-    //DataLogManager.log(String.format(getSubsystem() + ": Robot pitch: %.1f degrees - Robot power applied to motors: %.1f m/s", pitch, drivevalue));
+    //DataLogManager.log(String.format(getSubsystem() + ": Robot pitch: %.1f degrees - Robot power applied to motors: %.1f m/s", m_pitch, drivevalue));
+  }
+
+  public void driveStop(boolean fieldRelative)
+  {
+    drive(new Translation2d(0, 0), 0.0, fieldRelative, true);
   }
 
   //
@@ -654,7 +702,7 @@ public class Swerve extends SubsystemBase
   private boolean isSnapComplete( )
   {
     double error = m_snapPIDController.getGoal( ).position - m_pigeon.getYaw( ).getRadians( );
-    return (Math.abs(error) < Math.toRadians(Constants.SnapConstants.kEpsilon));
+    return (Math.abs(error) < Math.toRadians(SnapConstants.kEpsilon));
   }
 
   public boolean driveIsSnapFinished(boolean force)
@@ -666,21 +714,6 @@ public class Swerve extends SubsystemBase
     }
 
     return !m_isSnapping;
-  }
-
-  /* Used by SwerveControllerCommand in Auto */
-  public void setModuleStates(SwerveModuleState[ ] desiredStates)
-  {
-    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.SwerveConstants.maxSpeed);
-
-    for (SwerveModule mod : m_swerveMods)
-    {
-      mod.setDesiredState(desiredStates[mod.moduleNumber], false);
-      SmartDashboard.putNumber("mod " + mod.moduleNumber + " desired speed",
-          desiredStates[mod.moduleNumber].speedMetersPerSecond);
-      SmartDashboard.putNumber("mod " + mod.moduleNumber + " desired angle",
-          MathUtil.inputModulus(desiredStates[mod.moduleNumber].angle.getDegrees( ), 0, 180));
-    }
   }
 
   //
@@ -696,91 +729,45 @@ public class Swerve extends SubsystemBase
     m_locked = lock;
   }
 
-  public Pose2d getPose( )
+  /* Used by SwerveControllerCommand in Auto */
+  public void setModuleStates(SwerveModuleState[ ] desiredStates)
   {
-    return m_poseEstimator.getEstimatedPosition( );
-  }
+    SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, SWConsts.maxSpeed);
 
-  public void resetOdometry(Pose2d pose)
-  {
-    DataLogManager.log("GYRO: " + m_pigeon.getYaw( ));
-    DataLogManager.log("GYRO Before : " + m_poseEstimator.getEstimatedPosition( ));
-    m_poseEstimator.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
-    zeroGyro(pose.getRotation( ).getDegrees( ));
-  }
-
-  public void resetLimelightOdometry(Pose2d pose)
-  {
-    m_poseEstimator.resetPosition(m_pigeon.getYaw( ).getWPIRotation2d( ), getPositions( ), pose);
-  }
-
-  public void resetOdometryToLimelight( )
-  {
-    Pose2d llPose = RobotContainer.getInstance( ).m_vision.getLimelightRawPose( );
-
-    if (llPose != null)
-    {
-      resetLimelightOdometry(llPose);
-    }
-  }
-
-  public void resetAnglesToAbsolute( )
-  {
     for (SwerveModule mod : m_swerveMods)
-    {
-      mod.resetToAbsolute( );
-    }
+      mod.setDesiredState(desiredStates[mod.m_moduleNumber], false);
   }
 
-  public SwerveModuleState[ ] getStates( )
-  {
-    SwerveModuleState[ ] states = new SwerveModuleState[4];
-    for (SwerveModule mod : m_swerveMods)
-    {
-      states[mod.moduleNumber] = mod.getState( );
-      SmartDashboard.putNumber("mod " + mod.moduleNumber + " current speed", states[mod.moduleNumber].speedMetersPerSecond);
-      SmartDashboard.putNumber("mod " + mod.moduleNumber + " current angle",
-          MathUtil.inputModulus(states[mod.moduleNumber].angle.getDegrees( ), 0, 180));
-    }
-    return states;
-  }
+  //
+  // Used by WPILib in 2022 - switched to getPositions in 2023
+  //
+  // public SwerveModuleState[ ] getStates( )
+  // {
+  //   SwerveModuleState[ ] states = new SwerveModuleState[4];
+  //   for (SwerveModule mod : m_swerveMods)
+  //   {
+  //     states[mod.m_moduleNumber] = mod.getState( );
+  //     SmartDashboard.putNumber(String.format("mod%d current speed", mod.m_moduleNumber, "mod "),
+  //         states[mod.m_moduleNumber].speedMetersPerSecond);
+  //     SmartDashboard.putNumber(String.format("mod%d current angle", mod.m_moduleNumber, "mod "),
+  //         MathUtil.inputModulus(states[mod.m_moduleNumber].angle.getDegrees( ), 0, 180));
+  //   }
+  //   return states;
+  // }
 
   public SwerveModulePosition[ ] getPositions( )
   {
     SwerveModulePosition[ ] positions = new SwerveModulePosition[4];
     for (SwerveModule mod : m_swerveMods)
     {
-      positions[mod.moduleNumber] = mod.getPosition( );
-      SmartDashboard.putNumber("mod " + mod.moduleNumber + " current distance", positions[mod.moduleNumber].distanceMeters);
-      SmartDashboard.putNumber("mod " + mod.moduleNumber + " current angle",
-          MathUtil.inputModulus(positions[mod.moduleNumber].angle.getDegrees( ), 0, 180));
+      positions[mod.m_moduleNumber] = mod.getPosition( );
+      SmartDashboard.putNumber(String.format("mod%d current distance", mod.m_moduleNumber, "mod "),
+          positions[mod.m_moduleNumber].distanceMeters);
+      SmartDashboard.putNumber(String.format("mod%d current angle", mod.m_moduleNumber, "mod "),
+          MathUtil.inputModulus(positions[mod.m_moduleNumber].angle.getDegrees( ), 0, 180));
     }
     return positions;
   }
 
-  public void setAnglePIDValues(double kP, double kI, double kD)
-  {
-    for (SwerveModule swerveModule : m_swerveMods)
-    {
-      swerveModule.updateAnglePID(kP, kI, kD);
-    }
-  }
-
-  public double[ ] getAnglePIDValues(int index)
-  {
-    return m_swerveMods[index].getAnglePIDValues( );
-  }
-
-  public void zeroGyro( )
-  {
-    zeroGyro(0.0);
-  }
-
-  public void zeroGyro(double reset)
-  {
-    m_pigeon.setYaw(reset);
-  }
-
   //// 1678 Swerve //////////////////////////////////////////////////////////////
-
 }

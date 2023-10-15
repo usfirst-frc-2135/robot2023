@@ -32,7 +32,7 @@ public class WristRun extends CommandBase
   @Override
   public void execute( )
   {
-    m_wrist.moveWristWithJoystick(m_gamePad);
+    m_wrist.moveWithJoystick(m_gamePad);
   }
 
   // Called once the command ends or is interrupted.

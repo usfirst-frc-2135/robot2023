@@ -3,17 +3,25 @@
 //
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.sim.ChassisReference;
+import com.ctre.phoenix6.sim.TalonFXSimState;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.simulation.BatterySim;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
@@ -23,10 +31,13 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.EXConsts;
-import frc.robot.Constants.EXConsts.ExtensionLength;
 import frc.robot.Constants.EXConsts.ExtensionMode;
+import frc.robot.Constants.Ports;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
-import frc.robot.team2135.PhoenixUtil;
+import frc.robot.lib.math.Conversions;
+import frc.robot.lib.util.CTREConfigs6;
+import frc.robot.lib.util.PhoenixUtil6;
 
 //
 // Extension subsystem class
@@ -34,67 +45,39 @@ import frc.robot.team2135.PhoenixUtil;
 public class Extension extends SubsystemBase
 {
   // Constants
-  private static final int                PIDINDEX                = 0;   // PID in use (0-primary, 1-aux)
-  private static final int                SLOTINDEX               = 0;   // Use first PID slot
+  private final double              kLigament2dOffset = 0.0;                               // Offset from mechanism root for extension ligament
+  private final double              kLigament2dLength = Units.inchesToMeters(30.0); // Offset from mechanism root for extension ligament
 
   // Member objects
-  private final WPI_TalonFX               m_extension             = new WPI_TalonFX(Constants.Ports.kCANID_Extension);  //extension
-  // private final TalonFXSimCollection      m_extensionMotorSim     = new TalonFXSimCollection(m_extension);
-  // private final SingleJointedArmSim       m_extensionSim          = new SingleJointedArmSim(DCMotor.getFalcon500(1),
-  //     EXConsts.kExtensionGearRatio, 2.0, EXConsts.kForearmLengthMeters, 0.0, Math.PI, false);
+  private final TalonFX             m_motor           = new TalonFX(Ports.kCANID_Extension);
+  private final TalonFXSimState     m_motorSim        = m_motor.getSimState( );
+  private final ElevatorSim         m_armSim          = new ElevatorSim(DCMotor.getFalcon500(1), EXConsts.kGearRatio,
+      EXConsts.kForearmMassKg, Units.inchesToMeters(EXConsts.kDrumDiameterInches / 2), EXConsts.kForearmLengthMeters,
+      EXConsts.kForearmLengthMeters + 0.5, false);
 
   // Mechanism2d
-  private final Mechanism2d               m_extensionMech         = new Mechanism2d(3, 3);
-  private final MechanismRoot2d           m_extensionRoot         = m_extensionMech.getRoot("extension", 1.5, 2);
-  private MechanismLigament2d             m_extensionLigament     =
-      m_extensionRoot.append(new MechanismLigament2d("extension", 1, 0, 6, new Color8Bit(Color.kBlue)));
-
-  private boolean                         m_extensionValid;              // Health indicator for extension Talon 
-  // private double                          m_extensionLengthOffset = 0.0; // CANCoder length measured at reference point
-
-  //Devices and simulation objs
-  private SupplyCurrentLimitConfiguration m_supplyCurrentLimits   = new SupplyCurrentLimitConfiguration(true,
-      EXConsts.kSupplyCurrentLimit, EXConsts.kSupplyTriggerCurrent, EXConsts.kSupplyTriggerTime);
-  private StatorCurrentLimitConfiguration m_statorCurrentLimits   = new StatorCurrentLimitConfiguration(true,
-      EXConsts.kStatorCurrentLimit, EXConsts.kStatorTriggerCurrent, EXConsts.kStatorTriggerTime);
+  private final Mechanism2d         m_mech            = new Mechanism2d(3, 3);
+  private final MechanismRoot2d     m_mechRoot        = m_mech.getRoot("extension", 0.5, 1.5);
+  private final MechanismLigament2d m_mechLigament    =
+      m_mechRoot.append(new MechanismLigament2d("extension", kLigament2dLength, kLigament2dOffset, 6, new Color8Bit(Color.kRed)));
 
   // Declare module variables
-  private double                          m_neutralDeadband       = EXConsts.kExtensionNeutralDeadband;   // motor output deadband
-  private int                             m_velocity              = EXConsts.kExtensionMMVelocity;        // motion magic velocity
-  private int                             m_acceleration          = EXConsts.kExtensionMMAcceleration;    // motion magic acceleration
-  private int                             m_sCurveStrength        = EXConsts.kExtensionMMSCurveStrength;  // motion magic S curve smoothing
-  private double                          m_pidKf                 = EXConsts.kExtensionPidKf;             // PID force constant
-  private double                          m_pidKp                 = EXConsts.kExtensionPidKp;             // PID proportional
-  private double                          m_pidKi                 = EXConsts.kExtensionPidKi;             // PID integral
-  private double                          m_pidKd                 = EXConsts.kExtensionPidKd;             // PID derivative
-  private int                             m_extensionAllowedError = EXConsts.kExtensionAllowedError;      // PID allowable closed loop error
-  private double                          m_toleranceInches       = EXConsts.kExtensionToleranceInches;   // PID tolerance in inches
+  private boolean                   m_motorValid;      // Health indicator for Falcon 
+  private boolean                   m_calibrated      = true;
 
-  private double                          m_extensionLengthMin    = EXConsts.kExtensionLengthMin;          // minimum extension allowable length
-  private double                          m_extensionLengthStow   = EXConsts.kExtensionLengthStow;         // extension Stow length
-  private double                          m_extensionLengthIdle   = EXConsts.kExtensionLengthIdle;         // extension Stow length
-  private double                          m_extensionLengthLow    = EXConsts.kExtensionLengthScoreLow;     // low-peg scoring length   
-  private double                          m_extensionLengthMid    = EXConsts.kExtensionLengthScoreMid;     // mid-peg scoring length
-  private double                          m_extensionLengthHigh   = EXConsts.kExtensionLengthScoreHigh;    // high-peg scoring length
-  private double                          m_extensionLengthShelf  = EXConsts.kExtensionLengthSubstation;   // substation loading shelf
-  private double                          m_extensionLengthMax    = EXConsts.kExtensionLengthMax;          // maximum extension allowable length
+  private ExtensionMode             m_mode            = ExtensionMode.EXTENSION_INIT;     // Manual movement mode with joysticks
 
-  private double                          m_stickDeadband         = Constants.kStickDeadband;              // joystick deadband
-  private ExtensionMode                   m_extensionMode         = ExtensionMode.EXTENSION_INIT;          // Mode active with joysticks
+  private double                    m_currentInches   = 0.0; // Current length in inches
+  private double                    m_targetInches    = 0.0; // Target length in inches
+  private Debouncer                 m_withinTolerance = new Debouncer(0.060, DebounceType.kRising);
+  private boolean                   m_moveIsFinished;        // Movement has completed (within tolerance)
 
-  private boolean                         m_extensionDebug        = false;  // DEBUG flag to disable/enable extra logging calls
+  private VoltageOut                m_requestVolts    = new VoltageOut(0).withEnableFOC(false);
+  private MotionMagicVoltage        m_requestMMVolts  = new MotionMagicVoltage(0).withSlot(0).withEnableFOC(false);
+  private double                    m_totalArbFeedForward;   // Arbitrary feedforward added to counteract gravity
 
-  private ExtensionLength                 m_extensionLength;                // Desired extension length
-  private boolean                         m_moveIsFinished;
-  private double                          m_extensionTargetInches = 0.0;    // Target length in inches
-  private double                          m_extensionCurInches    = 0.0;    // Current length in inches
-  private int                             m_withinTolerance       = 0;      // Counter for consecutive readings within tolerance
-  private double                          m_extensionTotalFF;
-  private boolean                         m_calibrated            = EXConsts.kExtensionCalibrated;  // Indicates whether the extension has been calibrated
-
-  private Timer                           m_safetyTimer           = new Timer( ); // Safety timer for use in extension
-
-  private int                             maxVelocity;
+  private Timer                     m_safetyTimer     = new Timer( ); // Safety timer for movements
+  private StatusSignal<Double>      m_motorVelocity   = m_motor.getRotorVelocity( );
 
   // Constructor
   public Extension( )
@@ -102,13 +85,18 @@ public class Extension extends SubsystemBase
     setName("Extension");
     setSubsystem("Extension");
 
-    m_extensionValid = PhoenixUtil.getInstance( ).talonFXInitialize(m_extension, "extension");
+    m_motorValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_motor, "extension", CTREConfigs6.extensionLengthFXConfig( ));
 
-    if (m_extensionValid)
-      extensionTalonInitialize(m_extension, EXConsts.kInvertMotor);
+    if (Robot.isReal( ))
+      m_currentInches = getCurrentInches( );
+    m_motor.setRotorPosition(Conversions.inchesToWinchRotations(m_currentInches, EXConsts.kRolloutRatio));
+    DataLogManager.log(String.format("%s: CANCoder initial inches %.1f", getSubsystem( ), m_currentInches));
+
+    m_motorSim.Orientation = ChassisReference.CounterClockwise_Positive;
+
+    m_motorVelocity.setUpdateFrequency(50);
 
     initSmartDashboard( );
-
     initialize( );
   }
 
@@ -117,39 +105,20 @@ public class Extension extends SubsystemBase
   {
     // This method will be called once per scheduler run
 
-    if (m_extensionValid)
-    {
-      int curCounts = (int) m_extension.getSelectedSensorPosition(0);
+    m_currentInches = getCurrentInches( );
+    if (m_currentInches < 0)
+      setExtensionToZero( );
 
-      if (curCounts < 0)
-      {
-        m_extension.setNeutralMode(NeutralMode.Coast);
-        curCounts = 0;
-        m_extension.setSelectedSensorPosition(curCounts, PIDINDEX, Constants.kCANTimeoutMs);
-        m_extensionTargetInches = extensionCountsToInches(curCounts);
-      }
+    SmartDashboard.putNumber("EX_curInches", m_currentInches);
+    SmartDashboard.putNumber("EX_curRotations", Conversions.inchesToWinchRotations(m_currentInches, EXConsts.kRolloutRatio));
+    SmartDashboard.putNumber("EX_targetInches", m_targetInches);
+    SmartDashboard.putNumber("EX_curError", m_motor.getClosedLoopError( ).refresh( ).getValue( ));
+    SmartDashboard.putNumber("EX_rotorVelocity", m_motorVelocity.refresh( ).getValue( ));
 
-      if (m_extensionDebug)
-      {
-        int curVelocity = (int) m_extension.getSelectedSensorVelocity(0);
-        maxVelocity = (maxVelocity > curVelocity) ? maxVelocity : curVelocity;
+    m_totalArbFeedForward = calculateTotalArbFF( );
+    SmartDashboard.putNumber("EX_totalFF", m_totalArbFeedForward);
 
-        SmartDashboard.putNumber("EX_maxVelocity", maxVelocity);
-        SmartDashboard.putNumber("EX_curVelocity", curVelocity);
-        SmartDashboard.putNumber("EX_curCounts", curCounts);
-      }
-
-      m_extensionCurInches = extensionCountsToInches(curCounts);
-      SmartDashboard.putNumber("EX_curInches", m_extensionCurInches);
-      SmartDashboard.putNumber("EX_targetInches", m_extensionTargetInches);
-      m_extensionLigament.setLength(m_extensionCurInches);
-
-      m_extensionTotalFF = calculateTotalFF( );
-      SmartDashboard.putNumber("EX_totalFF", m_extensionTotalFF);
-
-      double currentDraw = m_extension.getStatorCurrent( );
-      SmartDashboard.putNumber("EX_currentDraw", currentDraw);
-    }
+    SmartDashboard.putNumber("EX_currentDraw", m_motor.getStatorCurrent( ).refresh( ).getValue( ));
   }
 
   @Override
@@ -158,338 +127,232 @@ public class Extension extends SubsystemBase
     // This method will be called once per scheduler run during simulation
 
     // Set input motor voltage from the motor setting
-    // m_extensionMotorSim.setBusVoltage(RobotController.getInputVoltage( ));
-    // m_extensionSim.setInput(m_extensionMotorSim.getMotorOutputLeadVoltage( ));
+    m_motorSim.setSupplyVoltage(RobotController.getInputVoltage( ));
+    m_armSim.setInput(m_motorSim.getMotorVoltage( ));
 
     // update for 20 msec loop
-    // m_extensionSim.update(0.020);
+    m_armSim.update(0.020);
 
-    // Finally, we set our simulated encoder's readings and simulated battery voltage
-    // m_extensionMotorSim
-    //     .setIntegratedSensorRawPosition(extensionInchesToCounts(Units.radiansToDegrees(m_extensionSim.getAngleRads( ))));
-    // m_extensionMotorSim
-    //     .setIntegratedSensorVelocity(extensionInchesToCounts(Units.radiansToDegrees(m_extensionSim.getVelocityRadPerSec( ))));
+    // // Finally, we set our simulated encoder's readings and simulated battery voltage
+    m_motorSim.setRawRotorPosition(
+        Conversions.inchesToWinchRotations(Units.metersToInches(m_armSim.getPositionMeters( )), EXConsts.kRolloutRatio));
+    m_motorSim.setRotorVelocity(
+        Conversions.inchesToWinchRotations(Units.metersToInches(m_armSim.getVelocityMetersPerSecond( )), EXConsts.kRolloutRatio));
 
     // SimBattery estimates loaded battery voltages
+    RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps( )));
 
+    m_mechLigament.setLength(kLigament2dLength + Units.inchesToMeters(m_currentInches));
   }
 
   private void initSmartDashboard( )
   {
-    SmartDashboard.putBoolean("HL_validEX", m_extensionValid);
-
-    // Initialize Variables
-    if (m_extensionDebug)
-    {
-      SmartDashboard.putNumber("EX_velocity", m_velocity);
-      SmartDashboard.putNumber("EX_acceleration", m_acceleration);
-      SmartDashboard.putNumber("EX_sCurveStrength", m_sCurveStrength);
-      SmartDashboard.putNumber("EX_pidKf", m_pidKf);
-      SmartDashboard.putNumber("EX_pidKp", m_pidKp);
-      SmartDashboard.putNumber("EX_pidKi", m_pidKi);
-      SmartDashboard.putNumber("EX_pidKd", m_pidKd);
-    }
-
-    SmartDashboard.putNumber("EX_curInches", m_extensionCurInches);
-    SmartDashboard.putNumber("EX_targetInches", m_extensionTargetInches);
-    SmartDashboard.putBoolean("EX_calibrated", EXConsts.kExtensionCalibrated);
-    SmartDashboard.putBoolean("EX_normalMode", !m_extensionDebug);
-
-    // post the mechanism to the dashboard
-    SmartDashboard.putData("ExtensionMech", m_extensionMech);
+    // Initialize dashboard widgets
+    SmartDashboard.putBoolean("HL_validEX", m_motorValid);
+    SmartDashboard.putData("ExtensionMech", m_mech);
   }
 
   public void initialize( )
   {
-    double curEXCounts = 0.0;
+    setStopped( );
 
-    DataLogManager.log(getSubsystem( ) + ": Subsystem initialized!");
-
-    setExtensionStopped( );
-
-    if (m_extensionValid)
-      curEXCounts = m_extension.getSelectedSensorPosition(0);
-    m_extensionCurInches = extensionCountsToInches((int) curEXCounts);
-    m_extensionTargetInches = m_extensionCurInches;
-    DataLogManager.log(String.format("%s: Init Target Inches: %.1f", getSubsystem( ), m_extensionTargetInches));
+    m_currentInches = getCurrentInches( );
+    m_targetInches = m_currentInches;
+    DataLogManager.log(String.format("%s: Subsystem initialized! Target Inches: %.1f", getSubsystem( ), m_targetInches));
   }
 
-  private int extensionInchesToCounts(double inches)
+  private double calculateTotalArbFF( )
   {
-    return (int) (inches / EXConsts.kExtensionInchesPerCount);
+    double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
+
+    return EXConsts.kArbitraryFF * Math.cos(Math.toRadians(elbowDegrees));
   }
 
-  private double extensionCountsToInches(int counts)
+  ///////////////////////// PUBLIC HELPERS ///////////////////////////////////
+
+  public double getCurrentInches( )
   {
-    return counts * EXConsts.kExtensionInchesPerCount;
+    return Conversions.rotationsToWinchInches(m_motor.getRotorPosition( ).refresh( ).getValue( ), EXConsts.kRolloutRatio);
   }
 
-  public boolean moveIsInRange(double inches)
+  public boolean isBelowIdle( )
   {
-    return (inches > m_extensionLengthMin) && (inches < m_extensionLengthMax);
+    return m_currentInches < EXConsts.kLengthIdle;
   }
 
-  public double getInches( )
+  public boolean isBelowLow( )
   {
-    return m_extensionCurInches;
+    return m_currentInches < EXConsts.kLengthScoreLow;
   }
 
-  private void extensionTalonInitialize(WPI_TalonFX motor, boolean inverted)
+  public boolean isBelowMid( )
   {
-    motor.setInverted(inverted);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "setInverted");
-    motor.setSensorPhase(true);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "setSensorPhase");
-    motor.setNeutralMode(NeutralMode.Brake);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "setNeutralMode");
-    motor.setSafetyEnabled(false);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "setSafetyEnabled");
-    motor.configNeutralDeadband(m_neutralDeadband, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configNeutralDeadband");
-
-    motor.configVoltageCompSaturation(12.0);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configVoltageCompSaturation");
-    motor.enableVoltageCompensation(true);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "enableVoltageCompensation");
-
-    motor.configSupplyCurrentLimit(m_supplyCurrentLimits);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configSupplyCurrentLimits");
-    motor.configStatorCurrentLimit(m_statorCurrentLimits);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configStatorCurrentLimits");
-
-    // Configure sensor settings
-    motor.setSelectedSensorPosition(0.0);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "setSelectedSensorPosition");
-    motor.configAllowableClosedloopError(SLOTINDEX, m_extensionAllowedError, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configAllowableClosedloopError");
-
-    motor.configMotionCruiseVelocity(m_velocity, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionCruiseVelocity");
-    motor.configMotionAcceleration(m_acceleration, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionAcceleration");
-    motor.configMotionSCurveStrength(m_sCurveStrength, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "configMotionSCurveStrength");
-
-    // Configure Magic Motion settings
-    motor.config_kF(0, m_pidKf, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kF");
-    motor.config_kP(0, m_pidKp, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kP");
-    motor.config_kI(0, m_pidKi, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kI");
-    motor.config_kD(0, m_pidKd, Constants.kLongCANTimeoutMs);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "config_kD");
-    motor.selectProfileSlot(SLOTINDEX, PIDINDEX);
-    PhoenixUtil.getInstance( ).checkTalonError(motor, "selectProfileSlot");
-
-    motor.set(ControlMode.PercentOutput, 0.0);
+    return m_currentInches < EXConsts.kLengthScoreMid;
   }
 
-  public void moveExtensionWithJoystick(XboxController joystick)
+  public boolean isMoveValid(double inches)
+  {
+    return (inches > EXConsts.kLengthMin) && (inches < EXConsts.kLengthMax);
+  }
+
+  private boolean isWithinTolerance(double targetInches)
+  {
+    return (Math.abs(targetInches - m_currentInches) < EXConsts.kToleranceInches);
+  }
+
+  public void resetPositionToZero( )
+  {
+    if (m_motorValid)
+      m_motor.setRotorPosition(Conversions.inchesToWinchRotations(0, EXConsts.kRolloutRatio));
+  }
+
+  public void setStopped( )
+  {
+    DataLogManager.log(String.format("%s: now STOPPED", getSubsystem( )));
+    m_motor.setControl(m_requestVolts.withOutput(0.0));
+  }
+
+  public void setMMPosition(double targetInches, double elbowAngle)
+  {
+    targetInches += (elbowAngle / 90.0) * EXConsts.kLengthExtension;
+    m_motor.setControl(m_requestMMVolts.withPosition(Conversions.inchesToWinchRotations(targetInches, EXConsts.kRolloutRatio))
+        .withFeedForward(m_totalArbFeedForward));
+
+  }
+
+  ///////////////////////// MANUAL MOVEMENT ///////////////////////////////////
+
+  public void moveWithJoystick(XboxController joystick)
   {
     double axisValue = joystick.getRightX( );
-    boolean outOfRange = false;
+    boolean rangeLimited = false;
     ExtensionMode newMode = ExtensionMode.EXTENSION_STOPPED;
 
-    axisValue = MathUtil.applyDeadband(axisValue, m_stickDeadband);
+    axisValue = MathUtil.applyDeadband(axisValue, Constants.kStickDeadband);
 
     if (axisValue < 0.0)
     {
-      if (m_extensionCurInches > m_extensionLengthMin)
+      if (m_currentInches > EXConsts.kLengthMin)
         newMode = ExtensionMode.EXTENSION_IN;
       else
-        outOfRange = true;
+        rangeLimited = true;
     }
     else if (axisValue > 0.0)
     {
-      if (m_extensionCurInches < m_extensionLengthMax)
+      if (m_currentInches < EXConsts.kLengthMax)
         newMode = ExtensionMode.EXTENSION_OUT;
       else
-        outOfRange = true;
+        rangeLimited = true;
     }
 
-    if (outOfRange)
+    if (rangeLimited)
       axisValue = 0.0;
 
-    if (newMode != m_extensionMode)
+    if (newMode != m_mode)
     {
-      m_extensionMode = newMode;
-      DataLogManager.log(getSubsystem( ) + ": move " + m_extensionMode + ((outOfRange) ? " - OUT OF RANGE" : ""));
+      m_mode = newMode;
+      DataLogManager.log(String.format("%s: move %s %.1f in %s", getSubsystem( ), m_mode, getCurrentInches( ),
+          ((rangeLimited) ? " - RANGE LIMITED" : "")));
     }
 
-    m_extensionTargetInches = m_extensionCurInches;
+    m_targetInches = m_currentInches;
 
-    if (m_extensionValid)
-      m_extension.set(ControlMode.PercentOutput, axisValue * EXConsts.kExtensionSpeedMaxManual + EXConsts.kExtensionArbitraryFF);
+    m_motor.setControl(m_requestVolts.withOutput(axisValue * EXConsts.kManualSpeedVolts)); // TODO: Check FF and volts
   }
 
-  public void setExtensionStopped( )
+  ///////////////////////// MOTION MAGIC ///////////////////////////////////
+
+  public void moveToPositionInit(double newLength, double elbowAngle, boolean holdPosition)
   {
-    DataLogManager.log(getSubsystem( ) + ": now STOPPED");
+    m_safetyTimer.restart( );
 
-    if (m_extensionValid)
-      m_extension.set(ControlMode.PercentOutput, 0.0);
+    if (holdPosition)
+      newLength = getCurrentInches( );
+
+    // Decide if a new position request
+    if (holdPosition || newLength != m_targetInches || !isWithinTolerance(newLength))
+    {
+      // Validate the position request
+      if (isMoveValid(newLength))
+      {
+        m_targetInches = newLength;
+        m_moveIsFinished = false;
+        m_withinTolerance.calculate(false); // Reset the debounce filter
+
+        setMMPosition(m_targetInches, elbowAngle);
+
+        DataLogManager.log(String.format("%s: Position move: %.1f -> %.1f inches (%.1f -> %.1f)", getSubsystem( ),
+            m_currentInches, m_targetInches, Conversions.inchesToWinchRotations(m_currentInches, EXConsts.kRolloutRatio),
+            Conversions.inchesToWinchRotations(m_targetInches, EXConsts.kRolloutRatio)));
+      }
+      else
+        DataLogManager.log(String.format("%s: Position move %.1f inches is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
+            m_targetInches, EXConsts.kLengthMin, EXConsts.kLengthMax));
+
+    }
+    else
+    {
+      m_moveIsFinished = true;
+      DataLogManager.log(String.format("%s: Position already achieved - %s", getSubsystem( ), m_targetInches));
+    }
   }
+
+  public void moveToPositionExecute(double elbowAngle)
+  {
+    if (m_calibrated)
+      setMMPosition(m_targetInches, elbowAngle);
+  }
+
+  public boolean moveToPositionIsFinished( )
+  {
+    boolean timedOut = m_safetyTimer.hasElapsed(2);//EXConsts.kMMSafetyTimeoutRatio); //TODO: check
+    double error = m_targetInches - m_currentInches;
+
+    if (m_withinTolerance.calculate(Math.abs(error) < EXConsts.kToleranceInches) || timedOut)
+    {
+      if (!m_moveIsFinished)
+        DataLogManager.log(String.format("%s: Position move finished - Current inches: %.1f (error %.1f) - Time: %.3f %s",
+            getSubsystem( ), m_currentInches, error, m_safetyTimer.get( ), (timedOut) ? "- TIMED OUT!" : ""));
+
+      m_moveIsFinished = true;
+    }
+
+    return m_moveIsFinished;
+  }
+
+  public void moveToPositionEnd( )
+  {
+    m_safetyTimer.stop( );
+    // m_motor.setControl(m_requestVolts.withOutput(0.0)); // TODO: Is this needed? It fixed a bug in Motion Magic in v5 that should be fixed in v6
+  }
+
+  ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
   public void moveToCalibrate( )
   {
-    if (m_extensionValid)
-      m_extension.set(ControlMode.PercentOutput, EXConsts.kSpeedCalibrate);
+    if (m_motorValid)
+      m_motor.setControl(m_requestVolts.withOutput(EXConsts.kCalibrateSpeedVolts));
   }
 
-  public void calibrate( )
+  public void calibrateExtension( )
   {
-    if (m_extensionValid)
-      m_extension.setSelectedSensorPosition(0.0);
-
-    m_extensionTargetInches = 0;
-    m_extensionCurInches = 0;
+    setExtensionToZero( );
     m_calibrated = true;
-    SmartDashboard.putBoolean("EX_calibrated", m_calibrated);
+    SmartDashboard.putBoolean("EL_calibrated", m_calibrated);
+  }
+
+  private void setExtensionToZero( )
+  {
+    m_targetInches = 0.0;
+    m_currentInches = 0.0;
+    resetPositionToZero( );
   }
 
   private double calculateTotalFF( )
   {
     double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
 
-    return EXConsts.kExtensionArbitraryFF * Math.cos(Math.toRadians(elbowDegrees));
-  }
-
-  ///////////////////////// MOTION MAGIC ///////////////////////////////////
-
-  public void moveExtensionLengthInit(ExtensionLength length)
-  {
-    if (m_extensionDebug)
-    {
-      m_velocity = (int) SmartDashboard.getNumber("EX_velocity", m_velocity);
-      m_acceleration = (int) SmartDashboard.getNumber("EX_acceleration", m_acceleration);
-      m_sCurveStrength = (int) SmartDashboard.getNumber("EX_sCurveStrength", m_sCurveStrength);
-      m_pidKf = SmartDashboard.getNumber("EX_pidKf", m_pidKf);
-      m_pidKp = SmartDashboard.getNumber("EX_pidKp", m_pidKp);
-      m_pidKi = SmartDashboard.getNumber("EX_pidKi", m_pidKi);
-      m_pidKd = SmartDashboard.getNumber("EX_pidKd", m_pidKd);
-
-      m_extension.configMotionCruiseVelocity(m_velocity);
-      m_extension.configMotionAcceleration(m_acceleration);
-      m_extension.configMotionSCurveStrength(m_sCurveStrength);
-      m_extension.config_kF(SLOTINDEX, m_pidKf);
-      m_extension.config_kP(SLOTINDEX, m_pidKp);
-      m_extension.config_kI(SLOTINDEX, m_pidKi);
-      m_extension.config_kD(SLOTINDEX, m_pidKd);
-    }
-
-    if (length != m_extensionLength)
-    {
-      m_extensionLength = length;
-      m_moveIsFinished = false;
-      DataLogManager.log(String.format("%s: new mode request - %s", getSubsystem( ), m_extensionLength));
-
-      switch (m_extensionLength)
-      {
-        default : // Fall through to NOCHANGE if invalid
-          DataLogManager.log(String.format("%s: requested length is invalid - %s", getSubsystem( ), m_extensionLength));
-        case EXTENSION_NOCHANGE : // Do not change from current level!
-          m_extensionTargetInches = m_extensionCurInches;
-          if (m_extensionTargetInches < 0.25)
-            m_extensionTargetInches = 0.25;
-          break;
-        case EXTENSION_STOW :
-          m_extensionTargetInches = m_extensionLengthStow;
-          break;
-        case EXTENSION_IDLE :
-          m_extensionTargetInches = m_extensionLengthIdle;
-          break;
-        case EXTENSION_LOW :
-          m_extensionTargetInches = m_extensionLengthLow;
-          break;
-        case EXTENSION_MID :
-          m_extensionTargetInches = m_extensionLengthMid;
-          break;
-        case EXTENSION_HIGH :
-          m_extensionTargetInches = m_extensionLengthHigh;
-          break;
-        case EXTENSION_SHELF :
-          m_extensionTargetInches = m_extensionLengthShelf;
-          break;
-      }
-    }
-
-    DataLogManager.log(String.format("%s: TARGET INCHES %.1f", getSubsystem( ), m_extensionTargetInches));
-
-    if (EXConsts.kExtensionCalibrated)
-    {
-      // length constraint check/soft limit for max and min length before raising
-      if (!moveIsInRange(m_extensionTargetInches))
-      {
-        DataLogManager.log(String.format("%s: Target %.1f inches is OUT OF RANGE! [%.1f, %.1f]", getSubsystem( ),
-            m_extensionTargetInches, m_extensionLengthMin, m_extensionLengthMax));
-        m_extensionTargetInches = m_extensionCurInches;
-      }
-
-      m_safetyTimer.restart( );
-
-      if (m_extensionValid && EXConsts.kExtensionCalibrated)
-        m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches),
-            DemandType.ArbitraryFeedForward, m_extensionTotalFF);
-
-      DataLogManager.log(String.format("%s: moving: %.1f -> %.1f inches | counts %.1f -> %.1f", getSubsystem( ),
-          m_extensionCurInches, m_extensionTargetInches, m_extensionCurInches, m_extensionTargetInches));
-    }
-    else
-    {
-      DataLogManager.log(getSubsystem( ) + ": not calibrated");
-      if (m_extensionValid)
-        m_extension.set(ControlMode.PercentOutput, 0.0);
-    }
-  }
-
-  public void moveExtensionLengthExecute( )
-  {
-    if (m_extensionValid && EXConsts.kExtensionCalibrated)
-      m_extension.set(ControlMode.MotionMagic, extensionInchesToCounts(m_extensionTargetInches), DemandType.ArbitraryFeedForward,
-          m_extensionTotalFF);
-  }
-
-  public boolean moveExtensionLengthIsFinished( )
-  {
-    double errorInInches = 0.0;
-
-    errorInInches = m_extensionTargetInches - m_extensionCurInches;
-
-    if (Math.abs(errorInInches) < m_toleranceInches)
-    {
-      if (++m_withinTolerance >= 5)
-      {
-        m_moveIsFinished = true;
-        DataLogManager.log(String.format("%s: move finished - Time: %.3f  |  Cur inches: %.1f", getSubsystem( ),
-            m_safetyTimer.get( ), m_extensionCurInches));
-      }
-    }
-    else
-    {
-      m_withinTolerance = 0;
-    }
-
-    if (m_safetyTimer.hasElapsed(EXConsts.kMMSafetyTimeout))
-    {
-      m_moveIsFinished = true;
-      DataLogManager.log(getSubsystem( ) + ": Move Safety timer has timed out! " + m_safetyTimer.get( ));
-    }
-
-    if (m_moveIsFinished)
-    {
-      m_withinTolerance = 0;
-      m_safetyTimer.stop( );
-    }
-
-    return (m_extensionLength == ExtensionLength.EXTENSION_NOCHANGE) ? false : m_moveIsFinished;
-  }
-
-  public void moveExtensionLengthEnd( )
-  {
-    m_moveIsFinished = false;
-    m_withinTolerance = 0;
-    m_safetyTimer.stop( );
+    return EXConsts.kArbitraryFF * Math.cos(Math.toRadians(elbowDegrees));
   }
 
 }

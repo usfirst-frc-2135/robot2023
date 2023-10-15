@@ -23,12 +23,13 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.AutoConstants.AutoChooser;
-import frc.robot.Constants.ELConsts.ElbowAngle;
-import frc.robot.Constants.EXConsts.ExtensionLength;
+import frc.robot.Constants.ELConsts;
+import frc.robot.Constants.EXConsts;
 import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.LEDConsts.LEDColor;
 import frc.robot.Constants.VIConsts.VIGoalDirection;
-import frc.robot.Constants.WRConsts.WristAngle;
+import frc.robot.Constants.WRConsts;
+import frc.robot.commands.ArmManualMode;
 import frc.robot.commands.ArmSetHeightIdle;
 import frc.robot.commands.ArmSetHeightScoreHigh;
 import frc.robot.commands.ArmSetHeightScoreLow;
@@ -44,21 +45,21 @@ import frc.robot.commands.AutoPreloadAndLeaveCommunityShort;
 import frc.robot.commands.AutoPreloadAndStop;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.DriveLimelightPath;
+import frc.robot.commands.DriveResetGyro;
+import frc.robot.commands.DriveResetOdometry;
 import frc.robot.commands.DriveSnap;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
-import frc.robot.commands.ElbowMoveToAngle;
+import frc.robot.commands.ElbowMoveToPosition;
+import frc.robot.commands.ElbowSetAngleZero;
 import frc.robot.commands.ExtensionCalibrate;
-import frc.robot.commands.ExtensionMoveToLength;
+import frc.robot.commands.ExtensionMoveToPosition;
 import frc.robot.commands.GripperRun;
 import frc.robot.commands.LEDSet;
-import frc.robot.commands.ManualMode;
-import frc.robot.commands.ResetGyro;
-import frc.robot.commands.ResetOdometryToLimelight;
-import frc.robot.commands.SetELAngleZero;
-import frc.robot.commands.SetWRAngleZero;
-import frc.robot.commands.WristMoveToAngle;
+import frc.robot.commands.WristMoveToPosition;
+import frc.robot.commands.WristRunBrake;
 import frc.robot.commands.WristRunConstant;
+import frc.robot.commands.WristSetAngleZero;
 import frc.robot.subsystems.Elbow;
 import frc.robot.subsystems.Extension;
 import frc.robot.subsystems.Gripper;
@@ -96,8 +97,10 @@ public class RobotContainer
 
   // A chooser for autonomous commands
   private SendableChooser<AutoChooser> m_autoChooser        = new SendableChooser<>( );
-  private Command                      autoCommand;
-  PathPlannerTrajectory                autoTrajectory;
+  private Command                      m_autoCommand;
+  PathPlannerTrajectory                m_autoTrajectory;
+
+  private SendableChooser<Integer>     m_odomChooser        = new SendableChooser<>( );
 
   // Command Scheduler
   public Command                       m_extensionCalibrate = new ExtensionCalibrate(m_extension);
@@ -114,6 +117,8 @@ public class RobotContainer
     initDefaultCommands( );
 
     initAutonomousChooser( );
+
+    initOdometryChooser( );
   }
 
   public static RobotContainer getInstance( )
@@ -140,30 +145,33 @@ public class RobotContainer
     SmartDashboard.putData("AutoDriveBalance", new AutoDriveBalance(m_swerve));
 
     // Elbow subsytem tests
-    SmartDashboard.putData("ElbowStow", new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_STOW));
-    SmartDashboard.putData("ElbowIdle", new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_IDLE));
-    SmartDashboard.putData("ElbowLow", new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_LOW));
-    SmartDashboard.putData("ElbowMid", new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_MID));
-    SmartDashboard.putData("ElbowHigh", new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_HIGH));
-    SmartDashboard.putData("ElbowShelf", new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_SHELF));
-    SmartDashboard.putData("ElbowSetAngleToZero", new SetELAngleZero(m_elbow));
+    SmartDashboard.putData("ElbowStow", new ElbowMoveToPosition(m_elbow, ELConsts.kAngleStow));
+    SmartDashboard.putData("ElbowIdle", new ElbowMoveToPosition(m_elbow, ELConsts.kAngleIdle));
+    SmartDashboard.putData("ElbowLow", new ElbowMoveToPosition(m_elbow, ELConsts.kAngleScoreLow));
+    SmartDashboard.putData("ElbowMid", new ElbowMoveToPosition(m_elbow, ELConsts.kAngleScoreMid));
+    SmartDashboard.putData("ElbowHigh", new ElbowMoveToPosition(m_elbow, ELConsts.kAngleScoreHigh));
+    SmartDashboard.putData("ElbowShelf", new ElbowMoveToPosition(m_elbow, ELConsts.kAngleSubstation));
+    SmartDashboard.putData("ElbowSetAngleToZero", new ElbowSetAngleZero(m_elbow));
 
     // Extension subsytem tests
-    SmartDashboard.putData("ExtensionStow", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_STOW));
-    SmartDashboard.putData("ExtensionIdle", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_IDLE));
-    SmartDashboard.putData("ExtensionLow", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_LOW));
-    SmartDashboard.putData("ExtensionMid", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_MID));
-    SmartDashboard.putData("ExtensionHigh", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_HIGH));
-    SmartDashboard.putData("ExtensionShelf", new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_SHELF));
+    SmartDashboard.putData("ExtensionStow", new ExtensionMoveToPosition(m_extension, m_elbow, EXConsts.kLengthStow));
+    SmartDashboard.putData("ExtensionIdle", new ExtensionMoveToPosition(m_extension, m_elbow, EXConsts.kLengthIdle));
+    SmartDashboard.putData("ExtensionLow", new ExtensionMoveToPosition(m_extension, m_elbow, EXConsts.kLengthScoreLow));
+    SmartDashboard.putData("ExtensionMid", new ExtensionMoveToPosition(m_extension, m_elbow, EXConsts.kLengthScoreMid));
+    SmartDashboard.putData("ExtensionHigh", new ExtensionMoveToPosition(m_extension, m_elbow, EXConsts.kLengthScoreHigh));
+    SmartDashboard.putData("ExtensionShelf", new ExtensionMoveToPosition(m_extension, m_elbow, EXConsts.kLengthSubstation));
+    SmartDashboard.putData("ExtensionCalibrate", new ExtensionCalibrate(m_extension));
 
     // Wrist subsytem tests
-    SmartDashboard.putData("WristStow", new WristMoveToAngle(m_wrist, WristAngle.WRIST_STOW));
-    SmartDashboard.putData("WristIdle", new WristMoveToAngle(m_wrist, WristAngle.WRIST_IDLE));
-    SmartDashboard.putData("WristLow", new WristMoveToAngle(m_wrist, WristAngle.WRIST_LOW));
-    SmartDashboard.putData("WristMid", new WristMoveToAngle(m_wrist, WristAngle.WRIST_MID));
-    SmartDashboard.putData("WristHigh", new WristMoveToAngle(m_wrist, WristAngle.WRIST_HIGH));
-    SmartDashboard.putData("WristShelf", new WristMoveToAngle(m_wrist, WristAngle.WRIST_SHELF));
-    SmartDashboard.putData("WristSetAngleToZero", new SetWRAngleZero(m_wrist));
+    SmartDashboard.putData("WristStow", new WristMoveToPosition(m_wrist, WRConsts.kAngleStow));
+    SmartDashboard.putData("WristIdle", new WristMoveToPosition(m_wrist, WRConsts.kAngleIdle));
+    SmartDashboard.putData("WristLow", new WristMoveToPosition(m_wrist, WRConsts.kAngleScoreLow));
+    SmartDashboard.putData("WristMid", new WristMoveToPosition(m_wrist, WRConsts.kAngleScoreMid));
+    SmartDashboard.putData("WristHigh", new WristMoveToPosition(m_wrist, WRConsts.kAngleScoreHigh));
+    SmartDashboard.putData("WristShelf", new WristMoveToPosition(m_wrist, WRConsts.kAngleSubstation));
+    SmartDashboard.putData("WristSetAngleToZero", new WristSetAngleZero(m_wrist));
+    SmartDashboard.putData("WristRunConstant", new WristRunConstant(m_wrist, true));
+    SmartDashboard.putData("WristRunBrake", new WristRunBrake(m_wrist, true));
 
     // Gripper subsystem test
     SmartDashboard.putData("GripperStop", new GripperRun(m_gripper, GRMode.GR_STOP));
@@ -179,18 +187,10 @@ public class RobotContainer
     SmartDashboard.putData("ArmSetHeightScoreHigh", new ArmSetHeightScoreHigh(m_elbow, m_extension, m_wrist));
 
     // On-the-fly path generation helper tests
-    SmartDashboard.putData("ResetOdometryToLimelight", new ResetOdometryToLimelight(m_swerve, m_vision, 0));
-    // SmartDashboard.putData("ResetOdo1", new ResetOdometryToLimelight(m_swerve, m_vision, 1));
-    // SmartDashboard.putData("ResetOdo2", new ResetOdometryToLimelight(m_swerve, m_vision, 2));
-    // SmartDashboard.putData("ResetOdo3", new ResetOdometryToLimelight(m_swerve, m_vision, 3));
-    // SmartDashboard.putData("ResetOdo4", new ResetOdometryToLimelight(m_swerve, m_vision, 4));
-    // SmartDashboard.putData("ResetOdo5", new ResetOdometryToLimelight(m_swerve, m_vision, 5));
-    // SmartDashboard.putData("ResetOdo6", new ResetOdometryToLimelight(m_swerve, m_vision, 6));
-    // SmartDashboard.putData("ResetOdo7", new ResetOdometryToLimelight(m_swerve, m_vision, 7));
-    // SmartDashboard.putData("ResetOdo8", new ResetOdometryToLimelight(m_swerve, m_vision, 8));
-    // SmartDashboard.putData("DriveLLLeft", new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_LEFT));
-    // SmartDashboard.putData("DriveLLMiddle", new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_MIDDLE));
-    // SmartDashboard.putData("DriveLLRight", new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_RIGHT));
+    SmartDashboard.putData("DriveResetOdometry", new DriveResetOdometry(m_swerve, m_vision));
+    SmartDashboard.putData("DriveLLLeft", new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_LEFT));
+    SmartDashboard.putData("DriveLLMiddle", new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_MIDDLE));
+    SmartDashboard.putData("DriveLLRight", new DriveLimelightPath(m_swerve, m_vision, VIGoalDirection.DIRECTION_RIGHT));
 
     // LED (CANdle) test
     SmartDashboard.putData("LEDSet", new LEDSet(m_led, LEDColor.LEDCOLOR_DASH));
@@ -245,8 +245,8 @@ public class RobotContainer
     driverLeftBumper.onTrue(new Dummy("left bumper"));
     driverRightBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
     driverRightBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
-    driverBack.onTrue(new ResetGyro(m_swerve, driverStart, driverBack)); // aka View
-    driverStart.onTrue(new ResetGyro(m_swerve, driverStart, driverBack)); // aka Menu
+    driverBack.onTrue(new DriveResetGyro(m_swerve, driverStart, driverBack)); // aka View
+    driverStart.onTrue(new DriveResetGyro(m_swerve, driverStart, driverBack)); // aka Menu
     //
     // Driver - POV buttons
     driverUp.onTrue(new DriveSnap(m_swerve, 0));
@@ -293,9 +293,10 @@ public class RobotContainer
     //
     // Operator - Bumpers, start, back
     operLeftBumper.whileTrue(new WristRunConstant(m_wrist, true));
+    operLeftBumper.onFalse(new WristRunBrake(m_wrist, true));
     operRightBumper.onTrue(new GripperRun(m_gripper, GRMode.GR_ACQUIRE));
     operRightBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
-    operBack.toggleOnTrue(new ManualMode(m_elbow, m_extension, m_wrist, m_operatorPad)); // aka View
+    operBack.toggleOnTrue(new ArmManualMode(m_elbow, m_extension, m_wrist, m_operatorPad)); // aka View
 
     operStart.onTrue(new Dummy("Start")); // aka Menu
     //
@@ -307,6 +308,7 @@ public class RobotContainer
     //
     // Operator Left/Right Trigger
     operLeftTrigger.whileTrue(new WristRunConstant(m_wrist, false));
+    operLeftTrigger.onFalse(new WristRunBrake(m_wrist, false));
     operRightTrigger.onTrue(new GripperRun(m_gripper, GRMode.GR_EXPEL));
     operRightTrigger.onFalse(new GripperRun(m_gripper, GRMode.GR_STOP));
   }
@@ -319,10 +321,12 @@ public class RobotContainer
   {
     m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_elbow, m_driverPad));
 
-    m_elbow.setDefaultCommand(new ElbowMoveToAngle(m_elbow, ElbowAngle.ELBOW_NOCHANGE));
-    m_extension.setDefaultCommand(new ExtensionMoveToLength(m_extension, ExtensionLength.EXTENSION_NOCHANGE));
-    m_wrist.setDefaultCommand(new WristMoveToAngle(m_wrist, WristAngle.WRIST_NOCHANGE));
+    // Default command - Motion Magic hold
+    m_elbow.setDefaultCommand(new ElbowMoveToPosition(m_elbow));
+    m_extension.setDefaultCommand(new ExtensionMoveToPosition(m_extension, m_elbow));
+    m_wrist.setDefaultCommand(new WristMoveToPosition(m_wrist));
 
+    // Default command - manual mode
     // m_elbow.setDefaultCommand(new ElbowRun(m_elbow, m_operatorPad));
     // m_extension.setDefaultCommand(new ExtensionRun(m_extension, m_operatorPad));
     // m_wrist.setDefaultCommand(new WristRun(m_wrist, m_operatorPad));
@@ -336,30 +340,18 @@ public class RobotContainer
   {
     // Autonomous Chooser
     m_autoChooser.setDefaultOption("0 - AutoStop", AutoChooser.AUTOSTOP);
-
     m_autoChooser.addOption("1 - AutoDriveOffCommunityShort", AutoChooser.AUTOCOMSHORT);
     m_autoChooser.addOption("2 - AutoDriveOffCommunityLong", AutoChooser.AUTOCOMLONG);
     m_autoChooser.addOption("3 - AutoEngageChargeStation", AutoChooser.AUTOCHARGE);
-
     m_autoChooser.addOption("4 - AutoPreloadAndStop", AutoChooser.AUTOPRESTOP);
     m_autoChooser.addOption("5 - AutoPreloadAndLeaveCommunityShort", AutoChooser.AUTOPRECOMSHORT);
     m_autoChooser.addOption("6 - AutoPreloadAndLeaveCommunityLong", AutoChooser.AUTOPRECOMLONG);
     m_autoChooser.addOption("7 - AutoPreloadAndEngageChargeStation", AutoChooser.AUTOPRECHARGE);
 
-    //m_chooser.addOption("7 - AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve));
+    //m_chooser.addOption("8 - AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve));
 
     // Configure autonomous sendable chooser
     SmartDashboard.putData("Auto Mode", m_autoChooser);
-  }
-
-  public XboxController getDriver( )
-  {
-    return m_driverPad;
-  }
-
-  public XboxController getOperator( )
-  {
-    return m_operatorPad;
   }
 
   /**
@@ -371,6 +363,8 @@ public class RobotContainer
   {
     String pathName = null;
     AutoChooser mode = m_autoChooser.getSelected( );
+    Alliance alliance = DriverStation.getAlliance( );
+
     // The selected command will be run in autonomous
     switch (mode)
     {
@@ -380,63 +374,97 @@ public class RobotContainer
         break;
       case AUTOCOMSHORT :
       case AUTOPRECOMSHORT :
-        pathName =
-            (DriverStation.getAlliance( ) == Alliance.Red) ? "driveOutOfCommunityShortRed" : "driveOutOfCommunityShortBlue";
+        pathName = (alliance == Alliance.Red) ? "driveOutOfCommunityShortRed" : "driveOutOfCommunityShortBlue";
         break;
       case AUTOCOMLONG :
       case AUTOPRECOMLONG :
-        pathName = (DriverStation.getAlliance( ) == Alliance.Red) ? "driveOutOfCommunityLongRed" : "driveOutOfCommunityLongBlue";
+        pathName = (alliance == Alliance.Red) ? "driveOutOfCommunityLongRed" : "driveOutOfCommunityLongBlue";
         break;
       case AUTOCHARGE :
       case AUTOPRECHARGE :
-        pathName = (DriverStation.getAlliance( ) == Alliance.Red) ? "driveOntoChargeStationRed" : "driveOntoChargeStationBlue";
+        pathName = (alliance == Alliance.Red) ? "driveOntoChargeStationRed" : "driveOntoChargeStationBlue";
         break;
     }
 
     if (pathName != null)
-      autoTrajectory = PathPlanner.loadPath(pathName, AutoConstants.defaultPathConfig);
+      m_autoTrajectory = PathPlanner.loadPath(pathName, AutoConstants.defaultPathConfig);
 
     switch (mode)
     {
       default :
       case AUTOSTOP :
-        autoCommand = new AutoStop(m_swerve);
+        m_autoCommand = new AutoStop(m_swerve);
         break;
       case AUTOCOMSHORT :
-        autoCommand = new AutoDrivePath(m_swerve, "driveOutOfCommunityShort", autoTrajectory, true);
+        m_autoCommand = new AutoDrivePath(m_swerve, "driveOutOfCommunityShort", m_autoTrajectory, true);
         break;
       case AUTOCOMLONG :
-        autoCommand = new AutoDrivePath(m_swerve, "driveOutOfCommunityLong", autoTrajectory, true);
+        m_autoCommand = new AutoDrivePath(m_swerve, "driveOutOfCommunityLong", m_autoTrajectory, true);
         break;
       case AUTOCHARGE :
-        autoCommand = new AutoEngageChargeStation(m_swerve, "driveOntoChargeStation", autoTrajectory);
+        m_autoCommand = new AutoEngageChargeStation(m_swerve, "driveOntoChargeStation", m_autoTrajectory);
         break;
       case AUTOPRESTOP :
-        autoCommand = new AutoPreloadAndStop(m_swerve, m_elbow, m_extension, m_wrist, m_gripper);
+        m_autoCommand = new AutoPreloadAndStop(m_swerve, m_elbow, m_extension, m_wrist, m_gripper);
         break;
       case AUTOPRECOMSHORT :
-        autoCommand = new AutoPreloadAndLeaveCommunityShort(m_swerve, m_elbow, m_extension, m_wrist, m_gripper,
-            "AutoPreloadAndLeaveCommunityShort", autoTrajectory);
+        m_autoCommand = new AutoPreloadAndLeaveCommunityShort(m_swerve, m_elbow, m_extension, m_wrist, m_gripper,
+            "AutoPreloadAndLeaveCommunityShort", m_autoTrajectory);
         break;
       case AUTOPRECOMLONG :
-        autoCommand = new AutoPreloadAndLeaveCommunityLong(m_swerve, m_elbow, m_extension, m_wrist, m_gripper,
-            "AutoPreloadAndLeaveCommunityLong", autoTrajectory);
+        m_autoCommand = new AutoPreloadAndLeaveCommunityLong(m_swerve, m_elbow, m_extension, m_wrist, m_gripper,
+            "AutoPreloadAndLeaveCommunityLong", m_autoTrajectory);
         break;
       case AUTOPRECHARGE :
-        autoCommand = new AutoPreloadAndEngageChargeStation(m_swerve, m_elbow, m_extension, m_wrist, m_gripper,
-            "AutoPreloadAndEngageChargeStation", autoTrajectory);
+        m_autoCommand = new AutoPreloadAndEngageChargeStation(m_swerve, m_elbow, m_extension, m_wrist, m_gripper,
+            "AutoPreloadAndEngageChargeStation", m_autoTrajectory);
         break;
     }
 
-    DataLogManager.log("getAutonomousCommand: mode is " + mode + " path is " + pathName);
+    DataLogManager.log(String.format("getAutonomousCommand: mode is %s path is %s", mode, pathName));
 
-    return autoCommand;
+    return m_autoCommand;
   }
 
   public void runAutonomousCommand( )
   {
     Command autoCmd = getAutonomousCommand( );
     autoCmd.schedule( );
+  }
+
+  /****************************************************************************
+   * 
+   * Set up odometry chooser
+   */
+  private void initOdometryChooser( )
+  {
+    // Autonomous Chooser
+    m_odomChooser.setDefaultOption("ID1 - AprilTag", 1);
+    m_odomChooser.addOption("ID2 - AprilTag", 2);
+    m_odomChooser.addOption("ID3 - AprilTag", 3);
+    m_odomChooser.addOption("ID4 - AprilTag", 4);
+    m_odomChooser.addOption("ID5 - AprilTag", 5);
+    m_odomChooser.addOption("ID6 - AprilTag", 6);
+    m_odomChooser.addOption("ID7 - AprilTag", 7);
+    m_odomChooser.addOption("ID8 - AprilTag", 8);
+
+    // Configure odometry sendable chooser
+    SmartDashboard.putData("Reset Odometry Mode", m_odomChooser);
+  }
+
+  public Integer getOdometryOption( )
+  {
+    return m_odomChooser.getSelected( );
+  }
+
+  public XboxController getDriver( )
+  {
+    return m_driverPad;
+  }
+
+  public XboxController getOperator( )
+  {
+    return m_operatorPad;
   }
 
 }

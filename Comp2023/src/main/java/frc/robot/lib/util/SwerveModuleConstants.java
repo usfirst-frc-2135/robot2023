@@ -1,22 +1,25 @@
 package frc.robot.lib.util;
 
-public class SwerveModuleConstants {
-    public final int driveMotorID;
-    public final int angleMotorID;
-    public final int cancoderID;
-    public final double angleOffset;
+public class SwerveModuleConstants
+{
+  public final int    driveMotorID;
+  public final int    steerMotorID;
+  public final int    cancoderID;
+  public final double steerOffset;
 
-    /**
-     * Swerve Module Constants to be used when creating swerve modules.
-     * @param driveMotorID
-     * @param angleMotorID
-     * @param canCoderID
-     * @param angleOffset
-     */
-    public SwerveModuleConstants(int driveMotorID, int angleMotorID, int canCoderID, double angleOffset) {
-        this.driveMotorID = driveMotorID;
-        this.angleMotorID = angleMotorID;
-        this.cancoderID = canCoderID;
-        this.angleOffset = angleOffset;
-    }
+  /**
+   * Swerve Module Constants to be used when creating swerve modules.
+   * 
+   * @param driveMotorID
+   * @param steerMotorID
+   * @param canCoderID
+   * @param steerOffset
+   */
+  public SwerveModuleConstants(int driveMotorID, int steerMotorID, int canCoderID, double steerOffset)
+  {
+    this.driveMotorID = driveMotorID;
+    this.steerMotorID = steerMotorID;
+    this.cancoderID = canCoderID;
+    this.steerOffset = steerOffset;
+  }
 }

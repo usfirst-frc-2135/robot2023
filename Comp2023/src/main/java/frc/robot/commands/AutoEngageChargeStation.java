@@ -26,7 +26,7 @@ public class AutoEngageChargeStation extends SequentialCommandGroup
         new AutoDrivePath (swerve, pathName, trajectory, true),
 
         new PrintCommand(getName() + ": Balance on ChargeStation"),
-        new AutoDriveBalance(swerve).withTimeout(6.0)
+        new AutoDriveBalance(swerve).withTimeout(9.0)
         // @formatter:on
     );
   }

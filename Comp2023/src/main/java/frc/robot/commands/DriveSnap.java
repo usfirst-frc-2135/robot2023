@@ -56,7 +56,7 @@ public class DriveSnap extends CommandBase
   {
     boolean timedOut = m_safetyTimer.hasElapsed(SnapConstants.kTimeout);
     if (timedOut)
-      DataLogManager.log(getName( ) + ": has timed out! " + m_safetyTimer.get( ));
+      DataLogManager.log(String.format("%s: has timed out! %.1f", getName( ), m_safetyTimer.get( )));
     return m_swerve.driveIsSnapFinished(timedOut);
   }
 

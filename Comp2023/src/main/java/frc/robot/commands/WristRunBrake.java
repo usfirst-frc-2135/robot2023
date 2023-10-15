@@ -1,36 +1,42 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.Wrist;
 
 /**
  *
  */
-public class WristRunConstant extends CommandBase
+public class WristRunBrake extends CommandBase
 {
 
   private final Wrist   m_wrist;
-  private final boolean m_moveUp;
+  private final Boolean m_brake;
+  private int           m_loopCounter;
 
-  public WristRunConstant(Wrist wrist, boolean moveUp)
+  public WristRunBrake(Wrist wrist, boolean brake)
   {
     m_wrist = wrist;
-    m_moveUp = moveUp;
+    m_brake = brake;
 
-    setName("WristRunConstant");
+    setName("WristRunBrake");
     addRequirements(m_wrist);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize( )
-  {}
+  {
+    m_loopCounter = 0;
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute( )
   {
-    m_wrist.moveConstantSpeed(m_moveUp ? 2.0 : -2.0);
+    m_wrist.setMotorOutput(m_brake ? -0.25 : 0.25);
+    m_loopCounter++;
+    DataLogManager.log(String.format("%s: motor set to down-power: %s", getName( ), m_brake));
   }
 
   // Called once the command ends or is interrupted.
@@ -42,7 +48,7 @@ public class WristRunConstant extends CommandBase
   @Override
   public boolean isFinished( )
   {
-    return false;
+    return (m_loopCounter > 50 ? true : false);
   }
 
   @Override

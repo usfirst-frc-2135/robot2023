@@ -27,3 +27,7 @@ hs_err_pid*
 Comp2023/simgui-ds.json
 
 Comp2023/simgui.json
+
+*.dat
+
+.DS_Store

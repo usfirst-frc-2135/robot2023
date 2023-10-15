@@ -31,7 +31,7 @@ public class ElbowRun extends CommandBase
   @Override
   public void execute( )
   {
-    m_elbow.moveElbowWithJoystick(m_gamePad);
+    m_elbow.moveWithJoystick(m_gamePad);
   }
 
   // Called once the command ends or is interrupted.
