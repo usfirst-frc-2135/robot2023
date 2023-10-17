@@ -41,7 +41,7 @@ public class DriveResetOdometry extends CommandBase
     if (llPose != null)
     {
       //m_swerve.resetOdometry(new Pose2d(new Translation2d(llPose.getX( ) + 2, llPose.getY( )), llPose.getRotation( ))); // TODO: ?
-      m_swerve.resetLimelightOdometry(llPose);
+      m_swerve.resetOdometry(llPose);
     }
     else
     {
@@ -55,7 +55,7 @@ public class DriveResetOdometry extends CommandBase
 
         DataLogManager.log(String.format("%s: Set Rotation: %.1f", getName( ), rotation));
 
-        m_swerve.zeroGyro(Units.radiansToDegrees(rotation));
+        m_swerve.resetGyro(Units.radiansToDegrees(rotation));
         m_swerve.resetOdometry(robotPose);
       }
     }
