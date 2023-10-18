@@ -40,7 +40,6 @@ public class DriveResetOdometry extends CommandBase
     Pose2d llPose = m_vision.getLimelightRawPose( );
     if (llPose != null)
     {
-      //m_swerve.resetOdometry(new Pose2d(new Translation2d(llPose.getX( ) + 2, llPose.getY( )), llPose.getRotation( ))); // TODO: ?
       m_swerve.resetOdometry(llPose);
     }
     else

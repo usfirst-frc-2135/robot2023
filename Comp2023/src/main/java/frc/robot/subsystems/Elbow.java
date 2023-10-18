@@ -338,7 +338,6 @@ public class Elbow extends SubsystemBase
   public void moveToPositionEnd( )
   {
     m_safetyTimer.stop( );
-    // m_motor.setControl(m_requestVolts.withOutput(0.0)); // TODO: Is this needed? It fixed a bug in Motion Magic in v5 that should be fixed in v6
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////

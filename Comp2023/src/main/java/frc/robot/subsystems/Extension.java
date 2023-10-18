@@ -262,7 +262,7 @@ public class Extension extends SubsystemBase
 
     m_targetInches = m_currentInches;
 
-    m_motor.setControl(m_requestVolts.withOutput(axisValue * EXConsts.kManualSpeedVolts)); // TODO: Check FF and volts
+    m_motor.setControl(m_requestVolts.withOutput(axisValue * EXConsts.kManualSpeedVolts));
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
@@ -328,7 +328,6 @@ public class Extension extends SubsystemBase
   public void moveToPositionEnd( )
   {
     m_safetyTimer.stop( );
-    // m_motor.setControl(m_requestVolts.withOutput(0.0)); // TODO: Is this needed? It fixed a bug in Motion Magic in v5 that should be fixed in v6
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
