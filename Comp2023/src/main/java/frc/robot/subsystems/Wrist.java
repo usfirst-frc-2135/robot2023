@@ -67,6 +67,7 @@ public class Wrist extends SubsystemBase
   private boolean                   m_motorValid;      // Health indicator for Falcon 
   private boolean                   m_ccValid;         // Health indicator for CANCoder 
   private boolean                   m_calibrated      = true;
+  private boolean                   m_debug           = true;
 
   private WristMode                 m_mode            = WristMode.WRIST_INIT;     // Manual movement mode with joysticks
 
@@ -81,6 +82,7 @@ public class Wrist extends SubsystemBase
 
   private Timer                     m_safetyTimer     = new Timer( ); // Safety timer for movements
   private StatusSignal<Double>      m_motorVelocity   = m_motor.getRotorVelocity( );
+  private StatusSignal<Double>      m_closedLoopError = m_motor.getClosedLoopError( );
 
   // Constructor
   public Wrist( )
@@ -100,6 +102,7 @@ public class Wrist extends SubsystemBase
     m_CANCoderSim.Orientation = ChassisReference.Clockwise_Positive;
 
     m_motorVelocity.setUpdateFrequency(50);
+    m_closedLoopError.setUpdateFrequency(50);
 
     initSmartDashboard( );
     initialize( );
@@ -111,16 +114,17 @@ public class Wrist extends SubsystemBase
     // This method will be called once per scheduler run
 
     m_currentDegrees = getTalonFXDegrees( );
+    m_totalArbFeedForward = calculateTotalArbFF( );
     SmartDashboard.putNumber("WR_curDegrees", m_currentDegrees);
     SmartDashboard.putNumber("WR_targetDegrees", m_targetDegrees);
     SmartDashboard.putNumber("WR_CCDegrees", getCANCoderDegrees( ));
-    SmartDashboard.putNumber("WR_curError", m_motor.getClosedLoopError( ).refresh( ).getValue( ));
-    SmartDashboard.putNumber("WR_rotorVelocity", m_motorVelocity.refresh( ).getValue( ));
-
-    m_totalArbFeedForward = calculateTotalArbFF( );
     SmartDashboard.putNumber("WR_totalFF", m_totalArbFeedForward);
-
-    SmartDashboard.putNumber("WR_currentDraw", m_motor.getStatorCurrent( ).refresh( ).getValue( ));
+    if (m_debug)
+    {
+      SmartDashboard.putNumber("WR_rotorVelocity", m_motorVelocity.refresh( ).getValue( ));
+      SmartDashboard.putNumber("WR_curError", m_motor.getClosedLoopError( ).refresh( ).getValue( ));
+      SmartDashboard.putNumber("WR_currentDraw", m_motor.getStatorCurrent( ).refresh( ).getValue( ));
+    }
   }
 
   @Override

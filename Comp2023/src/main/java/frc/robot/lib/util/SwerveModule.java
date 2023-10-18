@@ -31,6 +31,8 @@ public class SwerveModule
   private DutyCycleOut           m_dutyCycleRequest       = new DutyCycleOut(0.0);
   private VelocityVoltage        m_velocityVoltageRequest = new VelocityVoltage(0.0);
   private PositionVoltage        m_positionVoltageRequest = new PositionVoltage(0.0);
+  private StatusSignal<Double>   m_driveClosedLoopError;
+  private StatusSignal<Double>   m_steerClosedLoopError;
 
   public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants)
   {
@@ -51,6 +53,11 @@ public class SwerveModule
     /* Drive Motor Config */
     m_driveMotor = new TalonFX(moduleConstants.driveMotorID, Constants.Ports.kCANCarnivore);
     PhoenixUtil6.getInstance( ).talonFXInitialize6(m_driveMotor, driveName.toString( ), CTREConfigs6.swerveDriveFXConfig( ));
+
+    m_driveClosedLoopError = m_driveMotor.getClosedLoopError( );
+    m_steerClosedLoopError = m_steerMotor.getClosedLoopError( );
+    m_driveClosedLoopError.setUpdateFrequency(50);
+    m_steerClosedLoopError.setUpdateFrequency(50);
 
     m_lastAngle = getState( ).angle.getDegrees( );
   }

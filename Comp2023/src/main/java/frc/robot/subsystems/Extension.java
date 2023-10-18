@@ -64,6 +64,7 @@ public class Extension extends SubsystemBase
   // Declare module variables
   private boolean                   m_motorValid;      // Health indicator for Falcon 
   private boolean                   m_calibrated      = true;
+  private boolean                   m_debug           = false;
 
   private ExtensionMode             m_mode            = ExtensionMode.EXTENSION_INIT;     // Manual movement mode with joysticks
 
@@ -78,6 +79,7 @@ public class Extension extends SubsystemBase
 
   private Timer                     m_safetyTimer     = new Timer( ); // Safety timer for movements
   private StatusSignal<Double>      m_motorVelocity   = m_motor.getRotorVelocity( );
+  private StatusSignal<Double>      m_closedLoopError = m_motor.getClosedLoopError( );
 
   // Constructor
   public Extension( )
@@ -95,6 +97,7 @@ public class Extension extends SubsystemBase
     m_motorSim.Orientation = ChassisReference.CounterClockwise_Positive;
 
     m_motorVelocity.setUpdateFrequency(50);
+    m_closedLoopError.setUpdateFrequency(50);
 
     initSmartDashboard( );
     initialize( );
@@ -109,16 +112,18 @@ public class Extension extends SubsystemBase
     if (m_currentInches < 0)
       setExtensionToZero( );
 
-    SmartDashboard.putNumber("EX_curInches", m_currentInches);
-    SmartDashboard.putNumber("EX_curRotations", Conversions.inchesToWinchRotations(m_currentInches, EXConsts.kRolloutRatio));
-    SmartDashboard.putNumber("EX_targetInches", m_targetInches);
-    SmartDashboard.putNumber("EX_curError", m_motor.getClosedLoopError( ).refresh( ).getValue( ));
-    SmartDashboard.putNumber("EX_rotorVelocity", m_motorVelocity.refresh( ).getValue( ));
-
     m_totalArbFeedForward = calculateTotalArbFF( );
-    SmartDashboard.putNumber("EX_totalFF", m_totalArbFeedForward);
 
-    SmartDashboard.putNumber("EX_currentDraw", m_motor.getStatorCurrent( ).refresh( ).getValue( ));
+    SmartDashboard.putNumber("EX_curInches", m_currentInches);
+    SmartDashboard.putNumber("EX_targetInches", m_targetInches);
+    SmartDashboard.putNumber("EX_curRotations", Conversions.inchesToWinchRotations(m_currentInches, EXConsts.kRolloutRatio));
+    SmartDashboard.putNumber("EX_totalFF", m_totalArbFeedForward);
+    if (m_debug)
+    {
+      SmartDashboard.putNumber("EX_rotorVelocity", m_motorVelocity.refresh( ).getValue( ));
+      SmartDashboard.putNumber("EX_curError", m_motor.getClosedLoopError( ).refresh( ).getValue( ));
+      SmartDashboard.putNumber("EX_currentDraw", m_motor.getStatorCurrent( ).refresh( ).getValue( ));
+    }
   }
 
   @Override

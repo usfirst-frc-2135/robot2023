@@ -68,6 +68,7 @@ public class Elbow extends SubsystemBase
   private boolean                   m_motorValid;      // Health indicator for Falcon 
   private boolean                   m_ccValid;         // Health indicator for CANCoder 
   private boolean                   m_calibrated      = true;
+  private boolean                   m_debug           = true;
 
   private ElbowMode                 m_mode            = ElbowMode.ELBOW_INIT;     // Manual movement mode with joysticks
 
@@ -82,6 +83,7 @@ public class Elbow extends SubsystemBase
 
   private Timer                     m_safetyTimer     = new Timer( ); // Safety timer for movements
   private StatusSignal<Double>      m_motorVelocity   = m_motor.getRotorVelocity( );
+  private StatusSignal<Double>      m_closedLoopError = m_motor.getClosedLoopError( );
 
   // Constructor
   public Elbow( )
@@ -101,6 +103,7 @@ public class Elbow extends SubsystemBase
     m_CANCoderSim.Orientation = ChassisReference.Clockwise_Positive;
 
     m_motorVelocity.setUpdateFrequency(50);
+    m_closedLoopError.setUpdateFrequency(50);
 
     initSmartDashboard( );
     initialize( );
@@ -112,16 +115,18 @@ public class Elbow extends SubsystemBase
     // This method will be called once per scheduler run
 
     m_currentDegrees = getTalonFXDegrees( );
+    m_totalArbFeedForward = calculateTotalArbFF( );
+
     SmartDashboard.putNumber("EL_curDegrees", m_currentDegrees);
     SmartDashboard.putNumber("EL_targetDegrees", m_targetDegrees);
     SmartDashboard.putNumber("EL_CCDegrees", getCANCoderDegrees( ));
-    SmartDashboard.putNumber("EL_curError", m_motor.getClosedLoopError( ).refresh( ).getValue( ));
-    SmartDashboard.putNumber("EL_rotorVelocity", m_motorVelocity.refresh( ).getValue( ));
-
-    m_totalArbFeedForward = calculateTotalArbFF( );
     SmartDashboard.putNumber("EL_totalFF", m_totalArbFeedForward);
-
-    SmartDashboard.putNumber("EL_currentDraw", m_motor.getStatorCurrent( ).refresh( ).getValue( ));
+    if (m_debug)
+    {
+      SmartDashboard.putNumber("EL_rotorVelocity", m_motorVelocity.refresh( ).getValue( ));
+      SmartDashboard.putNumber("EL_curError", m_motor.getClosedLoopError( ).refresh( ).getValue( ));
+      SmartDashboard.putNumber("EL_currentDraw", m_motor.getStatorCurrent( ).refresh( ).getValue( ));
+    }
   }
 
   @Override
