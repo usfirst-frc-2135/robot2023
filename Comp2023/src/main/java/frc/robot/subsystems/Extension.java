@@ -91,7 +91,7 @@ public class Extension extends SubsystemBase
 
     if (Robot.isReal( ))
       m_currentInches = getCurrentInches( );
-    m_motor.setRotorPosition(Conversions.inchesToWinchRotations(m_currentInches, EXConsts.kRolloutRatio));
+    m_motor.setPosition(Conversions.inchesToWinchRotations(m_currentInches, EXConsts.kRolloutRatio));
     DataLogManager.log(String.format("%s: CANCoder initial inches %.1f", getSubsystem( ), m_currentInches));
 
     m_motorSim.Orientation = ChassisReference.CounterClockwise_Positive;
@@ -208,7 +208,7 @@ public class Extension extends SubsystemBase
   public void resetPositionToZero( )
   {
     if (m_motorValid)
-      m_motor.setRotorPosition(Conversions.inchesToWinchRotations(0, EXConsts.kRolloutRatio));
+      m_motor.setPosition(Conversions.inchesToWinchRotations(0, EXConsts.kRolloutRatio));
   }
 
   public void setStopped( )
