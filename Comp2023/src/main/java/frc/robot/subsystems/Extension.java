@@ -155,6 +155,7 @@ public class Extension extends SubsystemBase
     // Initialize dashboard widgets
     SmartDashboard.putBoolean("HL_validEX", m_motorValid);
     SmartDashboard.putData("ExtensionMech", m_mech);
+    SmartDashboard.putNumber("EX_ArbFF", 0.0);
   }
 
   public void initialize( )
@@ -262,7 +263,8 @@ public class Extension extends SubsystemBase
 
     m_targetInches = m_currentInches;
 
-    m_motor.setControl(m_requestVolts.withOutput(axisValue * EXConsts.kManualSpeedVolts));
+    m_motor.setControl(
+        m_requestVolts.withOutput(axisValue * EXConsts.kManualSpeedVolts + SmartDashboard.getNumber("EX_ArbFF", 0.0)));
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////

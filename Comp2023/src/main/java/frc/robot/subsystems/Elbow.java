@@ -161,6 +161,7 @@ public class Elbow extends SubsystemBase
     SmartDashboard.putBoolean("HL_validEL", m_motorValid);
     SmartDashboard.putBoolean("HL_validELCC", m_ccValid);
     SmartDashboard.putData("ElbowMech", m_mech);
+    SmartDashboard.putNumber("EL_ArbFF", 0.0);
   }
 
   public void initialize( )
@@ -271,7 +272,8 @@ public class Elbow extends SubsystemBase
 
     m_targetDegrees = m_currentDegrees;
 
-    m_motor.setControl(m_requestVolts.withOutput(axisValue * ELConsts.kManualSpeedVolts));
+    m_motor.setControl(
+        m_requestVolts.withOutput(axisValue * ELConsts.kManualSpeedVolts + SmartDashboard.getNumber("EL_ArbFF", 0.0)));
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////

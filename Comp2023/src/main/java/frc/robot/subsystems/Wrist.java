@@ -159,6 +159,7 @@ public class Wrist extends SubsystemBase
     SmartDashboard.putBoolean("HL_validWR", m_motorValid);
     SmartDashboard.putBoolean("HL_validWRCC", m_ccValid);
     SmartDashboard.putData("WristMech", m_mech);
+    SmartDashboard.putNumber("WR_ArbFF", 0.0);
   }
 
   public void initialize( )
@@ -269,7 +270,8 @@ public class Wrist extends SubsystemBase
 
     m_targetDegrees = m_currentDegrees;
 
-    m_motor.setControl(m_requestVolts.withOutput(axisValue * WRConsts.kManualSpeedVolts));
+    m_motor.setControl(
+        m_requestVolts.withOutput(axisValue * WRConsts.kManualSpeedVolts + SmartDashboard.getNumber("WR_ArbFF", 0.0)));
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
