@@ -51,12 +51,15 @@ import frc.robot.commands.DriveSnap;
 import frc.robot.commands.DriveTeleop;
 import frc.robot.commands.Dummy;
 import frc.robot.commands.ElbowMoveToPosition;
+import frc.robot.commands.ElbowRun;
 import frc.robot.commands.ElbowSetAngleZero;
 import frc.robot.commands.ExtensionCalibrate;
 import frc.robot.commands.ExtensionMoveToPosition;
+import frc.robot.commands.ExtensionRun;
 import frc.robot.commands.GripperRun;
 import frc.robot.commands.LEDSet;
 import frc.robot.commands.WristMoveToPosition;
+import frc.robot.commands.WristRun;
 import frc.robot.commands.WristRunBrake;
 import frc.robot.commands.WristRunConstant;
 import frc.robot.commands.WristSetAngleZero;
@@ -322,14 +325,14 @@ public class RobotContainer
     m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_elbow, m_driverPad));
 
     // Default command - Motion Magic hold
-    m_elbow.setDefaultCommand(new ElbowMoveToPosition(m_elbow));
-    m_extension.setDefaultCommand(new ExtensionMoveToPosition(m_extension, m_elbow));
-    m_wrist.setDefaultCommand(new WristMoveToPosition(m_wrist));
+    //m_elbow.setDefaultCommand(new ElbowMoveToPosition(m_elbow));
+    //m_extension.setDefaultCommand(new ExtensionMoveToPosition(m_extension, m_elbow));
+    //m_wrist.setDefaultCommand(new WristMoveToPosition(m_wrist));
 
     // Default command - manual mode
-    // m_elbow.setDefaultCommand(new ElbowRun(m_elbow, m_operatorPad));
-    // m_extension.setDefaultCommand(new ExtensionRun(m_extension, m_operatorPad));
-    // m_wrist.setDefaultCommand(new WristRun(m_wrist, m_operatorPad));
+    m_elbow.setDefaultCommand(new ElbowRun(m_elbow, m_operatorPad));
+    m_extension.setDefaultCommand(new ExtensionRun(m_extension, m_operatorPad));
+    m_wrist.setDefaultCommand(new WristRun(m_wrist, m_operatorPad));
   }
 
   /****************************************************************************

@@ -149,14 +149,14 @@ public class Constants
     /* Drive Motor PID Values */
     public static final double                driveFFKS                     = 0.0;
     public static final double                driveFFKV                     = 0.0;
-    public static final double                driveKP                       = 0.120;
+    public static final double                driveKP                       = 0.36;
     public static final double                driveKI                       = 0.0;
     public static final double                driveKD                       = 0.0;
 
     /* Angle Motor PID Values */
     public static final double                steerFFKS                     = 0.0;
     public static final double                steerFFKV                     = 0.0;
-    public static final double                steerKP                       = 1.0; // 7.21;
+    public static final double                steerKP                       = 12.0;
     public static final double                steerKI                       = 0.0;
     public static final double                steerKD                       = 0.0;
 
