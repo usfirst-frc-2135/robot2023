@@ -354,11 +354,4 @@ public class Extension extends SubsystemBase
     resetPositionToZero( );
   }
 
-  private double calculateTotalFF( )
-  {
-    double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
-
-    return EXConsts.kArbitraryFF * Math.cos(Math.toRadians(elbowDegrees));
-  }
-
 }

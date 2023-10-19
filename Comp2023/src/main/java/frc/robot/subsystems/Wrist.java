@@ -174,7 +174,7 @@ public class Wrist extends SubsystemBase
   private double calculateTotalArbFF( )
   {
     double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
-    double wristDegrees = RobotContainer.getInstance( ).m_wrist.getAngle( );
+    double wristDegrees = getAngle( );
 
     return WRConsts.kArbitraryFF * Math.cos(Math.toRadians(elbowDegrees - wristDegrees));
   }

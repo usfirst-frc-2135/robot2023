@@ -178,14 +178,15 @@ public class Swerve extends SubsystemBase
 
     if (m_allowPoseEstimate)
     {
-      Pose2d botLLPose = RobotContainer.getInstance( ).m_vision.getLimelightValidPose(getPose( ));
-      double latency = RobotContainer.getInstance( ).m_vision.getTargetLatency( );
+      Vision vision = RobotContainer.getInstance( ).m_vision;
+      Pose2d botLLPose = vision.getLimelightValidPose(getPose( ));
+      double latency = vision.getTargetLatency( );
 
       //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
       if (botLLPose != null && DriverStation.isTeleopEnabled( ))
         m_poseEstimator.addVisionMeasurement(botLLPose, Timer.getFPGATimestamp( ) - (latency / 1000));
 
-      Pose2d rawPose = RobotContainer.getInstance( ).m_vision.getLimelightRawPose( );
+      Pose2d rawPose = vision.getLimelightRawPose( );
 
       if (rawPose != null)
         resetOdometry(rawPose);
@@ -230,7 +231,7 @@ public class Swerve extends SubsystemBase
   //
   // Limelight driving mode
   //
-  public void driveWithLimelightInit(boolean m_endAtTarget)
+  public void driveWithLimelightInit(Vision vision, boolean m_endAtTarget)
   {
     // get pid values from dashboard
     m_turnConstant = SmartDashboard.getNumber("DLL_turnConstant", m_turnConstant);
@@ -254,18 +255,16 @@ public class Swerve extends SubsystemBase
     m_turnPid = new PIDController(m_turnPidKp, m_turnPidKi, m_turnPidKd);
     m_throttlePid = new PIDController(m_throttlePidKp, m_throttlePidKi, m_throttlePidKd);
 
-    RobotContainer rc = RobotContainer.getInstance( );
-    rc.m_vision.m_tyfilter.reset( );
-    rc.m_vision.m_tvfilter.reset( );
-    rc.m_vision.syncStateFromDashboard( );
+    vision.m_tyfilter.reset( );
+    vision.m_tvfilter.reset( );
+    vision.syncStateFromDashboard( );
   }
 
-  public void driveWithLimelightExecute( )
+  public void driveWithLimelightExecute(Vision vision)
   {
-    RobotContainer rc = RobotContainer.getInstance( );
-    boolean tv = rc.m_vision.getTargetValid( );
-    double tx = rc.m_vision.getHorizOffsetDeg( );
-    double ty = rc.m_vision.getVertOffsetDeg( );
+    boolean tv = vision.getTargetValid( );
+    double tx = vision.getHorizOffsetDeg( );
+    double ty = vision.getVertOffsetDeg( );
 
     if (!tv)
     {
@@ -312,11 +311,10 @@ public class Swerve extends SubsystemBase
               tv, tx, ty, m_limelightDistance, Math.abs(m_setPointDistance - m_limelightDistance), turnOutput, throttleOutput));
   }
 
-  public boolean driveWithLimelightIsFinished( )
+  public boolean driveWithLimelightIsFinished(Vision vision)
   {
-    RobotContainer rc = RobotContainer.getInstance( );
-    boolean tv = rc.m_vision.getTargetValid( );
-    double tx = rc.m_vision.getHorizOffsetDeg( );
+    boolean tv = vision.getTargetValid( );
+    double tx = vision.getHorizOffsetDeg( );
 
     return (tv && ((Math.abs(tx)) <= m_angleThreshold)
         && (Math.abs(m_setPointDistance - m_limelightDistance) <= m_distThreshold));
@@ -327,16 +325,15 @@ public class Swerve extends SubsystemBase
     driveStop(false);
   }
 
-  public boolean isLimelightValid(double horizAngleRange, double distRange)
+  public boolean isLimelightValid(Vision vision, double horizAngleRange, double distRange)
   {
     // check whether target is valid
     // check whether the limelight tx and ty is within a certain tolerance
     // check whether distance is within a certain tolerance
-    RobotContainer rc = RobotContainer.getInstance( );
-    boolean tv = rc.m_vision.getTargetValid( );
-    double tx = rc.m_vision.getHorizOffsetDeg( );
-    double ty = rc.m_vision.getVertOffsetDeg( );
-    m_limelightDistance = rc.m_vision.getDistLimelight( );
+    boolean tv = vision.getTargetValid( );
+    double tx = vision.getHorizOffsetDeg( );
+    double ty = vision.getVertOffsetDeg( );
+    m_limelightDistance = vision.getDistLimelight( );
 
     boolean sanityCheck =
         tv && (Math.abs(tx) <= horizAngleRange) && (Math.abs(m_setPointDistance - m_limelightDistance) <= distRange);
