@@ -28,6 +28,13 @@ public class AutoPreloadHigh extends SequentialCommandGroup
     addCommands(
         // Add Commands here:
 
+        // TODO: try faster sequence:
+        //  1) Gripper acquire (let run)
+        //  2) ArmSetHeightScoreHigh
+        //  3) Score using wrist movement to 90 degrees
+        //  4) Gripper expel + Extension retract
+        //  5) ArmSetHeightIdle
+        //
         // @formatter:off
         new PrintCommand(getName() + ": Making Sure Wrist is Set at Stow"),
         new WristMoveToPosition(wrist, WRConsts.kAngleStow).asProxy(),
