@@ -45,7 +45,7 @@ public class AutoPreloadHigh extends SequentialCommandGroup
         new ExtensionMoveToPosition(extension, elbow, EXConsts.kLengthScoreHigh).asProxy(),
 
         new PrintCommand(getName() + ": Move Wrist for Preload"),   
-        new WristMoveToPosition(wrist, WRConsts.kAngleScore).asProxy(),
+        new WristMoveToPosition(wrist, WRConsts.kAngleScoreAuto).asProxy(),
 
         new PrintCommand(getName() + ": AUTO: Gripper Score"),
         new GripperRun(gripper, GRConsts.GRMode.GR_EXPEL),
