@@ -342,53 +342,44 @@ public class Wrist extends SubsystemBase
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
-  // TODO: These were added during competition to allow cone scoring--needs to be tested/reworked
+  // Manual commands for scoring cones in slam dunk fashion
 
-  public void setMotorOutput(double brake)
+  public void moveConstantSpeed(double speedInvolts)
   {
-    m_motor.setControl(m_requestVolts.withOutput(brake));
-  }
-
-  public void moveConstantSpeed(double speed)
-  {
-    moveInput(speed);
-  }
-
-  public void moveInput(double axisValue)
-  {
-    boolean outOfRange = false;
+    boolean rangeLimited = false;
     WristMode newMode = WristMode.WRIST_STOPPED;
 
-    axisValue = MathUtil.applyDeadband(axisValue, Constants.kStickDeadband);
+    speedInvolts = MathUtil.applyDeadband(speedInvolts, Constants.kStickDeadband);
 
-    if (axisValue < 0.0)
+    if (speedInvolts < 0.0)
     {
       if (m_currentDegrees > WRConsts.kAngleMin)
         newMode = WristMode.WRIST_UP;
       else
-        outOfRange = true;
+        rangeLimited = true;
     }
-    else if (axisValue > 0.0)
+    else if (speedInvolts > 0.0)
     {
       if (m_currentDegrees < WRConsts.kAngleMax)
         newMode = WristMode.WRIST_DOWN;
       else
-        outOfRange = true;
+        rangeLimited = true;
     }
 
-    if (outOfRange)
-      axisValue = 0.0;
+    if (rangeLimited)
+      speedInvolts = 0.0;
 
     if (newMode != m_mode)
     {
       m_mode = newMode;
-      DataLogManager.log(String.format("%s: move %s%s", getSubsystem( ), m_mode, ((outOfRange) ? " - OUT OF RANGE" : "")));
+      DataLogManager.log(String.format("%s: move %s %.1f deg %s", getSubsystem( ), m_mode, getAngle( ),
+          ((rangeLimited) ? " - OUT OF RANGE" : "")));
     }
 
     m_targetDegrees = m_currentDegrees;
 
     if (m_motorValid)
-      m_motor.setControl(m_requestVolts.withOutput(axisValue * WRConsts.kManualSpeedVolts));
+      m_motor.setControl(m_requestVolts.withOutput(speedInvolts));
   }
 
 }

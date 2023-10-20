@@ -297,7 +297,7 @@ public class Constants
       ELBOW_UP       // Elbow moving up
     }
 
-    public static final double kManualSpeedVolts = 3.0;            // Motor voltage during manual operation
+    public static final double kManualSpeedVolts = 3.0;            // Motor voltage during manual operation (joystick)
 
     // Motion Magic config parameters
     public static final double kMMVelocity       = 79.75;          // 10/7/23 Tuned! Elbow motion magic velocity (75% of max motor RPM)
@@ -365,7 +365,7 @@ public class Constants
       EXTENSION_IN       // Extension moving in
     }
 
-    public static final double kManualSpeedVolts     = 3.0;            // Motor voltage during manual operation
+    public static final double kManualSpeedVolts     = 3.0;            // Motor voltage during manual operation (joystick)
 
     // Motion Magic config parameters
     public static final double kMMVelocity           = 79.75;          // 10/7/23 Tuned! Extension motion magic velocity (0.625 of max motor RPM)
@@ -431,7 +431,9 @@ public class Constants
       WRIST_UP       // Wrist moving up
     }
 
-    public static final double kManualSpeedVolts = 3.0;            // Motor voltage during manual operation
+    public static final double kManualSpeedVolts = 3.0;            // Motor voltage during manual operation (joystick)
+    public static final double kScoreSpeedVolts  = 4.5;            // Motor voltage during scoring slam dunk (was 2.0 * manual speed)
+    public static final double kBrakeSpeedVolts  = 0.0;            // Motor voltage braking after slam dunk (was 0.25 percent output)
 
     // Motion Magic config parameters
     public static final double kMMVelocity       = 79.75;          // 10/7/23 Tuned! Wrist motion magic velocity (75% of max motor RPM)
