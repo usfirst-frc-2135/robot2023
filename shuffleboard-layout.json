@@ -482,8 +482,7 @@
               "Y-axis/Automatic bounds": true,
               "Y-axis/Upper bound": 1.0,
               "Y-axis/Lower bound": -1.0,
-              "Y-axis/Unit": "ul",
-              "Visible data/SmartDashboard/EX_curError": true
+              "Y-axis/Unit": "ul"
             }
           },
           "6,0": {
@@ -1226,6 +1225,84 @@
               "Visuals/Robot Icon Size": 50.0,
               "Visuals/Show Outside Circles": false
             }
+          },
+          "0,0": {
+            "size": [
+              6,
+              4
+            ],
+            "content": {
+              "_type": "ComboBox Chooser",
+              "_source0": "network_table:///SmartDashboard/Auto Mode",
+              "_title": "SmartDashboard/Auto Mode",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "6,0": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EL_curDegrees",
+              "_title": "SmartDashboard/EL_curDegrees",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "6,4": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/WR_curDegrees",
+              "_title": "SmartDashboard/WR_curDegrees",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "9,4": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/WR_CCDegrees",
+              "_title": "SmartDashboard/WR_CCDegrees",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "9,0": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EL_CCDegrees",
+              "_title": "SmartDashboard/EL_CCDegrees",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "6,2": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_curInches",
+              "_title": "SmartDashboard/EX_curInches",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
           }
         }
       }
@@ -1516,8 +1593,8 @@
     }
   ],
   "windowGeometry": {
-    "x": 0.0,
-    "y": 25.0,
+    "x": 667.0,
+    "y": 540.0,
     "width": 1061.0,
     "height": 508.0
   }
