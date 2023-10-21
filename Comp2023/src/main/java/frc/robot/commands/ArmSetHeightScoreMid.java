@@ -31,11 +31,11 @@ public class ArmSetHeightScoreMid extends SequentialCommandGroup
 
         new ConditionalCommand(
           new SequentialCommandGroup(
-            new PrintCommand(getName() + ": Move Wrist"), // TODO: This looks backward and seemed wrong during testing
-            new WristMoveToPosition(wrist, WRConsts.kAngleScoreMid).asProxy(),
-
             new PrintCommand(getName() + ": Move Elbow"),
-            new ElbowMoveToPosition(elbow,  ELConsts.kAngleScoreMid).asProxy()
+            new ElbowMoveToPosition(elbow,  ELConsts.kAngleScoreMid).asProxy(),
+
+            new PrintCommand(getName() + ": Move Wrist"),
+            new WristMoveToPosition(wrist, WRConsts.kAngleScoreMid).asProxy()
           ),
 
           new SequentialCommandGroup(
