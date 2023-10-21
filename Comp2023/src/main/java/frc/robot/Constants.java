@@ -309,7 +309,7 @@ public class Constants
     public static final double kPidKi            = 0.0;            // Elbow PID integral constant
     public static final double kPidKd            = 0.0;            // Elbow PID derivative constant
 
-    public static final double kArbitraryFF      = 0.0; //0.045;          // Elbow motor output (duty cycle) for arm at 90 degrees
+    public static final double kArbitraryFF      = 0.235;          // Elbow motor output (duty cycle) for arm at 90 degrees
     public static final double kExtArbFF         = 0.0; //0.007;          // Elbow motor output (duty cycle) for arm at 90 degrees with full extension
 
     public static final double kToleranceDegrees = 2.0;            // Elbow PID tolerance in degrees (1 deg is 1" at 48" extension)
@@ -380,7 +380,7 @@ public class Constants
     public static final int    kAllowedError         = 0;              // Extension PID allowable closed loop error in counts
     public static final double kToleranceInches      = 0.5;            // Extension PID tolerance in inches
 
-    public static final double kArbitraryFF          = 0.0; //-0.030;         // Extension motor output for extension when fully retracted
+    public static final double kArbitraryFF          = -0.125;         // Extension motor output for extension when fully retracted
     public static final double kMMSafetyTimeoutRatio = 0.16;           // Seconds allowed for a Motion Magic movement
   }
 
@@ -448,7 +448,7 @@ public class Constants
     public static final int    kAllowedError     = 0;              // Wrist PID allowable closed loop error in counts
     public static final double kToleranceDegrees = 2.0;            // Wrist PID tolerance in degrees (1 deg is 0.25" at 15" length)
 
-    public static final double kArbitraryFF      = 0.0; //-0.034;         // Wrist motor output for 90 degrees
+    public static final double kArbitraryFF      = -0.08; //-0.034;         // Wrist motor output for 90 degrees
     public static final double kMMSafetyTimeout  = 3;              // Seconds allowed for a Motion Magic movement
   }
 
