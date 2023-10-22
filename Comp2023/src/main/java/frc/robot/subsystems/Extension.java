@@ -62,7 +62,7 @@ public class Extension extends SubsystemBase
   // Declare module variables
   private boolean                   m_motorValid;      // Health indicator for Falcon 
   private boolean                   m_calibrated      = true;
-  private boolean                   m_debug           = false;
+  private boolean                   m_debug           = true;
 
   private ExtensionMode             m_mode            = ExtensionMode.EXTENSION_INIT;     // Manual movement mode with joysticks
 
@@ -76,8 +76,9 @@ public class Extension extends SubsystemBase
   private double                    m_totalArbFeedForward;   // Arbitrary feedforward added to counteract gravity
 
   private Timer                     m_safetyTimer     = new Timer( ); // Safety timer for movements
+  private StatusSignal<Double>      m_motorPosition   = m_motor.getRotorPosition( );
   private StatusSignal<Double>      m_motorVelocity   = m_motor.getRotorVelocity( );
-  private StatusSignal<Double>      m_closedLoopError = m_motor.getClosedLoopError( );
+  private StatusSignal<Double>      m_motorCLoopError = m_motor.getClosedLoopError( );
 
   // Constructor
   public Extension( )
@@ -94,8 +95,9 @@ public class Extension extends SubsystemBase
 
     m_motorSim.Orientation = ChassisReference.CounterClockwise_Positive;
 
+    m_motorPosition.setUpdateFrequency(50);
     m_motorVelocity.setUpdateFrequency(50);
-    m_closedLoopError.setUpdateFrequency(50);
+    m_motorCLoopError.setUpdateFrequency(50);
 
     initSmartDashboard( );
     initialize( );
@@ -118,8 +120,7 @@ public class Extension extends SubsystemBase
     SmartDashboard.putNumber("EX_totalFF", m_totalArbFeedForward);
     if (m_debug)
     {
-      SmartDashboard.putNumber("EX_rotorVelocity", m_motorVelocity.refresh( ).getValue( ));
-      SmartDashboard.putNumber("EX_curError", m_motor.getClosedLoopError( ).refresh( ).getValue( ));
+      SmartDashboard.putNumber("EX_curError", m_motorCLoopError.refresh( ).getValue( ));
       SmartDashboard.putNumber("EX_currentDraw", m_motor.getStatorCurrent( ).refresh( ).getValue( ));
     }
   }
@@ -145,7 +146,7 @@ public class Extension extends SubsystemBase
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps( )));
 
-    m_mechLigament.setLength(kLigament2dLength + Units.inchesToMeters(m_currentInches));
+    m_mechLigament.setLength(EXConsts.kForearmLengthMeters + Units.inchesToMeters(m_currentInches));
   }
 
   private void initSmartDashboard( )
@@ -176,7 +177,7 @@ public class Extension extends SubsystemBase
 
   public double getCurrentInches( )
   {
-    return Conversions.rotationsToWinchInches(m_motor.getRotorPosition( ).refresh( ).getValue( ), EXConsts.kRolloutRatio);
+    return Conversions.rotationsToWinchInches(m_motorPosition.refresh( ).getValue( ), EXConsts.kRolloutRatio);
   }
 
   public boolean isBelowIdle( )
@@ -262,7 +263,7 @@ public class Extension extends SubsystemBase
     m_targetInches = m_currentInches;
 
     m_motor.setControl(
-        m_requestVolts.withOutput(axisValue * EXConsts.kManualSpeedVolts + SmartDashboard.getNumber("EX_ArbFF", 0.0)));
+        m_requestVolts.withOutput(axisValue * EXConsts.kManualSpeedVolts + SmartDashboard.getNumber("EX_ArbFF", 0.0))); // TODO: sine/cosine 
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////

@@ -81,8 +81,10 @@ public class Wrist extends SubsystemBase
   private double                    m_totalArbFeedForward;   // Arbitrary feedforward added to counteract gravity
 
   private Timer                     m_safetyTimer     = new Timer( ); // Safety timer for movements
+  private StatusSignal<Double>      m_motorPosition   = m_motor.getRotorPosition( );
   private StatusSignal<Double>      m_motorVelocity   = m_motor.getRotorVelocity( );
-  private StatusSignal<Double>      m_closedLoopError = m_motor.getClosedLoopError( );
+  private StatusSignal<Double>      m_motorCLoopError = m_motor.getClosedLoopError( );
+  private StatusSignal<Double>      m_ccPosition      = m_CANCoder.getAbsolutePosition( );
 
   // Constructor
   public Wrist( )
@@ -101,8 +103,10 @@ public class Wrist extends SubsystemBase
     m_motorSim.Orientation = ChassisReference.CounterClockwise_Positive;
     m_CANCoderSim.Orientation = ChassisReference.Clockwise_Positive;
 
+    m_motorPosition.setUpdateFrequency(50);
     m_motorVelocity.setUpdateFrequency(50);
-    m_closedLoopError.setUpdateFrequency(50);
+    m_motorCLoopError.setUpdateFrequency(50);
+    m_ccPosition.setUpdateFrequency(50);
 
     initSmartDashboard( );
     initialize( );
@@ -121,8 +125,7 @@ public class Wrist extends SubsystemBase
     SmartDashboard.putNumber("WR_totalFF", m_totalArbFeedForward);
     if (m_debug)
     {
-      SmartDashboard.putNumber("WR_rotorVelocity", m_motorVelocity.refresh( ).getValue( ));
-      SmartDashboard.putNumber("WR_curError", m_motor.getClosedLoopError( ).refresh( ).getValue( ));
+      SmartDashboard.putNumber("WR_curError", m_motorCLoopError.refresh( ).getValue( ));
       SmartDashboard.putNumber("WR_currentDraw", m_motor.getStatorCurrent( ).refresh( ).getValue( ));
     }
   }
@@ -188,12 +191,12 @@ public class Wrist extends SubsystemBase
 
   public double getCANCoderDegrees( )
   {
-    return Conversions.rotationsToOutputDegrees(m_CANCoder.getAbsolutePosition( ).refresh( ).getValue( ), 1.0);
+    return Conversions.rotationsToOutputDegrees(m_ccPosition.refresh( ).getValue( ), 1.0);
   }
 
   public double getTalonFXDegrees( )
   {
-    return Conversions.rotationsToOutputDegrees(m_motor.getRotorPosition( ).refresh( ).getValue( ), WRConsts.kGearRatio);
+    return Conversions.rotationsToOutputDegrees(m_motorPosition.refresh( ).getValue( ), WRConsts.kGearRatio);
   }
 
   public boolean isBelowIdle( )
@@ -271,7 +274,7 @@ public class Wrist extends SubsystemBase
     m_targetDegrees = m_currentDegrees;
 
     m_motor.setControl(
-        m_requestVolts.withOutput(axisValue * WRConsts.kManualSpeedVolts + SmartDashboard.getNumber("WR_ArbFF", 0.0)));
+        m_requestVolts.withOutput(axisValue * WRConsts.kManualSpeedVolts + SmartDashboard.getNumber("WR_ArbFF", 0.0))); // TODO: sine/cosine 
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
