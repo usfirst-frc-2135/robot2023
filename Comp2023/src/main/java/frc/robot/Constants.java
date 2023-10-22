@@ -323,8 +323,9 @@ public class Constants
   {
     // Global settings
     public static final double        kGearRatio                = 18.23; // Gear reduction for extension
-    public static final double        kDrumDiameterInches       = 1.375; // Drum diameter in inches
-    public static final double        kDrumCircumInches         = kDrumDiameterInches * Math.PI;   // Drum diameter in inches
+    private static final double       kDrumDiameterInches       = 1.375; // Drum diameter in inches
+    public static final double        kDrumRadiusMeters         = Units.inchesToMeters(kDrumDiameterInches) / 2;
+    private static final double       kDrumCircumInches         = kDrumDiameterInches * Math.PI;   // Drum diameter in inches
     public static final double        kRolloutRatio             = kDrumCircumInches / kGearRatio;  // inches per shaft rotation
     public static final double        kForearmLengthMeters      = 1.0;   // Sim value: 48 inches
     public static final double        kForearmMassKg            = 2.0;   // Sim value: 13.2 lbs 
@@ -348,7 +349,7 @@ public class Constants
     public static final double        kSupplyTriggerTime        = 0.001; // Supply time duration of trigger that will causing limiting
     public static final boolean       kSupplyCurrentLimitEnable = true;  // Supply current enable
 
-    public static final double        kStatorCurrentLimit       = 60.0;  // Stator current limit (after trigger)
+    public static final double        kStatorCurrentLimit       = 100.0; // Stator current limit (after trigger)
     public static final boolean       kStatorCurrentLimitEnable = false; // Stator current enable
 
     public static final double        kNeutralDeadband          = 0.001; // Extension motor output deadband
@@ -412,7 +413,7 @@ public class Constants
     public static final double               kSupplyTriggerTime        = 0.001; // Supply time duration of trigger that will causing limiting
     public static final boolean              kSupplyCurrentLimitEnable = true;  // Supply current enable
 
-    public static final double               kStatorCurrentLimit       = 40.0;  // Stator current limit (after trigger)
+    public static final double               kStatorCurrentLimit       = 100.0; // Stator current limit (after trigger)
     public static final boolean              kStatorCurrentLimitEnable = false; // Stator current enable
 
     public static final double               kNeutralDeadband          = 0.001; // Wrist motor output deadband

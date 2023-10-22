@@ -46,20 +46,18 @@ public class Extension extends SubsystemBase
 {
   // Constants
   private final double              kLigament2dOffset = 0.0;                               // Offset from mechanism root for extension ligament
-  private final double              kLigament2dLength = Units.inchesToMeters(30.0); // Offset from mechanism root for extension ligament
 
   // Member objects
   private final TalonFX             m_motor           = new TalonFX(Ports.kCANID_Extension);
   private final TalonFXSimState     m_motorSim        = m_motor.getSimState( );
   private final ElevatorSim         m_armSim          = new ElevatorSim(DCMotor.getFalcon500(1), EXConsts.kGearRatio,
-      EXConsts.kForearmMassKg, Units.inchesToMeters(EXConsts.kDrumDiameterInches / 2), EXConsts.kForearmLengthMeters,
-      EXConsts.kForearmLengthMeters + 0.5, false);
+      EXConsts.kForearmMassKg, EXConsts.kDrumRadiusMeters, -EXConsts.kLengthMax, EXConsts.kLengthMax, false);
 
   // Mechanism2d
   private final Mechanism2d         m_mech            = new Mechanism2d(3, 3);
   private final MechanismRoot2d     m_mechRoot        = m_mech.getRoot("extension", 0.5, 1.5);
-  private final MechanismLigament2d m_mechLigament    =
-      m_mechRoot.append(new MechanismLigament2d("extension", kLigament2dLength, kLigament2dOffset, 6, new Color8Bit(Color.kRed)));
+  private final MechanismLigament2d m_mechLigament    = m_mechRoot.append(
+      new MechanismLigament2d("extension", EXConsts.kForearmLengthMeters, kLigament2dOffset, 6, new Color8Bit(Color.kRed)));
 
   // Declare module variables
   private boolean                   m_motorValid;      // Health indicator for Falcon 
