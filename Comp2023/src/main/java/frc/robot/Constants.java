@@ -257,7 +257,7 @@ public class Constants
   public static final class ELConsts
   {
     // Global settings
-    public static final double               kGearRatio                = 300;   // Gear reduction for elbow
+    public static final double               kGearRatio                = 202.5;   // Gear reduction for elbow
     public static final double               kForearmLengthMeters      = 1.22;  // Sim value: 48 inches
     public static final double               kForearmMassKg            = 6.0;   // Sim value: 13.2 lbs 
 
@@ -322,7 +322,7 @@ public class Constants
   public static final class EXConsts
   {
     // Global settings
-    public static final double        kGearRatio                = 18.23; // Gear reduction for extension
+    public static final double        kGearRatio                = 9.64; // Gear reduction for extension
     private static final double       kDrumDiameterInches       = 1.375; // Drum diameter in inches
     public static final double        kDrumRadiusMeters         = Units.inchesToMeters(kDrumDiameterInches) / 2;
     private static final double       kDrumCircumInches         = kDrumDiameterInches * Math.PI;   // Drum diameter in inches
@@ -391,7 +391,7 @@ public class Constants
   public static final class WRConsts
   {
     // Global settings
-    public static final double               kGearRatio                = 213.9; // Gear reduction for wrist
+    public static final double               kGearRatio                = 106.1; // Gear reduction for wrist
     public static final double               kGripperLengthMeters      = 0.3;   // Sim value: 11.8 in
     public static final double               kGripperMassKg            = 3.0;   // Sim value: 6.6 lbs
 
@@ -405,7 +405,7 @@ public class Constants
     public static final double               kAngleSubstation          = 100.0; // From Mech Design (3'1-38" above floor)
     public static final double               kAngleMax                 = 110.0; // Wrist maximum allowable angle (a few degrees more than substation/horizontal)
 
-    public static final InvertedValue        kInvertMotor              = InvertedValue.CounterClockwise_Positive; // Motor direction for positive input
+    public static final InvertedValue        kInvertMotor              = InvertedValue.Clockwise_Positive; // Motor direction for positive input
 
     // Current limit settings - wrist
     public static final double               kSupplyCurrentLimit       = 10.0;  // Supply current limit (after trigger)
