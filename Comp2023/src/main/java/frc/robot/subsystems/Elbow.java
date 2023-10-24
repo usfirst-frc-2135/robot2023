@@ -100,7 +100,7 @@ public class Elbow extends SubsystemBase
 
     if (Robot.isReal( ))
       m_currentDegrees = getCANCoderDegrees( );
-    m_motor.setPosition(Conversions.degreesToInputRotations(m_currentDegrees, ELConsts.kGearRatio));
+    m_motor.setRotorPosition(Conversions.degreesToInputRotations(m_currentDegrees, ELConsts.kGearRatio));
     DataLogManager.log(String.format("%s: CANCoder initial degrees %.1f", getSubsystem( ), m_currentDegrees));
 
     m_motorSim.Orientation = ChassisReference.CounterClockwise_Positive;
@@ -238,7 +238,7 @@ public class Elbow extends SubsystemBase
   public void resetPositionToZero( )
   {
     if (m_motorValid)
-      m_motor.setPosition(Conversions.degreesToInputRotations(0, ELConsts.kGearRatio));
+      m_motor.setRotorPosition(Conversions.degreesToInputRotations(0, ELConsts.kGearRatio));
   }
 
   public void setStopped( )

@@ -53,7 +53,7 @@ public class PhoenixUtil6
     for (int i = 0; i < m_retries && fwvMajor == 0; i++)
     {
       StatusSignal<Integer> statusSignal = motor.getVersion( );
-      status = statusSignal.getStatus( );
+      status = statusSignal.getError( );
       if (status.isOK( ))
       {
         fwvMajor = (statusSignal.getValue( ) >> 24) & 0xff;
@@ -77,9 +77,9 @@ public class PhoenixUtil6
           .log(String.format("%s: ID %2d - %s motor: setControl - %s!", m_className, deviceID, name, status.getDescription( )));
 
     // Configure sensor settings
-    if ((status = motor.setPosition(0.0)) != StatusCode.OK)
-      DataLogManager
-          .log(String.format("%s: ID %2d - %s motor: setPosition - %s!", m_className, deviceID, name, status.getDescription( )));
+    if ((status = motor.setRotorPosition(0.0)) != StatusCode.OK)
+      DataLogManager.log(
+          String.format("%s: ID %2d - %s motor: setRotorPosition - %s!", m_className, deviceID, name, status.getDescription( )));
 
     motor.setSafetyEnabled(false);
 
@@ -108,7 +108,7 @@ public class PhoenixUtil6
     for (int i = 0; i < m_retries && fwvMajor == 0; i++)
     {
       StatusSignal<Integer> statusSignal = canCoder.getVersion( );
-      status = statusSignal.getStatus( );
+      status = statusSignal.getError( );
       if (status.isOK( ))
       {
         fwvMajor = (statusSignal.getValue( ) >> 24) & 0xff;
@@ -154,7 +154,7 @@ public class PhoenixUtil6
     for (int i = 0; i < m_retries && fwvMajor == 0; i++)
     {
       StatusSignal<Integer> statusSignal = pigeon2.getVersion( );
-      status = statusSignal.getStatus( );
+      status = statusSignal.getError( );
       if (status.isOK( ))
       {
         fwvMajor = (statusSignal.getValue( ) >> 24) & 0xff;

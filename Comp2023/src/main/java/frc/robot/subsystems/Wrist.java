@@ -99,7 +99,7 @@ public class Wrist extends SubsystemBase
 
     if (Robot.isReal( ))
       m_currentDegrees = getCANCoderDegrees( );
-    m_motor.setPosition(Conversions.degreesToInputRotations(m_currentDegrees, WRConsts.kGearRatio));
+    m_motor.setRotorPosition(Conversions.degreesToInputRotations(m_currentDegrees, WRConsts.kGearRatio));
     DataLogManager.log(String.format("%s: CANCoder initial degrees %.1f", getSubsystem( ), m_currentDegrees));
 
     m_motorSim.Orientation = ChassisReference.CounterClockwise_Positive;
@@ -236,7 +236,7 @@ public class Wrist extends SubsystemBase
   public void resetPositionToZero( )
   {
     if (m_motorValid)
-      m_motor.setPosition(Conversions.degreesToInputRotations(0, WRConsts.kGearRatio));
+      m_motor.setRotorPosition(Conversions.degreesToInputRotations(0, WRConsts.kGearRatio));
   }
 
   public void setStopped( )
