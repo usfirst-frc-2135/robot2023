@@ -84,6 +84,8 @@ public class Wrist extends SubsystemBase
   private StatusSignal<Double>      m_motorPosition   = m_motor.getRotorPosition( );
   private StatusSignal<Double>      m_motorVelocity   = m_motor.getRotorVelocity( );
   private StatusSignal<Double>      m_motorCLoopError = m_motor.getClosedLoopError( );
+  private StatusSignal<Double>      m_motorSupplyCur  = m_motor.getSupplyCurrent( );
+  private StatusSignal<Double>      m_motorStatorCur  = m_motor.getStatorCurrent( );
   private StatusSignal<Double>      m_ccPosition      = m_CANCoder.getAbsolutePosition( );
 
   // Constructor
@@ -104,8 +106,13 @@ public class Wrist extends SubsystemBase
     m_CANCoderSim.Orientation = ChassisReference.Clockwise_Positive;
 
     m_motorPosition.setUpdateFrequency(50);
-    m_motorVelocity.setUpdateFrequency(50);
-    m_motorCLoopError.setUpdateFrequency(50);
+    if (m_debug)
+    {
+      m_motorVelocity.setUpdateFrequency(50);
+      m_motorCLoopError.setUpdateFrequency(50);
+      m_motorSupplyCur.setUpdateFrequency(50);
+      m_motorStatorCur.setUpdateFrequency(50);
+    }
     m_ccPosition.setUpdateFrequency(50);
 
     initSmartDashboard( );
@@ -125,8 +132,10 @@ public class Wrist extends SubsystemBase
     SmartDashboard.putNumber("WR_totalFF", m_totalArbFeedForward);
     if (m_debug)
     {
+      SmartDashboard.putNumber("WR_velocity", m_motorVelocity.refresh( ).getValue( ));
       SmartDashboard.putNumber("WR_curError", m_motorCLoopError.refresh( ).getValue( ));
-      SmartDashboard.putNumber("WR_currentDraw", m_motor.getStatorCurrent( ).refresh( ).getValue( ));
+      SmartDashboard.putNumber("WR_supplyCur", m_motorSupplyCur.refresh( ).getValue( ));
+      SmartDashboard.putNumber("WR_statorCur", m_motorStatorCur.refresh( ).getValue( ));
     }
   }
 
@@ -189,12 +198,12 @@ public class Wrist extends SubsystemBase
     return m_currentDegrees;
   }
 
-  public double getCANCoderDegrees( )
+  private double getCANCoderDegrees( )
   {
     return Conversions.rotationsToOutputDegrees(m_ccPosition.refresh( ).getValue( ), 1.0);
   }
 
-  public double getTalonFXDegrees( )
+  private double getTalonFXDegrees( )
   {
     return Conversions.rotationsToOutputDegrees(m_motorPosition.refresh( ).getValue( ), WRConsts.kGearRatio);
   }
@@ -214,7 +223,7 @@ public class Wrist extends SubsystemBase
     return m_currentDegrees < WRConsts.kAngleScoreMid;
   }
 
-  public boolean isMoveValid(double degrees)
+  private boolean isMoveValid(double degrees)
   {
     return (degrees > WRConsts.kAngleMin) && (degrees < WRConsts.kAngleMax);
   }

@@ -79,6 +79,8 @@ public class Extension extends SubsystemBase
   private StatusSignal<Double>      m_motorPosition   = m_motor.getRotorPosition( );
   private StatusSignal<Double>      m_motorVelocity   = m_motor.getRotorVelocity( );
   private StatusSignal<Double>      m_motorCLoopError = m_motor.getClosedLoopError( );
+  private StatusSignal<Double>      m_motorSupplyCur  = m_motor.getSupplyCurrent( );
+  private StatusSignal<Double>      m_motorStatorCur  = m_motor.getStatorCurrent( );
 
   // Constructor
   public Extension( )
@@ -96,8 +98,13 @@ public class Extension extends SubsystemBase
     m_motorSim.Orientation = ChassisReference.CounterClockwise_Positive;
 
     m_motorPosition.setUpdateFrequency(50);
-    m_motorVelocity.setUpdateFrequency(50);
-    m_motorCLoopError.setUpdateFrequency(50);
+    if (m_debug)
+    {
+      m_motorVelocity.setUpdateFrequency(50);
+      m_motorCLoopError.setUpdateFrequency(50);
+      m_motorSupplyCur.setUpdateFrequency(50);
+      m_motorStatorCur.setUpdateFrequency(50);
+    }
 
     initSmartDashboard( );
     initialize( );
@@ -120,8 +127,10 @@ public class Extension extends SubsystemBase
     SmartDashboard.putNumber("EX_totalFF", m_totalArbFeedForward);
     if (m_debug)
     {
+      SmartDashboard.putNumber("EX_velocity", m_motorVelocity.refresh( ).getValue( ));
       SmartDashboard.putNumber("EX_curError", m_motorCLoopError.refresh( ).getValue( ));
-      SmartDashboard.putNumber("EX_currentDraw", m_motor.getStatorCurrent( ).refresh( ).getValue( ));
+      SmartDashboard.putNumber("EX_supplyCur", m_motorSupplyCur.refresh( ).getValue( ));
+      SmartDashboard.putNumber("EX_statorCur", m_motorStatorCur.refresh( ).getValue( ));
     }
   }
 
@@ -195,7 +204,7 @@ public class Extension extends SubsystemBase
     return m_currentInches < EXConsts.kLengthScoreMid;
   }
 
-  public boolean isMoveValid(double inches)
+  private boolean isMoveValid(double inches)
   {
     return (inches > EXConsts.kLengthMin) && (inches < EXConsts.kLengthMax);
   }
