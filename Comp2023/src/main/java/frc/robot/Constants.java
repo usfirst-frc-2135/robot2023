@@ -284,7 +284,7 @@ public class Constants
     public static final double               kNeutralDeadband          = 0.001; // Elbow motor output deadband
 
     // CANCoder elbow absolute offset
-    public static final double               kCompOffset               = -0.6965; // CANCoder offset rotations for comp bot
+    public static final double               kCompOffset               = 0.0203;  // CANCoder offset rotations for comp bot
     public static final double               kBetaOffset               = 0.000;   // TODO: CANCoder offset rotations for beta bot
     public static final SensorDirectionValue kSensorDirection          = SensorDirectionValue.Clockwise_Positive;
 
@@ -405,7 +405,7 @@ public class Constants
     public static final double               kAngleSubstation          = 100.0; // From Mech Design (3'1-38" above floor)
     public static final double               kAngleMax                 = 110.0; // Wrist maximum allowable angle (a few degrees more than substation/horizontal)
 
-    public static final InvertedValue        kInvertMotor              = InvertedValue.Clockwise_Positive; // Motor direction for positive input
+    public static final InvertedValue        kInvertMotor              = InvertedValue.CounterClockwise_Positive; // Motor direction for positive input
 
     // Current limit settings - wrist
     public static final double               kSupplyCurrentLimit       = 10.0;  // Supply current limit (after trigger)
@@ -419,7 +419,7 @@ public class Constants
     public static final double               kNeutralDeadband          = 0.001; // Wrist motor output deadband
 
     // CANCoder wrist absolute offset
-    public static final double               kCompOffset               = -0.3848; // CANCoder offset angle for comp bot
+    public static final double               kCompOffset               = -0.07446; // CANCoder offset angle for comp bot
     public static final double               kBetaOffset               = 0.000;   // TODO: CANCoder offset rotations for beta bot
     public static final SensorDirectionValue kSensorDirection          = SensorDirectionValue.Clockwise_Positive;
 
