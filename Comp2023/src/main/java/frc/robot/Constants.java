@@ -271,6 +271,7 @@ public class Constants
     public static final double               kAngleMax                 = 110.0; // Elbow maximum allowable degrees (10 deg more than high)
 
     public static final InvertedValue        kInvertMotor              = InvertedValue.Clockwise_Positive;  // Motor direction for positive input
+    public static final boolean              kInvertCANCoder           = false;
 
     // Current limit settings - elbow
     public static final double               kSupplyCurrentLimit       = 30.0;  // Supply current limit (after trigger)
@@ -406,6 +407,7 @@ public class Constants
     public static final double               kAngleMax                 = 110.0; // Wrist maximum allowable angle (a few degrees more than substation/horizontal)
 
     public static final InvertedValue        kInvertMotor              = InvertedValue.CounterClockwise_Positive; // Motor direction for positive input
+    public static final boolean              kInvertCANCoder           = true;
 
     // Current limit settings - wrist
     public static final double               kSupplyCurrentLimit       = 10.0;  // Supply current limit (after trigger)

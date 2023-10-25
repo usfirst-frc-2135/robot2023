@@ -200,7 +200,8 @@ public class Wrist extends SubsystemBase
 
   private double getCANCoderDegrees( )
   {
-    return Conversions.rotationsToOutputDegrees(m_ccPosition.refresh( ).getValue( ), 1.0);
+    return ((WRConsts.kInvertCANCoder) ? -1.0 : 1.0)
+        * Conversions.rotationsToOutputDegrees(m_ccPosition.refresh( ).getValue( ), 1.0);
   }
 
   private double getTalonFXDegrees( )
