@@ -195,7 +195,7 @@ public class Extension extends SubsystemBase
 
   private double getCurrentInches( )
   {
-    double offsetDueToElbow = (m_elbow.getAngle( ) / 90.0) * EXConsts.kLengthExtension;
+    double offsetDueToElbow = (0.0 / 90.0) * EXConsts.kLengthExtension; // replaced m_elbow.getAngle( ) with 0.0
 
     return Conversions.rotationsToWinchInches(m_motorPosition.refresh( ).getValue( ), EXConsts.kRolloutRatio) - offsetDueToElbow;
   }
