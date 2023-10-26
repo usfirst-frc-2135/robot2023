@@ -173,7 +173,7 @@ public class Extension extends SubsystemBase
     setStopped( );
     m_calibrated = false;
 
-    m_currentInches = 6.0; // Allow calibration routine to run for up to this length
+    m_currentInches = 0.5; // Allow calibration routine to run for up to this length
     m_targetInches = m_currentInches;
     DataLogManager.log(String.format("%s: Subsystem initialized! Target Inches: %.1f", getSubsystem( ), m_targetInches));
   }
@@ -362,13 +362,13 @@ public class Extension extends SubsystemBase
   public void endCalibration( )
   {
     setExtensionToZero( );
+    m_targetInches = m_currentInches;
     m_calibrated = true;
     SmartDashboard.putBoolean("EX_calibrated", m_calibrated);
   }
 
   private void setExtensionToZero( )
   {
-    m_targetInches = 0.0;
     m_currentInches = 0.0;
     resetPositionToZero( );
   }
