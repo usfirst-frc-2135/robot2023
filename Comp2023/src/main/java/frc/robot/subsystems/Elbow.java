@@ -34,10 +34,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ELConsts;
 import frc.robot.Constants.ELConsts.ElbowMode;
-import frc.robot.Constants.EXConsts;
 import frc.robot.Constants.Ports;
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.lib.math.Conversions;
 import frc.robot.lib.util.CTREConfigs6;
 import frc.robot.lib.util.PhoenixUtil6;
@@ -72,7 +70,7 @@ public class Elbow extends SubsystemBase
 
   private ElbowMode                 m_mode            = ElbowMode.ELBOW_INIT;     // Manual movement mode with joysticks
 
-  private double                    m_currentDegrees  = 0.0; // Current angle in degrees
+  private static double             m_currentDegrees  = 0.0; // Current angle in degrees
   private double                    m_targetDegrees   = 0.0; // Target angle in degrees
   private Debouncer                 m_withinTolerance = new Debouncer(0.060, DebounceType.kRising);
   private boolean                   m_moveIsFinished;        // Movement has completed (within tolerance)
@@ -187,10 +185,10 @@ public class Elbow extends SubsystemBase
 
   private double calculateTotalArbFF( )
   {
-    double extensionLength = RobotContainer.getInstance( ).m_extension.getCurrentInches( );
+    // double arbFF = SmartDashboard.getNumber("EL_ArbFF", 0.0); // Tuning only
+    double arbFF = (Robot.isReal( )) ? ELConsts.kArbitraryFF : 0.0;
 
-    return Math.sin(Math.toRadians(m_currentDegrees))
-        * (ELConsts.kArbitraryFF + ELConsts.kExtArbFF * ((extensionLength) / EXConsts.kLengthMax));
+    return arbFF * Math.sin(Math.toRadians(m_currentDegrees));
   }
 
   ///////////////////////// PUBLIC HELPERS ///////////////////////////////////
@@ -285,8 +283,7 @@ public class Elbow extends SubsystemBase
 
     m_targetDegrees = m_currentDegrees;
 
-    m_motor.setControl(
-        m_requestVolts.withOutput(axisValue * ELConsts.kManualSpeedVolts + SmartDashboard.getNumber("EL_ArbFF", 0.0))); // TODO: sine/cosine 
+    m_motor.setControl(m_requestVolts.withOutput(axisValue * ELConsts.kManualSpeedVolts + calculateTotalArbFF( )));
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////

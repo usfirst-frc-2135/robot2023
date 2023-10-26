@@ -36,7 +36,6 @@ import frc.robot.Constants.Ports;
 import frc.robot.Constants.WRConsts;
 import frc.robot.Constants.WRConsts.WristMode;
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.lib.math.Conversions;
 import frc.robot.lib.util.CTREConfigs6;
 import frc.robot.lib.util.PhoenixUtil6;
@@ -46,6 +45,7 @@ import frc.robot.lib.util.PhoenixUtil6;
 //
 public class Wrist extends SubsystemBase
 {
+  private Elbow                     m_elbow;
   // Constants
   private final double              kLigament2dOffset = 0.0; // Offset from mechanism root for wrist ligament
 
@@ -71,7 +71,7 @@ public class Wrist extends SubsystemBase
 
   private WristMode                 m_mode            = WristMode.WRIST_INIT;     // Manual movement mode with joysticks
 
-  private double                    m_currentDegrees  = 0.0; // Current angle in degrees
+  private static double             m_currentDegrees  = 0.0; // Current angle in degrees
   private double                    m_targetDegrees   = 0.0; // Target angle in degrees
   private Debouncer                 m_withinTolerance = new Debouncer(0.060, DebounceType.kRising);
   private boolean                   m_moveIsFinished;        // Movement has completed (within tolerance)
@@ -89,10 +89,11 @@ public class Wrist extends SubsystemBase
   private StatusSignal<Double>      m_ccPosition      = m_CANCoder.getAbsolutePosition( );
 
   // Constructor
-  public Wrist( )
+  public Wrist(Elbow elbow)
   {
     setName("Wrist");
     setSubsystem("Wrist");
+    m_elbow = elbow;
 
     m_motorValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_motor, "wrist", CTREConfigs6.wristAngleFXConfig( ));
     m_ccValid = PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANCoder, "wrist", CTREConfigs6.wristCancoderConfig( ));
@@ -185,10 +186,10 @@ public class Wrist extends SubsystemBase
 
   private double calculateTotalArbFF( )
   {
-    double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
-    double wristDegrees = getAngle( );
+    // double arbFF = SmartDashboard.getNumber("WR_ArbFF", 0.0); // Tuning only
+    double arbFF = (Robot.isReal( )) ? WRConsts.kArbitraryFF : 0.0;
 
-    return WRConsts.kArbitraryFF * Math.cos(Math.toRadians(elbowDegrees - wristDegrees));
+    return arbFF * Math.cos(Math.toRadians(m_elbow.getAngle( ) - getAngle( )));
   }
 
   ///////////////////////// PUBLIC HELPERS ///////////////////////////////////
@@ -283,8 +284,7 @@ public class Wrist extends SubsystemBase
 
     m_targetDegrees = m_currentDegrees;
 
-    m_motor.setControl(
-        m_requestVolts.withOutput(axisValue * WRConsts.kManualSpeedVolts + SmartDashboard.getNumber("WR_ArbFF", 0.0))); // TODO: sine/cosine 
+    m_motor.setControl(m_requestVolts.withOutput(axisValue * WRConsts.kManualSpeedVolts + calculateTotalArbFF( )));
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////

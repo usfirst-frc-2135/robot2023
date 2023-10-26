@@ -34,7 +34,6 @@ import frc.robot.Constants.EXConsts;
 import frc.robot.Constants.EXConsts.ExtensionMode;
 import frc.robot.Constants.Ports;
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.lib.math.Conversions;
 import frc.robot.lib.util.CTREConfigs6;
 import frc.robot.lib.util.PhoenixUtil6;
@@ -44,6 +43,8 @@ import frc.robot.lib.util.PhoenixUtil6;
 //
 public class Extension extends SubsystemBase
 {
+  private Elbow                     m_elbow;
+
   // Constants
   private final double              kLigament2dOffset = 0.0;                               // Offset from mechanism root for extension ligament
 
@@ -83,15 +84,16 @@ public class Extension extends SubsystemBase
   private StatusSignal<Double>      m_motorStatorCur  = m_motor.getStatorCurrent( );
 
   // Constructor
-  public Extension( )
+  public Extension(Elbow elbow)
   {
     setName("Extension");
     setSubsystem("Extension");
+    m_elbow = elbow;
 
     m_motorValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_motor, "extension", CTREConfigs6.extensionLengthFXConfig( ));
 
     if (Robot.isReal( ))
-      m_currentInches = getCurrentInches( );
+    m_currentInches = getCurrentInches( );
     m_motor.setRotorPosition(Conversions.inchesToWinchRotations(m_currentInches, EXConsts.kRolloutRatio));
     DataLogManager.log(String.format("%s: CANCoder initial inches %.1f", getSubsystem( ), m_currentInches));
 
@@ -169,24 +171,33 @@ public class Extension extends SubsystemBase
   public void initialize( )
   {
     setStopped( );
+    m_calibrated = false;
 
-    m_currentInches = getCurrentInches( );
+    m_currentInches = 6.0; // Allow calibration routine to run for up to this length
     m_targetInches = m_currentInches;
     DataLogManager.log(String.format("%s: Subsystem initialized! Target Inches: %.1f", getSubsystem( ), m_targetInches));
   }
 
   private double calculateTotalArbFF( )
   {
-    double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
+    // double arbFF = SmartDashboard.getNumber("EX_ArbFF", 0.0); // Tuning only
+    double arbFF = (Robot.isReal( )) ? EXConsts.kArbitraryFF : 0.0;
 
-    return EXConsts.kArbitraryFF * Math.cos(Math.toRadians(elbowDegrees));
+    return arbFF * Math.cos(Math.toRadians(m_elbow.getAngle( )));
   }
 
   ///////////////////////// PUBLIC HELPERS ///////////////////////////////////
 
-  public double getCurrentInches( )
+  public double getLength( )
   {
-    return Conversions.rotationsToWinchInches(m_motorPosition.refresh( ).getValue( ), EXConsts.kRolloutRatio);
+    return m_currentInches;
+  }
+
+  private double getCurrentInches( )
+  {
+    double offsetDueToElbow = (m_elbow.getAngle( ) / 90.0) * EXConsts.kLengthExtension;
+
+    return Conversions.rotationsToWinchInches(m_motorPosition.refresh( ).getValue( ), EXConsts.kRolloutRatio) - offsetDueToElbow;
   }
 
   public boolean isBelowIdle( )
@@ -229,9 +240,10 @@ public class Extension extends SubsystemBase
   public void setMMPosition(double targetInches, double elbowAngle)
   {
     // y = mx + b, where 0 degrees is 0.0 extension and 90 degrees is 1/4 winch turn (the extension constant)
-    targetInches += (elbowAngle / 90.0) * EXConsts.kLengthExtension;
-    m_motor.setControl(m_requestMMVolts.withPosition(Conversions.inchesToWinchRotations(targetInches, EXConsts.kRolloutRatio))
-        .withFeedForward(m_totalArbFeedForward));
+    double offsetDueToElbow = (elbowAngle / 90.0) * EXConsts.kLengthExtension;
+    m_motor.setControl(
+        m_requestMMVolts.withPosition(Conversions.inchesToWinchRotations(targetInches + offsetDueToElbow, EXConsts.kRolloutRatio))
+            .withFeedForward(m_totalArbFeedForward));
   }
 
   ///////////////////////// MANUAL MOVEMENT ///////////////////////////////////
@@ -271,8 +283,7 @@ public class Extension extends SubsystemBase
 
     m_targetInches = m_currentInches;
 
-    m_motor.setControl(
-        m_requestVolts.withOutput(axisValue * EXConsts.kManualSpeedVolts + SmartDashboard.getNumber("EX_ArbFF", 0.0))); // TODO: sine/cosine 
+    m_motor.setControl(m_requestVolts.withOutput(axisValue * EXConsts.kManualSpeedVolts + calculateTotalArbFF( )));
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
@@ -348,7 +359,7 @@ public class Extension extends SubsystemBase
       m_motor.setControl(m_requestVolts.withOutput(EXConsts.kCalibrateSpeedVolts));
   }
 
-  public void calibrateExtension( )
+  public void endCalibration( )
   {
     setExtensionToZero( );
     m_calibrated = true;

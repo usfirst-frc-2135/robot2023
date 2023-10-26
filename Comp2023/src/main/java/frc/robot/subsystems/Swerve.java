@@ -35,7 +35,6 @@ import frc.robot.Constants.LLConsts;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.SWConsts;
 import frc.robot.Constants.SnapConstants;
-import frc.robot.RobotContainer;
 import frc.robot.lib.util.PigeonIMU;
 import frc.robot.lib.util.SwerveModule;
 
@@ -44,6 +43,8 @@ import frc.robot.lib.util.SwerveModule;
 //
 public class Swerve extends SubsystemBase
 {
+  private Vision                   m_vision;
+
   // Member objects
   private SwerveModule[ ]          m_swerveMods        = new SwerveModule[ ]
   {
@@ -115,10 +116,11 @@ public class Swerve extends SubsystemBase
   private ProfiledPIDController    m_thetaController   =
       new ProfiledPIDController(AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
 
-  public Swerve( )
+  public Swerve(Vision vision)
   {
     setName("Swerve");
     setSubsystem("Swerve");
+    m_vision = vision;
 
     resetAnglesToAbsolute( );
     resetGyro(180.0); // All starting positions facing driver in field relative
@@ -177,15 +179,14 @@ public class Swerve extends SubsystemBase
 
     if (m_allowPoseEstimate)
     {
-      Vision vision = RobotContainer.getInstance( ).m_vision;
-      Pose2d botLLPose = vision.getLimelightValidPose(getPose( ));
-      double latency = vision.getTargetLatency( );
+      Pose2d botLLPose = m_vision.getLimelightValidPose(getPose( ));
+      double latency = m_vision.getTargetLatency( );
 
       //Adding a position specified by the limelight to the estimator at the time that the pose was generated 
       if (botLLPose != null && DriverStation.isTeleopEnabled( ))
         m_poseEstimator.addVisionMeasurement(botLLPose, Timer.getFPGATimestamp( ) - (latency / 1000));
 
-      Pose2d rawPose = vision.getLimelightRawPose( );
+      Pose2d rawPose = m_vision.getLimelightRawPose( );
 
       if (rawPose != null)
         resetOdometry(rawPose);
@@ -283,7 +284,7 @@ public class Swerve extends SubsystemBase
       turnOutput = turnOutput - m_turnConstant;
 
     // get throttle value
-    m_limelightDistance = RobotContainer.getInstance( ).m_vision.getDistLimelight( );
+    m_limelightDistance = m_vision.getDistLimelight( );
 
     double throttleDistance = m_throttlePid.calculate(m_limelightDistance, m_setPointDistance);
     double throttleOutput = throttleDistance * Math.pow(Math.cos(turnOutput * Math.PI / 180), m_throttleShape);

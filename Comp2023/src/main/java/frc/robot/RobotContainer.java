@@ -92,11 +92,11 @@ public class RobotContainer
 
   // These subsystems can use LED or vision and must be created afterward
   public final Elbow                   m_elbow              = new Elbow( );
-  public final Extension               m_extension          = new Extension( );
-  public final Wrist                   m_wrist              = new Wrist( );
+  public final Extension               m_extension          = new Extension(m_elbow);
+  public final Wrist                   m_wrist              = new Wrist(m_elbow);
   public final Gripper                 m_gripper            = new Gripper( );
   public final Power                   m_power              = new Power( );
-  public final Swerve                  m_swerve             = new Swerve( );
+  public final Swerve                  m_swerve             = new Swerve(m_vision);
 
   // A chooser for autonomous commands
   private SendableChooser<AutoChooser> m_autoChooser        = new SendableChooser<>( );
