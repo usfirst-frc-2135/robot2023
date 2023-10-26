@@ -93,7 +93,7 @@ public class Extension extends SubsystemBase
     m_motorValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_motor, "extension", CTREConfigs6.extensionLengthFXConfig( ));
 
     if (Robot.isReal( ))
-    m_currentInches = getCurrentInches( );
+      m_currentInches = getCurrentInches( );
     m_motor.setRotorPosition(Conversions.inchesToWinchRotations(m_currentInches, EXConsts.kRolloutRatio));
     DataLogManager.log(String.format("%s: CANCoder initial inches %.1f", getSubsystem( ), m_currentInches));
 
@@ -363,7 +363,7 @@ public class Extension extends SubsystemBase
   {
     setExtensionToZero( );
     m_calibrated = true;
-    SmartDashboard.putBoolean("EL_calibrated", m_calibrated);
+    SmartDashboard.putBoolean("EX_calibrated", m_calibrated);
   }
 
   private void setExtensionToZero( )
