@@ -325,14 +325,14 @@ public class RobotContainer
     m_swerve.setDefaultCommand(new DriveTeleop(m_swerve, m_elbow, m_driverPad));
 
     // Default command - Motion Magic hold
-    //m_elbow.setDefaultCommand(new ElbowMoveToPosition(m_elbow));
-    //m_extension.setDefaultCommand(new ExtensionMoveToPosition(m_extension, m_elbow));
-    //m_wrist.setDefaultCommand(new WristMoveToPosition(m_wrist));
+    m_elbow.setDefaultCommand(new ElbowMoveToPosition(m_elbow));
+    m_extension.setDefaultCommand(new ExtensionMoveToPosition(m_extension, m_elbow));
+    m_wrist.setDefaultCommand(new WristMoveToPosition(m_wrist));
 
     // Default command - manual mode
-    m_elbow.setDefaultCommand(new ElbowRun(m_elbow, m_operatorPad));
-    m_extension.setDefaultCommand(new ExtensionRun(m_extension, m_operatorPad));
-    m_wrist.setDefaultCommand(new WristRun(m_wrist, m_operatorPad));
+    //m_elbow.setDefaultCommand(new ElbowRun(m_elbow, m_operatorPad));
+    //m_extension.setDefaultCommand(new ExtensionRun(m_extension, m_operatorPad));
+    //m_wrist.setDefaultCommand(new WristRun(m_wrist, m_operatorPad));
   }
 
   /****************************************************************************
