@@ -93,7 +93,7 @@ public class Extension extends SubsystemBase
     m_motorValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_motor, "extension", CTREConfigs6.extensionLengthFXConfig( ));
 
     if (Robot.isReal( ))
-      m_currentInches = getCurrentInches( );
+      m_currentInches = 0;  //NOTE: Don't call getCurrentInches( );
     m_motor.setRotorPosition(Conversions.inchesToWinchRotations(m_currentInches, EXConsts.kRolloutRatio));
     DataLogManager.log(String.format("%s: CANCoder initial inches %.1f", getSubsystem( ), m_currentInches));
 
@@ -195,7 +195,7 @@ public class Extension extends SubsystemBase
 
   private double getCurrentInches( )
   {
-    double offsetDueToElbow = (0.0 / 90.0) * EXConsts.kLengthExtension; // replaced m_elbow.getAngle( ) with 0.0
+    double offsetDueToElbow = (0.0 / 90.0) * EXConsts.kLengthExtension; //m_elbow.getAngle( )
 
     return Conversions.rotationsToWinchInches(m_motorPosition.refresh( ).getValue( ), EXConsts.kRolloutRatio) - offsetDueToElbow;
   }
