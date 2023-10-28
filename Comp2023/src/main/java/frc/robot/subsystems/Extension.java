@@ -195,9 +195,7 @@ public class Extension extends SubsystemBase
 
   private double getCurrentInches( )
   {
-    double offsetDueToElbow = (0.0 / 90.0) * EXConsts.kLengthExtension; //m_elbow.getAngle( )
-
-    return Conversions.rotationsToWinchInches(m_motorPosition.refresh( ).getValue( ), EXConsts.kRolloutRatio) - offsetDueToElbow;
+    return Conversions.rotationsToWinchInches(m_motorPosition.refresh( ).getValue( ), EXConsts.kRolloutRatio);
   }
 
   public boolean isBelowIdle( )
@@ -240,10 +238,8 @@ public class Extension extends SubsystemBase
   public void setMMPosition(double targetInches, double elbowAngle)
   {
     // y = mx + b, where 0 degrees is 0.0 extension and 90 degrees is 1/4 winch turn (the extension constant)
-    double offsetDueToElbow = (elbowAngle / 90.0) * EXConsts.kLengthExtension;
-    m_motor.setControl(
-        m_requestMMVolts.withPosition(Conversions.inchesToWinchRotations(targetInches + offsetDueToElbow, EXConsts.kRolloutRatio))
-            .withFeedForward(m_totalArbFeedForward));
+    m_motor.setControl(m_requestMMVolts.withPosition(Conversions.inchesToWinchRotations(targetInches, EXConsts.kRolloutRatio))
+        .withFeedForward(m_totalArbFeedForward));
   }
 
   ///////////////////////// MANUAL MOVEMENT ///////////////////////////////////
