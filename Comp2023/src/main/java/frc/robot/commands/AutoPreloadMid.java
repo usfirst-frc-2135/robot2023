@@ -23,7 +23,7 @@ public class AutoPreloadMid extends SequentialCommandGroup
 {
   public AutoPreloadMid(Elbow elbow, Extension extension, Wrist wrist, Gripper gripper)
   {
-    setName("AutoPreloadMid");
+    setName("AutoPreloadMid"); //TODO: change back to high when applicable
 
     addCommands(
         // Add Commands here:
