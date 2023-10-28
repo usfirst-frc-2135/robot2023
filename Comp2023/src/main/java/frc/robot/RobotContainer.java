@@ -43,6 +43,9 @@ import frc.robot.commands.AutoPreloadAndEngageChargeStation;
 import frc.robot.commands.AutoPreloadAndLeaveCommunityLong;
 import frc.robot.commands.AutoPreloadAndLeaveCommunityShort;
 import frc.robot.commands.AutoPreloadAndStop;
+import frc.robot.commands.AutoPreloadMidAndLeaveCommunityLong;
+import frc.robot.commands.AutoPreloadMidAndLeaveCommunityShort;
+import frc.robot.commands.AutoPreloadMidAndStop;
 import frc.robot.commands.AutoStop;
 import frc.robot.commands.DriveLimelightPath;
 import frc.robot.commands.DriveResetGyro;
@@ -350,6 +353,9 @@ public class RobotContainer
     m_autoChooser.addOption("5 - AutoPreloadAndLeaveCommunityShort", AutoChooser.AUTOPRECOMSHORT);
     m_autoChooser.addOption("6 - AutoPreloadAndLeaveCommunityLong", AutoChooser.AUTOPRECOMLONG);
     m_autoChooser.addOption("7 - AutoPreloadAndEngageChargeStation", AutoChooser.AUTOPRECHARGE);
+    m_autoChooser.addOption("8 - AutoPreloadMidAndStop", AutoChooser.AUTOPREMIDSTOP);
+    m_autoChooser.addOption("9 - AutoPreloadMidAndLeaveCommunityShort", AutoChooser.AUTOPREMIDCOMSHORT);
+    m_autoChooser.addOption("10 - AutoPreloadMidAndLeaveCommunityLong", AutoChooser.AUTOPREMIDCOMLONG);
 
     //m_chooser.addOption("8 - AutoPreloadAndScoreAnother", new AutoPreloadAndScoreAnother(m_swerve));
 
@@ -420,7 +426,18 @@ public class RobotContainer
         break;
       case AUTOPRECHARGE :
         m_autoCommand = new AutoPreloadAndEngageChargeStation(m_swerve, m_elbow, m_extension, m_wrist, m_gripper,
-            "AutoPreloadAndEngageChargeStation", m_autoTrajectory);
+            "AutoPreloadMidAndEngageChargeStation", m_autoTrajectory);
+        break;
+      case AUTOPREMIDSTOP :
+        m_autoCommand = new AutoPreloadMidAndStop(m_swerve, m_elbow, m_extension, m_wrist, m_gripper);
+        break;
+      case AUTOPREMIDCOMSHORT :
+        m_autoCommand = new AutoPreloadMidAndLeaveCommunityShort(m_swerve, m_elbow, m_extension, m_wrist, m_gripper,
+            "AutoPreloadMidAndLeaveCommunityShort", m_autoTrajectory);
+        break;
+      case AUTOPREMIDCOMLONG :
+        m_autoCommand = new AutoPreloadMidAndLeaveCommunityLong(m_swerve, m_elbow, m_extension, m_wrist, m_gripper,
+            "AutoPreloadMidAndLeaveCommunityLong", m_autoTrajectory);
         break;
     }
 

@@ -246,7 +246,7 @@ public class Constants
 
     // Constants for balance
     public static final double kDriveBalancedAngle  = 5.0;    // Pitch values less than this stop driving
-    public static final double kDriveBalanceKp      = -0.040; // Amount of power to apply per degree
+    public static final double kDriveBalanceKp      = -0.038; // Amount of power to apply per degree
 
     public static final double kElbowDriveSlowAngle = 34.0;   // When arm is out beyond this angle - drive is slowed down
   }
@@ -342,7 +342,7 @@ public class Constants
     public static final double        kLengthMax                = 18.0;  // Extension maximum allowable length (2" beyond high length)
     public static final double        kLengthExtension          = 1.0;
 
-    public static final InvertedValue kInvertMotor              = InvertedValue.Clockwise_Positive; // Motor direction for positive input
+    public static final InvertedValue kInvertMotor              = InvertedValue.CounterClockwise_Positive; // Motor direction for positive inputt
 
     // Current limit settings - extension
     public static final double        kSupplyCurrentLimit       = 20.0;  // Supply current limit (after trigger)
@@ -435,7 +435,7 @@ public class Constants
     }
 
     public static final double kManualSpeedVolts = 3.0;            // Motor voltage during manual operation (joystick)
-    public static final double kScoreSpeedVolts  = 4.5;            // Motor voltage during scoring slam dunk (was 2.0 * manual speed)
+    public static final double kScoreSpeedVolts  = 4.0;            // Motor voltage during scoring slam dunk (was 2.0 * manual speed)
     public static final double kBrakeSpeedVolts  = 0.0;            // Motor voltage braking after slam dunk (was 0.25 percent output)
 
     // Motion Magic config parameters
@@ -605,14 +605,17 @@ public class Constants
   {
     enum AutoChooser
     {
-      AUTOSTOP,        // AutoStop
-      AUTOCOMSHORT,    // AutoDriveOffCommunityShort
-      AUTOCOMLONG,     // AutoDriveOffCommunityLong
-      AUTOCHARGE,      // AutoEngageChargeStation
-      AUTOPRESTOP,     // AutoPreloadAndStop
-      AUTOPRECOMSHORT, // AutoPreloadAndDriveOffCommunityShort
-      AUTOPRECOMLONG,  // AutoPreloadAndDriveOffCommunityLong
-      AUTOPRECHARGE    // AutoPreloadAndEngageChargeStation
+      AUTOSTOP,           // AutoStop
+      AUTOCOMSHORT,       // AutoDriveOffCommunityShort
+      AUTOCOMLONG,        // AutoDriveOffCommunityLong
+      AUTOCHARGE,         // AutoEngageChargeStation
+      AUTOPRESTOP,        // AutoPreloadAndStop
+      AUTOPRECOMSHORT,    // AutoPreloadAndDriveOffCommunityShort
+      AUTOPRECOMLONG,     // AutoPreloadAndDriveOffCommunityLong
+      AUTOPRECHARGE,      // AutoPreloadAndEngageChargeStation
+      AUTOPREMIDSTOP,     //AutoPreloadMidAndStop
+      AUTOPREMIDCOMSHORT, // AutoPreloadMidandDriveOffCommunityShort
+      AUTOPREMIDCOMLONG   //AutoPreloadMidAndDriveOffCommunityLong
     }
 
     public static final double                       kMaxSpeedMetersPerSecond                    = 2.2;
