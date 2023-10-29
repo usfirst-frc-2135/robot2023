@@ -246,7 +246,7 @@ public class Constants
 
     // Constants for balance
     public static final double kDriveBalancedAngle  = 5.0;    // Pitch values less than this stop driving
-    public static final double kDriveBalanceKp      = -0.038; // Amount of power to apply per degree
+    public static final double kDriveBalanceKp      = -0.025; // Amount of power to apply per degree
 
     public static final double kElbowDriveSlowAngle = 34.0;   // When arm is out beyond this angle - drive is slowed down
   }
@@ -263,8 +263,8 @@ public class Constants
 
     public static final double               kAngleMin                 = -3.0;  // Elbow minimum allowable degrees (a few degrees less than stowed)
     public static final double               kAngleStow                = 2.0;   // By definition - elbow is vertical
-    public static final double               kAngleIdle                = 23.0;  // Slightly angled out, empirically checked
-    public static final double               kAngleScoreLow            = 37.0;  // From Mech Design (floor, feet art 5" high), empirically checked
+    public static final double               kAngleIdle                = 20.0;  // Slightly angled out, empirically checked
+    public static final double               kAngleScoreLow            = 36.0;  // From Mech Design (floor, feet art 5" high), empirically checked
     public static final double               kAngleScoreMid            = 88.0;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), empirically checked
     public static final double               kAngleScoreHigh           = 98.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked
     public static final double               kAngleSubstation          = 104.0; // From Mech Design (3'1-38" above floor), empirical
@@ -335,11 +335,11 @@ public class Constants
     public static final double        kLengthMin                = -0.5;  // Extension minimum allowable length (half inch less than stowed)
     public static final double        kLengthStow               = 0.25;  // By definition - extension fully retracted
     public static final double        kLengthIdle               = 0.25;  // Slightly off mechanical hard stop
-    public static final double        kLengthScoreLow           = 11.0;   // From Mech Design (floor, feet art 5" high), empirically checked
+    public static final double        kLengthScoreLow           = 11.5;   // From Mech Design (floor, feet art 5" high), empirically checked
     public static final double        kLengthScoreMid           = 1.25;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), empirically checked
     public static final double        kLengthScoreHigh          = 18.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked
     public static final double        kLengthSubstation         = 1.25;  // From Mech Design (3'1-38" above floor)
-    public static final double        kLengthMax                = 18.0;  // Extension maximum allowable length (2" beyond high length)
+    public static final double        kLengthMax                = 18.5;  // Extension maximum allowable length (2" beyond high length)
     public static final double        kLengthExtension          = 1.0;
 
     public static final InvertedValue kInvertMotor              = InvertedValue.CounterClockwise_Positive; // Motor direction for positive inputt
@@ -399,7 +399,7 @@ public class Constants
     public static final double               kAngleMin                 = -2.0;  // Wrist minimum allowable angle (a few degrees less than stowed)
     public static final double               kAngleStow                = 0.0;   // By definition - wrist is 90 degrees perpendicular to arm
     public static final double               kAngleIdle                = 0.0;   // Slightly off stowed value
-    public static final double               kAngleScoreLow            = 39.0;  // From Mech Design (floor, feet art 5" high), empirically checked
+    public static final double               kAngleScoreLow            = 25.0;  // From Mech Design (floor, feet art 5" high), empirically checked
     public static final double               kAngleScoreMid            = 20.0;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), ready to score
     public static final double               kAngleScoreHigh           = 20.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
     public static final double               kAngleScoreAuto           = 90.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score

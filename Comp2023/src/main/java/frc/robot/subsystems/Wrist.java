@@ -87,6 +87,7 @@ public class Wrist extends SubsystemBase
   private StatusSignal<Double>      m_motorSupplyCur  = m_motor.getSupplyCurrent( );
   private StatusSignal<Double>      m_motorStatorCur  = m_motor.getStatorCurrent( );
   private StatusSignal<Double>      m_ccPosition      = m_CANCoder.getAbsolutePosition( );
+  private int                       m_counter         = 0;
 
   // Constructor
   public Wrist(Elbow elbow)
@@ -138,6 +139,13 @@ public class Wrist extends SubsystemBase
       SmartDashboard.putNumber("WR_supplyCur", m_motorSupplyCur.refresh( ).getValue( ));
       SmartDashboard.putNumber("WR_statorCur", m_motorStatorCur.refresh( ).getValue( ));
     }
+
+    //if (m_counter++ >= 25)
+    //{
+    //  m_currentDegrees = getCANCoderDegrees( );
+    //  m_motor.setRotorPosition(Conversions.degreesToInputRotations(m_currentDegrees, WRConsts.kGearRatio));
+    //  m_counter = 0;
+    //}
   }
 
   @Override

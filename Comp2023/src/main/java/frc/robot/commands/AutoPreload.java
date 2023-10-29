@@ -19,11 +19,11 @@ import frc.robot.subsystems.Wrist;
 /**
  *
  */
-public class AutoPreloadMid extends SequentialCommandGroup
+public class AutoPreload extends SequentialCommandGroup
 {
-  public AutoPreloadMid(Elbow elbow, Extension extension, Wrist wrist, Gripper gripper)
+  public AutoPreload(Elbow elbow, Extension extension, Wrist wrist, Gripper gripper)
   {
-    setName("AutoPreloadMid"); //TODO: change back to high when applicable
+    setName("AutoPreload");
 
     addCommands(
         // Add Commands here:
@@ -46,10 +46,10 @@ public class AutoPreloadMid extends SequentialCommandGroup
         new GripperRun(gripper, GRMode.GR_HOLD),  
 
         new PrintCommand(getName() + ": Move Elbow for Preload"),   
-        new ElbowMoveToPosition(elbow, ELConsts.kAngleScoreMid).asProxy(),
+        new ElbowMoveToPosition(elbow, ELConsts.kAngleScoreHigh).asProxy(),
 
         new PrintCommand(getName() + ": Move Extension for Preload"),   
-        new ExtensionMoveToPosition(extension, elbow, EXConsts.kLengthScoreMid).asProxy(),
+        new ExtensionMoveToPosition(extension, elbow, EXConsts.kLengthScoreHigh).asProxy(),
 
         new PrintCommand(getName() + ": Move Wrist for Preload"),   
         new WristMoveToPosition(wrist, WRConsts.kAngleScoreAuto).asProxy(),
