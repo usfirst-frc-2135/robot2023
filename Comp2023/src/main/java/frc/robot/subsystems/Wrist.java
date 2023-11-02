@@ -36,7 +36,6 @@ import frc.robot.Constants.Ports;
 import frc.robot.Constants.WRConsts;
 import frc.robot.Constants.WRConsts.WristMode;
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.lib.math.Conversions;
 import frc.robot.lib.util.CTREConfigs6;
 import frc.robot.lib.util.PhoenixUtil6;
@@ -46,6 +45,7 @@ import frc.robot.lib.util.PhoenixUtil6;
 //
 public class Wrist extends SubsystemBase
 {
+  private Elbow                     m_elbow;
   // Constants
   private final double              kLigament2dOffset = 0.0; // Offset from mechanism root for wrist ligament
 
@@ -67,10 +67,11 @@ public class Wrist extends SubsystemBase
   private boolean                   m_motorValid;      // Health indicator for Falcon 
   private boolean                   m_ccValid;         // Health indicator for CANCoder 
   private boolean                   m_calibrated      = true;
+  private boolean                   m_debug           = true;
 
   private WristMode                 m_mode            = WristMode.WRIST_INIT;     // Manual movement mode with joysticks
 
-  private double                    m_currentDegrees  = 0.0; // Current angle in degrees
+  private static double             m_currentDegrees  = 0.0; // Current angle in degrees
   private double                    m_targetDegrees   = 0.0; // Target angle in degrees
   private Debouncer                 m_withinTolerance = new Debouncer(0.060, DebounceType.kRising);
   private boolean                   m_moveIsFinished;        // Movement has completed (within tolerance)
@@ -80,13 +81,20 @@ public class Wrist extends SubsystemBase
   private double                    m_totalArbFeedForward;   // Arbitrary feedforward added to counteract gravity
 
   private Timer                     m_safetyTimer     = new Timer( ); // Safety timer for movements
+  private StatusSignal<Double>      m_motorPosition   = m_motor.getRotorPosition( );
   private StatusSignal<Double>      m_motorVelocity   = m_motor.getRotorVelocity( );
+  private StatusSignal<Double>      m_motorCLoopError = m_motor.getClosedLoopError( );
+  private StatusSignal<Double>      m_motorSupplyCur  = m_motor.getSupplyCurrent( );
+  private StatusSignal<Double>      m_motorStatorCur  = m_motor.getStatorCurrent( );
+  private StatusSignal<Double>      m_ccPosition      = m_CANCoder.getAbsolutePosition( );
+  private int                       m_counter         = 0;
 
   // Constructor
-  public Wrist( )
+  public Wrist(Elbow elbow)
   {
     setName("Wrist");
     setSubsystem("Wrist");
+    m_elbow = elbow;
 
     m_motorValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_motor, "wrist", CTREConfigs6.wristAngleFXConfig( ));
     m_ccValid = PhoenixUtil6.getInstance( ).canCoderInitialize6(m_CANCoder, "wrist", CTREConfigs6.wristCancoderConfig( ));
@@ -99,7 +107,15 @@ public class Wrist extends SubsystemBase
     m_motorSim.Orientation = ChassisReference.CounterClockwise_Positive;
     m_CANCoderSim.Orientation = ChassisReference.Clockwise_Positive;
 
-    m_motorVelocity.setUpdateFrequency(50);
+    m_motorPosition.setUpdateFrequency(50);
+    if (m_debug)
+    {
+      m_motorVelocity.setUpdateFrequency(50);
+      m_motorCLoopError.setUpdateFrequency(50);
+      m_motorSupplyCur.setUpdateFrequency(50);
+      m_motorStatorCur.setUpdateFrequency(50);
+    }
+    m_ccPosition.setUpdateFrequency(50);
 
     initSmartDashboard( );
     initialize( );
@@ -111,16 +127,25 @@ public class Wrist extends SubsystemBase
     // This method will be called once per scheduler run
 
     m_currentDegrees = getTalonFXDegrees( );
+    m_totalArbFeedForward = calculateTotalArbFF( );
     SmartDashboard.putNumber("WR_curDegrees", m_currentDegrees);
     SmartDashboard.putNumber("WR_targetDegrees", m_targetDegrees);
     SmartDashboard.putNumber("WR_CCDegrees", getCANCoderDegrees( ));
-    SmartDashboard.putNumber("WR_curError", m_motor.getClosedLoopError( ).refresh( ).getValue( ));
-    SmartDashboard.putNumber("WR_rotorVelocity", m_motorVelocity.refresh( ).getValue( ));
-
-    m_totalArbFeedForward = calculateTotalArbFF( );
     SmartDashboard.putNumber("WR_totalFF", m_totalArbFeedForward);
+    if (m_debug)
+    {
+      SmartDashboard.putNumber("WR_velocity", m_motorVelocity.refresh( ).getValue( ));
+      SmartDashboard.putNumber("WR_curError", m_motorCLoopError.refresh( ).getValue( ));
+      SmartDashboard.putNumber("WR_supplyCur", m_motorSupplyCur.refresh( ).getValue( ));
+      SmartDashboard.putNumber("WR_statorCur", m_motorStatorCur.refresh( ).getValue( ));
+    }
 
-    SmartDashboard.putNumber("WR_currentDraw", m_motor.getStatorCurrent( ).refresh( ).getValue( ));
+    //if (m_counter++ >= 25)
+    //{
+    //  m_currentDegrees = getCANCoderDegrees( );
+    //  m_motor.setRotorPosition(Conversions.degreesToInputRotations(m_currentDegrees, WRConsts.kGearRatio));
+    //  m_counter = 0;
+    //}
   }
 
   @Override
@@ -155,6 +180,7 @@ public class Wrist extends SubsystemBase
     SmartDashboard.putBoolean("HL_validWR", m_motorValid);
     SmartDashboard.putBoolean("HL_validWRCC", m_ccValid);
     SmartDashboard.putData("WristMech", m_mech);
+    SmartDashboard.putNumber("WR_ArbFF", 0.0);
   }
 
   public void initialize( )
@@ -168,10 +194,10 @@ public class Wrist extends SubsystemBase
 
   private double calculateTotalArbFF( )
   {
-    double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
-    double wristDegrees = RobotContainer.getInstance( ).m_wrist.getAngle( );
+    // double arbFF = SmartDashboard.getNumber("WR_ArbFF", 0.0); // Tuning only
+    double arbFF = (Robot.isReal( )) ? WRConsts.kArbitraryFF : 0.0;
 
-    return WRConsts.kArbitraryFF * Math.cos(Math.toRadians(elbowDegrees - wristDegrees));
+    return arbFF * Math.cos(Math.toRadians(m_elbow.getAngle( ) - getAngle( )));
   }
 
   ///////////////////////// PUBLIC HELPERS ///////////////////////////////////
@@ -181,14 +207,15 @@ public class Wrist extends SubsystemBase
     return m_currentDegrees;
   }
 
-  public double getCANCoderDegrees( )
+  private double getCANCoderDegrees( )
   {
-    return Conversions.rotationsToOutputDegrees(m_CANCoder.getAbsolutePosition( ).refresh( ).getValue( ), 1.0);
+    return ((WRConsts.kInvertCANCoder) ? -1.0 : 1.0)
+        * Conversions.rotationsToOutputDegrees(m_ccPosition.refresh( ).getValue( ), 1.0);
   }
 
-  public double getTalonFXDegrees( )
+  private double getTalonFXDegrees( )
   {
-    return Conversions.rotationsToOutputDegrees(m_motor.getRotorPosition( ).refresh( ).getValue( ), WRConsts.kGearRatio);
+    return Conversions.rotationsToOutputDegrees(m_motorPosition.refresh( ).getValue( ), WRConsts.kGearRatio);
   }
 
   public boolean isBelowIdle( )
@@ -206,7 +233,7 @@ public class Wrist extends SubsystemBase
     return m_currentDegrees < WRConsts.kAngleScoreMid;
   }
 
-  public boolean isMoveValid(double degrees)
+  private boolean isMoveValid(double degrees)
   {
     return (degrees > WRConsts.kAngleMin) && (degrees < WRConsts.kAngleMax);
   }
@@ -265,7 +292,7 @@ public class Wrist extends SubsystemBase
 
     m_targetDegrees = m_currentDegrees;
 
-    m_motor.setControl(m_requestVolts.withOutput(axisValue * WRConsts.kManualSpeedVolts));
+    m_motor.setControl(m_requestVolts.withOutput(axisValue * WRConsts.kManualSpeedVolts + calculateTotalArbFF( )));
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
@@ -332,58 +359,48 @@ public class Wrist extends SubsystemBase
   public void moveToPositionEnd( )
   {
     m_safetyTimer.stop( );
-    // m_motor.setControl(m_requestVolts.withOutput(0.0)); // TODO: Is this needed? It fixed a bug in Motion Magic in v5 that should be fixed in v6
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
 
-  // TODO: These were added during competition to allow cone scoring--needs to be tested/reworked
+  // Manual commands for scoring cones in slam dunk fashion
 
-  public void setMotorOutput(double brake)
+  public void moveConstantSpeed(double speedInvolts)
   {
-    m_motor.setControl(m_requestVolts.withOutput(brake));
-  }
-
-  public void moveConstantSpeed(double speed)
-  {
-    moveInput(speed);
-  }
-
-  public void moveInput(double axisValue)
-  {
-    boolean outOfRange = false;
+    boolean rangeLimited = false;
     WristMode newMode = WristMode.WRIST_STOPPED;
 
-    axisValue = MathUtil.applyDeadband(axisValue, Constants.kStickDeadband);
+    speedInvolts = MathUtil.applyDeadband(speedInvolts, Constants.kStickDeadband);
 
-    if (axisValue < 0.0)
+    if (speedInvolts < 0.0)
     {
       if (m_currentDegrees > WRConsts.kAngleMin)
         newMode = WristMode.WRIST_UP;
       else
-        outOfRange = true;
+        rangeLimited = true;
     }
-    else if (axisValue > 0.0)
+    else if (speedInvolts > 0.0)
     {
       if (m_currentDegrees < WRConsts.kAngleMax)
         newMode = WristMode.WRIST_DOWN;
       else
-        outOfRange = true;
+        rangeLimited = true;
     }
 
-    if (outOfRange)
-      axisValue = 0.0;
+    if (rangeLimited)
+      speedInvolts = 0.0;
 
     if (newMode != m_mode)
     {
       m_mode = newMode;
-      DataLogManager.log(String.format("%s: move %s%s", getSubsystem( ), m_mode, ((outOfRange) ? " - OUT OF RANGE" : "")));
+      DataLogManager.log(String.format("%s: move %s %.1f deg %s", getSubsystem( ), m_mode, getAngle( ),
+          ((rangeLimited) ? " - OUT OF RANGE" : "")));
     }
 
     m_targetDegrees = m_currentDegrees;
 
     if (m_motorValid)
-      m_motor.setControl(m_requestVolts.withOutput(axisValue * WRConsts.kManualSpeedVolts));
+      m_motor.setControl(m_requestVolts.withOutput(speedInvolts));
   }
 
 }

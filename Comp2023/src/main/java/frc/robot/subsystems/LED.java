@@ -69,7 +69,9 @@ public class LED extends SubsystemBase
   }
 
   public void faultDump( )
-  {}
+  {
+    DataLogManager.log(String.format("%s: faultDump  ----- DUMP FAULTS --------------", getSubsystem( )));
+  }
 
   public void setColor(LEDColor color)
   {

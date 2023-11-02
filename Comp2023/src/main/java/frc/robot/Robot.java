@@ -170,14 +170,8 @@ public class Robot extends TimedRobot
     DataLogManager.log(String.format("teleopInit: Match %s%s, %s Alliance", matchTypeToString(DriverStation.getMatchType( )),
         DriverStation.getMatchNumber( ), allianceToString(DriverStation.getAlliance( ))));
 
-    if (DriverStation.getAlliance( ) == Alliance.Red)
-    {
-      DataLogManager.log(String.format("GRYO before - %.1f", m_robotContainer.m_swerve.getYaw( )));
-      m_robotContainer.m_swerve.zeroGyro(m_robotContainer.m_swerve.getYaw( ) + 180);
-      DataLogManager.log(String.format("GRYO after  - %.1f", m_robotContainer.m_swerve.getYaw( )));
-    }
+    m_robotContainer.m_swerve.enterTeleopMode( );
 
-    m_robotContainer.m_swerve.setIsTeleported(false);
     // This makes sure that the autonomous stops running when teleop starts running. 
 
     if (m_autonomousCommand != null)

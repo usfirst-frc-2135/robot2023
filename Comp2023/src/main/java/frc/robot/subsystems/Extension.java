@@ -34,7 +34,6 @@ import frc.robot.Constants.EXConsts;
 import frc.robot.Constants.EXConsts.ExtensionMode;
 import frc.robot.Constants.Ports;
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.lib.math.Conversions;
 import frc.robot.lib.util.CTREConfigs6;
 import frc.robot.lib.util.PhoenixUtil6;
@@ -44,26 +43,27 @@ import frc.robot.lib.util.PhoenixUtil6;
 //
 public class Extension extends SubsystemBase
 {
+  private Elbow                     m_elbow;
+
   // Constants
   private final double              kLigament2dOffset = 0.0;                               // Offset from mechanism root for extension ligament
-  private final double              kLigament2dLength = Units.inchesToMeters(30.0); // Offset from mechanism root for extension ligament
 
   // Member objects
   private final TalonFX             m_motor           = new TalonFX(Ports.kCANID_Extension);
   private final TalonFXSimState     m_motorSim        = m_motor.getSimState( );
   private final ElevatorSim         m_armSim          = new ElevatorSim(DCMotor.getFalcon500(1), EXConsts.kGearRatio,
-      EXConsts.kForearmMassKg, Units.inchesToMeters(EXConsts.kDrumDiameterInches / 2), EXConsts.kForearmLengthMeters,
-      EXConsts.kForearmLengthMeters + 0.5, false);
+      EXConsts.kForearmMassKg, EXConsts.kDrumRadiusMeters, -EXConsts.kLengthMax, EXConsts.kLengthMax, false);
 
   // Mechanism2d
   private final Mechanism2d         m_mech            = new Mechanism2d(3, 3);
   private final MechanismRoot2d     m_mechRoot        = m_mech.getRoot("extension", 0.5, 1.5);
-  private final MechanismLigament2d m_mechLigament    =
-      m_mechRoot.append(new MechanismLigament2d("extension", kLigament2dLength, kLigament2dOffset, 6, new Color8Bit(Color.kRed)));
+  private final MechanismLigament2d m_mechLigament    = m_mechRoot.append(
+      new MechanismLigament2d("extension", EXConsts.kForearmLengthMeters, kLigament2dOffset, 6, new Color8Bit(Color.kRed)));
 
   // Declare module variables
   private boolean                   m_motorValid;      // Health indicator for Falcon 
   private boolean                   m_calibrated      = true;
+  private boolean                   m_debug           = true;
 
   private ExtensionMode             m_mode            = ExtensionMode.EXTENSION_INIT;     // Manual movement mode with joysticks
 
@@ -77,24 +77,36 @@ public class Extension extends SubsystemBase
   private double                    m_totalArbFeedForward;   // Arbitrary feedforward added to counteract gravity
 
   private Timer                     m_safetyTimer     = new Timer( ); // Safety timer for movements
+  private StatusSignal<Double>      m_motorPosition   = m_motor.getRotorPosition( );
   private StatusSignal<Double>      m_motorVelocity   = m_motor.getRotorVelocity( );
+  private StatusSignal<Double>      m_motorCLoopError = m_motor.getClosedLoopError( );
+  private StatusSignal<Double>      m_motorSupplyCur  = m_motor.getSupplyCurrent( );
+  private StatusSignal<Double>      m_motorStatorCur  = m_motor.getStatorCurrent( );
 
   // Constructor
-  public Extension( )
+  public Extension(Elbow elbow)
   {
     setName("Extension");
     setSubsystem("Extension");
+    m_elbow = elbow;
 
     m_motorValid = PhoenixUtil6.getInstance( ).talonFXInitialize6(m_motor, "extension", CTREConfigs6.extensionLengthFXConfig( ));
 
     if (Robot.isReal( ))
-      m_currentInches = getCurrentInches( );
+      m_currentInches = 0;  //NOTE: Don't call getCurrentInches( );
     m_motor.setRotorPosition(Conversions.inchesToWinchRotations(m_currentInches, EXConsts.kRolloutRatio));
     DataLogManager.log(String.format("%s: CANCoder initial inches %.1f", getSubsystem( ), m_currentInches));
 
     m_motorSim.Orientation = ChassisReference.CounterClockwise_Positive;
 
-    m_motorVelocity.setUpdateFrequency(50);
+    m_motorPosition.setUpdateFrequency(50);
+    if (m_debug)
+    {
+      m_motorVelocity.setUpdateFrequency(50);
+      m_motorCLoopError.setUpdateFrequency(50);
+      m_motorSupplyCur.setUpdateFrequency(50);
+      m_motorStatorCur.setUpdateFrequency(50);
+    }
 
     initSmartDashboard( );
     initialize( );
@@ -109,16 +121,19 @@ public class Extension extends SubsystemBase
     if (m_currentInches < 0)
       setExtensionToZero( );
 
-    SmartDashboard.putNumber("EX_curInches", m_currentInches);
-    SmartDashboard.putNumber("EX_curRotations", Conversions.inchesToWinchRotations(m_currentInches, EXConsts.kRolloutRatio));
-    SmartDashboard.putNumber("EX_targetInches", m_targetInches);
-    SmartDashboard.putNumber("EX_curError", m_motor.getClosedLoopError( ).refresh( ).getValue( ));
-    SmartDashboard.putNumber("EX_rotorVelocity", m_motorVelocity.refresh( ).getValue( ));
-
     m_totalArbFeedForward = calculateTotalArbFF( );
-    SmartDashboard.putNumber("EX_totalFF", m_totalArbFeedForward);
 
-    SmartDashboard.putNumber("EX_currentDraw", m_motor.getStatorCurrent( ).refresh( ).getValue( ));
+    SmartDashboard.putNumber("EX_curInches", m_currentInches);
+    SmartDashboard.putNumber("EX_targetInches", m_targetInches);
+    SmartDashboard.putNumber("EX_curRotations", Conversions.inchesToWinchRotations(m_currentInches, EXConsts.kRolloutRatio));
+    SmartDashboard.putNumber("EX_totalFF", m_totalArbFeedForward);
+    if (m_debug)
+    {
+      SmartDashboard.putNumber("EX_velocity", m_motorVelocity.refresh( ).getValue( ));
+      SmartDashboard.putNumber("EX_curError", m_motorCLoopError.refresh( ).getValue( ));
+      SmartDashboard.putNumber("EX_supplyCur", m_motorSupplyCur.refresh( ).getValue( ));
+      SmartDashboard.putNumber("EX_statorCur", m_motorStatorCur.refresh( ).getValue( ));
+    }
   }
 
   @Override
@@ -142,7 +157,7 @@ public class Extension extends SubsystemBase
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps( )));
 
-    m_mechLigament.setLength(kLigament2dLength + Units.inchesToMeters(m_currentInches));
+    m_mechLigament.setLength(EXConsts.kForearmLengthMeters + Units.inchesToMeters(m_currentInches));
   }
 
   private void initSmartDashboard( )
@@ -150,29 +165,37 @@ public class Extension extends SubsystemBase
     // Initialize dashboard widgets
     SmartDashboard.putBoolean("HL_validEX", m_motorValid);
     SmartDashboard.putData("ExtensionMech", m_mech);
+    SmartDashboard.putNumber("EX_ArbFF", 0.0);
   }
 
   public void initialize( )
   {
     setStopped( );
+    m_calibrated = false;
 
-    m_currentInches = getCurrentInches( );
+    m_currentInches = 0.5; // Allow calibration routine to run for up to this length
     m_targetInches = m_currentInches;
     DataLogManager.log(String.format("%s: Subsystem initialized! Target Inches: %.1f", getSubsystem( ), m_targetInches));
   }
 
   private double calculateTotalArbFF( )
   {
-    double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
+    // double arbFF = SmartDashboard.getNumber("EX_ArbFF", 0.0); // Tuning only
+    double arbFF = (Robot.isReal( )) ? EXConsts.kArbitraryFF : 0.0;
 
-    return EXConsts.kArbitraryFF * Math.cos(Math.toRadians(elbowDegrees));
+    return arbFF * Math.cos(Math.toRadians(m_elbow.getAngle( )));
   }
 
   ///////////////////////// PUBLIC HELPERS ///////////////////////////////////
 
-  public double getCurrentInches( )
+  public double getLength( )
   {
-    return Conversions.rotationsToWinchInches(m_motor.getRotorPosition( ).refresh( ).getValue( ), EXConsts.kRolloutRatio);
+    return m_currentInches;
+  }
+
+  private double getCurrentInches( )
+  {
+    return Conversions.rotationsToWinchInches(m_motorPosition.refresh( ).getValue( ), EXConsts.kRolloutRatio);
   }
 
   public boolean isBelowIdle( )
@@ -190,7 +213,7 @@ public class Extension extends SubsystemBase
     return m_currentInches < EXConsts.kLengthScoreMid;
   }
 
-  public boolean isMoveValid(double inches)
+  private boolean isMoveValid(double inches)
   {
     return (inches > EXConsts.kLengthMin) && (inches < EXConsts.kLengthMax);
   }
@@ -214,10 +237,9 @@ public class Extension extends SubsystemBase
 
   public void setMMPosition(double targetInches, double elbowAngle)
   {
-    targetInches += (elbowAngle / 90.0) * EXConsts.kLengthExtension;
+    // y = mx + b, where 0 degrees is 0.0 extension and 90 degrees is 1/4 winch turn (the extension constant)
     m_motor.setControl(m_requestMMVolts.withPosition(Conversions.inchesToWinchRotations(targetInches, EXConsts.kRolloutRatio))
         .withFeedForward(m_totalArbFeedForward));
-
   }
 
   ///////////////////////// MANUAL MOVEMENT ///////////////////////////////////
@@ -257,7 +279,7 @@ public class Extension extends SubsystemBase
 
     m_targetInches = m_currentInches;
 
-    m_motor.setControl(m_requestVolts.withOutput(axisValue * EXConsts.kManualSpeedVolts)); // TODO: Check FF and volts
+    m_motor.setControl(m_requestVolts.withOutput(axisValue * EXConsts.kManualSpeedVolts + calculateTotalArbFF( )));
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
@@ -323,7 +345,6 @@ public class Extension extends SubsystemBase
   public void moveToPositionEnd( )
   {
     m_safetyTimer.stop( );
-    // m_motor.setControl(m_requestVolts.withOutput(0.0)); // TODO: Is this needed? It fixed a bug in Motion Magic in v5 that should be fixed in v6
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
@@ -334,25 +355,18 @@ public class Extension extends SubsystemBase
       m_motor.setControl(m_requestVolts.withOutput(EXConsts.kCalibrateSpeedVolts));
   }
 
-  public void calibrateExtension( )
+  public void endCalibration( )
   {
     setExtensionToZero( );
+    m_targetInches = m_currentInches;
     m_calibrated = true;
-    SmartDashboard.putBoolean("EL_calibrated", m_calibrated);
+    SmartDashboard.putBoolean("EX_calibrated", m_calibrated);
   }
 
   private void setExtensionToZero( )
   {
-    m_targetInches = 0.0;
     m_currentInches = 0.0;
     resetPositionToZero( );
-  }
-
-  private double calculateTotalFF( )
-  {
-    double elbowDegrees = RobotContainer.getInstance( ).m_elbow.getAngle( );
-
-    return EXConsts.kArbitraryFF * Math.cos(Math.toRadians(elbowDegrees));
   }
 
 }

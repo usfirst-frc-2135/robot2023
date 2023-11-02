@@ -34,10 +34,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ELConsts;
 import frc.robot.Constants.ELConsts.ElbowMode;
-import frc.robot.Constants.EXConsts;
 import frc.robot.Constants.Ports;
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.lib.math.Conversions;
 import frc.robot.lib.util.CTREConfigs6;
 import frc.robot.lib.util.PhoenixUtil6;
@@ -68,10 +66,11 @@ public class Elbow extends SubsystemBase
   private boolean                   m_motorValid;      // Health indicator for Falcon 
   private boolean                   m_ccValid;         // Health indicator for CANCoder 
   private boolean                   m_calibrated      = true;
+  private boolean                   m_debug           = true;
 
   private ElbowMode                 m_mode            = ElbowMode.ELBOW_INIT;     // Manual movement mode with joysticks
 
-  private double                    m_currentDegrees  = 0.0; // Current angle in degrees
+  private static double             m_currentDegrees  = 0.0; // Current angle in degrees
   private double                    m_targetDegrees   = 0.0; // Target angle in degrees
   private Debouncer                 m_withinTolerance = new Debouncer(0.060, DebounceType.kRising);
   private boolean                   m_moveIsFinished;        // Movement has completed (within tolerance)
@@ -81,7 +80,12 @@ public class Elbow extends SubsystemBase
   private double                    m_totalArbFeedForward;   // Arbitrary feedforward added to counteract gravity
 
   private Timer                     m_safetyTimer     = new Timer( ); // Safety timer for movements
+  private StatusSignal<Double>      m_motorPosition   = m_motor.getRotorPosition( );
   private StatusSignal<Double>      m_motorVelocity   = m_motor.getRotorVelocity( );
+  private StatusSignal<Double>      m_motorCLoopError = m_motor.getClosedLoopError( );
+  private StatusSignal<Double>      m_motorSupplyCur  = m_motor.getSupplyCurrent( );
+  private StatusSignal<Double>      m_motorStatorCur  = m_motor.getStatorCurrent( );
+  private StatusSignal<Double>      m_ccPosition      = m_CANCoder.getAbsolutePosition( );
 
   // Constructor
   public Elbow( )
@@ -100,7 +104,15 @@ public class Elbow extends SubsystemBase
     m_motorSim.Orientation = ChassisReference.CounterClockwise_Positive;
     m_CANCoderSim.Orientation = ChassisReference.Clockwise_Positive;
 
-    m_motorVelocity.setUpdateFrequency(50);
+    m_motorPosition.setUpdateFrequency(50);
+    if (m_debug)
+    {
+      m_motorVelocity.setUpdateFrequency(50);
+      m_motorCLoopError.setUpdateFrequency(50);
+      m_motorSupplyCur.setUpdateFrequency(50);
+      m_motorStatorCur.setUpdateFrequency(50);
+    }
+    m_ccPosition.setUpdateFrequency(50);
 
     initSmartDashboard( );
     initialize( );
@@ -112,16 +124,19 @@ public class Elbow extends SubsystemBase
     // This method will be called once per scheduler run
 
     m_currentDegrees = getTalonFXDegrees( );
+    m_totalArbFeedForward = calculateTotalArbFF( );
+
     SmartDashboard.putNumber("EL_curDegrees", m_currentDegrees);
     SmartDashboard.putNumber("EL_targetDegrees", m_targetDegrees);
     SmartDashboard.putNumber("EL_CCDegrees", getCANCoderDegrees( ));
-    SmartDashboard.putNumber("EL_curError", m_motor.getClosedLoopError( ).refresh( ).getValue( ));
-    SmartDashboard.putNumber("EL_rotorVelocity", m_motorVelocity.refresh( ).getValue( ));
-
-    m_totalArbFeedForward = calculateTotalArbFF( );
     SmartDashboard.putNumber("EL_totalFF", m_totalArbFeedForward);
-
-    SmartDashboard.putNumber("EL_currentDraw", m_motor.getStatorCurrent( ).refresh( ).getValue( ));
+    if (m_debug)
+    {
+      SmartDashboard.putNumber("EL_velocity", m_motorVelocity.refresh( ).getValue( ));
+      SmartDashboard.putNumber("EL_curError", m_motorCLoopError.refresh( ).getValue( ));
+      SmartDashboard.putNumber("EL_supplyCur", m_motorSupplyCur.refresh( ).getValue( ));
+      SmartDashboard.putNumber("EL_statorCur", m_motorStatorCur.refresh( ).getValue( ));
+    }
   }
 
   @Override
@@ -141,8 +156,8 @@ public class Elbow extends SubsystemBase
     m_motorSim.setRawRotorPosition(Conversions.radiansToInputRotations(m_armSim.getAngleRads( ), ELConsts.kGearRatio));
     m_motorSim.setRotorVelocity(Conversions.radiansToInputRotations(m_armSim.getVelocityRadPerSec( ), ELConsts.kGearRatio));
 
-    m_CANCoderSim.setRawPosition(Units.radiansToRotations(m_armSim.getAngleRads( )));
-    m_CANCoderSim.setVelocity(Units.radiansToRotations(m_armSim.getVelocityRadPerSec( )));
+    m_CANCoderSim.setRawPosition(Units.radiansToRotations(-m_armSim.getAngleRads( )));
+    m_CANCoderSim.setVelocity(Units.radiansToRotations(-m_armSim.getVelocityRadPerSec( )));
 
     // SimBattery estimates loaded battery voltages
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps( )));
@@ -156,6 +171,7 @@ public class Elbow extends SubsystemBase
     SmartDashboard.putBoolean("HL_validEL", m_motorValid);
     SmartDashboard.putBoolean("HL_validELCC", m_ccValid);
     SmartDashboard.putData("ElbowMech", m_mech);
+    SmartDashboard.putNumber("EL_ArbFF", 0.0);
   }
 
   public void initialize( )
@@ -169,10 +185,10 @@ public class Elbow extends SubsystemBase
 
   private double calculateTotalArbFF( )
   {
-    double extensionLength = RobotContainer.getInstance( ).m_extension.getCurrentInches( );
+    // double arbFF = SmartDashboard.getNumber("EL_ArbFF", 0.0); // Tuning only
+    double arbFF = (Robot.isReal( )) ? ELConsts.kArbitraryFF : 0.0;
 
-    return Math.sin(Math.toRadians(m_currentDegrees))
-        * (ELConsts.kArbitraryFF + ELConsts.kExtArbFF * ((extensionLength) / EXConsts.kLengthMax));
+    return arbFF * Math.sin(Math.toRadians(m_currentDegrees));
   }
 
   ///////////////////////// PUBLIC HELPERS ///////////////////////////////////
@@ -182,14 +198,15 @@ public class Elbow extends SubsystemBase
     return m_currentDegrees;
   }
 
-  public double getCANCoderDegrees( )
+  private double getCANCoderDegrees( )
   {
-    return Conversions.rotationsToOutputDegrees(m_CANCoder.getAbsolutePosition( ).refresh( ).getValue( ), 1.0);
+    return ((ELConsts.kInvertCANCoder) ? -1.0 : 1.0)
+        * Conversions.rotationsToOutputDegrees(m_ccPosition.refresh( ).getValue( ), 1.0);
   }
 
-  public double getTalonFXDegrees( )
+  private double getTalonFXDegrees( )
   {
-    return Conversions.rotationsToOutputDegrees(m_motor.getRotorPosition( ).refresh( ).getValue( ), ELConsts.kGearRatio);
+    return Conversions.rotationsToOutputDegrees(m_motorPosition.refresh( ).getValue( ), ELConsts.kGearRatio);
   }
 
   public boolean isBelowIdle( )
@@ -207,7 +224,7 @@ public class Elbow extends SubsystemBase
     return m_currentDegrees < ELConsts.kAngleScoreMid;
   }
 
-  public boolean isMoveValid(double degrees)
+  private static boolean isMoveValid(double degrees)
   {
     return (degrees > ELConsts.kAngleMin) && (degrees < ELConsts.kAngleMax);
   }
@@ -266,7 +283,7 @@ public class Elbow extends SubsystemBase
 
     m_targetDegrees = m_currentDegrees;
 
-    m_motor.setControl(m_requestVolts.withOutput(axisValue * ELConsts.kManualSpeedVolts));
+    m_motor.setControl(m_requestVolts.withOutput(axisValue * ELConsts.kManualSpeedVolts + calculateTotalArbFF( )));
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////
@@ -333,7 +350,6 @@ public class Elbow extends SubsystemBase
   public void moveToPositionEnd( )
   {
     m_safetyTimer.stop( );
-    // m_motor.setControl(m_requestVolts.withOutput(0.0)); // TODO: Is this needed? It fixed a bug in Motion Magic in v5 that should be fixed in v6
   }
 
   ///////////////////////// MOTION MAGIC ///////////////////////////////////

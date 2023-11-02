@@ -47,7 +47,7 @@ public class ExtensionCalibrate extends CommandBase
     DataLogManager.log(String.format("%s: Ending calibrate %.3f FPGATime %.3f", getSubsystem( ), m_calibrateTimer.get( ),
         Timer.getFPGATimestamp( )));
     m_calibrateTimer.stop( );
-    m_extension.calibrateExtension( );
+    m_extension.endCalibration( );
     m_extension.setStopped( );
   }
 

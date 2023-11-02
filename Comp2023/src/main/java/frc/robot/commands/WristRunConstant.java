@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.WRConsts;
 import frc.robot.subsystems.Wrist;
 
 /**
@@ -30,7 +31,7 @@ public class WristRunConstant extends CommandBase
   @Override
   public void execute( )
   {
-    m_wrist.moveConstantSpeed(m_moveUp ? 2.0 : -2.0);
+    m_wrist.moveConstantSpeed(m_moveUp ? WRConsts.kScoreSpeedVolts : -WRConsts.kScoreSpeedVolts);
   }
 
   // Called once the command ends or is interrupted.

@@ -24,13 +24,14 @@ public class SwerveModule
   private CANcoder               m_steerEncoder;
   private double                 m_steerOffset;
   private double                 m_lastAngle;
-  private StatusSignal<Double>   m_closedlooperror;
 
   private SimpleMotorFeedforward m_feedforward            =
       new SimpleMotorFeedforward(SWConsts.driveKS, SWConsts.driveKV, SWConsts.driveKA);
   private DutyCycleOut           m_dutyCycleRequest       = new DutyCycleOut(0.0);
   private VelocityVoltage        m_velocityVoltageRequest = new VelocityVoltage(0.0);
   private PositionVoltage        m_positionVoltageRequest = new PositionVoltage(0.0);
+  private StatusSignal<Double>   m_driveClosedLoopError;
+  private StatusSignal<Double>   m_steerClosedLoopError;
 
   public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants)
   {
@@ -51,6 +52,11 @@ public class SwerveModule
     /* Drive Motor Config */
     m_driveMotor = new TalonFX(moduleConstants.driveMotorID, Constants.Ports.kCANCarnivore);
     PhoenixUtil6.getInstance( ).talonFXInitialize6(m_driveMotor, driveName.toString( ), CTREConfigs6.swerveDriveFXConfig( ));
+
+    m_driveClosedLoopError = m_driveMotor.getClosedLoopError( );
+    m_steerClosedLoopError = m_steerMotor.getClosedLoopError( );
+    m_driveClosedLoopError.setUpdateFrequency(50);
+    m_steerClosedLoopError.setUpdateFrequency(50);
 
     m_lastAngle = getState( ).angle.getDegrees( );
   }
@@ -103,9 +109,8 @@ public class SwerveModule
         SWConsts.driveGearRatio);
     Rotation2d angle = Rotation2d.fromDegrees(
         Conversions.rotationsToOutputDegrees(m_steerMotor.getPosition( ).refresh( ).getValue( ), SWConsts.steerGearRatio));
-    m_closedlooperror = m_driveMotor.getClosedLoopError( );
-    double closedlooperror = m_closedlooperror.refresh( ).getValue( );
-    SmartDashboard.putNumber("SW Closed Loop Error", closedlooperror);
+    SmartDashboard.putNumber("SW_driveClosedLoopError", m_driveClosedLoopError.refresh( ).getValue( ));
+    SmartDashboard.putNumber("SW_steerClosedLoopError", m_steerClosedLoopError.refresh( ).getValue( ));
 
     return new SwerveModuleState(velocity, angle);
   }

@@ -89,11 +89,11 @@ public class RobotContainer
 
   // These subsystems can use LED or vision and must be created afterward
   public final Elbow                   m_elbow              = new Elbow( );
-  public final Extension               m_extension          = new Extension( );
-  public final Wrist                   m_wrist              = new Wrist( );
+  public final Extension               m_extension          = new Extension(m_elbow);
+  public final Wrist                   m_wrist              = new Wrist(m_elbow);
   public final Gripper                 m_gripper            = new Gripper( );
   public final Power                   m_power              = new Power( );
-  public final Swerve                  m_swerve             = new Swerve( );
+  public final Swerve                  m_swerve             = new Swerve(m_vision);
 
   // A chooser for autonomous commands
   private SendableChooser<AutoChooser> m_autoChooser        = new SendableChooser<>( );
@@ -327,9 +327,9 @@ public class RobotContainer
     m_wrist.setDefaultCommand(new WristMoveToPosition(m_wrist));
 
     // Default command - manual mode
-    // m_elbow.setDefaultCommand(new ElbowRun(m_elbow, m_operatorPad));
-    // m_extension.setDefaultCommand(new ExtensionRun(m_extension, m_operatorPad));
-    // m_wrist.setDefaultCommand(new WristRun(m_wrist, m_operatorPad));
+    //m_elbow.setDefaultCommand(new ElbowRun(m_elbow, m_operatorPad));
+    //m_extension.setDefaultCommand(new ExtensionRun(m_extension, m_operatorPad));
+    //m_wrist.setDefaultCommand(new WristRun(m_wrist, m_operatorPad));
   }
 
   /****************************************************************************
@@ -417,7 +417,7 @@ public class RobotContainer
         break;
       case AUTOPRECHARGE :
         m_autoCommand = new AutoPreloadAndEngageChargeStation(m_swerve, m_elbow, m_extension, m_wrist, m_gripper,
-            "AutoPreloadAndEngageChargeStation", m_autoTrajectory);
+            "AutoPreloadMidAndEngageChargeStation", m_autoTrajectory);
         break;
     }
 

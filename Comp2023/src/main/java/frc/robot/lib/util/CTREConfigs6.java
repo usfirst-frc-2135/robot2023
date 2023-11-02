@@ -10,6 +10,7 @@ import frc.robot.Constants.ELConsts;
 import frc.robot.Constants.EXConsts;
 import frc.robot.Constants.SWConsts;
 import frc.robot.Constants.WRConsts;
+import frc.robot.Robot;
 import frc.robot.lib.math.Conversions;
 
 public final class CTREConfigs6
@@ -162,7 +163,10 @@ public final class CTREConfigs6
     CANcoderConfiguration config = new CANcoderConfiguration( );
     config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
     config.MagnetSensor.SensorDirection = ELConsts.kSensorDirection;
-    config.MagnetSensor.MagnetOffset = (Constants.isComp) ? ELConsts.kCompOffset : ELConsts.kBetaOffset;
+    if (Robot.isSimulation( ))
+      config.MagnetSensor.MagnetOffset = -0.25; // CANCoder simulate defaults to 0.25 rotations
+    else
+      config.MagnetSensor.MagnetOffset = (Constants.isComp) ? ELConsts.kCompOffset : ELConsts.kBetaOffset;
     return config;
   }
 
@@ -231,7 +235,10 @@ public final class CTREConfigs6
     CANcoderConfiguration config = new CANcoderConfiguration( );
     config.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
     config.MagnetSensor.SensorDirection = WRConsts.kSensorDirection;
-    config.MagnetSensor.MagnetOffset = (Constants.isComp) ? WRConsts.kCompOffset : WRConsts.kBetaOffset;
+    if (Robot.isSimulation( ))
+      config.MagnetSensor.MagnetOffset = -0.25; // CANCoder simulate defaults to 0.25 rotations
+    else
+      config.MagnetSensor.MagnetOffset = (Constants.isComp) ? WRConsts.kCompOffset : WRConsts.kBetaOffset;
     return config;
   }
 

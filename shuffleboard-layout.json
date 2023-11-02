@@ -272,21 +272,6 @@
               "_showGlyph": false
             }
           },
-          "12,0": {
-            "size": [
-              3,
-              2
-            ],
-            "content": {
-              "_type": "Boolean Box",
-              "_source0": "network_table:///SmartDashboard/EL_calibrated",
-              "_title": "SmartDashboard/EL_calibrated",
-              "_glyph": 148,
-              "_showGlyph": false,
-              "Colors/Color when true": "#7CFC00FF",
-              "Colors/Color when false": "#8B0000FF"
-            }
-          },
           "6,4": {
             "size": [
               3,
@@ -367,20 +352,7 @@
               "_showGlyph": false
             }
           },
-          "9,0": {
-            "size": [
-              3,
-              2
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/EL_currentDraw",
-              "_title": "/SmartDashboard/EL_currentDraw",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "14,2": {
+          "15,0": {
             "size": [
               3,
               2
@@ -409,6 +381,45 @@
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/EL_CCDegrees",
               "_title": "/SmartDashboard/EL_CCDegrees",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "12,4": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EL_statorCur",
+              "_title": "SmartDashboard/EL_statorCur",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "12,2": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EL_supplyCur",
+              "_title": "SmartDashboard/EL_supplyCur",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "12,0": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EL_velocity",
+              "_title": "SmartDashboard/EL_velocity",
               "_glyph": 148,
               "_showGlyph": false
             }
@@ -466,7 +477,7 @@
               "_showGlyph": false
             }
           },
-          "14,2": {
+          "15,0": {
             "size": [
               3,
               2
@@ -510,19 +521,6 @@
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/EX_totalFF",
               "_title": "/SmartDashboard/EX_totalFF",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "9,0": {
-            "size": [
-              3,
-              2
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/EX_currentDraw",
-              "_title": "/SmartDashboard/EX_currentDraw",
               "_glyph": 148,
               "_showGlyph": false
             }
@@ -591,6 +589,60 @@
               "_glyph": 148,
               "_showGlyph": false
             }
+          },
+          "12,0": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_velocity",
+              "_title": "SmartDashboard/EX_velocity",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "12,2": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_supplyCur",
+              "_title": "SmartDashboard/EX_supplyCur",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "12,4": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_statorCur",
+              "_title": "SmartDashboard/EX_statorCur",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "9,0": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Boolean Box",
+              "_source0": "network_table:///SmartDashboard/EX_calibrated",
+              "_title": "SmartDashboard/EX_calibrated",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Colors/Color when true": "#7CFC00FF",
+              "Colors/Color when false": "#8B0000FF"
+            }
           }
         }
       }
@@ -656,21 +708,6 @@
               "_title": "SmartDashboard/WristStow",
               "_glyph": 148,
               "_showGlyph": false
-            }
-          },
-          "12,0": {
-            "size": [
-              3,
-              2
-            ],
-            "content": {
-              "_type": "Boolean Box",
-              "_source0": "network_table:///SmartDashboard/WR_calibrated",
-              "_title": "SmartDashboard/WR_calibrated",
-              "_glyph": 148,
-              "_showGlyph": false,
-              "Colors/Color when true": "#7CFC00FF",
-              "Colors/Color when false": "#8B0000FF"
             }
           },
           "6,4": {
@@ -753,7 +790,7 @@
               "_showGlyph": false
             }
           },
-          "15,4": {
+          "15,0": {
             "size": [
               3,
               2
@@ -771,19 +808,6 @@
               "Y-axis/Lower bound": -1.0,
               "Y-axis/Unit": "ul",
               "Visible data/SmartDashboard/WR_curError": true
-            }
-          },
-          "9,0": {
-            "size": [
-              3,
-              2
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/WR_currentDraw",
-              "_title": "/SmartDashboard/WR_currentDraw",
-              "_glyph": 148,
-              "_showGlyph": false
             }
           },
           "9,2": {
@@ -808,6 +832,45 @@
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/WR_CCDegrees",
               "_title": "/SmartDashboard/WR_CCDegrees",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "12,4": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/WR_statorCur",
+              "_title": "SmartDashboard/WR_statorCur",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "12,2": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/WR_supplyCur",
+              "_title": "SmartDashboard/WR_supplyCur",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "12,0": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/WR_velocity",
+              "_title": "SmartDashboard/WR_velocity",
               "_glyph": 148,
               "_showGlyph": false
             }
@@ -1226,6 +1289,110 @@
               "Visuals/Robot Icon Size": 50.0,
               "Visuals/Show Outside Circles": false
             }
+          },
+          "0,0": {
+            "size": [
+              6,
+              4
+            ],
+            "content": {
+              "_type": "ComboBox Chooser",
+              "_source0": "network_table:///SmartDashboard/Auto Mode",
+              "_title": "SmartDashboard/Auto Mode",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "6,0": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EL_curDegrees",
+              "_title": "SmartDashboard/EL_curDegrees",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "6,4": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/WR_curDegrees",
+              "_title": "SmartDashboard/WR_curDegrees",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "9,4": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/WR_CCDegrees",
+              "_title": "SmartDashboard/WR_CCDegrees",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "9,0": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EL_CCDegrees",
+              "_title": "SmartDashboard/EL_CCDegrees",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "6,2": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/EX_curInches",
+              "_title": "SmartDashboard/EX_curInches",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "0,4": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/ElbowSetAngleToZero",
+              "_title": "SmartDashboard/ElbowSetAngleToZero",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
+          },
+          "3,4": {
+            "size": [
+              3,
+              2
+            ],
+            "content": {
+              "_type": "Command",
+              "_source0": "network_table:///SmartDashboard/WristSetAngleToZero",
+              "_title": "SmartDashboard/WristSetAngleToZero",
+              "_glyph": 148,
+              "_showGlyph": false
+            }
           }
         }
       }
@@ -1517,7 +1684,7 @@
   ],
   "windowGeometry": {
     "x": 0.0,
-    "y": 25.0,
+    "y": 38.0,
     "width": 1061.0,
     "height": 508.0
   }
