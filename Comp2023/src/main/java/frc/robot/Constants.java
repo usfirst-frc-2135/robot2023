@@ -263,11 +263,11 @@ public class Constants
 
     public static final double               kAngleMin                 = -3.0;  // Elbow minimum allowable degrees (a few degrees less than stowed)
     public static final double               kAngleStow                = 2.0;   // By definition - elbow is vertical
-    public static final double               kAngleIdle                = 20.0;  // Slightly angled out, empirically checked
-    public static final double               kAngleScoreLow            = 36.0;  // From Mech Design (floor, feet art 5" high), empirically checked
-    public static final double               kAngleScoreMid            = 88.0;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), empirically checked
-    public static final double               kAngleScoreHigh           = 98.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked
-    public static final double               kAngleSubstation          = 104.0; // From Mech Design (3'1-38" above floor), empirical
+    public static final double               kAngleIdle                = 15.0;  // Slightly angled out, empirically checked
+    public static final double               kAngleScoreLow            = 33.0;  // From Mech Design (floor, feet art 5" high), empirically checked
+    public static final double               kAngleScoreMid            = 80.0;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), empirically checked
+    public static final double               kAngleScoreHigh           = 103.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked
+    public static final double               kAngleSubstation          = 45.0; // From Mech Design (3'1-38" above floor), empirical
     public static final double               kAngleMax                 = 110.0; // Elbow maximum allowable degrees (10 deg more than high)
 
     public static final InvertedValue        kInvertMotor              = InvertedValue.Clockwise_Positive;  // Motor direction for positive input
@@ -334,11 +334,11 @@ public class Constants
     // Extension lengths increase by 0.95" per 90 degrees of elbow rotation (lengths manually adjusted below)
     public static final double        kLengthMin                = -0.5;  // Extension minimum allowable length (half inch less than stowed)
     public static final double        kLengthStow               = 0.25;  // By definition - extension fully retracted
-    public static final double        kLengthIdle               = 0.25;  // Slightly off mechanical hard stop
+    public static final double        kLengthIdle               = 0.0;  // Slightly off mechanical hard stop
     public static final double        kLengthScoreLow           = 11.5;   // From Mech Design (floor, feet art 5" high), empirically checked
-    public static final double        kLengthScoreMid           = 1.25;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), empirically checked
+    public static final double        kLengthScoreMid           = 0.5;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), empirically checked
     public static final double        kLengthScoreHigh          = 18.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked
-    public static final double        kLengthSubstation         = 1.25;  // From Mech Design (3'1-38" above floor)
+    public static final double        kLengthSubstation         = 0.5;  // From Mech Design (3'1-38" above floor)
     public static final double        kLengthMax                = 18.5;  // Extension maximum allowable length (2" beyond high length)
     public static final double        kLengthExtension          = 1.0;
 
@@ -356,7 +356,7 @@ public class Constants
     public static final double        kNeutralDeadband          = 0.001; // Extension motor output deadband
 
     // Calibration
-    public static final double        kCalibrateSpeedVolts      = -1.6; // Motor voltage during calibration
+    public static final double        kCalibrateSpeedVolts      = -1.4; // Motor voltage during calibration
 
     // Manual config parameters
     public enum ExtensionMode
@@ -403,7 +403,7 @@ public class Constants
     public static final double               kAngleScoreMid            = 20.0;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), ready to score
     public static final double               kAngleScoreHigh           = 20.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
     public static final double               kAngleScoreAuto           = 90.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
-    public static final double               kAngleSubstation          = 100.0; // From Mech Design (3'1-38" above floor)
+    public static final double               kAngleSubstation          = 0.0; // From Mech Design (3'1-38" above floor)
     public static final double               kAngleMax                 = 110.0; // Wrist maximum allowable angle (a few degrees more than substation/horizontal)
 
     public static final InvertedValue        kInvertMotor              = InvertedValue.CounterClockwise_Positive; // Motor direction for positive input
@@ -421,7 +421,7 @@ public class Constants
     public static final double               kNeutralDeadband          = 0.001; // Wrist motor output deadband
 
     // CANCoder wrist absolute offset
-    public static final double               kCompOffset               = -0.07446; // CANCoder offset angle for comp bot
+    public static final double               kCompOffset               = 0.083252; // CANCoder offset angle for comp bot
     public static final double               kBetaOffset               = 0.000;   // TODO: CANCoder offset rotations for beta bot
     public static final SensorDirectionValue kSensorDirection          = SensorDirectionValue.Clockwise_Positive;
 
