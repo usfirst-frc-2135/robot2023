@@ -27,6 +27,7 @@ import frc.robot.Constants.ELConsts;
 import frc.robot.Constants.EXConsts;
 import frc.robot.Constants.GRConsts.GRMode;
 import frc.robot.Constants.LEDConsts.LEDColor;
+import frc.robot.Constants.VIConsts;
 import frc.robot.Constants.VIConsts.VIGoalDirection;
 import frc.robot.Constants.WRConsts;
 import frc.robot.commands.ArmManualMode;
@@ -44,6 +45,7 @@ import frc.robot.commands.AutoPreloadAndLeaveCommunityLong;
 import frc.robot.commands.AutoPreloadAndLeaveCommunityShort;
 import frc.robot.commands.AutoPreloadAndStop;
 import frc.robot.commands.AutoStop;
+import frc.robot.commands.CameraDisplaySet;
 import frc.robot.commands.DriveLimelightPath;
 import frc.robot.commands.DriveResetGyro;
 import frc.robot.commands.DriveResetOdometry;
@@ -298,7 +300,7 @@ public class RobotContainer
     operRightBumper.onFalse(new GripperRun(m_gripper, GRMode.GR_HOLD));
     operBack.toggleOnTrue(new ArmManualMode(m_elbow, m_extension, m_wrist, m_operatorPad)); // aka View
 
-    operStart.onTrue(new Dummy("Start")); // aka Menu
+    operStart.onTrue(new CameraDisplaySet(m_vision, VIConsts.PIP_SECONDARY)); // aka Menu
     //
     // Operator - POV buttons
     operUp.onTrue(new ArmSetHeightShelf(m_elbow, m_extension, m_wrist));

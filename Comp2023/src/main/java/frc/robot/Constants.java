@@ -279,8 +279,8 @@ public class Constants
     public static final double               kSupplyTriggerTime        = 0.001; // Supply time duration of trigger that will causing limiting
     public static final boolean              kSupplyCurrentLimitEnable = true;  // Supply current enable
 
-    public static final double               kStatorCurrentLimit       = 100.0; // Stator current limit (after trigger)
-    public static final boolean              kStatorCurrentLimitEnable = false; // Stator current enable
+    public static final double               kStatorCurrentLimit       = 75.0; // Stator current limit (after trigger)
+    public static final boolean              kStatorCurrentLimitEnable = true; // Stator current enable
 
     public static final double               kNeutralDeadband          = 0.001; // Elbow motor output deadband
 
@@ -350,8 +350,8 @@ public class Constants
     public static final double        kSupplyTriggerTime        = 0.001; // Supply time duration of trigger that will causing limiting
     public static final boolean       kSupplyCurrentLimitEnable = true;  // Supply current enable
 
-    public static final double        kStatorCurrentLimit       = 100.0; // Stator current limit (after trigger)
-    public static final boolean       kStatorCurrentLimitEnable = false; // Stator current enable
+    public static final double        kStatorCurrentLimit       = 45.0; // Stator current limit (after trigger)
+    public static final boolean       kStatorCurrentLimitEnable = true; // Stator current enable
 
     public static final double        kNeutralDeadband          = 0.001; // Extension motor output deadband
 
@@ -375,7 +375,7 @@ public class Constants
     public static final double kMMJerk               = kMMAcceleration * 4.0; // Elbow motion magic jerk limit (1/4 of acceleration time)
     public static final double kS                    = 0.0;            // Voltage constant to overcome friction
     public static final double kV                    = 0.1129;         // Voltage constant per desired RPM
-    public static final double kPidKp                = 5.864;          // Extension PID proportional constant
+    public static final double kPidKp                = 2.932;          // Extension PID proportional constant
     public static final double kPidKi                = 0.0;            // Extension PID integral constant
     public static final double kPidKd                = 0.0;            // Extension PID derivative constant
 
@@ -402,9 +402,9 @@ public class Constants
     public static final double               kAngleScoreLow            = 25.0;  // From Mech Design (floor, feet art 5" high), empirically checked
     public static final double               kAngleScoreMid            = 20.0;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), ready to score
     public static final double               kAngleScoreHigh           = 20.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
-    public static final double               kAngleScoreAuto           = 90.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
+    public static final double               kAngleScoreAuto           = 110.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), ready to score
     public static final double               kAngleSubstation          = 0.0; // From Mech Design (3'1-38" above floor)
-    public static final double               kAngleMax                 = 110.0; // Wrist maximum allowable angle (a few degrees more than substation/horizontal)
+    public static final double               kAngleMax                 = 115.0; // Wrist maximum allowable angle (a few degrees more than substation/horizontal)
 
     public static final InvertedValue        kInvertMotor              = InvertedValue.CounterClockwise_Positive; // Motor direction for positive input
     public static final boolean              kInvertCANCoder           = true;
@@ -415,8 +415,8 @@ public class Constants
     public static final double               kSupplyTriggerTime        = 0.001; // Supply time duration of trigger that will causing limiting
     public static final boolean              kSupplyCurrentLimitEnable = true;  // Supply current enable
 
-    public static final double               kStatorCurrentLimit       = 100.0; // Stator current limit (after trigger)
-    public static final boolean              kStatorCurrentLimitEnable = false; // Stator current enable
+    public static final double               kStatorCurrentLimit       = 20.0; // Stator current limit (after trigger)
+    public static final boolean              kStatorCurrentLimitEnable = true; // Stator current enable
 
     public static final double               kNeutralDeadband          = 0.001; // Wrist motor output deadband
 
