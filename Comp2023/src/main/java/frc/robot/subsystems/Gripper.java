@@ -71,7 +71,7 @@ public class Gripper extends SubsystemBase
   {
     motor.setInverted(inverted);
     PhoenixUtil5.getInstance( ).talonSRXCheckError(motor, "setInverted");
-    motor.setNeutralMode(NeutralMode.Coast);
+    motor.setNeutralMode(NeutralMode.Brake);
     PhoenixUtil5.getInstance( ).talonSRXCheckError(motor, "setNeutralMode");
     motor.setSafetyEnabled(false);
     PhoenixUtil5.getInstance( ).talonSRXCheckError(motor, "setSafetyEnabled");

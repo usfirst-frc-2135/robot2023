@@ -334,8 +334,8 @@ public class Constants
     // Extension lengths increase by 0.95" per 90 degrees of elbow rotation (lengths manually adjusted below)
     public static final double        kLengthMin                = -0.5;  // Extension minimum allowable length (half inch less than stowed)
     public static final double        kLengthStow               = 0.25;  // By definition - extension fully retracted
-    public static final double        kLengthIdle               = 0.0;  // Slightly off mechanical hard stop
-    public static final double        kLengthScoreLow           = 11.5;   // From Mech Design (floor, feet art 5" high), empirically checked
+    public static final double        kLengthIdle               = -0.25;  // Slightly off mechanical hard stopoppppppppp
+    public static final double        kLengthScoreLow           = 12.5;   // From Mech Design (floor, feet art 5" high), empirically checked
     public static final double        kLengthScoreMid           = 0.5;  // From Mech Design (1'10-3/4" deep, 2'10" high peg, 1'11-1/2 high cube), empirically checked
     public static final double        kLengthScoreHigh          = 18.0;  // From Mech Design (3'3-3/4" deep, 3'10" high peg, 2'11-1/2 high cube), empirically checked
     public static final double        kLengthSubstation         = 0.5;  // From Mech Design (3'1-38" above floor)
@@ -375,7 +375,7 @@ public class Constants
     public static final double kMMJerk               = kMMAcceleration * 4.0; // Elbow motion magic jerk limit (1/4 of acceleration time)
     public static final double kS                    = 0.0;            // Voltage constant to overcome friction
     public static final double kV                    = 0.1129;         // Voltage constant per desired RPM
-    public static final double kPidKp                = 2.932;          // Extension PID proportional constant
+    public static final double kPidKp                = 2.0;          // Extension PID proportional constant
     public static final double kPidKi                = 0.0;            // Extension PID integral constant
     public static final double kPidKd                = 0.0;            // Extension PID derivative constant
 
