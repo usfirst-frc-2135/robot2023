@@ -35,20 +35,20 @@ public class ExampleSmartMotorController implements MotorController
 
   // private final static double                       ks            = 0.0;   // Volts to overcome static friction
   // private final static double                       kf            = 0.0;   // Volts per velocity unit
-  private final static double   kp                  = 0.4;   // (native units) 10% * 102.3 / 1023
+  private final static double   kp                  = 0.05;          // (native units) 10% * 102.3 / 1023
   private final static double   ki                  = 0.0;
   private final static double   kd                  = 0.0;
 
-  private static final double   kGearRatio          = 9.0;                                // TODO: Change to actual value
-  private static final double   kForearmMassKg      = 2.0;
-  private static final double   kDrumDiameterMeters = Units.inchesToMeters(1.375); // Drum diameter in meters
-  private static final double   kLengthMeters       = Units.inchesToMeters(60.0);  // Maximum length in meters
+  private static final double   kGearRatio          = 10.0;          // TODO: Change to actual value
+  private static final double   kCarriageMassKg     = 0.1;
+  private static final double   kDrumDiameterMeters = 1.0 / Math.PI; // Drum diameter in meters (make meter = rotation)
+  private static final double   kLengthMeters       = 2.0;           // Maximum length in meters
   private static final double   kDrumCircumMeters   = kDrumDiameterMeters * Math.PI;      // Drum diameter in meters
   // private static final double   kRolloutRatioMeters = kDrumCircumMeters / kGearRatio;     // Meters per shaft rotation
 
   private WPI_TalonSRX          m_motor;
   private TalonSRXSimCollection m_motorSim;
-  private final ElevatorSim     m_armSim            = new ElevatorSim(DCMotor.getVex775Pro(1), kGearRatio, kForearmMassKg,
+  private final ElevatorSim     m_elevatorSim       = new ElevatorSim(DCMotor.getVex775Pro(1), kGearRatio, kCarriageMassKg,
       kDrumDiameterMeters / 2, -kLengthMeters, kLengthMeters, false);
 
   /**
@@ -83,24 +83,27 @@ public class ExampleSmartMotorController implements MotorController
 
     // Set input motor voltage from the motor setting
     m_motorSim.setBusVoltage(RobotController.getInputVoltage( ));
-    m_armSim.setInput(m_motorSim.getMotorOutputLeadVoltage( ));
+    m_elevatorSim.setInput(m_motorSim.getMotorOutputLeadVoltage( ));
 
     // update for 20 msec loop
-    m_armSim.update(0.020);
+    m_elevatorSim.update(0.020);
 
     // // Finally, we set our simulated encoder's readings and simulated battery voltage
-    m_motorSim.setQuadratureRawPosition((int) (kEncoderCPR * m_armSim.getPositionMeters( ) / kDrumCircumMeters));
-    m_motorSim.setQuadratureVelocity((int) (kEncoderCPR * (m_armSim.getVelocityMetersPerSecond( ) / kDrumCircumMeters) / 10));
+    m_motorSim.setQuadratureRawPosition((int) (kEncoderCPR * m_elevatorSim.getPositionMeters( ) / kDrumCircumMeters));
+    m_motorSim
+        .setQuadratureVelocity((int) (kEncoderCPR * (m_elevatorSim.getVelocityMetersPerSecond( ) / kDrumCircumMeters) / 10));
 
     // SimBattery estimates loaded battery voltages
-    RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_armSim.getCurrentDrawAmps( )));
+    RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_elevatorSim.getCurrentDrawAmps( )));
 
     SmartDashboard.putNumber("2-motorVolts", m_motorSim.getMotorOutputLeadVoltage( ));    // Voltage applied to motor
-    SmartDashboard.putNumber("3-armPos", m_armSim.getPositionMeters( ));                  // Get elevator position from simulation (meters)
-    SmartDashboard.putNumber("4-armVel", m_armSim.getVelocityMetersPerSecond( ));         // Get elevator velocity from simulation (mps)
+    SmartDashboard.putNumber("3-armPos", m_elevatorSim.getPositionMeters( ));             // Get elevator position from simulation (meters)
+    SmartDashboard.putNumber("4-armVel", m_elevatorSim.getVelocityMetersPerSecond( ));    // Get elevator velocity from simulation (mps)
     SmartDashboard.putNumber("5-Rotations", getEncoderPosition( ));                       // Output shaft distance (rotations)
-    SmartDashboard.putNumber("6-Velocity", getEncoderVelocity( ));                            // Output shaft velocity (rps)
+    SmartDashboard.putNumber("6-Velocity", getEncoderVelocity( ));                        // Output shaft velocity (rps)
     SmartDashboard.putNumber("7-normError", m_motor.getClosedLoopError( ) / kEncoderCPR); // Normalized error in shaft rotations 
+    SmartDashboard.putNumber("8-setpoint", m_motor.getSelectedSensorPosition( )); // Normalized error in shaft rotations 
+    SmartDashboard.putNumber("9-encoder", m_motor.getClosedLoopTarget( ));        // Normalized error in shaft rotations 
   }
 
   /**
@@ -159,7 +162,7 @@ public class ExampleSmartMotorController implements MotorController
     }
 
     // Talon SRX is before gearbox, but CTRE mag encoder is after it (multiply by gear ratio)
-    m_motor.set(controlMode, rotationsToCounts(setpoint) * kGearRatio);
+    m_motor.set(controlMode, rotationsToCounts(setpoint));
   }
 
   /**
@@ -209,7 +212,7 @@ public class ExampleSmartMotorController implements MotorController
   @Override
   public void set(double percentOutput)
   {
-    m_motor.set(ControlMode.PercentOutput, percentOutput);
+    // m_motor.set(ControlMode.PercentOutput, percentOutput);
   }
 
   /**

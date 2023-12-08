@@ -14,11 +14,11 @@ public class Robot extends TimedRobot
 {
   private final static double                       kDt           = 0.020;  // 20 msec per RoboRIO loop
 
-  private final static double                       kv            = 2.0;    // Max velocity - RPS
-  private final static double                       ka            = 8.0;    // Max acceleration - RPS^2
+  private final static double                       kv            = 8.0;    // Max velocity - RPS
+  private final static double                       ka            = 16.0;   // Max acceleration - RPS^2
 
-  private final static double                       goal_1        = 0.0;  // Goal 1 position
-  private final static double                       goal_2        = 0.5;  // Goal 2 position
+  private final static double                       goal_1        = 0.0;    // Goal 1 position
+  private final static double                       goal_2        = 0.5;    // Goal 2 position
 
   private final static XboxController               m_controller  = new XboxController(1);
   private final static ExampleSmartMotorController  m_motor       = new ExampleSmartMotorController(5);
