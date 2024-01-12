@@ -41,9 +41,12 @@ public class AutoPreload extends SequentialCommandGroup
 
         new PrintCommand(getName() + ": Holding Game Piece"), 
         new GripperRun(gripper, GRMode.GR_ACQUIRE),
-        new WaitCommand(0.25),
+        new WaitCommand(0.5),
 
-        new GripperRun(gripper, GRMode.GR_HOLD),  
+        //new GripperRun(gripper, GRMode.GR_HOLD), 
+        
+        new PrintCommand(getName() + "Move Arm to Idle"),
+        new ArmSetHeightIdle(elbow, extension, wrist),
 
         new PrintCommand(getName() + ": Move Elbow for Preload"),   
         new ElbowMoveToPosition(elbow, ELConsts.kAngleScoreHigh).asProxy(),

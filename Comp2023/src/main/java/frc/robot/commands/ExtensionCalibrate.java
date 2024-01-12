@@ -15,7 +15,7 @@ public class ExtensionCalibrate extends CommandBase
 {
   private Timer               m_calibrateTimer = new Timer( );
   private Extension           m_extension;
-  private static final double kTimeout         = 0.5;
+  private static final double kTimeout         = 0.4;
 
   public ExtensionCalibrate(Extension extension)
   {

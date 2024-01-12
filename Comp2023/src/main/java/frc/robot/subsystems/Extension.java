@@ -15,6 +15,7 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
@@ -69,6 +70,7 @@ public class Extension extends SubsystemBase
 
   private double                    m_currentInches   = 0.0; // Current length in inches
   private double                    m_targetInches    = 0.0; // Target length in inches
+  private int                       m_hardStopCounter = 0;
   private Debouncer                 m_withinTolerance = new Debouncer(0.060, DebounceType.kRising);
   private boolean                   m_moveIsFinished;        // Movement has completed (within tolerance)
 
@@ -287,6 +289,7 @@ public class Extension extends SubsystemBase
   public void moveToPositionInit(double newLength, double elbowAngle, boolean holdPosition)
   {
     m_safetyTimer.restart( );
+    m_hardStopCounter = 0;
 
     if (holdPosition)
       newLength = getCurrentInches( );
@@ -327,11 +330,14 @@ public class Extension extends SubsystemBase
 
   public boolean moveToPositionIsFinished( )
   {
-    boolean timedOut = m_safetyTimer.hasElapsed(2);//EXConsts.kMMSafetyTimeoutRatio); //TODO: check
+    boolean timedOut = m_safetyTimer.hasElapsed(1.25);//EXConsts.kMMSafetyTimeoutRatio); //TODO: check
     double error = m_targetInches - m_currentInches;
+    boolean hittingHardStop = (m_targetInches <= 0.0) && (m_currentInches <= 1.0) && (m_hardStopCounter++ >= 10);
 
-    if (m_withinTolerance.calculate(Math.abs(error) < EXConsts.kToleranceInches) || timedOut)
+    if (m_withinTolerance.calculate(Math.abs(error) < EXConsts.kToleranceInches) || timedOut || hittingHardStop)
     {
+      if (hittingHardStop)
+        DataLogManager.log(String.format("%s - HITTINGHARDSTOP: %s", getSubsystem( ), hittingHardStop));
       if (!m_moveIsFinished)
         DataLogManager.log(String.format("%s: Position move finished - Current inches: %.1f (error %.1f) - Time: %.3f %s",
             getSubsystem( ), m_currentInches, error, m_safetyTimer.get( ), (timedOut) ? "- TIMED OUT!" : ""));
